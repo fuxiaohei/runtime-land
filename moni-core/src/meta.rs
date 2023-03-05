@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn to_file() {
         let manifest = Meta::from_file("../tests/data/meta.toml").unwrap();
-        manifest.to_file("../tests/data/metadata2.toml").unwrap();
+        manifest.to_file("../tests/data/meta2.toml").unwrap();
         let manifest2 = Meta::from_file("../tests/data/meta2.toml").unwrap();
         assert_eq!(manifest.manifest, manifest2.manifest);
         assert_eq!(manifest.name, manifest2.name);

@@ -13,3 +13,6 @@
 # Added by cargo
 
 /target
+
+# Local demo
+/demo
