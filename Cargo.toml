@@ -8,6 +8,7 @@ authors = { workspace = true }
 members = [
     "examples/rust-basic",
     "examples/rust-fetch",
+    "examples/rust-router",
     "moni-cli",
     "moni-core",
     "moni-runtime",
@@ -55,4 +56,3 @@ wasi-host = { git = "https://github.com/bytecodealliance/preview2-prototyping", 
 wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 async-trait = "0.1.66"
-

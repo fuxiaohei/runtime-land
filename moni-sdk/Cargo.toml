@@ -7,6 +7,8 @@ authors = { workspace = true }
 [dependencies]
 bytes = { workspace = true }
 http = { workspace = true }
+lazy_static = { workspace = true }
+matchit = "0.7.0"
 moni-sdk-macro = { path = "./macro" }
 wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen" }
 

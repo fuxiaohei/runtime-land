@@ -1,0 +1,8 @@
+manifest = "v1"
+name = "rust-router"
+description = "example rust project with router"
+authors = []
+language = "rust"
+
+[build]
+rust_target_dir = "../../target"

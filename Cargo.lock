@@ -1096,6 +1096,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "matchit"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b87248edafb776e59e6ee64a79086f65890d3510f2c656c000bf2a7e8a0aea40"
+
+[[package]]
 name = "maybe-owned"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1207,6 +1213,8 @@ version = "0.1.1"
 dependencies = [
  "bytes",
  "http",
+ "lazy_static",
+ "matchit",
  "moni-sdk-macro",
  "wit-bindgen",
 ]
@@ -1683,6 +1691,17 @@ dependencies = [
 
 [[package]]
 name = "rust-fetch"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "http",
+ "moni-sdk",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "rust-router"
 version = "0.1.0"
 dependencies = [
  "anyhow",

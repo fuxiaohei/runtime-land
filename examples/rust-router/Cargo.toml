@@ -1,0 +1,14 @@
+[package]
+name = "rust-router"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.69"
+bytes = "1.4.0"
+http = "0.2.9"
+moni-sdk = { path = "../../moni-sdk" }
+wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen" }
+
+[lib]
+crate-type = ["cdylib"]

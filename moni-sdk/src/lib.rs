@@ -1,4 +1,5 @@
 mod fetch;
+mod router;
 
 pub mod http {
     use bytes::Bytes;
@@ -14,6 +15,10 @@ pub mod http {
 
     pub type Error = super::fetch::FetchError;
     pub use super::fetch::{fetch, FetchOptions, RedirectPolicy};
+
+    pub mod router {
+        pub use crate::router::*;
+    }
 }
 
 /// Re-export macro from sdk-macro
