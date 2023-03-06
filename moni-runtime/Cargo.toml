@@ -1,0 +1,20 @@
+[package]
+name = "moni-runtime"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+wit-bindgen-core = { workspace = true }
+wit-bindgen-rust = { workspace = true }
+wit-component = { workspace = true }
+wit-parser = { workspace = true }
+tracing = { workspace = true }
+which = "4.4.0"
+wasmtime = { workspace = true }
+wasi-host = { workspace = true }
+wasi-cap-std-sync = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -9,6 +9,7 @@ anyhow = { workspace = true }
 bincode = { workspace = true }
 clap = { workspace = true }
 moni-core = { path = "../moni-core" }
+moni-runtime = { path = "../moni-runtime" }
 rust-embed = "6.6.0"
 serde = { workspace = true }
 tokio = { workspace = true }

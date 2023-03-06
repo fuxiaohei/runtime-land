@@ -1,14 +1,15 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use bytes::Bytes;
+use moni_sdk::http::{Request, Response};
+use moni_sdk::http_main;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[http_main]
+pub fn handle_sdk_http(mut req: Request) -> Response {
+    let url = req.uri().clone();
+    let method = req.method().to_string().to_uppercase();
+    http::Response::builder()
+        .status(200)
+        .header("X-Request-Url", url.to_string())
+        .header("X-Request-Method", method)
+        .body(Bytes::from("Hello, World"))
+        .unwrap()
 }

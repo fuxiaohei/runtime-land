@@ -1,0 +1,10 @@
+[package]
+name = "moni-sdk"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+http = { workspace = true }
+bytes = { workspace = true }
+moni-sdk-macro = { path = "./macro" }

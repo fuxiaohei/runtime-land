@@ -1,0 +1,39 @@
+interface http-handler-exports {
+    // HTTP Status Codes
+    type http-status = u16
+
+    // HTTP Request Methods, use uppercase
+    type http-method = string
+
+    // HTTP Request Headers
+    type http-headers = list<tuple<string, string>>
+
+    // HTTP Request Body
+    type http-body = list<u8>
+
+    // HTTP URI
+    type http-uri = string
+
+    // HTTP Request
+    record request{
+        method: http-method,
+        uri: http-uri,
+        headers: http-headers,
+        body: option<http-body>
+    }
+
+    // HTTP Response
+    record response{
+        status: http-status,
+        headers: http-headers,
+        body: option<http-body>
+    }
+
+    // handle request function
+    handle-request: func(req: request) -> response
+}
+
+// export http-handler
+default world http-handler {
+    export http-handler: self.http-handler-exports
+}
