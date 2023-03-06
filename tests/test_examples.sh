@@ -3,22 +3,24 @@
 set -e
 set -o pipefail
 
-cmd="target/release/moni-serverless"
+pwd=$(pwd)
+
+cmd="$pwd/target/release/moni-serverless"
 echo -e "build runner:"
 cargo build --release
 
-cli="target/release/moni-cli"
+cli="$pwd/target/release/moni-cli"
 echo -e "build cli:"
 cargo build -p moni-cli --release
 
 echo -e "rust-basic:"
-cargo build -p rust-basic --target wasm32-wasi --release && $cmd rust-basic
+(cd examples/rust-basic && $cli build) && $cmd rust-basic
 
 echo -e "rust-fetch:"
-cargo build -p rust-fetch --target wasm32-wasi --release && $cmd rust-fetch
+(cd examples/rust-fetch && $cli build) && $cmd rust-fetch
 
-echo -e "\nrust-router:"
-cargo build -p rust-router --target wasm32-wasi --release
+echo -e "rust-router:"
+(cd examples/rust-router && $cli build) 
 $cmd rust-router --url=/hello
 $cmd rust-router --url=/foo/bar
 $cmd rust-router --url=/params/666
