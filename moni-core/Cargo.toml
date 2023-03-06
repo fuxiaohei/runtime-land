@@ -15,3 +15,6 @@ tracing-subscriber = { workspace = true }
 
 [build-dependencies]
 vergen = "7.5.1"
+
+[lib]
+doctest = false

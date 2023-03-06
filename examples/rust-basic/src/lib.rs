@@ -3,7 +3,7 @@ use moni_sdk::http::{Request, Response};
 use moni_sdk::http_main;
 
 #[http_main]
-pub fn handle_sdk_http(mut req: Request) -> Response {
+pub fn handle_http_request(mut req: Request) -> Response {
     let url = req.uri().clone();
     let method = req.method().to_string().to_uppercase();
     http::Response::builder()

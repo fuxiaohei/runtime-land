@@ -1,7 +1,6 @@
 mod meta;
 pub use meta::Meta;
 pub use meta::MetadataBuild;
-pub use meta::MetadataDeploy;
 pub use meta::DEFAULT_METADATA_FILE;
 
 use lazy_static::lazy_static;

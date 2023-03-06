@@ -1,3 +1,4 @@
+use crate::host_call::fetch_impl::{http_fetch, FetchCtx};
 use crate::host_call::http_impl;
 use anyhow::Result;
 use wasi_cap_std_sync::WasiCtxBuilder;
@@ -6,18 +7,31 @@ use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, Store};
 
 pub struct Context {
-    wasi: WasiCtx,
+    wasi_ctx: WasiCtx,
+    fetch_ctx: FetchCtx,
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Context {
     pub fn new() -> Self {
         Context {
-            wasi: WasiCtxBuilder::new().inherit_stdio().build(),
+            wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build(),
+            fetch_ctx: FetchCtx::new(1),
         }
     }
     /// get wasi
     pub fn wasi(&mut self) -> &mut WasiCtx {
-        &mut self.wasi
+        &mut self.wasi_ctx
+    }
+
+    /// get fetch ctx
+    pub fn fetch(&mut self) -> &mut FetchCtx {
+        &mut self.fetch_ctx
     }
 }
 
@@ -47,6 +61,8 @@ impl Worker {
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
         wasi_host::add_to_linker(&mut linker, Context::wasi)?;
+        http_fetch::add_to_linker(&mut linker, Context::fetch)?;
+
         Ok(Self {
             _path: path.to_string(),
             engine,

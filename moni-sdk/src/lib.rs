@@ -1,3 +1,5 @@
+mod fetch;
+
 pub mod http {
     use bytes::Bytes;
 
@@ -9,6 +11,9 @@ pub mod http {
         *response.status_mut() = status;
         response
     }
+
+    pub type Error = super::fetch::FetchError;
+    pub use super::fetch::{fetch, FetchOptions, RedirectPolicy};
 }
 
 /// Re-export macro from sdk-macro

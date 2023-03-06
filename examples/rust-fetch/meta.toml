@@ -1,0 +1,8 @@
+manifest = "v1"
+name = "rust-fetch"
+description = "example rust project with fetch remote resource"
+authors = []
+language = "rust"
+
+[build]
+rust_target_dir = "../../target"

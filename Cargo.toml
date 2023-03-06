@@ -6,12 +6,13 @@ authors = { workspace = true }
 
 [workspace]
 members = [
+    "examples/rust-basic",
+    "examples/rust-fetch",
     "moni-cli",
     "moni-core",
     "moni-runtime",
     "moni-sdk",
     "moni-sdk/macro",
-    "examples/rust-basic",
 ]
 
 [workspace.package]
@@ -21,12 +22,14 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [dependencies]
 clap = { workspace = true }
+moni-runtime = { path = "moni-runtime" }
 tokio = { workspace = true }
 
 [build-dependencies]
 moni-runtime = { path = "moni-runtime" }
 
 [workspace.dependencies]
+reqwest = "0.11.14"
 clap = { version = "4.1.8", features = ["derive"] }
 tokio = { version = "1.26.0", features = ["full"] }
 serde = { version = "1.0.152", features = ["derive"] }
@@ -50,3 +53,6 @@ wit-parser = "0.6.2"
 wasmtime = { version = "6.0.0", features = ["component-model", "async"] }
 wasi-host = { git = "https://github.com/bytecodealliance/preview2-prototyping", package = "host" }
 wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
+deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
+async-trait = "0.1.66"
+

@@ -5,6 +5,10 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-http = { workspace = true }
 bytes = { workspace = true }
+http = { workspace = true }
 moni-sdk-macro = { path = "./macro" }
+wit-bindgen = { git = "https://github.com/bytecodealliance/wit-bindgen" }
+
+[lib]
+doctest = false

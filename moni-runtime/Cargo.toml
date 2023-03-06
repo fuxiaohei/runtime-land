@@ -6,15 +6,22 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+async-trait = { workspace = true }
+deadpool = { workspace = true }
+reqwest ={ workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+wasi-cap-std-sync = { workspace = true }
+wasi-host = { workspace = true }
+wasmtime = { workspace = true }
+which = "4.4.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-component = { workspace = true }
 wit-parser = { workspace = true }
-tracing = { workspace = true }
-which = "4.4.0"
-wasmtime = { workspace = true }
-wasi-host = { workspace = true }
-wasi-cap-std-sync = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true }
+
+[lib]
+doctest = false

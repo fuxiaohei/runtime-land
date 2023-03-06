@@ -15,30 +15,12 @@ pub struct Meta {
     pub language: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub build: Option<MetadataBuild>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub deploy: Option<MetadataDeploy>,
 }
 
 /// MetadataBuild is the build section of the Meta
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MetadataBuild {
     pub rust_target_dir: Option<String>,
-}
-
-// MetadataDeploy is the deploy section of the Meta
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MetadataDeploy {
-    pub trigger: String,
-    pub route_base: Option<String>,
-}
-
-impl Default for MetadataDeploy {
-    fn default() -> Self {
-        Self {
-            trigger: "http".to_string(),
-            route_base: Some("/*path".to_string()),
-        }
-    }
 }
 
 impl Meta {
@@ -50,9 +32,6 @@ impl Meta {
         // fill value to default for Option<T>
         if manifest.build.is_none() {
             manifest.build = Some(MetadataBuild::default());
-        }
-        if manifest.deploy.is_none() {
-            manifest.deploy = Some(MetadataDeploy::default());
         }
 
         Ok(manifest)
@@ -106,15 +85,6 @@ impl Meta {
             return "dist/".to_string();
         }
         "src/".to_string()
-    }
-
-    /// get route base
-    pub fn get_route_base(&self) -> String {
-        self.deploy
-            .clone()
-            .unwrap_or_default()
-            .route_base
-            .unwrap_or_else(|| "/*path".to_string())
     }
 }
 
