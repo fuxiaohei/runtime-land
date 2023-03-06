@@ -3,6 +3,7 @@ use clap::Parser;
 mod embed;
 mod env;
 mod flags;
+mod server;
 
 /// cli command line
 #[derive(Parser)]

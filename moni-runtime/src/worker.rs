@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::host_call::fetch_impl::{http_fetch, FetchCtx};
 use crate::host_call::http_impl;
 use anyhow::Result;
@@ -44,10 +46,16 @@ fn create_wasmtime_config() -> Config {
 
 /// Worker is used to run wasm component
 pub struct Worker {
-    _path: String,
+    path: String,
     engine: Engine,
     // component: Component,
     instance_pre: InstancePre<Context>,
+}
+
+impl Debug for Worker {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Worker").field("path", &self.path).finish()
+    }
 }
 
 impl Worker {
@@ -64,7 +72,7 @@ impl Worker {
         http_fetch::add_to_linker(&mut linker, Context::fetch)?;
 
         Ok(Self {
-            _path: path.to_string(),
+            path: path.to_string(),
             engine,
             instance_pre: linker.instantiate_pre(&component)?,
         })

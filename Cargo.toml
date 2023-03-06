@@ -56,3 +56,7 @@ wasi-host = { git = "https://github.com/bytecodealliance/preview2-prototyping", 
 wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 async-trait = "0.1.66"
+axum = "0.6.10"
+once_cell = "1.17.1"
+hyper = { version = "0.14.24", features = ["full"] }
+

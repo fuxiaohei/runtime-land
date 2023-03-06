@@ -1,7 +1,7 @@
 use clap::Args;
 use moni_core::{Meta, DEFAULT_METADATA_FILE};
 use std::path::{Path, PathBuf};
-use tracing::{debug, error, info};
+use tracing::{debug, debug_span, error, info, Instrument};
 
 /// Command Init
 #[derive(Args, Debug)]
@@ -150,7 +150,15 @@ pub struct Serve {
 
 impl Serve {
     pub async fn run(&self) {
-        println!("Serve: {self:?}");
+        debug!("Serve: {self:?}");
+
+        let meta = Meta::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
+        debug!("Meta: {meta:?}");
+
+        crate::server::start(self.addr.unwrap(), &meta)
+            .instrument(debug_span!("[Http]"))
+            .await
+            .unwrap();
     }
 }
 
