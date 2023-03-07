@@ -1,4 +1,18 @@
 use clap::Parser;
+use moni_core::keyvalue::SledStorage;
+use moni_runtime::Context;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+
+/// get_default_kv_db returns default kv db path
+pub fn get_default_kv_db() -> String {
+    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+    std::path::Path::new(&home)
+        .join(".moni_keyvalue_db")
+        .to_str()
+        .unwrap()
+        .to_string()
+}
 
 #[derive(Parser, Debug)]
 struct CliArgs {
@@ -41,7 +55,12 @@ async fn main() {
         body: None,
     };
 
-    let resp = worker.handle_request(req).await.unwrap();
+    let kvdb = SledStorage::new(&get_default_kv_db()).unwrap();
+    let provider = Arc::new(Mutex::new(kvdb));
+    let mut context = Context::new();
+    context.set_kv_provider(provider);
+
+    let resp = worker.handle_request(req, context).await.unwrap();
     println!("-----\nstatus, {:?}", resp.status);
     for (key, value) in resp.headers {
         println!("header\t, {key}: {value}");

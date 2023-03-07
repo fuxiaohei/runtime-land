@@ -8,6 +8,7 @@ authors = { workspace = true }
 members = [
     "examples/rust-basic",
     "examples/rust-fetch",
+    "examples/rust-kv",
     "examples/rust-router",
     "moni-cli",
     "moni-core",
@@ -23,6 +24,7 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [dependencies]
 clap = { workspace = true }
+moni-core = { path = "moni-core" }
 moni-runtime = { path = "moni-runtime" }
 tokio = { workspace = true }
 
@@ -59,4 +61,3 @@ async-trait = "0.1.66"
 axum = "0.6.10"
 once_cell = "1.17.1"
 hyper = { version = "0.14.24", features = ["full"] }
-

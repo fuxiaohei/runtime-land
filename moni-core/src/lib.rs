@@ -49,3 +49,5 @@ lazy_static! {
 pub fn get_version() -> &'static str {
     &VERSION
 }
+
+pub mod keyvalue;

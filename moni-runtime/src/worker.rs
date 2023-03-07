@@ -2,6 +2,7 @@ use std::fmt::Debug;
 
 use crate::host_call::fetch_impl::{http_fetch, FetchCtx};
 use crate::host_call::http_impl;
+use crate::host_call::kv_impl::{kv_storage, KvCtx, Provider};
 use anyhow::Result;
 use wasi_cap_std_sync::WasiCtxBuilder;
 use wasi_host::WasiCtx;
@@ -11,6 +12,7 @@ use wasmtime::{Config, Engine, Store};
 pub struct Context {
     wasi_ctx: WasiCtx,
     fetch_ctx: FetchCtx,
+    kv_ctx: Option<KvCtx>,
 }
 
 impl Default for Context {
@@ -24,8 +26,14 @@ impl Context {
         Context {
             wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build(),
             fetch_ctx: FetchCtx::new(1),
+            kv_ctx: None,
         }
     }
+    /// set kv provider
+    pub fn set_kv_provider(&mut self, provider: Provider) {
+        self.kv_ctx = Some(KvCtx::new(provider));
+    }
+
     /// get wasi
     pub fn wasi(&mut self) -> &mut WasiCtx {
         &mut self.wasi_ctx
@@ -34,6 +42,11 @@ impl Context {
     /// get fetch ctx
     pub fn fetch(&mut self) -> &mut FetchCtx {
         &mut self.fetch_ctx
+    }
+
+    /// get kv ctx
+    pub fn kv(&mut self) -> &mut KvCtx {
+        self.kv_ctx.as_mut().unwrap()
     }
 }
 
@@ -70,6 +83,7 @@ impl Worker {
         let mut linker: Linker<Context> = Linker::new(&engine);
         wasi_host::add_to_linker(&mut linker, Context::wasi)?;
         http_fetch::add_to_linker(&mut linker, Context::fetch)?;
+        kv_storage::add_to_linker(&mut linker, Context::kv)?;
 
         Ok(Self {
             path: path.to_string(),
@@ -82,9 +96,10 @@ impl Worker {
     pub async fn handle_request(
         &mut self,
         req: http_impl::http_handler::Request<'_>,
+        context: Context,
     ) -> Result<http_impl::http_handler::Response> {
         // create store
-        let mut store = Store::new(&self.engine, Context::new());
+        let mut store = Store::new(&self.engine, context);
 
         // get exports and call handle_request
         let (exports, _instance) =
@@ -99,7 +114,7 @@ impl Worker {
 
 #[cfg(test)]
 mod tests {
-    use super::Worker;
+    use super::{Context, Worker};
     use crate::host_call::http_impl::http_handler::Request;
 
     #[tokio::test]
@@ -116,7 +131,7 @@ mod tests {
                 body: Some("xxxyyy".as_bytes()),
             };
 
-            let resp = worker.handle_request(req).await.unwrap();
+            let resp = worker.handle_request(req, Context::new()).await.unwrap();
             assert_eq!(resp.status, 200);
             assert_eq!(resp.body, Some("Hello, World".as_bytes().to_vec()));
 

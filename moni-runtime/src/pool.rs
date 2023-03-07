@@ -48,6 +48,7 @@ pub fn create_pool(path: &str) -> Result<WorkerPool> {
 #[cfg(test)]
 mod tests {
     use crate::host_call::http_impl::http_handler::Request;
+    use crate::Context;
 
     #[tokio::test]
     async fn run_worker_pool_test() {
@@ -70,7 +71,7 @@ mod tests {
                 body: Some("xxxyyy".as_bytes()),
             };
 
-            let resp = worker.handle_request(req).await.unwrap();
+            let resp = worker.handle_request(req, Context::new()).await.unwrap();
             assert_eq!(resp.status, 200);
             assert_eq!(resp.body, Some("Hello, World".as_bytes().to_vec()));
 

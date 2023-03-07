@@ -8,6 +8,8 @@ pub use worker::{Context, Worker};
 
 mod host_call;
 pub use host_call::http_impl;
+pub use host_call::kv_impl;
+pub use host_call::fetch_impl;
 
 mod pool;
 pub use pool::create_pool;

@@ -5,15 +5,33 @@ use axum::{
     routing::any,
     Router,
 };
+use moni_core::keyvalue::SledStorage;
 use moni_core::Meta;
 use moni_runtime::http_impl::http_handler::{Request as HostRequest, Response as HostResponse};
-use moni_runtime::WorkerPool;
-use once_cell::sync::OnceCell;
+use moni_runtime::kv_impl::Provider;
+use moni_runtime::{Context, WorkerPool};
+use once_cell::sync::{Lazy, OnceCell};
 use std::net::SocketAddr;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 use tracing::info;
 
 /// WASM_POOL is a global wasm worker pool
 static WASM_POOL: OnceCell<WorkerPool> = OnceCell::new();
+
+/// KV_STORAGE is global kv storage for local cli
+static KV_STORAGE: Lazy<Provider> =
+    Lazy::new(|| Arc::new(Mutex::new(SledStorage::new(&get_default_kv_db()).unwrap())));
+
+/// get_default_kv_db returns default kv db path
+pub fn get_default_kv_db() -> String {
+    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+    std::path::Path::new(&home)
+        .join(".moni_keyvalue_db")
+        .to_str()
+        .unwrap()
+        .to_string()
+}
 
 /// start server
 pub async fn start(addr: SocketAddr, meta: &Meta) -> Result<()> {
@@ -60,8 +78,12 @@ async fn root(req: Request<Body>) -> Response<Body> {
         body: Some(&body_bytes),
     };
 
+    // create runtime context
+    let mut context = Context::new();
+    context.set_kv_provider(KV_STORAGE.clone());
+
     // call worker execute
-    let host_resp: HostResponse = worker.handle_request(host_req).await.unwrap();
+    let host_resp: HostResponse = worker.handle_request(host_req, context).await.unwrap();
 
     // convert host-call response to axum response
     let mut builder = Response::builder().status(host_resp.status);

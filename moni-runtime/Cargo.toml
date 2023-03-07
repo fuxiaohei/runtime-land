@@ -8,7 +8,8 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 deadpool = { workspace = true }
-reqwest ={ workspace = true }
+moni-core = { path = "../moni-core" }
+reqwest = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 wasi-cap-std-sync = { workspace = true }

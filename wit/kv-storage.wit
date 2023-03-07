@@ -1,0 +1,41 @@
+interface kv-storage-imports {
+	/// A key is a unique identifier for a value in storage.
+	type key = string
+
+    /// A value is a value of bytes.
+    type value = list<u8>
+
+    /// A key-value pair.
+    type pair = tuple<key, value>
+
+    /// kv operation errors
+    enum kv-error {
+        /// The key is not found.
+        key-not-found,
+        /// The key is invalid.
+        invalid-key,
+        /// The Key is too large.
+        key-too-large,
+        /// The Value is too large.
+        value-too-large,
+        /// Internal error.
+        internal-error,
+    }
+
+    /// get value by key
+    get: func(k: key) -> result<value,kv-error>
+
+    /// set value with expire time and value
+    set: func(k: key, v: value, expire: u64) -> result<_,kv-error>
+
+    /// delete key and value
+    delete: func(k: key) -> result<_,kv-error>
+
+    /// lists all keys and values
+    get-all: func() -> result<list<pair>,kv-error>
+}
+
+// import kv-storage
+default world kv-storage {
+    import kv-storage: self.kv-storage-imports
+}

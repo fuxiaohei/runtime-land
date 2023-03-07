@@ -24,3 +24,6 @@ echo -e "rust-router:"
 $cmd rust-router --url=/hello
 $cmd rust-router --url=/foo/bar
 $cmd rust-router --url=/params/666
+
+echo -e "rust-kv:"
+(cd examples/rust-kv && $cli build) && $cmd rust-kv
