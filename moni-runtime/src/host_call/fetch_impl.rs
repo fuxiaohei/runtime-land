@@ -46,7 +46,7 @@ impl TryFrom<http_fetch::RedirectPolicy> for redirect::Policy {
 }
 
 #[async_trait::async_trait]
-impl http_fetch::HttpFetch for FetchCtx {
+impl http_fetch::Host for FetchCtx {
     #[instrument(skip_all, name = "[Fetch]", level = "debug", fields(req_id = self.req_id, counter = self.counter))]
     async fn fetch(
         &mut self,
@@ -100,11 +100,11 @@ impl http_fetch::HttpFetch for FetchCtx {
 
 #[cfg(test)]
 mod tests {
+    use crate::fetch_impl::http_fetch::Host;
     use super::*;
 
     #[tokio::test]
     async fn run_fetch_impl() {
-        use http_fetch::HttpFetch;
         let mut fetch_impl = FetchCtx::new(0);
         let req = Request {
             method: "GET".to_string(),

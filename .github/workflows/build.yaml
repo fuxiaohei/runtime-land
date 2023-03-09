@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Build
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  build_all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "moni-serverless"
+      - name: Update local toolchain
+        run: |
+          rustup update stable
+          rustup component add clippy
+          rustup target add wasm32-wasi
+          cargo install wizer --all-features
+      - name: Toolchain info
+        run: |
+          cargo --version --verbose
+          rustc --version
+          cargo clippy --version
+          wizer --version
+      - name: Run examples
+        run: |
+          ./tests/test_examples.sh
+      - name: Run unit tests
+        run: |
+          cargo test --all --release

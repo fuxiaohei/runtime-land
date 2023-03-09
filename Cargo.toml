@@ -35,7 +35,7 @@ moni-runtime = { path = "moni-runtime" }
 reqwest = "0.11.14"
 clap = { version = "4.1.8", features = ["derive"] }
 tokio = { version = "1.26.0", features = ["full"] }
-serde = { version = "1.0.152", features = ["derive"] }
+serde = { version = "1.0.154", features = ["derive"] }
 anyhow = "1.0.69"
 bytes = "1.4.0"
 http = "0.2.9"
@@ -51,9 +51,12 @@ time = "0.3.20"
 lazy_static = "1.4.0"
 wit-bindgen-core = { git = "https://github.com/bytecodealliance/wit-bindgen" }
 wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen" }
-wit-component = "0.7.1"
-wit-parser = "0.6.2"
-wasmtime = { version = "6.0.0", features = ["component-model", "async"] }
+wit-component = "0.7.3"
+wit-parser = "0.6.4"
+wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", rev = "8d3a881b524d56498dfc71b65818b2abbeb1da44", features = [
+    "component-model",
+    "async"
+] }
 wasi-host = { git = "https://github.com/bytecodealliance/preview2-prototyping", package = "host" }
 wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }

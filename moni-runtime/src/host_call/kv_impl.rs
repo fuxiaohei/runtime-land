@@ -35,7 +35,7 @@ impl From<Error> for kv_storage::KvError {
 }
 
 #[async_trait::async_trait]
-impl kv_storage::KvStorage for KvCtx {
+impl kv_storage::Host for KvCtx {
     async fn get(
         &mut self,
         k: kv_storage::Key,
@@ -88,7 +88,7 @@ impl kv_storage::KvStorage for KvCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::host_call::kv_impl::kv_storage::KvStorage;
+    use crate::kv_impl::kv_storage::Host;
 
     #[tokio::test]
     async fn run_kv_storage_impl() {
