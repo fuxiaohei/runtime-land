@@ -27,3 +27,9 @@ $cmd rust-router --url=/params/666
 
 echo -e "rust-kv:"
 (cd examples/rust-kv && $cli build) && $cmd rust-kv
+
+echo -e "js-basic:"
+(cd examples/js-basic && $cli build) && $cmd js-basic
+
+echo -e "js-fetch:"
+(cd examples/js-fetch && $cli build) && $cmd js-fetch
