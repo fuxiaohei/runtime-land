@@ -63,4 +63,7 @@ deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 async-trait = "0.1.66"
 once_cell = "1.17.1"
 hyper = { version = "0.14.24", features = ["full"] }
-actix-web = "4.3.1"
+tonic = "0.8.3"
+tonic-build = "0.8.4"
+axum = "0.6.10"
+

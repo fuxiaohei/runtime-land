@@ -51,3 +51,4 @@ pub fn get_version() -> &'static str {
 }
 
 pub mod keyvalue;
+pub mod rpc;

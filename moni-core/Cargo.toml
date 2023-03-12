@@ -9,10 +9,12 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 bincode = { workspace = true }
 lazy_static = { workspace = true }
+prost = "0.11.8"
 serde = { workspace = true }
 sled = "0.34.7"
 time = { workspace = true }
 toml = { workspace = true }
+tonic = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
@@ -20,6 +22,7 @@ tracing-subscriber = { workspace = true }
 tokio = { workspace = true }
 
 [build-dependencies]
+tonic-build = { workspace = true }
 vergen = "7.5.1"
 
 [lib]

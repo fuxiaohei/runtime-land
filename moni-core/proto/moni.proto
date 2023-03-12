@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package moni;
+
+// LoginTokenRequest is the request message for the LoginByToken method.
+message LoginTokenRequest { string token = 1; }
+
+// LoginTokenResponse is the response message for the LoginByToken method.
+// it contains an jwt token generated from LoginTokenRequest.token
+message LoginTokenResponse { string jwt_token = 1; }
+
+service MoniRpcService {
+  // LoginByToken returns a jwt token generated from LoginTokenRequest.token
+  rpc LoginByToken(LoginTokenRequest) returns (LoginTokenResponse);
+}
