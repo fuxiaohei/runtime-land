@@ -1,10 +1,6 @@
+use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use anyhow::Result;
-use axum::{
-    body::Body,
-    http::{Request, Response},
-    routing::any,
-    Router,
-};
+use hyper::StatusCode;
 use moni_core::keyvalue::SledStorage;
 use moni_core::Meta;
 use moni_runtime::http_impl::http_handler::{Request as HostRequest, Response as HostResponse};
@@ -40,20 +36,20 @@ pub async fn start(addr: SocketAddr, meta: &Meta) -> Result<()> {
     WASM_POOL.set(pool).unwrap();
     info!("wasm pool created");
 
-    // build our application with a route
-    let app = Router::new()
-        .route("/", any(root))
-        .route("/*path", any(root));
-
+    // start actix-web http server
     info!("starting on {}", addr);
-
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await?;
+    HttpServer::new(|| {
+        App::new()
+            .wrap(middleware::Logger::default())
+            .default_service(web::to(default_handler))
+    })
+    .bind(&addr)?
+    .run()
+    .await?;
     Ok(())
 }
 
-async fn root(req: Request<Body>) -> Response<Body> {
+async fn default_handler(req: HttpRequest, req_body_bytes: web::Bytes) -> HttpResponse {
     let pool = WASM_POOL.get().expect("wasm pool not found");
     let mut worker = pool.get().await.expect("wasm worker not found");
 
@@ -66,10 +62,7 @@ async fn root(req: Request<Body>) -> Response<Body> {
 
     let url = req.uri().to_string();
     let method = req.method().clone();
-    let body_bytes = hyper::body::to_bytes(req.into_body())
-        .await
-        .unwrap()
-        .to_vec();
+    let body_bytes = req_body_bytes.to_vec();
 
     let host_req = HostRequest {
         method: method.as_str(),
@@ -86,9 +79,9 @@ async fn root(req: Request<Body>) -> Response<Body> {
     let host_resp: HostResponse = worker.handle_request(host_req, context).await.unwrap();
 
     // convert host-call response to axum response
-    let mut builder = Response::builder().status(host_resp.status);
+    let mut builder = HttpResponse::build(StatusCode::from_u16(host_resp.status).unwrap());
     for (k, v) in host_resp.headers {
-        builder = builder.header(k, v);
+        builder.insert_header((k.as_str(), v.as_str()));
     }
-    builder.body(Body::from(host_resp.body.unwrap())).unwrap()
+    builder.body(host_resp.body.unwrap())
 }
