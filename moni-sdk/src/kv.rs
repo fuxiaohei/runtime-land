@@ -1,4 +1,4 @@
-include!("../../wit/kv-storage.rs");
+include!("../../wit/kv_storage.rs");
 
 /// Key is the key of the key-value pair.
 pub type Key = String;

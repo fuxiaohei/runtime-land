@@ -1199,7 +1199,7 @@ dependencies = [
 
 [[package]]
 name = "moni-cli"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -1217,7 +1217,7 @@ dependencies = [
 
 [[package]]
 name = "moni-core"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1235,7 +1235,7 @@ dependencies = [
 
 [[package]]
 name = "moni-runtime"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1256,7 +1256,7 @@ dependencies = [
 
 [[package]]
 name = "moni-sdk"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "bytes",
  "http",
@@ -1268,7 +1268,7 @@ dependencies = [
 
 [[package]]
 name = "moni-sdk-macro"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1279,7 +1279,7 @@ dependencies = [
 
 [[package]]
 name = "moni-serverless"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "clap",
  "moni-core",

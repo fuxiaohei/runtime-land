@@ -33,3 +33,6 @@ echo -e "js-basic:"
 
 echo -e "js-fetch:"
 (cd examples/js-fetch && $cli build) && $cmd js-fetch
+
+echo -e "js-kv:"
+(cd examples/js-kv && $cli build) && $cmd js-kv
