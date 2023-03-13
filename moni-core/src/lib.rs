@@ -3,6 +3,11 @@ pub use meta::Meta;
 pub use meta::MetadataBuild;
 pub use meta::DEFAULT_METADATA_FILE;
 
+mod db;
+pub use db::init_db;
+pub use db::DbConfig;
+pub use db::DB;
+
 use lazy_static::lazy_static;
 use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::EnvFilter;
@@ -52,3 +57,4 @@ pub fn get_version() -> &'static str {
 
 pub mod keyvalue;
 pub mod rpc;
+pub mod dao;

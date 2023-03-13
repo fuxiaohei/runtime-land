@@ -1,4 +1,5 @@
 use anyhow::Result;
+use moni_core::DbConfig;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -17,6 +18,7 @@ impl Default for HttpConfig {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {
     pub http: HttpConfig,
+    pub db: DbConfig,
 }
 
 impl Config {

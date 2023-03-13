@@ -12,11 +12,14 @@ lazy_static = { workspace = true }
 prost = "0.11.8"
 serde = { workspace = true }
 sled = "0.34.7"
+sqlx = { version = "0.6.2", features = ["mysql", "runtime-tokio-native-tls"] }
 time = { workspace = true }
 toml = { workspace = true }
 tonic = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+once_cell = { workspace = true }
+jwt-simple = "0.11.4"
 
 [dev-dependencies]
 tokio = { workspace = true }

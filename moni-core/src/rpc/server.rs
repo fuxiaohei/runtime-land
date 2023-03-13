@@ -1,6 +1,7 @@
 use super::moni_rpc_service_server::{MoniRpcService, MoniRpcServiceServer};
+use crate::dao;
 use std::net::SocketAddr;
-use tracing::info;
+use tracing::{error, info};
 
 #[derive(Default)]
 pub struct ServiceImpl {}
@@ -9,9 +10,20 @@ pub struct ServiceImpl {}
 impl MoniRpcService for ServiceImpl {
     async fn login_by_token(
         &self,
-        _request: tonic::Request<super::LoginTokenRequest>,
+        request: tonic::Request<super::LoginTokenRequest>,
     ) -> Result<tonic::Response<super::LoginTokenResponse>, tonic::Status> {
-        todo!()
+        let token = request.into_inner().token;
+        match dao::user_token::create_jwt_token(&token).await {
+            Ok(token) => {
+                let mut response = super::LoginTokenResponse::default();
+                response.jwt_token = token;
+                Ok(tonic::Response::new(response))
+            }
+            Err(e) => {
+                error!("login_by_token error: {}, token: {}", e, &token);
+                Err(tonic::Status::internal("internal error".to_string()))
+            }
+        }
     }
 }
 
