@@ -1244,6 +1244,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "moni-backend"
+version = "0.1.2"
+dependencies = [
+ "anyhow",
+ "clap",
+ "moni-core",
+ "serde",
+ "tokio",
+ "toml 0.7.2",
+ "tracing",
+]
+
+[[package]]
 name = "moni-cli"
 version = "0.1.2"
 dependencies = [

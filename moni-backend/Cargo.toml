@@ -1,0 +1,14 @@
+[package]
+name = "moni-backend"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+clap = { workspace = true }
+moni-core = { path = "../moni-core" }
+tokio = { workspace = true }
+serde = { workspace = true }
+anyhow = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }

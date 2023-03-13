@@ -15,6 +15,7 @@ members = [
     "moni-runtime",
     "moni-sdk",
     "moni-sdk/macro",
+    "moni-backend",
 ]
 
 [workspace.package]
