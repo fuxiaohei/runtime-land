@@ -1,7 +1,9 @@
 use clap::Args;
-use moni_core::{Meta, DEFAULT_METADATA_FILE};
+use moni_core::{rpc, Meta, DEFAULT_METADATA_FILE};
 use std::path::{Path, PathBuf};
 use tracing::{debug, debug_span, error, info, Instrument};
+
+use crate::env::{get_metadata_env_file, CliEnv};
 
 /// Command Init
 #[derive(Args, Debug)]
@@ -167,11 +169,50 @@ impl Serve {
 pub struct Login {
     /// The user_token
     pub user_token: String,
+    /// The cloud api
+    #[clap(long, default_value("http://127.0.0.1:8779"))]
+    pub cloud: Option<String>,
 }
 
 impl Login {
     pub async fn run(&self) {
-        println!("Login: {self:?}");
+        use rpc::LoginTokenRequest;
+        use tonic::Request;
+
+        let mut client = match rpc::new_client(self.cloud.clone().unwrap()).await {
+            Ok(client) => client,
+            Err(e) => {
+                error!("Connect cloud failed: {:?}", e);
+                std::process::exit(1);
+            }
+        };
+
+        let request = Request::new(LoginTokenRequest {
+            token: self.user_token.clone(),
+        });
+        let response = match client.login_by_token(request).await {
+            Ok(response) => response,
+            Err(e) => {
+                error!("Login failed: {:?}", e);
+                std::process::exit(1);
+            }
+        };
+        debug!("Login response={:?}", response);
+        let env = CliEnv {
+            api_key: self.user_token.clone(),
+            api_jwt_token: response.into_inner().jwt_token.clone(),
+            api_host: self.cloud.clone().unwrap(),
+        };
+        let env_file = get_metadata_env_file();
+        match env.to_file(&env_file) {
+            Ok(_) => {
+                info!("Login success");
+            }
+            Err(e) => {
+                error!("Save logged env file failed: {:?}", e);
+                std::process::exit(1);
+            }
+        }
     }
 }
 

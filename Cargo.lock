@@ -1615,6 +1615,7 @@ dependencies = [
  "rust-embed",
  "serde",
  "tokio",
+ "tonic",
  "tracing",
 ]
 

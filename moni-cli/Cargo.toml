@@ -16,4 +16,5 @@ once_cell = { workspace = true }
 rust-embed = "6.6.0"
 serde = { workspace = true }
 tokio = { workspace = true }
+tonic = { workspace = true }
 tracing = { workspace = true }

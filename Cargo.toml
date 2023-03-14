@@ -10,12 +10,12 @@ members = [
     "examples/rust-fetch",
     "examples/rust-kv",
     "examples/rust-router",
+    "moni-backend",
     "moni-cli",
     "moni-core",
     "moni-runtime",
     "moni-sdk",
     "moni-sdk/macro",
-    "moni-backend",
 ]
 
 [workspace.package]

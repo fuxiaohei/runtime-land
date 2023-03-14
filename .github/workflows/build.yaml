@@ -21,12 +21,17 @@ jobs:
           rustup component add clippy
           rustup target add wasm32-wasi
           cargo install wizer --all-features
+      - name: Install protobuf
+        run: |
+          sudo apt update
+          sudo apt install -y protobuf-compiler libprotobuf-dev
       - name: Toolchain info
         run: |
           cargo --version --verbose
           rustc --version
           cargo clippy --version
           wizer --version
+          protoc --version
       - name: Run examples
         run: |
           ./tests/test_examples.sh
