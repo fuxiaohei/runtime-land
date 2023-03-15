@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, warn, info};
+use tracing::{debug, info, warn};
 
 mod config;
 
@@ -23,7 +23,7 @@ async fn main() {
         std::process::exit(1);
     }
 
-    let conf = config::Config::from_file(&conf_file).unwrap();
+    let conf = config::Config::from_file(conf_file).unwrap();
     debug!("load conf: {:?}", conf);
 
     // init db pool

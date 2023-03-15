@@ -14,12 +14,17 @@ once_cell = { workspace = true }
 prost = "0.11.8"
 serde = { workspace = true }
 sled = "0.34.7"
-sqlx = { version = "0.6.2", features = ["mysql", "runtime-tokio-native-tls"] }
+sqlx = { version = "0.6.2", features = [
+    "mysql",
+    "runtime-tokio-native-tls",
+    "time"
+] }
 time = { workspace = true }
 toml = { workspace = true }
 tonic = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+uuid = { version = "1.3.0", features = ["v4"] }
 
 [dev-dependencies]
 tokio = { workspace = true }

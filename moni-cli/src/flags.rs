@@ -1,9 +1,11 @@
+use crate::{
+    deploy,
+    env::{get_metadata_env_file, CliEnv},
+};
 use clap::Args;
 use moni_core::{rpc, Meta, DEFAULT_METADATA_FILE};
 use std::path::{Path, PathBuf};
 use tracing::{debug, debug_span, error, info, Instrument};
-
-use crate::env::{get_metadata_env_file, CliEnv};
 
 /// Command Init
 #[derive(Args, Debug)]
@@ -200,7 +202,7 @@ impl Login {
         debug!("Login response={:?}", response);
         let env = CliEnv {
             api_key: self.user_token.clone(),
-            api_jwt_token: response.into_inner().jwt_token.clone(),
+            api_jwt_token: response.into_inner().jwt_token,
             api_host: self.cloud.clone().unwrap(),
         };
         let env_file = get_metadata_env_file();
@@ -224,6 +226,7 @@ impl Deploy {
     pub async fn run(&self) {
         debug!("Deploy: {self:?}");
 
+        // read env
         let env_file = crate::env::get_metadata_env_file();
         debug!("Env file: {:?}", env_file);
         let env = match crate::env::CliEnv::from_file(&env_file) {
@@ -235,5 +238,11 @@ impl Deploy {
             }
         };
         debug!("Env: {:?}", env);
+
+        // read metadata from file
+        let meta = Meta::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
+
+        // call deploy
+        deploy::deploy(&env, &meta).await
     }
 }

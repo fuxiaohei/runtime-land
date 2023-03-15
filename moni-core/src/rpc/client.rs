@@ -38,7 +38,7 @@ impl Interceptor for ClientTokenInterceptor {
     fn call(&mut self, mut req: Request<()>) -> Result<Request<()>, Status> {
         let token_value = format!("Bearer {}:{}", self.token, self.jwt_token);
         let token: MetadataValue<_> = token_value.parse().unwrap();
-        req.metadata_mut().insert("Authorization", token);
+        req.metadata_mut().insert("authorization", token);
         Ok(req)
     }
 }
