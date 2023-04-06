@@ -1,0 +1,58 @@
+default interface http-types {
+
+    // HTTP Request Methods, use uppercase
+    type http-method = string
+
+    // HTTP Request Headers
+    type http-headers = list<tuple<string, string>>
+
+    // HTTP URI
+    type http-uri = string
+
+    // HTTP Request Body
+    type http-body-handle = u32
+
+    // HTTP Request
+    record request{
+        method: http-method,
+        uri: http-uri,
+        headers: http-headers,
+        body: option<http-body-handle>
+    }
+
+    // HTTP status
+    type http-status-code = u16
+
+    // HTTP Response
+    record response{
+        status: http-status-code,
+        headers: http-headers,
+        body: option<http-body-handle>
+    }
+
+    // This type enumerates the different kinds of errors that may occur when
+    // initially returning a response.
+    variant request-error {
+        invalid-url(string),
+        timeout-error(string),
+        protocol-error(string),
+        unexpected-error(string)
+    }
+
+    // Fetch redirect policy
+    enum redirect-policy {
+        // Follow redirects.
+        follow,
+        // Do not follow redirects.
+        error,
+        // Follow redirects, but do not follow redirects to cross-origin destinations.
+        manual,
+    }
+
+    // Additional optional parameters that can be set when making a request.
+    record request-options {
+        timeout-ms: option<u32>,
+        redirect-limit: option<u32>,
+        redirect: redirect-policy,
+    }
+}
