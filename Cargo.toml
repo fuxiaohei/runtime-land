@@ -10,20 +10,26 @@ authors = { workspace = true }
 moni-runtime = { path = "moni-runtime" }
 
 [workspace]
-members = ["moni-cli", "moni-lib", "moni-runtime"]
+members = ["moni-cli", "moni-lib", "moni-runtime", "moni-sdk"]
 
 [workspace.dependencies]
 anyhow = "1.0.70"
+async-trait = "0.1.68"
 clap = { version = "4.2.1", features = ["derive"] }
 lazy_static = "1.4.0"
+reqwest = "0.11.16"
+serde = { version = "1.0.159", features = ["derive"] }
 time = "0.3.20"
 tokio = { version = "1.27.0", features = ["full"] }
+toml = "0.7.3"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.16", features = [
     "time",
     "local-time",
     "env-filter"
 ] }
+wasi-cap-std-sync = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
+wasi-host = { git = "https://github.com/bytecodealliance/preview2-prototyping", package = "host" }
 wasmtime = { version = "7.0.0", features = ["component-model", "async"] }
 wit-bindgen = "0.4.0"
 wit-bindgen-core = "0.4.0"

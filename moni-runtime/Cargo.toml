@@ -6,6 +6,11 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+async-trait = { workspace = true }
+reqwest = { workspace = true }
+wasi-cap-std-sync = { workspace = true }
+wasi-host = { workspace = true }
+wasmtime = { workspace = true }
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-parser = { workspace = true }

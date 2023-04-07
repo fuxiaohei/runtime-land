@@ -55,4 +55,12 @@ default interface http-types {
         redirect-limit: option<u32>,
         redirect: redirect-policy,
     }
+
+    /// An error type returned from a body operation. Currently this
+    /// doesn't provide any additional information.
+    record body-error {}
+
+    /// http body operations
+    http-body-read: func(handle: http-body-handle, size: u64) -> result<tuple<list<u8>, bool>, body-error>
+    http-body-write: func(handle: http-body-handle, data: list<u8>) -> result<u64, body-error>
 }

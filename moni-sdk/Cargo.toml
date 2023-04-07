@@ -1,0 +1,7 @@
+[package]
+name = "moni-sdk"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]

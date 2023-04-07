@@ -1,0 +1,9 @@
+manifest = "v1"
+name = "rust-basic"
+description = "example rust project"
+authors = ["your-name"]
+language = "rust"
+
+[build]
+rust_target_dir = "./target"
+rust_enable_wasi = true
