@@ -6,20 +6,29 @@ authors = { workspace = true }
 
 [dependencies]
 
+[build-dependencies]
+moni-runtime = { path = "moni-runtime" }
+
 [workspace]
-members = ["moni-cli", "moni-lib"]
+members = ["moni-cli", "moni-lib", "moni-runtime"]
 
 [workspace.dependencies]
+anyhow = "1.0.70"
+clap = { version = "4.2.1", features = ["derive"] }
 lazy_static = "1.4.0"
 time = "0.3.20"
+tokio = { version = "1.27.0", features = ["full"] }
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.16", features = [
     "time",
     "local-time",
     "env-filter"
 ] }
-clap = { version = "4.2.1", features = ["derive"] }
-tokio = { version = "1.27.0", features = ["full"] }
+wasmtime = { version = "7.0.0", features = ["component-model", "async"] }
+wit-bindgen = "0.4.0"
+wit-bindgen-core = "0.4.0"
+wit-bindgen-rust = "0.4.0"
+wit-parser = "0.6.4"
 
 [workspace.package]
 version = "0.2.0"

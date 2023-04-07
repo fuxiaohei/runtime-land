@@ -1,3 +1,4 @@
 {
-    "rust-analyzer.showUnlinkedFileNotification": false
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "editor.fontFamily": "'Cascadia Mono', Menlo, Monaco, 'Courier New', monospace"
 }

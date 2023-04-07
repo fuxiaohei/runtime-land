@@ -1,0 +1,11 @@
+[package]
+name = "moni-runtime"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+wit-bindgen-core = { workspace = true }
+wit-bindgen-rust = { workspace = true }
+wit-parser = { workspace = true }
