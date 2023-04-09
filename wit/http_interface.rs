@@ -139,6 +139,7 @@ pub mod http_types {
     }
     impl std::error::Error for BodyError {}
     #[allow(clippy::all)]
+    /// http body operations
     pub fn http_body_read(
         handle: HttpBodyHandle,
         size: u64,

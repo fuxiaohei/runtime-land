@@ -5,7 +5,10 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
 clap = { workspace = true }
+futures-util = "0.3.28"
 moni-lib = { path = "../moni-lib" }
 tokio = { workspace = true }
 tracing = { workspace = true }

@@ -10,7 +10,13 @@ authors = { workspace = true }
 moni-runtime = { path = "moni-runtime" }
 
 [workspace]
-members = ["moni-cli", "moni-lib", "moni-runtime", "moni-sdk"]
+members = [
+    "examples/rust-impl"
+,
+    "moni-cli",
+    "moni-lib",
+    "moni-runtime",
+    "moni-sdk"]
 
 [workspace.dependencies]
 anyhow = "1.0.70"
@@ -35,6 +41,8 @@ wit-bindgen = "0.4.0"
 wit-bindgen-core = "0.4.0"
 wit-bindgen-rust = "0.4.0"
 wit-parser = "0.6.4"
+http = "0.2.9"
+axum = "0.6.12"
 
 [workspace.package]
 version = "0.2.0"
