@@ -10,5 +10,6 @@ axum = { workspace = true }
 clap = { workspace = true }
 futures-util = "0.3.28"
 moni-lib = { path = "../moni-lib" }
+moni-runtime = { path = "../moni-runtime" }
 tokio = { workspace = true }
 tracing = { workspace = true }

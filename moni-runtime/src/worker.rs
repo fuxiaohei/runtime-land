@@ -1,5 +1,6 @@
 use crate::host_call::{http_incoming, HttpImplContext, HttpInterface};
 use anyhow::Result;
+use axum::body::Body;
 use std::fmt::Debug;
 use wasi_cap_std_sync::WasiCtxBuilder;
 use wasi_host::WasiCtx;
@@ -33,6 +34,11 @@ impl Context {
     /// get http_impl_ctx
     pub fn http_impl_ctx(&mut self) -> &mut HttpImplContext {
         &mut self.http_impl_ctx
+    }
+
+    /// set body
+    pub fn set_body(&mut self, body: Body) -> u32 {
+        self.http_impl_ctx.set_body(body)
     }
 }
 

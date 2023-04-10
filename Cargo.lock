@@ -1220,6 +1220,7 @@ dependencies = [
  "clap",
  "futures-util",
  "moni-lib",
+ "moni-runtime",
  "tokio",
  "tracing",
 ]
@@ -1244,6 +1245,7 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "axum",
  "deadpool",
  "host",
  "reqwest",
@@ -1260,7 +1262,9 @@ dependencies = [
 name = "moni-sdk"
 version = "0.2.0"
 dependencies = [
+ "anyhow",
  "http",
+ "wit-bindgen",
 ]
 
 [[package]]
@@ -1268,6 +1272,7 @@ name = "moni-serverless"
 version = "0.2.0"
 dependencies = [
  "moni-runtime",
+ "once_cell",
 ]
 
 [[package]]

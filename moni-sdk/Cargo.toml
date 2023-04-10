@@ -6,3 +6,5 @@ authors = { workspace = true }
 
 [dependencies]
 http = { workspace = true }
+wit-bindgen = { workspace = true }
+anyhow = { workspace = true }

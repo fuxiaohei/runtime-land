@@ -60,7 +60,13 @@ default interface http-types {
     /// doesn't provide any additional information.
     record body-error {}
 
-    /// http body operations
+    /// Read http body bytes with size and eof flag
     http-body-read: func(handle: http-body-handle, size: u64) -> result<tuple<list<u8>, bool>, body-error>
+
+    /// Write http body bytes, return written bytes length
     http-body-write: func(handle: http-body-handle, data: list<u8>) -> result<u64, body-error>
+
+    /// Accquire http body and get http body handle
+    http-body-new: func() -> result<http-body-handle,body-error>
+    
 }
