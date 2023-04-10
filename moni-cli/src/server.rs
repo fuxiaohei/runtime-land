@@ -5,7 +5,7 @@ use axum::{
     routing::any,
     Router,
 };
-use moni_runtime::host_call::http_incoming::RequestParam;
+use moni_runtime::host_call::http_incoming::http_incoming::Request as WasmRequest;
 use moni_runtime::{Context, WorkerPool};
 use std::net::SocketAddr;
 use tokio::sync::OnceCell;
@@ -52,7 +52,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let mut context = Context::new();
     let body = req.into_body();
     let body_handle = context.set_body(body);
-    let wasm_req = RequestParam {
+    let wasm_req = WasmRequest {
         method: method.as_str(),
         uri: uri.as_str(),
         headers: &headers,

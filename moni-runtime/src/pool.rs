@@ -47,7 +47,7 @@ pub fn create_pool(path: &str) -> Result<WorkerPool> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{host_call::http_incoming::RequestParam, worker::Context};
+    use crate::{host_call::http_incoming::http_incoming::Request, worker::Context};
 
     #[tokio::test]
     async fn run_worker_pool_test() {
@@ -63,7 +63,7 @@ mod tests {
             let worker = worker.as_mut();
 
             let headers: Vec<(&str, &str)> = vec![];
-            let req = RequestParam {
+            let req = Request {
                 method: "GET",
                 uri: "/abc",
                 headers: &headers,

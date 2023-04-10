@@ -1,0 +1,43 @@
+interface http-incoming-exports {
+
+    // HTTP Request Methods, use uppercase
+    type http-method = string
+
+    // HTTP Request Headers
+    type http-headers = list<tuple<string, string>>
+
+    // HTTP Request Body
+    type http-body = list<u8>
+
+    // HTTP URI
+    type http-uri = string
+
+    // HTTP Request Body
+    type http-body-handle = u32
+
+    // HTTP Request
+    record request{
+        method: http-method,
+        uri: http-uri,
+        headers: http-headers,
+        body: option<http-body-handle>
+    }
+
+    // HTTP Status Codes
+    type http-status-code = u16
+
+    // HTTP Response
+    record response{
+        status: http-status-code,
+        headers: http-headers,
+        body: option<http-body-handle>
+    }
+
+    // handle request function
+    handle-request: func(req: request) -> response
+}
+
+// export http-incoming
+default world http-incoming {
+    export http-incoming: self.http-incoming-exports
+}

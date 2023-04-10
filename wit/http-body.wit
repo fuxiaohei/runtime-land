@@ -1,0 +1,22 @@
+interface http-body-iface {
+    // HTTP Request Body
+    type http-body-handle = u32
+
+    /// An error type returned from a body operation. Currently this
+    /// doesn't provide any additional information.
+    record body-error {}
+
+    /// Read http body bytes with size and eof flag
+    http-body-read: func(handle: http-body-handle, size: u64) -> result<tuple<list<u8>, bool>, body-error>
+
+    /// Write http body bytes, return written bytes length
+    http-body-write: func(handle: http-body-handle, data: list<u8>) -> result<u64, body-error>
+
+    /// Accquire http body and get http body handle
+    http-body-new: func() -> result<http-body-handle,body-error>
+}
+
+// import http-body
+default world http-body {
+    import http-body: self.http-body-iface
+}

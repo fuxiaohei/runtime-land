@@ -10,7 +10,11 @@ fn main() {
 
 fn build_wit_guest_code() {
     let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
-    let worlds = vec![("http-interface", "http_interface.rs")];
+    let worlds = vec![
+        ("http-incoming", "http_incoming.rs"),
+        ("http-outgoing", "http_outgoing.rs"),
+        ("http-body", "http_body.rs"),
+    ];
     for world in worlds {
         let outputs = generate_guest(
             wit_dir.clone(),

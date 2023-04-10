@@ -1,4 +1,5 @@
-use crate::host_call::{http_incoming, HttpImplContext, HttpInterface};
+use crate::host_call::{http_incoming, http_incoming::HttpIncoming, HttpContext};
+use crate::worker::http_incoming::http_incoming::{Request, Response};
 use anyhow::Result;
 use axum::body::Body;
 use std::fmt::Debug;
@@ -9,7 +10,7 @@ use wasmtime::{Config, Engine, Store};
 
 pub struct Context {
     wasi_ctx: WasiCtx,
-    http_impl_ctx: HttpImplContext,
+    http_ctx: HttpContext,
 }
 
 impl Default for Context {
@@ -22,7 +23,7 @@ impl Context {
     pub fn new() -> Self {
         Context {
             wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build(),
-            http_impl_ctx: HttpImplContext::new(1),
+            http_ctx: HttpContext::new(1),
         }
     }
 
@@ -31,14 +32,14 @@ impl Context {
         &mut self.wasi_ctx
     }
 
-    /// get http_impl_ctx
-    pub fn http_impl_ctx(&mut self) -> &mut HttpImplContext {
-        &mut self.http_impl_ctx
+    /// get http_ctx
+    pub fn http_ctx(&mut self) -> &mut HttpContext {
+        &mut self.http_ctx
     }
 
     /// set body
     pub fn set_body(&mut self, body: Body) -> u32 {
-        self.http_impl_ctx.set_body(body)
+        self.http_ctx.set_body(body)
     }
 }
 
@@ -74,7 +75,7 @@ impl Worker {
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
         wasi_host::command::add_to_linker(&mut linker, Context::wasi)?;
-        HttpInterface::add_to_linker(&mut linker, Context::http_impl_ctx)?;
+        // http_incoming::add_to_linker(&mut linker, Context::http_ctx)?;
 
         Ok(Self {
             path: path.to_string(),
@@ -84,17 +85,13 @@ impl Worker {
     }
 
     /// handle_request is used to handle http request
-    pub async fn handle_request(
-        &mut self,
-        req: http_incoming::RequestParam<'_>,
-        context: Context,
-    ) -> Result<http_incoming::Response> {
+    pub async fn handle_request(&mut self, req: Request<'_>, context: Context) -> Result<Response> {
         // create store
         let mut store = Store::new(&self.engine, context);
 
         // get exports and call handle_request
         let (exports, _instance) =
-            HttpInterface::instantiate_pre(&mut store, &self.instance_pre).await?;
+            HttpIncoming::instantiate_pre(&mut store, &self.instance_pre).await?;
         let resp = exports
             .http_incoming()
             .call_handle_request(&mut store, req)
@@ -106,7 +103,7 @@ impl Worker {
 #[cfg(test)]
 mod tests {
     use crate::{
-        host_call::http_incoming::RequestParam,
+        host_call::http_incoming::http_incoming::Request,
         worker::{Context, Worker},
     };
 
@@ -117,7 +114,7 @@ mod tests {
 
         for _ in 1..10 {
             let headers: Vec<(&str, &str)> = vec![];
-            let req = RequestParam {
+            let req = Request {
                 method: "GET",
                 uri: "/abc",
                 headers: &headers,
