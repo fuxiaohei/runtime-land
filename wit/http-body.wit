@@ -7,7 +7,10 @@ interface http-body-iface {
     record body-error {}
 
     /// Read http body bytes with size and eof flag
-    http-body-read: func(handle: http-body-handle, size: u64) -> result<tuple<list<u8>, bool>, body-error>
+    http-body-read: func(handle: http-body-handle) -> result<tuple<list<u8>, bool>, body-error>
+
+    /// Readall http body bytes with size and eof flag
+    http-body-read-all: func(handle: http-body-handle) -> result<list<u8>, body-error>
 
     /// Write http body bytes, return written bytes length
     http-body-write: func(handle: http-body-handle, data: list<u8>) -> result<u64, body-error>

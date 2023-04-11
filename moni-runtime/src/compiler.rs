@@ -67,11 +67,11 @@ mod tests {
         let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../wit");
         let outputs = generate_guest(
             wit_dir,
-            Some(String::from("http-interface")),
+            Some(String::from("http-incoming")),
             super::GuestGeneratorType::Rust,
         )
         .unwrap();
         assert_eq!(outputs.len(), 1);
-        assert_eq!(outputs.contains_key("http_interface.rs"), true);
+        assert_eq!(outputs.contains_key("http_incoming.rs"), true);
     }
 }

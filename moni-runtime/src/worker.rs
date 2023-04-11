@@ -1,7 +1,8 @@
+use crate::host_call::http_body::http_body;
 use crate::host_call::{http_incoming, http_incoming::HttpIncoming, HttpContext};
 use crate::worker::http_incoming::http_incoming::{Request, Response};
 use anyhow::Result;
-use axum::body::Body;
+use hyper::body::Body;
 use std::fmt::Debug;
 use wasi_cap_std_sync::WasiCtxBuilder;
 use wasi_host::WasiCtx;
@@ -75,7 +76,7 @@ impl Worker {
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
         wasi_host::command::add_to_linker(&mut linker, Context::wasi)?;
-        // http_incoming::add_to_linker(&mut linker, Context::http_ctx)?;
+        http_body::add_to_linker(&mut linker, Context::http_ctx)?;
 
         Ok(Self {
             path: path.to_string(),

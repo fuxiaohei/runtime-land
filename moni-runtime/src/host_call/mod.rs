@@ -1,4 +1,4 @@
-use axum::body::Body;
+use hyper::body::Body;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicU32;
 
@@ -32,3 +32,4 @@ impl HttpContext {
 }
 
 pub mod http_incoming;
+pub mod http_body;

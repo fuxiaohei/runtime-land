@@ -17,7 +17,8 @@ wasmtime = { workspace = true }
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-parser = { workspace = true }
-axum =  { workspace = true }
+hyper =  { workspace = true }
+futures-util = "0.3.28"
 
 [dev-dependencies]
 tokio = { workspace = true }

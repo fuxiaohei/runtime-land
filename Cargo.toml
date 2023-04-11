@@ -12,12 +12,13 @@ moni-runtime = { path = "moni-runtime" }
 
 [workspace]
 members = [
-    "examples/rust-impl"
-,
+    "examples/rust-impl",
     "moni-cli",
     "moni-lib",
     "moni-runtime",
-    "moni-sdk"]
+    "moni-sdk",
+    "moni-sdk/macro"
+]
 
 [workspace.dependencies]
 anyhow = "1.0.70"
@@ -45,6 +46,8 @@ wit-parser = "0.6.4"
 http = "0.2.9"
 axum = "0.6.12"
 once_cell = "1.17.1"
+hyper = { version = "0.14.25", features = ["full"] }
+
 
 [workspace.package]
 version = "0.2.0"

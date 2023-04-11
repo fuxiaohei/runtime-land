@@ -1245,9 +1245,10 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "axum",
  "deadpool",
+ "futures-util",
  "host",
+ "hyper",
  "reqwest",
  "tokio",
  "tracing",
@@ -1264,7 +1265,18 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "http",
+ "moni-sdk-macro",
  "wit-bindgen",
+]
+
+[[package]]
+name = "moni-sdk-macro"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "http",
+ "quote",
+ "syn 2.0.13",
 ]
 
 [[package]]
