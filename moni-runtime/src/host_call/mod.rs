@@ -1,4 +1,4 @@
-use hyper::body::Body;
+use hyper::body::{Body, Sender};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicU32;
 
@@ -9,6 +9,8 @@ pub struct HttpContext {
     pub counter: u16,
     /// body hash map
     body_map: HashMap<u32, Body>,
+    /// body sender
+    body_sender_map: HashMap<u32, Sender>,
     /// atomic increment id for body
     body_id: AtomicU32,
 }
@@ -19,6 +21,7 @@ impl HttpContext {
             req_id,
             counter: 10,
             body_map: HashMap::new(),
+            body_sender_map: HashMap::new(),
             body_id: AtomicU32::new(1),
         }
     }
@@ -29,7 +32,11 @@ impl HttpContext {
         self.body_map.insert(id, body);
         id
     }
+
+    fn set_body_sender(&mut self, id: u32, sender: Sender) {
+        self.body_sender_map.insert(id, sender);
+    }
 }
 
-pub mod http_incoming;
 pub mod http_body;
+pub mod http_incoming;

@@ -51,12 +51,22 @@ impl http_body::Host for HttpContext {
         handle: HttpBodyHandle,
         data: Vec<u8>,
     ) -> wasmtime::Result<Result<u64, BodyError>> {
-        Ok(Err(BodyError {}))
+        if !self.body_map.contains_key(&handle) {
+            return Ok(Err(BodyError {}));
+        }
+        let size = data.len() as u64;
+        let sender = self.body_sender_map.get_mut(&handle).unwrap();
+        sender
+            .send_data(data.into())
+            .await
+            .map_err(|_| BodyError {})?;
+        Ok(Ok(size))
     }
 
     async fn http_body_new(&mut self) -> wasmtime::Result<Result<HttpBodyHandle, BodyError>> {
-        let body = Body::empty();
+        let (sender, body) = Body::channel();
         let body_handle = self.set_body(body);
+        self.set_body_sender(body_handle, sender);
         Ok(Ok(body_handle))
     }
 }
