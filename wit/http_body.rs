@@ -3,14 +3,30 @@
 #[allow(clippy::all)]
 pub mod http_body {
     pub type HttpBodyHandle = u32;
-    /// An error type returned from a body operation. Currently this
-    /// doesn't provide any additional information.
-    #[repr(C)]
-    #[derive(Copy, Clone)]
-    pub struct BodyError {}
+    /// an error type returned from a body operation.
+    #[derive(Clone)]
+    pub enum BodyError {
+        /// The body is invalid
+        InvalidHandle,
+        /// The body is only readable
+        ReadOnly,
+        /// The body read failed
+        ReadFailed(wit_bindgen::rt::string::String),
+        /// The body write failed
+        WriteFailed(wit_bindgen::rt::string::String),
+    }
     impl core::fmt::Debug for BodyError {
         fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-            f.debug_struct("BodyError").finish()
+            match self {
+                BodyError::InvalidHandle => f.debug_tuple("BodyError::InvalidHandle").finish(),
+                BodyError::ReadOnly => f.debug_tuple("BodyError::ReadOnly").finish(),
+                BodyError::ReadFailed(e) => {
+                    f.debug_tuple("BodyError::ReadFailed").field(e).finish()
+                }
+                BodyError::WriteFailed(e) => {
+                    f.debug_tuple("BodyError::WriteFailed").field(e).finish()
+                }
+            }
         }
     }
     impl core::fmt::Display for BodyError {
@@ -18,6 +34,7 @@ pub mod http_body {
             write!(f, "{:?}", self)
         }
     }
+
     impl std::error::Error for BodyError {}
     #[allow(clippy::all)]
     /// Read http body bytes with size and eof flag
@@ -63,7 +80,87 @@ pub mod http_body {
                         },
                     )
                 }),
-                1 => Err(BodyError {}),
+                1 => Err({
+                    {
+                        match i32::from(*((ptr0 + 4) as *const u8)) {
+                            0 => BodyError::InvalidHandle,
+                            1 => BodyError::ReadOnly,
+                            2 => BodyError::ReadFailed({
+                                let len2 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            3 => BodyError::WriteFailed({
+                                let len3 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(not(debug_assertions))]
+                            _ => BodyError::WriteFailed({
+                                let len3 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            _ => panic!("invalid enum discriminant"),
+                        }
+                    }
+                }),
                 #[cfg(not(debug_assertions))]
                 _ => core::hint::unreachable_unchecked(),
                 #[cfg(debug_assertions)]
@@ -80,7 +177,7 @@ pub mod http_body {
         use wit_bindgen::rt::{alloc, string::String, vec::Vec};
         unsafe {
             #[repr(align(4))]
-            struct RetArea([u8; 12]);
+            struct RetArea([u8; 16]);
             let mut ret_area = core::mem::MaybeUninit::<RetArea>::uninit();
             let ptr0 = ret_area.as_mut_ptr() as i32;
             #[link(wasm_import_module = "http-body")]
@@ -99,7 +196,87 @@ pub mod http_body {
 
                     Vec::from_raw_parts(*((ptr0 + 4) as *const i32) as *mut _, len1, len1)
                 }),
-                1 => Err(BodyError {}),
+                1 => Err({
+                    {
+                        match i32::from(*((ptr0 + 4) as *const u8)) {
+                            0 => BodyError::InvalidHandle,
+                            1 => BodyError::ReadOnly,
+                            2 => BodyError::ReadFailed({
+                                let len2 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            3 => BodyError::WriteFailed({
+                                let len3 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(not(debug_assertions))]
+                            _ => BodyError::WriteFailed({
+                                let len3 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            _ => panic!("invalid enum discriminant"),
+                        }
+                    }
+                }),
                 #[cfg(not(debug_assertions))]
                 _ => core::hint::unreachable_unchecked(),
                 #[cfg(debug_assertions)]
@@ -114,7 +291,7 @@ pub mod http_body {
         use wit_bindgen::rt::{alloc, string::String, vec::Vec};
         unsafe {
             #[repr(align(8))]
-            struct RetArea([u8; 16]);
+            struct RetArea([u8; 24]);
             let mut ret_area = core::mem::MaybeUninit::<RetArea>::uninit();
             let vec0 = data;
             let ptr0 = vec0.as_ptr() as i32;
@@ -129,7 +306,87 @@ pub mod http_body {
             wit_import(wit_bindgen::rt::as_i32(handle), ptr0, len0, ptr1);
             match i32::from(*((ptr1 + 0) as *const u8)) {
                 0 => Ok(*((ptr1 + 8) as *const i64) as u64),
-                1 => Err(BodyError {}),
+                1 => Err({
+                    {
+                        match i32::from(*((ptr1 + 8) as *const u8)) {
+                            0 => BodyError::InvalidHandle,
+                            1 => BodyError::ReadOnly,
+                            2 => BodyError::ReadFailed({
+                                let len2 = *((ptr1 + 16) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            3 => BodyError::WriteFailed({
+                                let len3 = *((ptr1 + 16) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(not(debug_assertions))]
+                            _ => BodyError::WriteFailed({
+                                let len3 = *((ptr1 + 16) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr1 + 12) as *const i32) as *mut _,
+                                            len3,
+                                            len3,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            _ => panic!("invalid enum discriminant"),
+                        }
+                    }
+                }),
                 #[cfg(not(debug_assertions))]
                 _ => core::hint::unreachable_unchecked(),
                 #[cfg(debug_assertions)]
@@ -144,7 +401,7 @@ pub mod http_body {
         use wit_bindgen::rt::{alloc, string::String, vec::Vec};
         unsafe {
             #[repr(align(4))]
-            struct RetArea([u8; 8]);
+            struct RetArea([u8; 16]);
             let mut ret_area = core::mem::MaybeUninit::<RetArea>::uninit();
             let ptr0 = ret_area.as_mut_ptr() as i32;
             #[link(wasm_import_module = "http-body")]
@@ -156,7 +413,87 @@ pub mod http_body {
             wit_import(ptr0);
             match i32::from(*((ptr0 + 0) as *const u8)) {
                 0 => Ok(*((ptr0 + 4) as *const i32) as u32),
-                1 => Err(BodyError {}),
+                1 => Err({
+                    {
+                        match i32::from(*((ptr0 + 4) as *const u8)) {
+                            0 => BodyError::InvalidHandle,
+                            1 => BodyError::ReadOnly,
+                            2 => BodyError::ReadFailed({
+                                let len1 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len1,
+                                            len1,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len1,
+                                            len1,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            3 => BodyError::WriteFailed({
+                                let len2 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(not(debug_assertions))]
+                            _ => BodyError::WriteFailed({
+                                let len2 = *((ptr0 + 12) as *const i32) as usize;
+
+                                {
+                                    #[cfg(not(debug_assertions))]
+                                    {
+                                        String::from_utf8_unchecked(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                    }
+                                    #[cfg(debug_assertions)]
+                                    {
+                                        String::from_utf8(Vec::from_raw_parts(
+                                            *((ptr0 + 8) as *const i32) as *mut _,
+                                            len2,
+                                            len2,
+                                        ))
+                                        .unwrap()
+                                    }
+                                }
+                            }),
+                            #[cfg(debug_assertions)]
+                            _ => panic!("invalid enum discriminant"),
+                        }
+                    }
+                }),
                 #[cfg(not(debug_assertions))]
                 _ => core::hint::unreachable_unchecked(),
                 #[cfg(debug_assertions)]
@@ -169,7 +506,7 @@ pub mod http_body {
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:http-body"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2534] = [
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2654] = [
     2, 0, 3, 119, 105, 116, 9, 104, 116, 116, 112, 45, 98, 111, 100, 121, 9, 104, 116, 116, 112,
     45, 98, 111, 100, 121, 0, 97, 115, 109, 12, 0, 1, 0, 7, 190, 8, 1, 65, 4, 1, 66, 27, 1, 109, 6,
     13, 110, 101, 116, 119, 111, 114, 107, 45, 101, 114, 114, 111, 114, 7, 116, 105, 109, 101, 111,
@@ -257,37 +594,42 @@ pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 2534] = [
     107, 103, 58, 47, 104, 116, 116, 112, 45, 105, 110, 99, 111, 109, 105, 110, 103, 47, 104, 116,
     116, 112, 45, 105, 110, 99, 111, 109, 105, 110, 103, 4, 1, 11, 37, 1, 13, 104, 116, 116, 112,
     45, 105, 110, 99, 111, 109, 105, 110, 103, 18, 112, 107, 103, 58, 47, 104, 116, 116, 112, 45,
-    105, 110, 99, 111, 109, 105, 110, 103, 3, 2, 0, 7, 170, 4, 1, 65, 4, 1, 66, 18, 1, 121, 4, 16,
-    104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 104, 97, 110, 100, 108, 101, 0, 3, 0, 0, 1, 114,
-    0, 4, 10, 98, 111, 100, 121, 45, 101, 114, 114, 111, 114, 0, 3, 0, 2, 1, 112, 125, 1, 111, 2,
-    4, 127, 1, 106, 1, 5, 1, 3, 1, 64, 1, 6, 104, 97, 110, 100, 108, 101, 1, 0, 6, 4, 14, 104, 116,
-    116, 112, 45, 98, 111, 100, 121, 45, 114, 101, 97, 100, 0, 1, 7, 1, 106, 1, 4, 1, 3, 1, 64, 1,
-    6, 104, 97, 110, 100, 108, 101, 1, 0, 8, 4, 18, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45,
-    114, 101, 97, 100, 45, 97, 108, 108, 0, 1, 9, 1, 106, 1, 119, 1, 3, 1, 64, 2, 6, 104, 97, 110,
-    100, 108, 101, 1, 4, 100, 97, 116, 97, 4, 0, 10, 4, 15, 104, 116, 116, 112, 45, 98, 111, 100,
-    121, 45, 119, 114, 105, 116, 101, 0, 1, 11, 1, 106, 1, 1, 1, 3, 1, 64, 0, 0, 12, 4, 13, 104,
-    116, 116, 112, 45, 98, 111, 100, 121, 45, 110, 101, 119, 0, 1, 13, 4, 15, 104, 116, 116, 112,
-    45, 98, 111, 100, 121, 45, 105, 102, 97, 99, 101, 30, 112, 107, 103, 58, 47, 104, 116, 116,
-    112, 45, 98, 111, 100, 121, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 105, 102, 97,
-    99, 101, 5, 0, 1, 65, 2, 1, 66, 18, 1, 121, 4, 16, 104, 116, 116, 112, 45, 98, 111, 100, 121,
-    45, 104, 97, 110, 100, 108, 101, 0, 3, 0, 0, 1, 114, 0, 4, 10, 98, 111, 100, 121, 45, 101, 114,
-    114, 111, 114, 0, 3, 0, 2, 1, 112, 125, 1, 111, 2, 4, 127, 1, 106, 1, 5, 1, 3, 1, 64, 1, 6,
-    104, 97, 110, 100, 108, 101, 1, 0, 6, 4, 14, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45,
-    114, 101, 97, 100, 0, 1, 7, 1, 106, 1, 4, 1, 3, 1, 64, 1, 6, 104, 97, 110, 100, 108, 101, 1, 0,
-    8, 4, 18, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 114, 101, 97, 100, 45, 97, 108, 108,
-    0, 1, 9, 1, 106, 1, 119, 1, 3, 1, 64, 2, 6, 104, 97, 110, 100, 108, 101, 1, 4, 100, 97, 116,
-    97, 4, 0, 10, 4, 15, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 119, 114, 105, 116, 101, 0,
-    1, 11, 1, 106, 1, 1, 1, 3, 1, 64, 0, 0, 12, 4, 13, 104, 116, 116, 112, 45, 98, 111, 100, 121,
-    45, 110, 101, 119, 0, 1, 13, 3, 9, 104, 116, 116, 112, 45, 98, 111, 100, 121, 30, 112, 107,
-    103, 58, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 47, 104, 116, 116, 112, 45, 98, 111,
-    100, 121, 45, 105, 102, 97, 99, 101, 5, 0, 4, 9, 104, 116, 116, 112, 45, 98, 111, 100, 121, 24,
-    112, 107, 103, 58, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 47, 104, 116, 116, 112, 45,
-    98, 111, 100, 121, 4, 1, 0, 68, 9, 112, 114, 111, 100, 117, 99, 101, 114, 115, 1, 12, 112, 114,
-    111, 99, 101, 115, 115, 101, 100, 45, 98, 121, 2, 13, 119, 105, 116, 45, 99, 111, 109, 112,
-    111, 110, 101, 110, 116, 5, 48, 46, 55, 46, 52, 16, 119, 105, 116, 45, 98, 105, 110, 100, 103,
-    101, 110, 45, 114, 117, 115, 116, 5, 48, 46, 52, 46, 48, 11, 29, 1, 9, 104, 116, 116, 112, 45,
-    98, 111, 100, 121, 14, 112, 107, 103, 58, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 3, 4,
-    0,
+    105, 110, 99, 111, 109, 105, 110, 103, 3, 2, 0, 7, 162, 5, 1, 65, 4, 1, 66, 18, 1, 121, 4, 16,
+    104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 104, 97, 110, 100, 108, 101, 0, 3, 0, 0, 1, 113,
+    4, 14, 105, 110, 118, 97, 108, 105, 100, 45, 104, 97, 110, 100, 108, 101, 0, 0, 9, 114, 101,
+    97, 100, 45, 111, 110, 108, 121, 0, 0, 11, 114, 101, 97, 100, 45, 102, 97, 105, 108, 101, 100,
+    1, 115, 0, 12, 119, 114, 105, 116, 101, 45, 102, 97, 105, 108, 101, 100, 1, 115, 0, 4, 10, 98,
+    111, 100, 121, 45, 101, 114, 114, 111, 114, 0, 3, 0, 2, 1, 112, 125, 1, 111, 2, 4, 127, 1, 106,
+    1, 5, 1, 3, 1, 64, 1, 6, 104, 97, 110, 100, 108, 101, 1, 0, 6, 4, 14, 104, 116, 116, 112, 45,
+    98, 111, 100, 121, 45, 114, 101, 97, 100, 0, 1, 7, 1, 106, 1, 4, 1, 3, 1, 64, 1, 6, 104, 97,
+    110, 100, 108, 101, 1, 0, 8, 4, 18, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 114, 101,
+    97, 100, 45, 97, 108, 108, 0, 1, 9, 1, 106, 1, 119, 1, 3, 1, 64, 2, 6, 104, 97, 110, 100, 108,
+    101, 1, 4, 100, 97, 116, 97, 4, 0, 10, 4, 15, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45,
+    119, 114, 105, 116, 101, 0, 1, 11, 1, 106, 1, 1, 1, 3, 1, 64, 0, 0, 12, 4, 13, 104, 116, 116,
+    112, 45, 98, 111, 100, 121, 45, 110, 101, 119, 0, 1, 13, 4, 15, 104, 116, 116, 112, 45, 98,
+    111, 100, 121, 45, 105, 102, 97, 99, 101, 30, 112, 107, 103, 58, 47, 104, 116, 116, 112, 45,
+    98, 111, 100, 121, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 105, 102, 97, 99, 101, 5,
+    0, 1, 65, 2, 1, 66, 18, 1, 121, 4, 16, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 104, 97,
+    110, 100, 108, 101, 0, 3, 0, 0, 1, 113, 4, 14, 105, 110, 118, 97, 108, 105, 100, 45, 104, 97,
+    110, 100, 108, 101, 0, 0, 9, 114, 101, 97, 100, 45, 111, 110, 108, 121, 0, 0, 11, 114, 101, 97,
+    100, 45, 102, 97, 105, 108, 101, 100, 1, 115, 0, 12, 119, 114, 105, 116, 101, 45, 102, 97, 105,
+    108, 101, 100, 1, 115, 0, 4, 10, 98, 111, 100, 121, 45, 101, 114, 114, 111, 114, 0, 3, 0, 2, 1,
+    112, 125, 1, 111, 2, 4, 127, 1, 106, 1, 5, 1, 3, 1, 64, 1, 6, 104, 97, 110, 100, 108, 101, 1,
+    0, 6, 4, 14, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 114, 101, 97, 100, 0, 1, 7, 1, 106,
+    1, 4, 1, 3, 1, 64, 1, 6, 104, 97, 110, 100, 108, 101, 1, 0, 8, 4, 18, 104, 116, 116, 112, 45,
+    98, 111, 100, 121, 45, 114, 101, 97, 100, 45, 97, 108, 108, 0, 1, 9, 1, 106, 1, 119, 1, 3, 1,
+    64, 2, 6, 104, 97, 110, 100, 108, 101, 1, 4, 100, 97, 116, 97, 4, 0, 10, 4, 15, 104, 116, 116,
+    112, 45, 98, 111, 100, 121, 45, 119, 114, 105, 116, 101, 0, 1, 11, 1, 106, 1, 1, 1, 3, 1, 64,
+    0, 0, 12, 4, 13, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 110, 101, 119, 0, 1, 13, 3, 9,
+    104, 116, 116, 112, 45, 98, 111, 100, 121, 30, 112, 107, 103, 58, 47, 104, 116, 116, 112, 45,
+    98, 111, 100, 121, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 45, 105, 102, 97, 99, 101, 5,
+    0, 4, 9, 104, 116, 116, 112, 45, 98, 111, 100, 121, 24, 112, 107, 103, 58, 47, 104, 116, 116,
+    112, 45, 98, 111, 100, 121, 47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 4, 1, 0, 68, 9, 112,
+    114, 111, 100, 117, 99, 101, 114, 115, 1, 12, 112, 114, 111, 99, 101, 115, 115, 101, 100, 45,
+    98, 121, 2, 13, 119, 105, 116, 45, 99, 111, 109, 112, 111, 110, 101, 110, 116, 5, 48, 46, 55,
+    46, 52, 16, 119, 105, 116, 45, 98, 105, 110, 100, 103, 101, 110, 45, 114, 117, 115, 116, 5, 48,
+    46, 52, 46, 48, 11, 29, 1, 9, 104, 116, 116, 112, 45, 98, 111, 100, 121, 14, 112, 107, 103, 58,
+    47, 104, 116, 116, 112, 45, 98, 111, 100, 121, 3, 4, 0,
 ];
 
 #[inline(never)]

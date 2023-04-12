@@ -2,9 +2,17 @@ interface http-body-iface {
     // HTTP Request Body
     type http-body-handle = u32
 
-    /// An error type returned from a body operation. Currently this
-    /// doesn't provide any additional information.
-    record body-error {}
+    /// an error type returned from a body operation.
+    variant body-error{
+        /// The body is invalid
+        invalid-handle,
+        /// The body is only readable
+        read-only,
+        /// The body read failed
+        read-failed(string),
+        /// The body write failed
+        write-failed(string),
+    }
 
     /// Read http body bytes with size and eof flag
     http-body-read: func(handle: http-body-handle) -> result<tuple<list<u8>, bool>, body-error>

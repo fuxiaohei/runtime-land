@@ -52,18 +52,20 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let mut context = Context::new();
     let body = req.into_body();
     let body_handle = context.set_body(body);
+
     let wasm_req = WasmRequest {
         method: method.as_str(),
         uri: uri.as_str(),
         headers: &headers,
         body: Some(body_handle),
     };
-    println!("----- wasm_req = {:?}", wasm_req);
 
-    let wasm_resp = worker.handle_request(wasm_req, context).await.unwrap();
+    let (wasm_resp, wasm_resp_body) = worker.handle_request(wasm_req, context).await.unwrap();
 
-    Response::builder()
-        .status(wasm_resp.status)
-        .body(Body::from("Hello, World!"))
-        .unwrap()
+    // convert host-call response to response
+    let mut builder = Response::builder().status(wasm_resp.status);
+    for (k, v) in wasm_resp.headers {
+        builder = builder.header(k, v);
+    }
+    builder.body(wasm_resp_body).unwrap()
 }

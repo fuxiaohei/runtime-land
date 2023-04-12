@@ -48,6 +48,7 @@ pub fn create_pool(path: &str) -> Result<WorkerPool> {
 #[cfg(test)]
 mod tests {
     use crate::{host_call::http_incoming::http_incoming::Request, worker::Context};
+    use hyper::Body;
 
     #[tokio::test]
     async fn run_worker_pool_test() {
@@ -62,15 +63,19 @@ mod tests {
             let mut worker = pool.get().await.unwrap();
             let worker = worker.as_mut();
 
+            let mut context = Context::new();
+            let body = Body::from("test request body");
+            let body_handle = context.set_body(body);
+
             let headers: Vec<(&str, &str)> = vec![];
             let req = Request {
                 method: "GET",
                 uri: "/abc",
                 headers: &headers,
-                body: Some(2),
+                body: Some(body_handle),
             };
 
-            let resp = worker.handle_request(req, Context::new()).await.unwrap();
+            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
             assert_eq!(resp.status, 200);
             assert_eq!(resp.body, Some(2));
 

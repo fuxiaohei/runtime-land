@@ -33,6 +33,10 @@ impl HttpContext {
         id
     }
 
+    pub fn take_body(&mut self, id: u32) -> Option<Body> {
+        self.body_map.remove(&id)
+    }
+
     fn set_body_sender(&mut self, id: u32, sender: Sender) {
         self.body_sender_map.insert(id, sender);
     }

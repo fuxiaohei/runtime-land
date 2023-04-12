@@ -7,7 +7,7 @@ use std::fmt::Debug;
 use wasi_cap_std_sync::WasiCtxBuilder;
 use wasi_host::WasiCtx;
 use wasmtime::component::{Component, InstancePre, Linker};
-use wasmtime::{Config, Engine, Store};
+use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
 
 pub struct Context {
     wasi_ctx: WasiCtx,
@@ -42,12 +42,26 @@ impl Context {
     pub fn set_body(&mut self, body: Body) -> u32 {
         self.http_ctx.set_body(body)
     }
+
+    /// take body
+    pub fn take_body(&mut self, handle: u32) -> Option<Body> {
+        self.http_ctx.take_body(handle)
+    }
 }
 
 fn create_wasmtime_config() -> Config {
     let mut config = Config::new();
     config.wasm_component_model(true);
     config.async_support(true);
+
+    const MB: usize = 1 << 20;
+    let mut pooling_allocation_config = PoolingAllocationConfig::default();
+    pooling_allocation_config.instance_size(MB);
+    pooling_allocation_config.instance_memory_pages(128 * (MB as u64) / (64 * 1024));
+    config.allocation_strategy(InstanceAllocationStrategy::Pooling(
+        pooling_allocation_config,
+    ));
+    
     config
 }
 
@@ -86,7 +100,11 @@ impl Worker {
     }
 
     /// handle_request is used to handle http request
-    pub async fn handle_request(&mut self, req: Request<'_>, context: Context) -> Result<Response> {
+    pub async fn handle_request(
+        &mut self,
+        req: Request<'_>,
+        context: Context,
+    ) -> Result<(Response, Body)> {
         // create store
         let mut store = Store::new(&self.engine, context);
 
@@ -97,7 +115,8 @@ impl Worker {
             .http_incoming()
             .call_handle_request(&mut store, req)
             .await?;
-        Ok(resp)
+        let body = store.data_mut().take_body(resp.body.unwrap()).unwrap();
+        Ok((resp, body))
     }
 }
 
@@ -107,6 +126,7 @@ mod tests {
         host_call::http_incoming::http_incoming::Request,
         worker::{Context, Worker},
     };
+    use hyper::Body;
 
     #[tokio::test]
     async fn run_wasm() {
@@ -115,14 +135,19 @@ mod tests {
 
         for _ in 1..10 {
             let headers: Vec<(&str, &str)> = vec![];
+
+            let mut context = Context::new();
+            let body = Body::from("test request body");
+            let body_handle = context.set_body(body);
+
             let req = Request {
                 method: "GET",
                 uri: "/abc",
                 headers: &headers,
-                body: Some(2),
+                body: Some(body_handle),
             };
 
-            let resp = worker.handle_request(req, Context::new()).await.unwrap();
+            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
             assert_eq!(resp.status, 200);
             // this wasm return request's body
             // so the body handler u32 is 2, same as request's body

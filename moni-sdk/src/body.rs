@@ -1,4 +1,6 @@
-use self::http_body::{http_body_read, http_body_read_all, HttpBodyHandle};
+use self::http_body::{
+    http_body_new, http_body_read, http_body_read_all, http_body_write, HttpBodyHandle,
+};
 use anyhow::Result;
 
 include!("../../wit/http_body.rs");
@@ -24,5 +26,37 @@ impl Body {
             Ok(resp) => Ok(resp),
             Err(e) => Err(e.into()),
         }
+    }
+}
+
+impl From<&[u8]> for Body {
+    fn from(s: &[u8]) -> Self {
+        let body_handle = http_body_new().unwrap();
+        http_body_write(body_handle, s).unwrap();
+        Body { body_handle }
+    }
+}
+
+impl From<&str> for Body {
+    fn from(s: &str) -> Self {
+        let body_handle = http_body_new().unwrap();
+        http_body_write(body_handle, s.as_bytes()).unwrap();
+        Body { body_handle }
+    }
+}
+
+impl From<String> for Body {
+    fn from(s: String) -> Self {
+        let body_handle = http_body_new().unwrap();
+        http_body_write(body_handle, s.as_bytes()).unwrap();
+        Body { body_handle }
+    }
+}
+
+impl From<Vec<u8>> for Body{
+    fn from(v: Vec<u8>) -> Self {
+        let body_handle = http_body_new().unwrap();
+        http_body_write(body_handle, v.as_slice()).unwrap();
+        Body { body_handle }
     }
 }
