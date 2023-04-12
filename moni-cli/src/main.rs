@@ -1,12 +1,15 @@
 use clap::Parser;
 
+mod embed;
 mod flags;
-mod  server;
+mod server;
 
 /// cli command line
 #[derive(Parser)]
 #[clap(name = "moni-cli", version = moni_lib::version::get())]
 enum Cli {
+    /// Init creates a new project
+    Init(flags::Init),
     /// Build compiles the project
     Build(flags::Build),
     /// Serve runs the project
@@ -19,6 +22,7 @@ async fn main() {
 
     let args = Cli::parse();
     match args {
+        Cli::Init(cmd) => cmd.run().await,
         Cli::Build(cmd) => cmd.run().await,
         Cli::Serve(cmd) => cmd.run().await,
     }

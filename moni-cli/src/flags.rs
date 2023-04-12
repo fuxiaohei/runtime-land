@@ -1,6 +1,22 @@
 use clap::Args;
 use tracing::debug;
 
+/// Command Init
+#[derive(Args, Debug)]
+pub struct Init {
+    /// The name of the project
+    pub name: String,
+    /// The template to use
+    #[clap(long, default_value("rust-basic"))]
+    pub template: Option<String>,
+}
+
+impl Init {
+    pub async fn run(&self) {
+        debug!("Init: {self:?}");
+    }
+}
+
 /// Command Build
 #[derive(Args, Debug)]
 pub struct Build {
