@@ -1,4 +1,5 @@
 use crate::host_call::http_body::http_body;
+use crate::host_call::http_outgoing::http_outgoing;
 use crate::host_call::{http_incoming, http_incoming::HttpIncoming, HttpContext};
 use crate::worker::http_incoming::http_incoming::{Request, Response};
 use anyhow::Result;
@@ -61,7 +62,7 @@ fn create_wasmtime_config() -> Config {
     config.allocation_strategy(InstanceAllocationStrategy::Pooling(
         pooling_allocation_config,
     ));
-    
+
     config
 }
 
@@ -91,6 +92,7 @@ impl Worker {
         let mut linker: Linker<Context> = Linker::new(&engine);
         wasi_host::command::add_to_linker(&mut linker, Context::wasi)?;
         http_body::add_to_linker(&mut linker, Context::http_ctx)?;
+        http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
 
         Ok(Self {
             path: path.to_string(),

@@ -9,6 +9,6 @@ pub fn handle_request(req: Request) -> Response {
         .status(200)
         .header("X-Request-Url", url.to_string())
         .header("X-Request-Method", method)
-        .body(Body::from("Hello Hahaha!!"))
+        .body(Body::from("Hello Moni Serverless!!"))
         .unwrap()
 }

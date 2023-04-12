@@ -5,7 +5,7 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-http = { workspace = true }
-wit-bindgen = { workspace = true }
 anyhow = { workspace = true }
+http = { workspace = true }
 moni-sdk-macro = { path = "./macro" }
+wit-bindgen = { workspace = true }

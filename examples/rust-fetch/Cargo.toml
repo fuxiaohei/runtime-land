@@ -1,5 +1,5 @@
 [package]
-name = "rust-impl"
+name = "rust-fetch"
 version = "0.1.0"
 edition = "2021"
 
