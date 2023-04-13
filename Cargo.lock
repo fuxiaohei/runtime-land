@@ -1278,6 +1278,8 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "http",
+ "lazy_static",
+ "matchit",
  "moni-sdk-macro",
  "wit-bindgen",
 ]
@@ -1742,6 +1744,16 @@ dependencies = [
 
 [[package]]
 name = "rust-fetch"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "http",
+ "moni-sdk",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "rust-router"
 version = "0.1.0"
 dependencies = [
  "anyhow",

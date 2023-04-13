@@ -19,8 +19,8 @@ wasmtime = { workspace = true }
 which = "4.4.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
-wit-parser = { workspace = true }
 wit-component = { workspace = true }
+wit-parser = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true }

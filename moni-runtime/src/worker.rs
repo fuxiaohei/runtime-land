@@ -17,15 +17,15 @@ pub struct Context {
 
 impl Default for Context {
     fn default() -> Self {
-        Self::new()
+        Self::new(1)
     }
 }
 
 impl Context {
-    pub fn new() -> Self {
+    pub fn new(req_id: u64) -> Self {
         Context {
             wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build(),
-            http_ctx: HttpContext::new(1),
+            http_ctx: HttpContext::new(req_id),
         }
     }
 
@@ -138,7 +138,7 @@ mod tests {
         for _ in 1..10 {
             let headers: Vec<(&str, &str)> = vec![];
 
-            let mut context = Context::new();
+            let mut context = Context::default();
             let body = Body::from("test request body");
             let body_handle = context.set_body(body);
 

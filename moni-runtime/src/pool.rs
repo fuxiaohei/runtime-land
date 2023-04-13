@@ -63,7 +63,7 @@ mod tests {
             let mut worker = pool.get().await.unwrap();
             let worker = worker.as_mut();
 
-            let mut context = Context::new();
+            let mut context = Context::default();
             let body = Body::from("test request body");
             let body_handle = context.set_body(body);
 

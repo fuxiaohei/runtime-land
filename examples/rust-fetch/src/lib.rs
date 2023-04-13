@@ -1,14 +1,16 @@
-use moni_sdk::http::{Body, Request, Response};
+use moni_sdk::http::{fetch, Body, Request, RequestOptions, Response};
 use moni_sdk::http_main;
 
 #[http_main]
-pub fn handle_request(req: Request) -> Response {
-    let url = req.uri().clone();
-    let method = req.method().to_string().to_uppercase();
+pub fn handle_request(_req: Request) -> Response {
+    let fetch_request = http::Request::builder()
+        .method("GET")
+        .uri("https://www.rust-lang.org/")
+        .body(Body::from(""))
+        .unwrap();
+    let fetch_response = fetch(fetch_request, RequestOptions::default()).unwrap();
     http::Response::builder()
-        .status(200)
-        .header("X-Request-Url", url.to_string())
-        .header("X-Request-Method", method)
-        .body(Body::from("Hello Moni Serverless!!"))
+        .status(fetch_response.status())
+        .body(fetch_response.into_body())
         .unwrap()
 }
