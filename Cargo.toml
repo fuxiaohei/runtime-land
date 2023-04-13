@@ -5,6 +5,7 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+wit-component = "0.7.4"
 
 [build-dependencies]
 moni-runtime = { path = "moni-runtime" }
@@ -47,6 +48,7 @@ wit-bindgen = "0.4.0"
 wit-bindgen-core = "0.4.0"
 wit-bindgen-rust = "0.4.0"
 wit-parser = "0.6.4"
+wit-component = "0.7.4"
 
 [workspace.package]
 version = "0.2.0"

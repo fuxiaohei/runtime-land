@@ -1233,6 +1233,7 @@ dependencies = [
  "rust-embed",
  "tokio",
  "tracing",
+ "which",
 ]
 
 [[package]]
@@ -1264,8 +1265,10 @@ dependencies = [
  "tracing",
  "wasi-cap-std-sync",
  "wasmtime",
+ "which",
  "wit-bindgen-core",
  "wit-bindgen-rust",
+ "wit-component",
  "wit-parser",
 ]
 
@@ -1294,6 +1297,7 @@ name = "moni-serverless"
 version = "0.2.0"
 dependencies = [
  "moni-runtime",
+ "wit-component",
 ]
 
 [[package]]
@@ -2890,6 +2894,17 @@ checksum = "e33b99f4b23ba3eec1a53ac264e35a755f00e966e0065077d6027c0f575b0b97"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "which"
+version = "4.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2441c784c52b289a054b7201fc93253e288f094e2f4be9058343127c4226a269"
+dependencies = [
+ "either",
+ "libc",
+ "once_cell",
 ]
 
 [[package]]

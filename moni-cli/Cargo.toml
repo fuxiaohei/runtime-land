@@ -14,3 +14,4 @@ moni-runtime = { path = "../moni-runtime" }
 rust-embed = "6.6.1"
 tokio = { workspace = true }
 tracing = { workspace = true }
+which = "4.4.0"

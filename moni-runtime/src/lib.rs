@@ -1,4 +1,7 @@
 mod compiler;
+pub use compiler::compile_js;
+pub use compiler::compile_rust;
+pub use compiler::convert_component;
 pub use compiler::generate_guest;
 pub use compiler::GuestGeneratorType;
 
