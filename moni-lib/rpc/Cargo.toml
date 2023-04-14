@@ -1,0 +1,13 @@
+[package]
+name = "moni-rpc"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+prost = "0.11.9"
+tonic = "0.9.1"
+tracing = { workspace = true }
+
+[build-dependencies]
+tonic-build = "0.9.1"

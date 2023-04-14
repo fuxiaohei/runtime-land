@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tracing::{debug, info};
 use which::which;
+use wit_bindgen_core::wit_parser::{Resolve, UnresolvedPackage};
 use wit_bindgen_core::{Files, WorldGenerator};
-use wit_parser::{Resolve, UnresolvedPackage};
 use wit_component::ComponentEncoder;
 
 /// GuestGeneratorType is the type of the guest generator.

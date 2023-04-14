@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package moni;
+
+// CreateFunctionRequest is the request message for the CreateFunction method.
+message CreateFunctionRequest {
+    string name = 1;
+    bytes code = 2;
+    string description = 3;
+    string md5 = 4;
+    string language = 5;
+    bool publish = 6;
+}
+
+// CreateFunctionResponse is the response message for the CreateFunction method.
+message CreateFunctionResponse {
+    string error = 1;
+    FunctionData data = 2;
+    int64 code = 3;
+}
+
+// FunctionData contains the data of a function created by the CreateFunction method.
+message FunctionData {
+    string uuid = 1;
+    string name = 2;
+    string version = 3;
+}
+
+service MoniRpcService {  
+    // CreateFunction creates a new function with the specified data and returns
+    // its information
+    rpc CreateFunction(CreateFunctionRequest) returns (CreateFunctionResponse);
+  }

@@ -1,0 +1,10 @@
+[http]
+addr = "127.0.0.1:38779"
+
+[db]
+host = "localhost"
+port = 3306
+user = "root"
+password = ""
+database = "moni-serverless"
+pool_size = 10

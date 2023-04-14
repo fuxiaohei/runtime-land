@@ -5,7 +5,15 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-wit-component = "0.7.4"
+anyhow = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+moni-lib = { path = "./moni-lib" }
+moni-rpc = { path = "./moni-lib/rpc" }
+serde = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
 
 [build-dependencies]
 moni-runtime = { path = "moni-runtime" }
@@ -17,9 +25,10 @@ members = [
     "examples/rust-router",
     "moni-cli",
     "moni-lib",
+    "moni-lib/rpc",
     "moni-runtime",
     "moni-sdk",
-    "moni-sdk/macro"
+    "moni-sdk/macro",
 ]
 
 [workspace.dependencies]
@@ -48,8 +57,7 @@ wasmtime = { version = "7.0.0", features = ["component-model", "async"] }
 wit-bindgen = "0.4.0"
 wit-bindgen-core = "0.4.0"
 wit-bindgen-rust = "0.4.0"
-wit-parser = "0.6.4"
-wit-component = "0.7.4"
+wit-component = "0.8.1"
 
 [workspace.package]
 version = "0.2.0"
