@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, info, warn};
+use tracing::{debug, warn};
 
 mod config;
 

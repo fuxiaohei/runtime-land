@@ -6,8 +6,8 @@ authors = { workspace = true }
 
 [dependencies]
 prost = "0.11.9"
-tonic = "0.9.1"
+tonic = "0.9.2"
 tracing = { workspace = true }
 
 [build-dependencies]
-tonic-build = "0.9.1"
+tonic-build = "0.9.2"

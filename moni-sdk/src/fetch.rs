@@ -15,7 +15,7 @@ impl Default for RequestOptions {
 pub fn fetch(req: Request, options: RequestOptions) -> Result<Response, RequestError> {
     let mut headers = vec![];
     for (key, value) in req.headers() {
-        headers.push((key.as_str(), value.to_str().unwrap()));
+        headers.push((key.to_string(), value.to_str().unwrap().to_string()));
     }
     let uri = req.uri().clone().to_string();
     let method = req.method().clone();
@@ -34,6 +34,6 @@ pub fn fetch(req: Request, options: RequestOptions) -> Result<Response, RequestE
     }
     let resp_body = Body::new(fetch_resp.body.unwrap());
     let resp = builder.body(resp_body).unwrap();
-    
+
     Ok(resp)
 }

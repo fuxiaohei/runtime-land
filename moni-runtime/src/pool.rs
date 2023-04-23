@@ -67,7 +67,7 @@ mod tests {
             let body = Body::from("test request body");
             let body_handle = context.set_body(body);
 
-            let headers: Vec<(&str, &str)> = vec![];
+            let headers: Vec<(String, String)> = vec![];
             let req = Request {
                 method: "GET",
                 uri: "/abc",

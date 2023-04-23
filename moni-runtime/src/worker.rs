@@ -90,7 +90,7 @@ impl Worker {
 
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
-        wasi_host::command::add_to_linker(&mut linker, Context::wasi)?;
+        wasi_host::wasi::command::add_to_linker(&mut linker, Context::wasi)?;
         http_body::add_to_linker(&mut linker, Context::http_ctx)?;
         http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
 
@@ -136,7 +136,7 @@ mod tests {
         let mut worker = Worker::new(wasm_file).await.unwrap();
 
         for _ in 1..10 {
-            let headers: Vec<(&str, &str)> = vec![];
+            let headers: Vec<(String, String)> = vec![];
 
             let mut context = Context::default();
             let body = Body::from("test request body");

@@ -44,10 +44,10 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let mut worker = pool.get().await.expect("wasm worker not found");
 
     // convert request to host-call request
-    let mut headers: Vec<(&str, &str)> = vec![];
+    let mut headers: Vec<(String, String)> = vec![];
     let req_headers = req.headers().clone();
     req_headers.iter().for_each(|(k, v)| {
-        headers.push((k.as_str(), v.to_str().unwrap()));
+        headers.push((k.to_string(), v.to_str().unwrap().to_string()));
     });
 
     let uri = req.uri().to_string();
