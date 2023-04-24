@@ -56,10 +56,13 @@ impl http_body::Host for HttpContext {
         if !self.body_map.contains_key(&handle) {
             return Ok(Err(BodyError::InvalidHandle));
         }
-        if !self.body_sender_map.contains_key(&handle) {
-            return Ok(Err(BodyError::ReadOnly));
-        }
         let size = data.len() as u64;
+        if !self.body_sender_map.contains_key(&handle) {
+            let body = Body::from(data);
+            self.replace_body(handle, body);
+            debug!("write body: {}", size);
+            return Ok(Ok(size));
+        }
         let sender = self.body_sender_map.get_mut(&handle).unwrap();
         sender
             .send_data(data.into())
@@ -71,10 +74,20 @@ impl http_body::Host for HttpContext {
 
     #[instrument(skip_all, name = "[Body]", level = "debug", fields(req_id = self.req_id))]
     async fn http_body_new(&mut self) -> wasmtime::Result<Result<HttpBodyHandle, BodyError>> {
+        let body = Body::empty();
+        let body_handle = self.set_body(body);
+        debug!("new body: {}", body_handle);
+        Ok(Ok(body_handle))
+    }
+
+    #[instrument(skip_all, name = "[Body]", level = "debug", fields(req_id = self.req_id))]
+    async fn http_body_new_stream(
+        &mut self,
+    ) -> wasmtime::Result<Result<HttpBodyHandle, BodyError>> {
         let (sender, body) = Body::channel();
         let body_handle = self.set_body(body);
         self.set_body_sender(body_handle, sender);
-        debug!("new body: {}", body_handle);
+        debug!("new body stream: {}", body_handle);
         Ok(Ok(body_handle))
     }
 }

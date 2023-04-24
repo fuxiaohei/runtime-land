@@ -25,6 +25,9 @@ interface http-body-iface {
 
     /// Accquire http body and get http body handle
     http-body-new: func() -> result<http-body-handle,body-error>
+
+    /// Accquire http body and get http body handle
+    http-body-new-stream: func() -> result<http-body-handle,body-error>
 }
 
 // import http-body
