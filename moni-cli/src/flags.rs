@@ -166,3 +166,29 @@ impl Serve {
             .unwrap();
     }
 }
+
+/// Command Login
+#[derive(Args, Debug)]
+pub struct Login {
+    /// The user_token
+    pub user_token: String,
+    /// The cloud api
+    #[clap(long, default_value("http://127.0.0.1:8779"))]
+    pub cloud: Option<String>,
+}
+
+impl Login {
+    pub async fn run(&self) {
+        debug!("Login: {self:?}");
+    }
+}
+
+/// Command Deploy
+#[derive(Args, Debug)]
+pub struct Deploy {}
+
+impl Deploy {
+    pub async fn run(&self) {
+        debug!("Deploy: {self:?}");
+    }
+}

@@ -14,6 +14,10 @@ enum Cli {
     Build(flags::Build),
     /// Serve runs the project
     Serve(flags::Serve),
+    /// Login to cloud server
+    Login(flags::Login),
+    /// Deploy to cloud server
+    Deploy(flags::Deploy),
 }
 
 #[tokio::main]
@@ -25,5 +29,7 @@ async fn main() {
         Cli::Init(cmd) => cmd.run().await,
         Cli::Build(cmd) => cmd.run().await,
         Cli::Serve(cmd) => cmd.run().await,
+        Cli::Login(cmd) => cmd.run().await,
+        Cli::Deploy(cmd) => cmd.run().await,
     }
 }
