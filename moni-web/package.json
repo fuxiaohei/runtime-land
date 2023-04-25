@@ -1,0 +1,23 @@
+{
+    "name": "moni-web-rspack",
+    "private": true,
+    "version": "0.2.0",
+    "scripts": {
+        "dev": "rspack serve",
+        "build": "rspack build"
+    },
+    "dependencies": {
+        "boostrap": "^2.0.0",
+        "bootstrap": "^5.2.3",
+        "react": "^18.2.0",
+        "react-bootstrap": "^2.7.2",
+        "react-dom": "^18.2.0",
+        "react-icons": "^4.8.0",
+        "react-router-dom": "^6.9.0"
+    },
+    "devDependencies": {
+        "@rspack/cli": "latest",
+        "@types/react": "^18.0.25",
+        "@types/react-dom": "^18.0.8"
+    }
+}

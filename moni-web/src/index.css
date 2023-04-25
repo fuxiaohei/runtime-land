@@ -1,0 +1,153 @@
+html,
+body {
+    background-color: #FAFAFA;
+}
+
+.login-navbar,
+.dashboard-navbar {
+    border-bottom: 1px solid #ccc;
+    /* add shadow in bottom*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container {
+    margin-top: 130px;
+    width: 360px;
+    /* Set the width of the login container */
+    padding: 30px 40px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    /* add shadow in bottom*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container-header {
+    text-align: center;
+    padding-bottom: .3em;
+    padding-top: .5em;
+}
+
+.login-container .login-connection {
+    margin: 2em 0;
+}
+
+.login-container .login-connection .item {
+    margin-bottom: 1em;
+}
+
+.login-container .login-connection .item .fa {
+    margin-right: .4em;
+    size: 26px;
+}
+
+#dashboard-container,
+#project-container {
+    margin-top: 40px;
+    max-width: 900px;
+}
+
+#dashboard-header-left h2,
+#project-header-left h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#dashboard-header-left h3 {
+    font-size: 1.1em;
+    color: #AAA;
+    font-weight: normal;
+}
+
+#project-header-left p {
+    color: #AAA;
+}
+
+#dashboard-header-right {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#project-header-right {
+    text-align: right;
+    line-height: 70px;
+}
+
+.project-card {
+    margin-top: 40px;
+    transition: box-shadow .15s ease-in-out;
+}
+
+.project-card:hover {
+    border-color: #AAA;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-card:hover .project-card-title {
+    color: #111;
+}
+
+.project-card a {
+    text-decoration: none;
+}
+
+.project-card .card-body {
+    padding: 24px 16px;
+}
+
+.project-card-title {
+    font-size: 1.2rem;
+    line-height: 1.25rem;
+    color: #666;
+}
+
+.project-card-title:hover {
+    color: #111;
+}
+
+.project-card-updated {
+    font-size: .8rem;
+    color: #AAA;
+    padding-left: .1rem;
+}
+
+.project-view {
+    text-align: right;
+    line-height: 48px;
+}
+
+#project-header-right .icon {
+    margin-right: .5rem;
+}
+
+#project-tabs-container {
+    margin: 0 10px;
+}
+
+#project-tabs-container .nav-tabs {
+    border: none;
+}
+
+#project-tabs-container .nav-link {
+    padding: .2rem .4rem;
+    margin-right: .3rem;
+    border-radius: 0.3rem;
+    color: #444;
+}
+
+#project-tabs-container .nav-link.active {
+    border: none;
+    background-color: #444;
+    color: #DDD;
+}
+
+#project-tabs-container .nav-link:hover {
+    background-color: #DDD;
+    color: #444;
+}
+
+#project-tabs-container .nav-link.disabled {
+    color: #AAA
+}
