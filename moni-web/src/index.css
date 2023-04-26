@@ -118,6 +118,10 @@ body {
     line-height: 48px;
 }
 
+#project-header-right button {
+    margin-left: 1rem;
+}
+
 #project-header-right .icon {
     margin-right: .5rem;
 }

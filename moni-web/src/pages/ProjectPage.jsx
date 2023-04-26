@@ -1,6 +1,6 @@
 import { Container, Row, Col, Button, Nav } from "react-bootstrap";
 import DashboardNavbar from "./DashboardNavbar";
-import { BsClouds } from "react-icons/bs";
+import { BsClouds, BsFillArrowUpLeftSquareFill } from "react-icons/bs";
 
 function ProjectPage() {
   return (
@@ -15,8 +15,12 @@ function ProjectPage() {
                 <p>Github / Pending</p>
               </Col>
               <Col id="project-header-right">
-                <Button variant="primary">
-                  <BsClouds size={18} className="icon" />
+                <Button variant="secondary" size="sm" href="/dashboard">
+                  <BsFillArrowUpLeftSquareFill size={16} className="icon" />
+                  Projects
+                </Button>
+                <Button variant="primary" size="sm">
+                  <BsClouds size={16} className="icon" />
                   View
                 </Button>
               </Col>

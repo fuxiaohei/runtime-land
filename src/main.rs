@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 mod config;
 
@@ -25,6 +25,10 @@ async fn main() {
 
     let conf = config::Config::from_file(conf_file).unwrap();
     debug!("load conf: {:?}", conf);
+
+    // init db
+    moni_lib::db::init(&conf.db).await.expect("init db failed");
+    info!("init db success");
 
     // start rpc server
     moni_rpc::start_server(conf.http.addr.parse().unwrap())

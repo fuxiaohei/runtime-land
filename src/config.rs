@@ -17,6 +17,7 @@ impl Default for HttpConfig {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {
     pub http: HttpConfig,
+    pub db: moni_lib::db::DbConfig,
 }
 
 impl Config {

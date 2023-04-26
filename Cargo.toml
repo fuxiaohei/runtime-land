@@ -36,6 +36,7 @@ anyhow = "1.0.70"
 async-trait = "0.1.68"
 axum = "0.6.16"
 clap = { version = "4.2.4", features = ["derive"] }
+chrono = "0.4.24"
 http = "0.2.9"
 hyper = { version = "0.14.26", features = ["full"] }
 lazy_static = "1.4.0"

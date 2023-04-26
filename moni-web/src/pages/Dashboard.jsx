@@ -43,7 +43,7 @@ function Dashboard() {
                   <Card.Body>
                     <Row>
                       <Col md={8}>
-                        <a href="#project-1">
+                        <a href="/project">
                           <Card.Title className="project-card-title">
                             quick-trout-fox-22
                           </Card.Title>
