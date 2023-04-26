@@ -12,19 +12,19 @@ function LoginPage() {
         <h3 className="login-container-header">Login to Moni-Web</h3>
         <hr />
         <div className="d-grid gap-2 login-connection">
-          <Button className="item" variant="dark">
+          <Button className="item" variant="dark" disabled>
             <FaGithubAlt size="24" className="fa" /> Continue with Github
           </Button>
-          <Button className="item" variant="danger">
+          <Button className="item" variant="danger" disabled>
             <FaGitlab size="24" className="fa" /> Continue with Gitlab
           </Button>
-          <Button variant="primary">
+          <Button variant="primary" disabled>
             <FaBitbucket size="24" className="fa" /> Continue with Bitbucket
           </Button>
         </div>
         <hr />
         <div className="d-grid gap-2">
-          <Button variant="link" href="#link">
+          <Button variant="link" href="/login-email">
             Continue with Email
           </Button>
         </div>

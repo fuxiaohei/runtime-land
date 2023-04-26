@@ -13,6 +13,8 @@ import {
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import ProjectPage from "./pages/ProjectPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import LoginEmailPage from "./pages/LoginEmailPage";
 
 function PublicPage() {
   return <h3>Public</h3>;
@@ -73,8 +75,10 @@ function App() {
             }
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/login-email" element={<LoginEmailPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/project" element={<ProjectPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </AuthProvider>

@@ -2,3 +2,5 @@
 
 pub use super::project_deployment::Entity as ProjectDeployment;
 pub use super::project_info::Entity as ProjectInfo;
+pub use super::user_info::Entity as UserInfo;
+pub use super::user_token::Entity as UserToken;

@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.39)
 # Database: moni-serverless
-# Generation Time: 2023-04-26 10:07:53 +0000
+# Generation Time: 2023-04-26 22:50:53 +0000
 # ************************************************************
 
 
@@ -55,6 +55,43 @@ CREATE TABLE `project_info` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `owner_id` (`owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+# Dump of table user_info
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_info`;
+
+CREATE TABLE `user_info` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(128) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `display_name` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+# Dump of table user_token
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_token`;
+
+CREATE TABLE `user_token` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `owner_id` int(11) NOT NULL COMMENT 'token owner',
+  `token` varchar(128) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `origin` varchar(24) NOT NULL,
+  `expired_at` int(16) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
