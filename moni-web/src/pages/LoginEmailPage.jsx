@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Alert, Form, Button, Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import LoginNavbar from "./LoginNavbar";
+import { Link, useNavigate } from "react-router-dom";
+import LoginNavbar from "../components/LoginNavbar";
 import { BsFillCaretLeftSquareFill } from "react-icons/bs";
+import { userAuthContext } from "../components/AuthContext";
 
 function LoginEmailPage() {
   const [email, setEmail] = useState("");
@@ -10,8 +11,10 @@ function LoginEmailPage() {
   const [validated, setValidated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const navigate = useNavigate();
+  const { signin } = userAuthContext();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     const form = event.currentTarget;
     const validated = form.checkValidity();
     if (validated === false) {
@@ -23,7 +26,13 @@ function LoginEmailPage() {
     if (validated) {
       event.preventDefault();
       event.stopPropagation();
-      console.log(email, password, validated);
+      let res = await signin({ email, password });
+      if (res.error) {
+        setShowAlert(true);
+        setAlertMessage(res.error);
+        return;
+      }
+      navigate("/dashboard");
     }
   };
 

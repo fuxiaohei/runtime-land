@@ -4,12 +4,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpConfig {
     pub addr: String,
+    pub enable_grpc_web: bool,
 }
 
 impl Default for HttpConfig {
     fn default() -> Self {
         Self {
             addr: "127.0.0.1:38779".to_string(),
+            enable_grpc_web: false,
         }
     }
 }

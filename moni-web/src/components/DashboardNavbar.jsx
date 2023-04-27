@@ -7,7 +7,7 @@ function DashboardNavbar() {
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
-        <Navbar.Brand href="#home">Moni-Web</Navbar.Brand>
+        <Navbar.Brand href="/">Moni-Web</Navbar.Brand>
         <Navbar.Toggle aria-controls="dashboard-navbar-nav" />
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">

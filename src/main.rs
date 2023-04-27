@@ -31,7 +31,7 @@ async fn main() {
     info!("init db success");
 
     // start rpc server
-    moni_rpc::start_server(conf.http.addr.parse().unwrap())
+    moni_rpc::start_server(conf.http.addr.parse().unwrap(), conf.http.enable_grpc_web)
         .await
         .unwrap();
 }

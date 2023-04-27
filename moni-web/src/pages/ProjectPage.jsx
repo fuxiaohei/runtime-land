@@ -1,5 +1,5 @@
 import { Container, Row, Col, Button, Nav } from "react-bootstrap";
-import DashboardNavbar from "./DashboardNavbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import { BsClouds, BsFillArrowUpLeftSquareFill } from "react-icons/bs";
 
 function ProjectPage() {

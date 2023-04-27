@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import LoginNavbar from "./LoginNavbar";
+import LoginNavbar from "../components/LoginNavbar";
 import { FaGithubAlt, FaGitlab, FaBitbucket } from "react-icons/fa";
 
 function LoginPage() {

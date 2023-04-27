@@ -1,4 +1,4 @@
-import DashboardNavbar from "./DashboardNavbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import {
   Container,
   Button,
@@ -72,7 +72,9 @@ function Dashboard() {
                         </Card.Text>
                       </Col>
                       <Col md={4} className="project-view">
-                        <Button variant="light" disabled>Not Ready</Button>
+                        <Button variant="light" disabled>
+                          Not Ready
+                        </Button>
                       </Col>
                     </Row>
                   </Card.Body>

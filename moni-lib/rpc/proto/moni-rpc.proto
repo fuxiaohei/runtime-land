@@ -8,11 +8,24 @@ message LoginEmailRequest {
   string password = 2;
 }
 
-// LoginEmailResponse is the response message for the LoginEmail method.
-message LoginEmailResponse {
+// LoginAccessTokenRequest is the request message for the LoginAccessToken
+message LoginAccessTokenRequest{
   string access_token = 1;
-  int64 code = 2;
+}
+
+// LoginResponse is the response message for the LoginEmail method.
+message LoginResponse {
+  int64 code = 1;
+  LoginResultData data = 2;
   string error = 3;
+}
+
+// LoginResultData contains the data of a user logged in by the LoginEmail
+message LoginResultData{
+  string access_token = 1;
+  string display_name = 2;
+  string display_email = 3;
+  string avatar_url = 4;
 }
 
 // CreateProjectRequest is the request message for the CreateProject method.
@@ -42,7 +55,10 @@ message ProjectData {
 
 service MoniRpcService {
   // LoginEmail logs in a user with the specified email and password
-  rpc LoginEmail(LoginEmailRequest) returns (LoginEmailResponse);
+  rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
+
+  // LoginAccessToken logs in a user with the specified access token
+  rpc LoginAccessToken(LoginAccessTokenRequest) returns (LoginResponse);
 
   // CreateProject creates a new function project with the specified data and
   // returns its information
