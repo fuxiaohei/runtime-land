@@ -78,13 +78,13 @@ proto.moni.MoniRpcServicePromiseClient =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.moni.LoginEmailRequest,
- *   !proto.moni.LoginEmailResponse>}
+ *   !proto.moni.LoginResponse>}
  */
 const methodDescriptor_MoniRpcService_LoginEmail = new grpc.web.MethodDescriptor(
   '/moni.MoniRpcService/LoginEmail',
   grpc.web.MethodType.UNARY,
   proto.moni.LoginEmailRequest,
-  proto.moni.LoginEmailResponse,
+  proto.moni.LoginResponse,
   /**
    * @param {!proto.moni.LoginEmailRequest} request
    * @return {!Uint8Array}
@@ -92,7 +92,7 @@ const methodDescriptor_MoniRpcService_LoginEmail = new grpc.web.MethodDescriptor
   function(request) {
     return request.serializeBinary();
   },
-  proto.moni.LoginEmailResponse.deserializeBinary
+  proto.moni.LoginResponse.deserializeBinary
 );
 
 
@@ -101,9 +101,9 @@ const methodDescriptor_MoniRpcService_LoginEmail = new grpc.web.MethodDescriptor
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.moni.LoginEmailResponse)}
+ * @param {function(?grpc.web.RpcError, ?proto.moni.LoginResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.moni.LoginEmailResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.LoginResponse>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.moni.MoniRpcServiceClient.prototype.loginEmail =
@@ -122,7 +122,7 @@ proto.moni.MoniRpcServiceClient.prototype.loginEmail =
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.moni.LoginEmailResponse>}
+ * @return {!Promise<!proto.moni.LoginResponse>}
  *     Promise that resolves to the response
  */
 proto.moni.MoniRpcServicePromiseClient.prototype.loginEmail =
@@ -132,6 +132,67 @@ proto.moni.MoniRpcServicePromiseClient.prototype.loginEmail =
       request,
       metadata || {},
       methodDescriptor_MoniRpcService_LoginEmail);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.LoginAccessTokenRequest,
+ *   !proto.moni.LoginResponse>}
+ */
+const methodDescriptor_MoniRpcService_LoginAccessToken = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/LoginAccessToken',
+  grpc.web.MethodType.UNARY,
+  proto.moni.LoginAccessTokenRequest,
+  proto.moni.LoginResponse,
+  /**
+   * @param {!proto.moni.LoginAccessTokenRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.LoginResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.LoginAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.LoginResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.LoginResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.loginAccessToken =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/LoginAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_LoginAccessToken,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.LoginAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.LoginResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.loginAccessToken =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/LoginAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_LoginAccessToken);
 };
 
 
