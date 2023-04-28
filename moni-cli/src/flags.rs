@@ -41,9 +41,14 @@ impl Init {
         let mut meta = Meta::from_binary(&meta.unwrap().data).unwrap();
         meta.name = self.name.clone();
         meta.build = None;
+        meta.generate_project_name();
         let metadata_file = PathBuf::from(&self.name).join(DEFAULT_METADATA_FILE);
         meta.to_file(metadata_file.to_str().unwrap()).unwrap();
-        info!("Created metadata: {:?}", metadata_file);
+        info!(
+            "Created metadata: {:?}, project: {:?}",
+            metadata_file,
+            meta.get_project_name()
+        );
         meta
     }
 
@@ -167,25 +172,15 @@ impl Serve {
     }
 }
 
-/// Command Login
-#[derive(Args, Debug)]
-pub struct Login {
-    /// The user_token
-    pub user_token: String,
-    /// The cloud api
-    #[clap(long, default_value("http://127.0.0.1:8779"))]
-    pub cloud: Option<String>,
-}
-
-impl Login {
-    pub async fn run(&self) {
-        debug!("Login: {self:?}");
-    }
-}
-
 /// Command Deploy
 #[derive(Args, Debug)]
-pub struct Deploy {}
+pub struct Deploy {
+    /// The token
+    pub token: String,
+    /// The cloud api
+    #[clap(long, default_value("http://127.0.0.1:38779"))]
+    pub cloud: Option<String>,
+}
 
 impl Deploy {
     pub async fn run(&self) {

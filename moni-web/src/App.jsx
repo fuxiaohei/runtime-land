@@ -10,6 +10,7 @@ import {
   AuthProvider,
   RequireAuth,
   RequireUnauth,
+  SignoutPage,
 } from "./components/AuthContext";
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
             }
           />
           <Route path="/project" element={<ProjectPage />} />
+          <Route path="/signout" element={<SignoutPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

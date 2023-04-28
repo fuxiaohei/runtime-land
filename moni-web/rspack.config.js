@@ -10,6 +10,8 @@ module.exports = {
     html: [
       {
         template: "./index.html",
+        title: "Moni Serverless",
+        favicon: "./public/favicon.png",
       },
     ],
   },
@@ -17,6 +19,10 @@ module.exports = {
     rules: [
       {
         test: /\.svg$/,
+        type: "asset",
+      },
+      {
+        test: /\.png$/,
         type: "asset",
       },
     ],

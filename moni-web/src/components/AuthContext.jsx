@@ -1,7 +1,7 @@
 import React from "react";
 import { mockAuthProvider } from "../auth";
 import { getLocalUser, loginByEmail } from "../api/login";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 
 let AuthContext = React.createContext(null);
 
@@ -17,7 +17,6 @@ function AuthProvider({ children }) {
     // if login by email and password
     if (newUser.email && newUser.password) {
       let res = await loginByEmail(newUser.email, newUser.password);
-      console.log("---res", res);
       if (res.data) {
         setUser(res.data);
         localStorage.setItem("moni-web-user", JSON.stringify(res.data));
@@ -26,10 +25,11 @@ function AuthProvider({ children }) {
     }
   };
 
-  let signout = (callback) => {
+  let signout = async (user) => {
+    console.log("--signout", user);
+    localStorage.removeItem("moni-web-user");
     return mockAuthProvider.signout(() => {
       setUser(null);
-      callback();
     });
   };
 
@@ -65,10 +65,31 @@ function RequireUnauth({ children }) {
   return children;
 }
 
+function SignoutPage() {
+  let auth = userAuthContext();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    await auth.signout(auth.user);
+    navigate("/login");
+  };
+
+  // Call handleLogout when the component is mounted
+  React.useEffect(() => {
+    handleLogout();
+  }, []);
+
+  return (
+    <div id="logging-out">
+      <h4>Logging out...</h4>
+    </div>
+  );
+}
+
 export {
   userAuthContext,
   AuthContext,
   AuthProvider,
   RequireAuth,
   RequireUnauth,
+  SignoutPage,
 };

@@ -1669,6 +1669,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "once_cell",
+ "rand",
  "sea-orm",
  "serde",
  "time 0.3.20",

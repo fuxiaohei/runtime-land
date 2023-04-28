@@ -187,3 +187,30 @@ body {
     font-size: .9rem;
     color: #666;
 }
+
+.dashboard-navbar-avatar {
+    margin-right: 6px;
+    margin-top: -2px;
+}
+
+#current-account .account-name {
+    margin-left: .5rem;
+}
+
+#create-org-nav .create-org {
+    margin-left: .5rem;
+    font-size: 0.9rem;
+    color: #AAA;
+}
+
+.profile-avatar {
+    text-align: center;
+}
+
+.profile-avatar h5 {
+    line-height: 2em;
+}
+
+#logging-out {
+    margin: 1rem 2rem;
+}

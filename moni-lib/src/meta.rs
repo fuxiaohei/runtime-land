@@ -1,4 +1,6 @@
 use anyhow::Result;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -86,6 +88,22 @@ impl Meta {
             return "dist/".to_string();
         }
         "src/".to_string()
+    }
+
+    /// get project name
+    pub fn get_project_name(&self) -> String {
+        self.project.clone()
+    }
+
+    /// generate project name with random string
+    pub fn generate_project_name(&mut self) -> String {
+        let rand_string: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(10)
+            .map(char::from)
+            .collect();
+        self.project = format!("{}-{}", self.name, rand_string.to_lowercase());
+        self.project.clone()
     }
 }
 
