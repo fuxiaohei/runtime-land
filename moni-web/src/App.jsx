@@ -12,6 +12,7 @@ import {
   RequireUnauth,
   SignoutPage,
 } from "./components/AuthContext";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
           />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/signout" element={<SignoutPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

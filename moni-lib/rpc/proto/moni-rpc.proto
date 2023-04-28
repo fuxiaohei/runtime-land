@@ -63,4 +63,5 @@ service MoniRpcService {
   // CreateProject creates a new function project with the specified data and
   // returns its information
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+
 }

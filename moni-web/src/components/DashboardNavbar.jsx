@@ -16,7 +16,6 @@ function DashboardNavbar() {
       <span>{user.displayName}</span>
     </span>
   );
-  console.log("----user", user);
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
@@ -25,7 +24,7 @@ function DashboardNavbar() {
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">
             <NavDropdown title={avatarLogo} id="dashboard-nav-dropdown">
-              <NavDropdown.Item id="current-account">
+              <NavDropdown.Item id="current-account" href="/dashboard">
                 <BsCheckCircle size={16} />
                 <span className="account-name">{user.displayName}</span>
               </NavDropdown.Item>
@@ -56,12 +55,19 @@ function DashboardNavbar() {
               id="dashboard-profile-dropdown"
             >
               <div className="profile-avatar">
-                <Image src={user.avatarUrl} roundedCircle width={80} height={80} />
-                <p><h5>{user.displayName}</h5></p>
+                <Image
+                  src={user.avatarUrl}
+                  roundedCircle
+                  width={80}
+                  height={80}
+                />
+                <p>
+                  <h5>{user.displayName}</h5>
+                </p>
               </div>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/dashboard">Projects</NavDropdown.Item>
-              <NavDropdown.Item href="/access-tokens">
+              <NavDropdown.Item href="/settings#access-tokens">
                 Access Tokens
               </NavDropdown.Item>
               <NavDropdown.Divider />
