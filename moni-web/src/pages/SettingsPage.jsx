@@ -1,8 +1,11 @@
 import { Container, Card, ListGroup, Button } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { TbWebhook, TbTrash, TbSquareKey } from "react-icons/tb";
+import CreateAccessTokenModal from "../components/CreateAccessTokenModal";
+import React from "react";
 
 function SettingsPage() {
+  const [tokenModelShow, setTokenModelShow] = React.useState(false);
   return (
     <div>
       <DashboardNavbar />
@@ -47,13 +50,21 @@ function SettingsPage() {
               </ListGroup.Item>
             </ListGroup>
             <Card.Text>
-              <Button variant="dark" size="sm">
+              <Button
+                variant="dark"
+                size="sm"
+                onClick={() => setTokenModelShow(true)}
+              >
                 Create Access Token
               </Button>
             </Card.Text>
           </Card.Body>
         </Card>
       </Container>
+      <CreateAccessTokenModal
+        show={tokenModelShow}
+        onHide={() => setTokenModelShow(false)}
+      />
     </div>
   );
 }

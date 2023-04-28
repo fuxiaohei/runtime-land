@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package moni;
 
+// Empty is the empty message
+message Empty {}
+
 // LoginEmailRequest is the request message for the LoginEmail method.
 message LoginEmailRequest {
   string email = 1;
@@ -9,9 +12,7 @@ message LoginEmailRequest {
 }
 
 // LoginAccessTokenRequest is the request message for the LoginAccessToken
-message LoginAccessTokenRequest{
-  string access_token = 1;
-}
+message LoginAccessTokenRequest { string access_token = 1; }
 
 // LoginResponse is the response message for the LoginEmail method.
 message LoginResponse {
@@ -21,7 +22,7 @@ message LoginResponse {
 }
 
 // LoginResultData contains the data of a user logged in by the LoginEmail
-message LoginResultData{
+message LoginResultData {
   string access_token = 1;
   string display_name = 2;
   string display_email = 3;
@@ -53,6 +54,20 @@ message ProjectData {
   string version = 3;
 }
 
+// AccessToken is the struct of an access token
+message AccessTokenData {
+  string name = 1;
+  int64 created_at = 2;
+  int64 expires_at = 3;
+  string origin = 4;
+}
+
+message ListAccessTokensResponse {
+  int64 code = 1;
+  repeated AccessTokenData data = 2;
+  string error = 3;
+}
+
 service MoniRpcService {
   // LoginEmail logs in a user with the specified email and password
   rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
@@ -64,4 +79,6 @@ service MoniRpcService {
   // returns its information
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
 
+  // ListAccessTokens lists all access tokens of the current user
+  rpc ListAccessTokens(Empty) returns (ListAccessTokensResponse);
 }

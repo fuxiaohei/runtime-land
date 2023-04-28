@@ -1,14 +1,15 @@
 use crate::{
     db::DB,
     model::{
-        user_info::{self, Entity as UserInfoEntity},
+        user_info::{self, Entity as UserInfoEntity, Model},
         user_token,
     },
 };
 use anyhow::Result;
+use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
 
-pub async fn login_by_email(email: String, pwd: String) -> Result<String> {
+pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, String)> {
     let db = DB.get().unwrap();
     let user = UserInfoEntity::find()
         .filter(user_info::Column::Email.eq(email))
@@ -29,16 +30,21 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<String> {
         3 * 24 * 3600,
     )
     .await?;
-    Ok(token)
+    Ok((user, token))
 }
 
 async fn create_token(owner_id: i32, name: String, origin: String, expire: i64) -> Result<String> {
     let now = chrono::Utc::now();
     let expired_at = now.timestamp() + expire;
+    let token: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(40)
+        .map(char::from)
+        .collect();
     let token_model = user_token::Model {
         id: 0,
         owner_id,
-        token: String::from("11111"),
+        token,
         name,
         created_at: now,
         updated_at: now,

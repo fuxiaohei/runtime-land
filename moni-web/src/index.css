@@ -249,3 +249,7 @@ body {
 #access-tokens-list .list-group-item .del-button:hover {
     color: #dc3545;
 }
+
+#create-access-token-modal {
+    width: 500px;
+}
