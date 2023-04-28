@@ -34,8 +34,8 @@ members = [
 [workspace.dependencies]
 anyhow = "1.0.70"
 async-trait = "0.1.68"
-axum = "0.6.16"
-clap = { version = "4.2.4", features = ["derive"] }
+axum = "0.6.17"
+clap = { version = "4.2.5", features = ["derive"] }
 chrono = "0.4.24"
 http = "0.2.9"
 hyper = { version = "0.14.26", features = ["full"] }
@@ -44,9 +44,9 @@ once_cell = "1.17.1"
 reqwest = { version = "0.11.16", features = ["stream"] }
 serde = { version = "1.0.160", features = ["derive"] }
 time = "0.3.20"
-tokio = { version = "1.27.0", features = ["full"] }
+tokio = { version = "1.28.0", features = ["full"] }
 toml = "0.7.3"
-tracing = "0.1.37"
+tracing = "0.1.38"
 tracing-subscriber = { version = "0.3.17", features = [
     "time",
     "local-time",
@@ -58,10 +58,10 @@ wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", rev = "299131
     "component-model",
     "async"
 ] }
-wit-bindgen = "0.5.0"
-wit-bindgen-core = "0.5.0"
-wit-bindgen-rust = "0.5.0"
-wit-component = "0.8.1"
+wit-bindgen = "0.6.0"
+wit-bindgen-core = "0.6.0"
+wit-bindgen-rust = "0.6.0"
+wit-component = "0.8.2"
 
 [workspace.package]
 version = "0.2.0"

@@ -1,5 +1,6 @@
 manifest = "v1"
 name = "rust-fetch"
+project = ""
 description = "example rust project with fetch api"
 authors = []
 language = "rust"

@@ -9,6 +9,7 @@ pub const DEFAULT_METADATA_FILE: &str = "meta.toml";
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Meta {
     pub manifest: String,
+    pub project: String, // project name auto generated
     pub name: String,
     pub description: String,
     pub authors: Vec<String>,

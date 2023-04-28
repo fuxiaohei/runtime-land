@@ -1,5 +1,6 @@
 manifest = "v1"
 name = "rust-router"
+project = ""
 description = "example rust project with router api"
 authors = []
 language = "rust"

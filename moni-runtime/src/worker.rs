@@ -24,7 +24,7 @@ impl Default for Context {
 impl Context {
     pub fn new(req_id: u64) -> Self {
         Context {
-            wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build(),
+            wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build().unwrap(),
             http_ctx: HttpContext::new(req_id),
         }
     }
