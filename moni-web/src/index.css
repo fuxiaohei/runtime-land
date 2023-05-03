@@ -213,6 +213,10 @@ body {
     line-height: 2em;
 }
 
+.profile-displayname {
+    font-size: 1.3rem;
+}
+
 #logging-out {
     margin: 1rem 2rem;
 }

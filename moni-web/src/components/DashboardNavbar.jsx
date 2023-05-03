@@ -1,6 +1,7 @@
 import { Container, Nav, Navbar, NavDropdown, Image } from "react-bootstrap";
 import { userAuthContext } from "./AuthContext";
 import { BsCheckCircle, BsPlus } from "react-icons/bs";
+import { NavDropdownItemLink, NavbarBrandLink } from "./ButtonLink";
 
 function DashboardNavbar() {
   const user = userAuthContext().user;
@@ -19,7 +20,7 @@ function DashboardNavbar() {
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
-        <Navbar.Brand href="/">Moni-Web</Navbar.Brand>
+        <NavbarBrandLink to="/dashboard">Moni-Web</NavbarBrandLink>
         <Navbar.Toggle aria-controls="dashboard-navbar-nav" />
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">
@@ -62,16 +63,20 @@ function DashboardNavbar() {
                   height={80}
                 />
                 <p>
-                  <h5>{user.displayName}</h5>
+                  <strong className="profile-displayname">
+                    {user.displayName}
+                  </strong>
                 </p>
               </div>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="/dashboard">Projects</NavDropdown.Item>
-              <NavDropdown.Item href="/settings#access-tokens">
+              <NavDropdownItemLink to="/dashboard">
+                Projects
+              </NavDropdownItemLink>
+              <NavDropdownItemLink to="/settings#access-token">
                 Access Tokens
-              </NavDropdown.Item>
+              </NavDropdownItemLink>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="/signout">Sign Out</NavDropdown.Item>
+              <NavDropdownItemLink to="/singout">Sign Out</NavDropdownItemLink>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
