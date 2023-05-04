@@ -14,26 +14,31 @@ function CreateAccessTokenModal(props) {
           Generate Access Token
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Form>
+      <Form onSubmit={props.onSubmit}>
+        <Modal.Body>
           <Form.Group className="mb-3">
             <div className="mb-3">
               <Form.Text className="text-muted">
                 Enter the description of the new access token.
               </Form.Text>
             </div>
-            <Form.Control type="text" placeholder="What's the token user for" />
+            <Form.Control
+              name="tokenvalue"
+              required
+              type="text"
+              placeholder="What's the token user for"
+            />
           </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="light" onClick={props.onHide}>
-          Cancel
-        </Button>
-        <Button variant="primary" className="ms-3">
-          Create
-        </Button>
-      </Modal.Footer>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="light" onClick={props.onHide}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" className="ms-3">
+            Create
+          </Button>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 }

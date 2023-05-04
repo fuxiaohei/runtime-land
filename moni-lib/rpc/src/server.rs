@@ -33,7 +33,7 @@ impl MoniRpcService for ServiceImpl {
             error: String::new(),
             code: 0,
             data: Some(crate::LoginResultData {
-                access_token: token,
+                access_token: token.token,
                 display_name: user.display_name,
                 display_email: user.email,
                 avatar_url: gravatar_url.to_string(),
@@ -82,21 +82,10 @@ impl MoniRpcService for ServiceImpl {
         &self,
         _req: tonic::Request<super::Empty>,
     ) -> Result<tonic::Response<super::ListAccessTokensResponse>, tonic::Status> {
-        let tokens = match token::list(1).await {
-            Ok(t) => t,
-            Err(e) => {
-                let resp = super::ListAccessTokensResponse {
-                    error: format!("{:?}", e),
-                    code: 1,
-                    data: vec![],
-                };
-                warn!("list access tokens failed: {:?}", e);
-                return Ok(tonic::Response::new(resp));
-            }
-        };
+        let tokens = token::list(1)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         let resp = super::ListAccessTokensResponse {
-            error: String::new(),
-            code: 0,
             data: tokens
                 .into_iter()
                 .map(|t| super::AccessTokenData {
@@ -104,8 +93,29 @@ impl MoniRpcService for ServiceImpl {
                     created_at: t.created_at.timestamp(),
                     expires_at: t.expired_at as i64,
                     origin: t.origin,
+                    value: None,
                 })
                 .collect(),
+        };
+        Ok(tonic::Response::new(resp))
+    }
+
+    async fn create_access_token(
+        &self,
+        req: tonic::Request<super::CreateAccessTokenRequest>,
+    ) -> Result<tonic::Response<super::CreateAccessTokenResponse>, tonic::Status> {
+        let req = req.into_inner();
+        let tk = token::create(1, req.name, "dashboard".to_string(), 365 * 24 * 3600)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        let resp = super::CreateAccessTokenResponse {
+            data: Some(super::AccessTokenData {
+                name: tk.name,
+                created_at: tk.created_at.timestamp(),
+                expires_at: tk.expired_at as i64,
+                origin: tk.origin,
+                value: Some(tk.token),
+            }),
         };
         Ok(tonic::Response::new(resp))
     }

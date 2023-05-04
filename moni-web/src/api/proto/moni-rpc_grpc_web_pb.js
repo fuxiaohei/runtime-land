@@ -199,6 +199,128 @@ proto.moni.MoniRpcServicePromiseClient.prototype.loginAccessToken =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.CreateAccessTokenRequest,
+ *   !proto.moni.CreateAccessTokenResponse>}
+ */
+const methodDescriptor_MoniRpcService_CreateAccessToken = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/CreateAccessToken',
+  grpc.web.MethodType.UNARY,
+  proto.moni.CreateAccessTokenRequest,
+  proto.moni.CreateAccessTokenResponse,
+  /**
+   * @param {!proto.moni.CreateAccessTokenRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.CreateAccessTokenResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.CreateAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.CreateAccessTokenResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.CreateAccessTokenResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.createAccessToken =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateAccessToken,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.CreateAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.CreateAccessTokenResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.createAccessToken =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateAccessToken);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.Empty,
+ *   !proto.moni.ListAccessTokensResponse>}
+ */
+const methodDescriptor_MoniRpcService_ListAccessTokens = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/ListAccessTokens',
+  grpc.web.MethodType.UNARY,
+  proto.moni.Empty,
+  proto.moni.ListAccessTokensResponse,
+  /**
+   * @param {!proto.moni.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.ListAccessTokensResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.ListAccessTokensResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.ListAccessTokensResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.listAccessTokens =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/ListAccessTokens',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ListAccessTokens,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.ListAccessTokensResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.listAccessTokens =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/ListAccessTokens',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ListAccessTokens);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.moni.CreateProjectRequest,
  *   !proto.moni.CreateProjectResponse>}
  */

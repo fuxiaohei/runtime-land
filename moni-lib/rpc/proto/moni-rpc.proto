@@ -60,12 +60,22 @@ message AccessTokenData {
   int64 created_at = 2;
   int64 expires_at = 3;
   string origin = 4;
+  optional string value = 5;
 }
 
+// CreateAccessTokenRequest is the request message for the CreateAccessToken
+message CreateAccessTokenRequest{
+  string name = 1;
+}
+
+// CreateAccessTokenResponse is the response message for the CreateAccessToken
+message CreateAccessTokenResponse{
+  AccessTokenData data = 2;
+}
+
+// ListAccessTokensResponse is the response message for the ListAccessTokens
 message ListAccessTokensResponse {
-  int64 code = 1;
   repeated AccessTokenData data = 2;
-  string error = 3;
 }
 
 service MoniRpcService {
@@ -75,10 +85,14 @@ service MoniRpcService {
   // LoginAccessToken logs in a user with the specified access token
   rpc LoginAccessToken(LoginAccessTokenRequest) returns (LoginResponse);
 
-  // CreateProject creates a new function project with the specified data and
-  // returns its information
-  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  // CreateAccessToken creates a new access token for the current user
+  rpc CreateAccessToken(CreateAccessTokenRequest) returns (CreateAccessTokenResponse);
 
   // ListAccessTokens lists all access tokens of the current user
   rpc ListAccessTokens(Empty) returns (ListAccessTokensResponse);
+
+
+  // CreateProject creates a new function project with the specified data and
+  // returns its information
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
 }

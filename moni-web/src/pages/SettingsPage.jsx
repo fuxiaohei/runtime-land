@@ -1,11 +1,48 @@
-import { Container, Card, ListGroup, Button } from "react-bootstrap";
+import { Container, Card, Button, Spinner } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
-import { TbWebhook, TbTrash, TbSquareKey } from "react-icons/tb";
 import CreateAccessTokenModal from "../components/CreateAccessTokenModal";
-import React from "react";
+import CreatedTokenListGroup from "../components/CreatedTokenListGroup";
+import ListAccessTokensGroup from "../components/ListAccessTokensGroup";
+import React, { useEffect } from "react";
+import { createAccessToken, listAccessTokens } from "../api/token";
 
 function SettingsPage() {
   const [tokenModelShow, setTokenModelShow] = React.useState(false);
+  const [createdToken, setCreatedToken] = React.useState(null);
+  const [tokensList, setTokensList] = React.useState([]);
+
+  const handleCreateSubmit = async (event) => {
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const tokenName = formData.get("tokenvalue");
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    let response = await createAccessToken(tokenName);
+    if (response.error) {
+      return;
+    }
+    setCreatedToken(response.data);
+    setTokenModelShow(false);
+  };
+
+  const handleDoneClick = async () => {
+    // TODO: load the list of tokens again
+    setCreatedToken(null);
+  };
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      let response = await listAccessTokens();
+      if (response.error) {
+        return;
+      }
+      setTokensList(response.dataList || []);
+    };
+    fetchTokens();
+  });
+
   return (
     <div>
       <DashboardNavbar />
@@ -19,36 +56,21 @@ function SettingsPage() {
             <Card.Subtitle>
               Personal access tokens can be used to access Moni-Web API.
             </Card.Subtitle>
-            <ListGroup id="access-tokens-list">
-              <ListGroup.Item className="d-flex py-3 justify-content-between">
-                <div className="desc">
-                  <TbWebhook size={20} />
-                  <span className="ps-1 align-text-top fw-bold">
-                    Web Page Login
-                  </span>
-                  <span className="ps-2 extra">
-                    Logged in 2 days ago, expires in 4 hours
-                  </span>
-                </div>
-                <Button variant="link" size="sm" className="del-button">
-                  <TbTrash size={20} />
-                </Button>
-              </ListGroup.Item>
-              <ListGroup.Item className="d-flex py-3 justify-content-between">
-                <div className="desc">
-                  <TbSquareKey size={20} />
-                  <span className="ps-1 align-text-top fw-bold">
-                    User Created
-                  </span>
-                  <span className="ps-2 extra">
-                    Logged in 2 days ago, expires in 4 hours
-                  </span>
-                </div>
-                <Button variant="link" className="del-button">
-                  <TbTrash size={20} />
-                </Button>
-              </ListGroup.Item>
-            </ListGroup>
+            {tokensList.length ? (
+              <ListAccessTokensGroup tokens={tokensList} />
+            ) : (
+              <Spinner
+                className="access-tokens-loading"
+                animation="border"
+                size="sm"
+              />
+            )}
+            {createdToken ? (
+              <CreatedTokenListGroup
+                onDoneClick={handleDoneClick}
+                value={createdToken}
+              />
+            ) : null}
             <Card.Text>
               <Button
                 variant="dark"
@@ -64,6 +86,7 @@ function SettingsPage() {
       <CreateAccessTokenModal
         show={tokenModelShow}
         onHide={() => setTokenModelShow(false)}
+        onSubmit={handleCreateSubmit}
       />
     </div>
   );

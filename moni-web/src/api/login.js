@@ -1,8 +1,9 @@
 const { LoginEmailRequest } = require("./proto/moni-rpc_pb.js");
 const { MoniRpcServiceClient } = require("./proto/moni-rpc_grpc_web_pb.js");
+const { RPC_CLIENT_ADDRESS } = require("./utils.js");
 
 function loginByEmail(email, password) {
-  let client = new MoniRpcServiceClient("http://127.0.0.1:38779");
+  let client = new MoniRpcServiceClient(RPC_CLIENT_ADDRESS);
   let request = new LoginEmailRequest();
   request.setEmail(email);
   request.setPassword(password);
@@ -10,7 +11,7 @@ function loginByEmail(email, password) {
   let promise = new Promise((resolve, reject) => {
     client.loginEmail(request, {}, (err, response) => {
       if (err) {
-        resolve({ code: 1, error: response_error });
+        resolve({ code: 1, error: err });
         return;
       }
       if (response.getCode()) {

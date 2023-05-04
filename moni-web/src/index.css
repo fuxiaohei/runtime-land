@@ -231,29 +231,57 @@ body {
     font-weight: normal;
 }
 
-#access-tokens-list {
+#access-tokens-existing-list {
     margin-top: 1rem;
     margin-bottom: 1.5rem;
 }
 
-#access-tokens-list .list-group-item {
+#access-tokens-new-value {
+    margin-bottom: 1.5rem;
+}
+
+.access-tokens-list .list-group-item {
     background-color: #f1f5f9;
 }
 
-#access-tokens-list .list-group-item .desc .extra {
+.access-tokens-list .list-group-item .desc .extra {
     font-size: .8rem;
     color: #888;
 }
 
-#access-tokens-list .list-group-item .del-button {
+.access-tokens-list .list-group-item .del-button {
     color: #666;
     padding: 0;
 }
 
-#access-tokens-list .list-group-item .del-button:hover {
+.access-tokens-list .list-group-item .del-button:hover {
     color: #dc3545;
 }
 
 #create-access-token-modal {
     width: 500px;
+}
+
+#access-tokens-new-value p.name,
+#access-tokens-new-value p.value {
+    margin-bottom: 0;
+}
+
+#access-tokens-new-value p.value {
+    margin-left: 24px;
+}
+
+#access-tokens-new-value .list-group-item {
+    border-color: #a3cfbb;
+    background-color: #e6f4ed;
+}
+
+#access-tokens-new-value .copy-btn {
+    margin-left: .5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.access-tokens-loading {
+    margin: 1rem 0;
 }
