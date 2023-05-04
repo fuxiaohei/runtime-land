@@ -1846,9 +1846,11 @@ proto.moni.AccessTokenData.toObject = function(includeInstance, msg) {
   var f, obj = {
     name: jspb.Message.getFieldWithDefault(msg, 1, ""),
     createdAt: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    expiresAt: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    origin: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    value: jspb.Message.getFieldWithDefault(msg, 5, "")
+    updatedAt: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    expiresAt: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    origin: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    uuid: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    value: jspb.Message.getFieldWithDefault(msg, 7, "")
   };
 
   if (includeInstance) {
@@ -1895,13 +1897,21 @@ proto.moni.AccessTokenData.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 3:
       var value = /** @type {number} */ (reader.readInt64());
-      msg.setExpiresAt(value);
+      msg.setUpdatedAt(value);
       break;
     case 4:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setExpiresAt(value);
+      break;
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setOrigin(value);
       break;
-    case 5:
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUuid(value);
+      break;
+    case 7:
       var value = /** @type {string} */ (reader.readString());
       msg.setValue(value);
       break;
@@ -1948,24 +1958,38 @@ proto.moni.AccessTokenData.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getExpiresAt();
+  f = message.getUpdatedAt();
   if (f !== 0) {
     writer.writeInt64(
       3,
       f
     );
   }
-  f = message.getOrigin();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getExpiresAt();
+  if (f !== 0) {
+    writer.writeInt64(
       4,
       f
     );
   }
-  f = /** @type {string} */ (jspb.Message.getField(message, 5));
-  if (f != null) {
+  f = message.getOrigin();
+  if (f.length > 0) {
     writer.writeString(
       5,
+      f
+    );
+  }
+  f = message.getUuid();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 7));
+  if (f != null) {
+    writer.writeString(
+      7,
       f
     );
   }
@@ -2009,10 +2033,10 @@ proto.moni.AccessTokenData.prototype.setCreatedAt = function(value) {
 
 
 /**
- * optional int64 expires_at = 3;
+ * optional int64 updated_at = 3;
  * @return {number}
  */
-proto.moni.AccessTokenData.prototype.getExpiresAt = function() {
+proto.moni.AccessTokenData.prototype.getUpdatedAt = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -2021,34 +2045,34 @@ proto.moni.AccessTokenData.prototype.getExpiresAt = function() {
  * @param {number} value
  * @return {!proto.moni.AccessTokenData} returns this
  */
-proto.moni.AccessTokenData.prototype.setExpiresAt = function(value) {
+proto.moni.AccessTokenData.prototype.setUpdatedAt = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * optional string origin = 4;
+ * optional int64 expires_at = 4;
+ * @return {number}
+ */
+proto.moni.AccessTokenData.prototype.getExpiresAt = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.moni.AccessTokenData} returns this
+ */
+proto.moni.AccessTokenData.prototype.setExpiresAt = function(value) {
+  return jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional string origin = 5;
  * @return {string}
  */
 proto.moni.AccessTokenData.prototype.getOrigin = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.moni.AccessTokenData} returns this
- */
-proto.moni.AccessTokenData.prototype.setOrigin = function(value) {
-  return jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string value = 5;
- * @return {string}
- */
-proto.moni.AccessTokenData.prototype.getValue = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
@@ -2057,8 +2081,44 @@ proto.moni.AccessTokenData.prototype.getValue = function() {
  * @param {string} value
  * @return {!proto.moni.AccessTokenData} returns this
  */
+proto.moni.AccessTokenData.prototype.setOrigin = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional string uuid = 6;
+ * @return {string}
+ */
+proto.moni.AccessTokenData.prototype.getUuid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.moni.AccessTokenData} returns this
+ */
+proto.moni.AccessTokenData.prototype.setUuid = function(value) {
+  return jspb.Message.setProto3StringField(this, 6, value);
+};
+
+
+/**
+ * optional string value = 7;
+ * @return {string}
+ */
+proto.moni.AccessTokenData.prototype.getValue = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.moni.AccessTokenData} returns this
+ */
 proto.moni.AccessTokenData.prototype.setValue = function(value) {
-  return jspb.Message.setField(this, 5, value);
+  return jspb.Message.setField(this, 7, value);
 };
 
 
@@ -2067,7 +2127,7 @@ proto.moni.AccessTokenData.prototype.setValue = function(value) {
  * @return {!proto.moni.AccessTokenData} returns this
  */
 proto.moni.AccessTokenData.prototype.clearValue = function() {
-  return jspb.Message.setField(this, 5, undefined);
+  return jspb.Message.setField(this, 7, undefined);
 };
 
 
@@ -2076,7 +2136,7 @@ proto.moni.AccessTokenData.prototype.clearValue = function() {
  * @return {boolean}
  */
 proto.moni.AccessTokenData.prototype.hasValue = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 7) != null;
 };
 
 

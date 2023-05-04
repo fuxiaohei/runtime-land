@@ -1,17 +1,17 @@
 import { Button, Modal, Form } from "react-bootstrap";
 
-function CreateAccessTokenModal(props) {
+function AccessTokenRemoveModal(props) {
   return (
     <Modal
       {...props}
       size="lg"
-      aria-labelledby="create-access-token-modal-title"
+      aria-labelledby="remove-access-token-modal-title"
       centered
-      id="create-access-token-modal"
+      id="remove-access-token-modal"
     >
       <Modal.Header closeButton={false}>
-        <Modal.Title id="create-access-token-modal-title">
-          Generate Access Token
+        <Modal.Title id="Remove token-access-token-modal-title">
+          Remove Access Token
         </Modal.Title>
       </Modal.Header>
       <Form onSubmit={props.onSubmit}>
@@ -19,7 +19,7 @@ function CreateAccessTokenModal(props) {
           <Form.Group className="mb-3">
             <div className="mb-3">
               <Form.Text className="text-muted">
-                Enter the description of the new access token.
+                Are you sure you want to remove this token?
               </Form.Text>
             </div>
             <Form.Control
@@ -34,8 +34,8 @@ function CreateAccessTokenModal(props) {
           <Button variant="light" onClick={props.onHide}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" className="ms-3">
-            Create
+          <Button type="submit" variant="danger" className="ms-3">
+            Remove
           </Button>
         </Modal.Footer>
       </Form>
@@ -43,4 +43,4 @@ function CreateAccessTokenModal(props) {
   );
 }
 
-export default CreateAccessTokenModal;
+export default AccessTokenRemoveModal;

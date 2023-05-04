@@ -2,18 +2,24 @@ use crate::{db::DB, model::user_token};
 use anyhow::Result;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 
 pub async fn list(owner_id: i32) -> Result<Vec<user_token::Model>> {
     let db = DB.get().unwrap();
     let tokens = user_token::Entity::find()
         .filter(user_token::Column::OwnerId.eq(owner_id))
+        .order_by_desc(user_token::Column::UpdatedAt)
         .all(db)
         .await?;
     Ok(tokens)
 }
 
-pub async fn create(owner_id: i32, name: String, origin: String, expire: i64) -> Result<user_token::Model> {
+pub async fn create(
+    owner_id: i32,
+    name: String,
+    origin: String,
+    expire: i64,
+) -> Result<user_token::Model> {
     let now = chrono::Utc::now();
     let expired_at = now.timestamp() + expire;
     let token: String = thread_rng()
@@ -21,10 +27,12 @@ pub async fn create(owner_id: i32, name: String, origin: String, expire: i64) ->
         .take(40)
         .map(char::from)
         .collect();
+    let uuid = uuid::Uuid::new_v4().to_string();
     let token_model = user_token::Model {
         id: 0,
         owner_id,
         token,
+        uuid,
         name,
         created_at: now,
         updated_at: now,

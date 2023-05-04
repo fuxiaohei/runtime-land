@@ -1,13 +1,18 @@
 import { Container, Card, Button, Spinner } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
-import CreateAccessTokenModal from "../components/CreateAccessTokenModal";
-import CreatedTokenListGroup from "../components/CreatedTokenListGroup";
-import ListAccessTokensGroup from "../components/ListAccessTokensGroup";
+import AccessTokenCreateModal from "../components/AccessTokenCreateModal";
+import AccessTokenCreatedItem from "../components/AccessTokenCreatedItem";
+import AccessTokensListGroup from "../components/AccessTokensListGroup";
 import React, { useEffect } from "react";
 import { createAccessToken, listAccessTokens } from "../api/token";
+import AccessTokenRemoveModal from "../components/AccessTokenRemoveModal";
 
 function SettingsPage() {
   const [tokenModelShow, setTokenModelShow] = React.useState(false);
+  const [removeModelShow, setRemoveModelShow] = React.useState({
+    show: false,
+    token: null,
+  });
   const [createdToken, setCreatedToken] = React.useState(null);
   const [tokensList, setTokensList] = React.useState([]);
 
@@ -32,14 +37,24 @@ function SettingsPage() {
     setCreatedToken(null);
   };
 
+  const handleRemoveClick = async (token) => {
+    console.log("---remove", token);
+    setRemoveModelShow({ show: true, token: token });
+  };
+
+  const fetchTokens = async () => {
+    let response = await listAccessTokens();
+    if (response.error) {
+      return;
+    }
+    setTokensList(response.dataList || []);
+  };
+
   useEffect(() => {
-    const fetchTokens = async () => {
-      let response = await listAccessTokens();
-      if (response.error) {
-        return;
-      }
-      setTokensList(response.dataList || []);
-    };
+    if (tokensList.length) {
+      return;
+    }
+
     fetchTokens();
   });
 
@@ -57,7 +72,10 @@ function SettingsPage() {
               Personal access tokens can be used to access Moni-Web API.
             </Card.Subtitle>
             {tokensList.length ? (
-              <ListAccessTokensGroup tokens={tokensList} />
+              <AccessTokensListGroup
+                tokens={tokensList}
+                onRemoveClick={handleRemoveClick}
+              />
             ) : (
               <Spinner
                 className="access-tokens-loading"
@@ -66,7 +84,7 @@ function SettingsPage() {
               />
             )}
             {createdToken ? (
-              <CreatedTokenListGroup
+              <AccessTokenCreatedItem
                 onDoneClick={handleDoneClick}
                 value={createdToken}
               />
@@ -83,10 +101,15 @@ function SettingsPage() {
           </Card.Body>
         </Card>
       </Container>
-      <CreateAccessTokenModal
+      <AccessTokenCreateModal
         show={tokenModelShow}
         onHide={() => setTokenModelShow(false)}
         onSubmit={handleCreateSubmit}
+      />
+      <AccessTokenRemoveModal
+        show={removeModelShow.show}
+        onHide={() => setRemoveModelShow({ show: false, token: null })}
+        token={removeModelShow.token}
       />
     </div>
   );

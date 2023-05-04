@@ -91,8 +91,10 @@ impl MoniRpcService for ServiceImpl {
                 .map(|t| super::AccessTokenData {
                     name: t.name,
                     created_at: t.created_at.timestamp(),
+                    updated_at: t.updated_at.timestamp(),
                     expires_at: t.expired_at as i64,
                     origin: t.origin,
+                    uuid: t.uuid,
                     value: None,
                 })
                 .collect(),
@@ -112,8 +114,10 @@ impl MoniRpcService for ServiceImpl {
             data: Some(super::AccessTokenData {
                 name: tk.name,
                 created_at: tk.created_at.timestamp(),
+                updated_at: tk.updated_at.timestamp(),
                 expires_at: tk.expired_at as i64,
                 origin: tk.origin,
+                uuid: tk.uuid,
                 value: Some(tk.token),
             }),
         };

@@ -1,8 +1,9 @@
 import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ListGroup, Button } from "react-bootstrap";
+import { TbSquareKey, TbCopy, TbCheck } from "react-icons/tb";
 
-function CreatedTokenListGroup({ value, onDoneClick }) {
+function AccessTokenCreatedItem({ value, onDoneClick }) {
   const [tokenCopied, setTokenCopied] = React.useState(false);
   return (
     <ListGroup className="access-tokens-list" id="access-tokens-new-value">
@@ -35,4 +36,4 @@ function CreatedTokenListGroup({ value, onDoneClick }) {
   );
 }
 
-export default CreatedTokenListGroup;
+export default AccessTokenCreatedItem;
