@@ -86,12 +86,14 @@ CREATE TABLE `user_token` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `owner_id` int(11) NOT NULL COMMENT 'token owner',
   `token` varchar(128) NOT NULL,
+  `uuid` varchar(64) NOT NULL,
   `name` varchar(64) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `origin` varchar(24) NOT NULL,
   `expired_at` int(16) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
