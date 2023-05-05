@@ -13,40 +13,35 @@ impl MoniRpcService for ServiceImpl {
         req: tonic::Request<super::LoginEmailRequest>,
     ) -> Result<tonic::Response<super::LoginResponse>, tonic::Status> {
         let login_req = req.into_inner();
-        let (user, token) = match user::login_by_email(login_req.email, login_req.password).await {
-            Ok(t) => t,
-            Err(e) => {
-                let resp = super::LoginResponse {
-                    error: format!("{:?}", e),
-                    code: 1,
-                    data: None,
-                };
-                warn!("login by email failed: {:?}", e);
-                return Ok(tonic::Response::new(resp));
-            }
-        };
+        let (user, token) = user::login_by_email(login_req.email, login_req.password)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         let gravatar_url = Gravatar::new(&user.email)
             .set_size(Some(400))
             .set_rating(Some(Rating::Pg))
             .image_url();
-        let resp = super::LoginResponse {
-            error: String::new(),
-            code: 0,
-            data: Some(crate::LoginResultData {
-                access_token: token.token,
-                display_name: user.display_name,
-                display_email: user.email,
-                avatar_url: gravatar_url.to_string(),
-            }),
-        };
-        Ok(tonic::Response::new(resp))
+        Ok(tonic::Response::new(super::LoginResponse {
+            access_token: token.token,
+            display_name: user.display_name,
+            display_email: user.email,
+            avatar_url: gravatar_url.to_string(),
+        }))
     }
 
     async fn login_access_token(
         &self,
-        _req: tonic::Request<super::LoginAccessTokenRequest>,
+        req: tonic::Request<super::LoginAccessTokenRequest>,
     ) -> Result<tonic::Response<super::LoginResponse>, tonic::Status> {
-        Err(tonic::Status::unimplemented("not implemented"))
+        let token_req = req.into_inner();
+        let (user, token) = user::login_by_access_token(token_req.access_token)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        Ok(tonic::Response::new(super::LoginResponse {
+            access_token: token.token,
+            display_name: user.display_name,
+            display_email: user.email,
+            avatar_url: String::new(),
+        }))
     }
 
     async fn create_project(

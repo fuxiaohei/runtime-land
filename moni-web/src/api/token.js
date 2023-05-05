@@ -1,7 +1,6 @@
 import { callClient } from "./utils.js";
 
 const { CreateAccessTokenRequest, Empty } = require("./proto/moni-rpc_pb.js");
-callClient;
 
 async function createAccessToken(name) {
   let req = new CreateAccessTokenRequest();

@@ -159,13 +159,15 @@ body {
     color: #AAA
 }
 
-#notfound-container {
+#notfound-container,
+#login-loading-container {
     margin-top: 90px;
     width: 900px;
     line-height: 2rem;
 }
 
-#notfound-container h1 {
+#notfound-container h1,
+#login-loading-container h1 {
     font-size: 2rem;
 }
 

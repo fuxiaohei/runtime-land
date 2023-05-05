@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Form, Button, Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Button, Container } from "react-bootstrap";
 import LoginNavbar from "../components/LoginNavbar";
 import { FaGithubAlt, FaGitlab, FaBitbucket } from "react-icons/fa";
+import { ButtonLink } from "../components/ButtonLink";
 
 function LoginPage() {
   return (
@@ -24,9 +24,9 @@ function LoginPage() {
         </div>
         <hr />
         <div className="d-grid gap-2">
-          <Button variant="link" href="/login-email">
+          <ButtonLink variant="link" to="/login-email">
             Continue with Email
-          </Button>
+          </ButtonLink>
         </div>
       </Container>
     </div>

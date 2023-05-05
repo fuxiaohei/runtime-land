@@ -16,13 +16,6 @@ message LoginAccessTokenRequest { string access_token = 1; }
 
 // LoginResponse is the response message for the LoginEmail method.
 message LoginResponse {
-  int64 code = 1;
-  LoginResultData data = 2;
-  string error = 3;
-}
-
-// LoginResultData contains the data of a user logged in by the LoginEmail
-message LoginResultData {
   string access_token = 1;
   string display_name = 2;
   string display_email = 3;

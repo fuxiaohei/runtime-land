@@ -1,7 +1,7 @@
 import React from "react";
-import { mockAuthProvider } from "../auth";
-import { getLocalUser, loginByEmail } from "../api/login";
+import { getLocalUser, loginByEmail, loginByLocalUser } from "../api/login";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import LoginLoadingPage from "../pages/LoginLoadingPage";
 
 let AuthContext = React.createContext(null);
 
@@ -26,11 +26,8 @@ function AuthProvider({ children }) {
   };
 
   let signout = async (user) => {
-    console.log("--signout", user);
     localStorage.removeItem("moni-web-user");
-    return mockAuthProvider.signout(() => {
-      setUser(null);
-    });
+    setUser(null);
   };
 
   let value = { user, signin, signout };
@@ -39,15 +36,36 @@ function AuthProvider({ children }) {
 
 function RequireAuth({ children }) {
   let auth = userAuthContext();
-  console.log("---auth", auth, children);
   let location = useLocation();
+  let [logged, setLogged] = React.useState(false);
+
+  const fetchLogin = async () => {
+    let response = await loginByLocalUser(auth.user);
+    if (response.error) {
+      console.log("[auth] browser token error", response.error);
+      auth.signout();
+      return;
+    }
+    setLogged(true);
+  };
+
+  React.useEffect(() => {
+    if (!auth.user) {
+      return;
+    }
+    fetchLogin();
+  });
 
   if (!auth.user) {
+    console.log("[auth] no browser token");
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
     // than dropping them off on the home page.
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  if (!logged) {
+    return <LoginLoadingPage />;
   }
 
   return children;
