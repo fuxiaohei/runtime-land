@@ -35,10 +35,10 @@ function SettingsPage() {
   const handleDoneClick = async () => {
     // TODO: load the list of tokens again
     setCreatedToken(null);
+    fetchTokens();
   };
 
   const handleRemoveClick = async (token) => {
-    console.log("---remove", token);
     setRemoveModelShow({ show: true, token: token });
   };
 
@@ -49,6 +49,10 @@ function SettingsPage() {
     }
     setTokensList(response.dataList || []);
   };
+
+  const handleRemoveSubmit = async (token) => {
+    console.log("----remove",token);
+  }
 
   useEffect(() => {
     if (tokensList.length) {
@@ -110,6 +114,7 @@ function SettingsPage() {
         show={removeModelShow.show}
         onHide={() => setRemoveModelShow({ show: false, token: null })}
         token={removeModelShow.token}
+        onSubmit={handleRemoveSubmit}
       />
     </div>
   );

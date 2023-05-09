@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginNavbar from "../components/LoginNavbar";
 import { BsFillCaretLeftSquareFill } from "react-icons/bs";
 import { userAuthContext } from "../components/AuthContext";
+import { ButtonLink } from "../components/ButtonLink";
 
 function LoginEmailPage() {
   const [email, setEmail] = useState("");
@@ -89,10 +90,10 @@ function LoginEmailPage() {
         </Form>
         <hr />
         <div className="d-grid gap-2">
-          <Button variant="link" href="/login" className="login-email-back">
+          <ButtonLink variant="link" to="/login" className="login-email-back">
             <BsFillCaretLeftSquareFill size={16} />
             Other Login Options
-          </Button>
+          </ButtonLink>
         </div>
       </Container>
     </div>

@@ -65,4 +65,12 @@ async function loginByLocalUser(user) {
   return response;
 }
 
-export { loginByEmail, getLocalUser, loginByLocalUser };
+async function loginByMail(email, password) {
+  let request = new LoginEmailRequest();
+  request.setEmail(email);
+  request.setPassword(password);
+  let response = await callClient(request, "loginEmail");
+  return response;
+}
+
+export { loginByEmail, getLocalUser, loginByLocalUser, loginByMail };

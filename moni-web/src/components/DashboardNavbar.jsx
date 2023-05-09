@@ -25,16 +25,16 @@ function DashboardNavbar() {
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">
             <NavDropdown title={avatarLogo} id="dashboard-nav-dropdown">
-              <NavDropdown.Item id="current-account" href="/dashboard">
+              <NavDropdownItemLink id="current-account" to="/dashboard">
                 <BsCheckCircle size={16} />
                 <span className="account-name">{user.displayName}</span>
-              </NavDropdown.Item>
+              </NavDropdownItemLink>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="/org/new" id="create-org-nav" disabled>
+              <NavDropdownItemLink to="/org/team" id="create-org-nav" disabled>
                 <BsPlus size={16} />
-                <span className="create-org">New Organization</span>
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.4">BBB Inc.</NavDropdown.Item>
+                <span className="create-org">New Team</span>
+              </NavDropdownItemLink>
+              <NavDropdown.Item href="#BBB">BBB Inc.</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

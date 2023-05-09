@@ -17,8 +17,8 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, user_t
     }
     let token = super::token::create(
         user.id as i32,
-        String::from("Login by Email"),
-        String::from("login-by-email"),
+        String::from("Web Dashboard"),
+        String::from("web-dashboard"),
         3 * 24 * 3600,
     )
     .await?;

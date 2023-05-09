@@ -1,5 +1,5 @@
 import React from "react";
-import { getLocalUser, loginByEmail, loginByLocalUser } from "../api/login";
+import { getLocalUser, loginByLocalUser, loginByMail } from "../api/login";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import LoginLoadingPage from "../pages/LoginLoadingPage";
 
@@ -14,12 +14,11 @@ function AuthProvider({ children }) {
   let [user, setUser] = React.useState(localUser);
 
   let signin = async (newUser) => {
-    // if login by email and password
     if (newUser.email && newUser.password) {
-      let res = await loginByEmail(newUser.email, newUser.password);
-      if (res.data) {
-        setUser(res.data);
-        localStorage.setItem("moni-web-user", JSON.stringify(res.data));
+      let res = await loginByMail(newUser.email, newUser.password);
+      if (!res.error) {
+        setUser(res);
+        localStorage.setItem("moni-web-user", JSON.stringify(res));
       }
       return res;
     }
@@ -58,10 +57,6 @@ function RequireAuth({ children }) {
 
   if (!auth.user) {
     console.log("[auth] no browser token");
-    // Redirect them to the /login page, but save the current location they were
-    // trying to go to when they were redirected. This allows us to send them
-    // along to that page after they login, which is a nicer user experience
-    // than dropping them off on the home page.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   if (!logged) {

@@ -1,9 +1,11 @@
 import { ListGroup, Button } from "react-bootstrap";
 import { TbWebhook, TbTrash, TbSquareKey } from "react-icons/tb";
 import React from "react";
+import TimeAgo from "javascript-time-ago";
 
 function AccessTokensListGroup({ tokens, onRemoveClick }) {
   console.log("--tokens", tokens, onRemoveClick);
+  const timeAgo = new TimeAgo("en-US");
   const listItems = tokens.map((token) => (
     <ListGroup.Item
       key={token.uuid}
@@ -17,7 +19,8 @@ function AccessTokensListGroup({ tokens, onRemoveClick }) {
         )}
         <span className="ps-1 align-text-top fw-bold">{token.name}</span>
         <span className="ps-2 extra">
-          Logged in 2 days ago, expires in 4 hours
+          Logged {timeAgo.format(token.updatedAt * 1000)}, expires{" "}
+          {timeAgo.format(token.expiresAt * 1000)}
         </span>
       </div>
       <Button

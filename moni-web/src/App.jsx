@@ -14,6 +14,10 @@ import {
 } from "./components/AuthContext";
 import SettingsPage from "./pages/SettingsPage";
 
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+TimeAgo.addDefaultLocale(en);
+
 function App() {
   return (
     <AuthProvider>
@@ -46,7 +50,14 @@ function App() {
           />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/signout" element={<SignoutPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <SettingsPage />
+              </RequireAuth>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
