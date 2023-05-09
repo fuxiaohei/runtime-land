@@ -76,7 +76,7 @@ function DashboardNavbar() {
                 Access Tokens
               </NavDropdownItemLink>
               <NavDropdown.Divider />
-              <NavDropdownItemLink to="/singout">Sign Out</NavDropdownItemLink>
+              <NavDropdownItemLink to="/signout">Sign Out</NavDropdownItemLink>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

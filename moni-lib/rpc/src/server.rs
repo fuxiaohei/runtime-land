@@ -22,6 +22,7 @@ impl MoniRpcService for ServiceImpl {
             .image_url();
         Ok(tonic::Response::new(super::LoginResponse {
             access_token: token.token,
+            access_token_uuid: token.uuid,
             display_name: user.display_name,
             display_email: user.email,
             avatar_url: gravatar_url.to_string(),
@@ -38,6 +39,7 @@ impl MoniRpcService for ServiceImpl {
             .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         Ok(tonic::Response::new(super::LoginResponse {
             access_token: token.token,
+            access_token_uuid: token.uuid,
             display_name: user.display_name,
             display_email: user.email,
             avatar_url: String::new(),
@@ -117,5 +119,19 @@ impl MoniRpcService for ServiceImpl {
             }),
         };
         Ok(tonic::Response::new(resp))
+    }
+
+    async fn remove_access_token(
+        &self,
+        req: tonic::Request<super::RemoveAccessTokenRequest>,
+    ) -> std::result::Result<tonic::Response<super::NoDataResponse>, tonic::Status> {
+        let req = req.into_inner();
+        token::remove(1, req.token_uuid)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        Ok(tonic::Response::new(super::NoDataResponse {
+            code: 0,
+            error: String::new(),
+        }))
     }
 }

@@ -321,6 +321,67 @@ proto.moni.MoniRpcServicePromiseClient.prototype.listAccessTokens =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.RemoveAccessTokenRequest,
+ *   !proto.moni.NoDataResponse>}
+ */
+const methodDescriptor_MoniRpcService_RemoveAccessToken = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/RemoveAccessToken',
+  grpc.web.MethodType.UNARY,
+  proto.moni.RemoveAccessTokenRequest,
+  proto.moni.NoDataResponse,
+  /**
+   * @param {!proto.moni.RemoveAccessTokenRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.NoDataResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.RemoveAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.NoDataResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.NoDataResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.removeAccessToken =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/RemoveAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_RemoveAccessToken,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.RemoveAccessTokenRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.NoDataResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.removeAccessToken =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/RemoveAccessToken',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_RemoveAccessToken);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.moni.CreateProjectRequest,
  *   !proto.moni.CreateProjectResponse>}
  */

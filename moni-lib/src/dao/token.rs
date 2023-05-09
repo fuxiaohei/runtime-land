@@ -70,3 +70,18 @@ pub async fn create(
     let token_model = token_active_model.insert(db).await?;
     Ok(token_model)
 }
+
+pub async fn remove(owner_id: i32, token_uuid: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::Uuid.eq(token_uuid))
+        .one(db)
+        .await?
+        .unwrap();
+    if token.owner_id != owner_id {
+        return Err(anyhow::anyhow!("token not found"));
+    }
+    let token_active_model: user_token::ActiveModel = token.into();
+    token_active_model.delete(db).await?;
+    Ok(())
+}

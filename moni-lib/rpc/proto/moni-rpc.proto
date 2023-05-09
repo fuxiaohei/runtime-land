@@ -5,6 +5,12 @@ package moni;
 // Empty is the empty message
 message Empty {}
 
+// NoDataResponse is the response message without data
+message NoDataResponse{
+  string error = 1;
+  int64 code = 2;
+}
+
 // LoginEmailRequest is the request message for the LoginEmail method.
 message LoginEmailRequest {
   string email = 1;
@@ -17,10 +23,14 @@ message LoginAccessTokenRequest { string access_token = 1; }
 // LoginResponse is the response message for the LoginEmail method.
 message LoginResponse {
   string access_token = 1;
-  string display_name = 2;
-  string display_email = 3;
-  string avatar_url = 4;
+  string access_token_uuid = 2;
+  string display_name = 3;
+  string display_email = 4;
+  string avatar_url = 5;
 }
+
+// RemoveAccessTokenRequest is the request message for the RemoveAccessToken
+message RemoveAccessTokenRequest{ string token_uuid = 1;}
 
 // CreateProjectRequest is the request message for the CreateProject method.
 message CreateProjectRequest {
@@ -80,6 +90,9 @@ service MoniRpcService {
 
   // ListAccessTokens lists all access tokens of the current user
   rpc ListAccessTokens(Empty) returns (ListAccessTokensResponse);
+
+  // RemoveAccessToken removes the access token with the specified uuid
+  rpc RemoveAccessToken(RemoveAccessTokenRequest) returns (NoDataResponse);
 
   // CreateProject creates a new function project with the specified data and
   // returns its information

@@ -4,7 +4,11 @@ import AccessTokenCreateModal from "../components/AccessTokenCreateModal";
 import AccessTokenCreatedItem from "../components/AccessTokenCreatedItem";
 import AccessTokensListGroup from "../components/AccessTokensListGroup";
 import React, { useEffect } from "react";
-import { createAccessToken, listAccessTokens } from "../api/token";
+import {
+  createAccessToken,
+  listAccessTokens,
+  removeAccessToken,
+} from "../api/token";
 import AccessTokenRemoveModal from "../components/AccessTokenRemoveModal";
 
 function SettingsPage() {
@@ -51,8 +55,13 @@ function SettingsPage() {
   };
 
   const handleRemoveSubmit = async (token) => {
-    console.log("----remove",token);
-  }
+    let response = await removeAccessToken(token.uuid);
+    if (response.error) {
+      return;
+    }
+    setRemoveModelShow({ show: false, token: null });
+    fetchTokens();
+  };
 
   useEffect(() => {
     if (tokensList.length) {

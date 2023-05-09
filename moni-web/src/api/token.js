@@ -1,6 +1,10 @@
 import { callClient } from "./utils.js";
 
-const { CreateAccessTokenRequest, Empty } = require("./proto/moni-rpc_pb.js");
+const {
+  CreateAccessTokenRequest,
+  RemoveAccessTokenRequest,
+  Empty,
+} = require("./proto/moni-rpc_pb.js");
 
 async function createAccessToken(name) {
   let req = new CreateAccessTokenRequest();
@@ -15,4 +19,11 @@ async function listAccessTokens() {
   return response;
 }
 
-export { createAccessToken, listAccessTokens };
+async function removeAccessToken(uuid) {
+  let req = new RemoveAccessTokenRequest();
+  req.setTokenUuid(uuid);
+  let response = await callClient(req, "removeAccessToken");
+  return response;
+}
+
+export { createAccessToken, listAccessTokens, removeAccessToken };
