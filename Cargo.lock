@@ -1768,11 +1768,13 @@ name = "moni-rpc"
 version = "0.2.0"
 dependencies = [
  "gravatar",
+ "http",
  "moni-lib",
  "prost",
  "tonic",
  "tonic-build",
  "tonic-web",
+ "tower-http",
  "tracing",
 ]
 

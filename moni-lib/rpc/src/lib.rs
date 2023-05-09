@@ -1,23 +1,85 @@
 use crate::moni_rpc_service_server::MoniRpcServiceServer;
+use http::HeaderName;
 use std::net::SocketAddr;
+use std::time::Duration;
+use tonic::{Request, Status};
+use tonic_web::GrpcWebLayer;
+use tower_http::cors::{AllowOrigin, CorsLayer};
 use tracing::info;
 
 mod server;
 
 tonic::include_proto!("moni");
 
+const DEFAULT_MAX_AGE: Duration = Duration::from_secs(24 * 60 * 60);
+const DEFAULT_EXPOSED_HEADERS: [&str; 3] =
+    ["grpc-status", "grpc-message", "grpc-status-details-bin"];
+const DEFAULT_ALLOW_HEADERS: [&str; 6] = [
+    "x-grpc-web",
+    "content-type",
+    "x-user-agent",
+    "grpc-timeout",
+    "authorization",
+    "x-grpc-method",
+];
+
+fn auth_intercept(req: Request<()>) -> Result<Request<()>, Status> {
+    let grpc_method = match req.metadata().get("x-grpc-method") {
+        Some(grpc_method) => grpc_method.to_str().unwrap(),
+        None => {
+            return Err(Status::unauthenticated("no grpc method"));
+        }
+    };
+
+    // if grpc_method is loginEmail or LoginAccessToken, no need to check auth token
+    if grpc_method == "loginEmail" || grpc_method == "loginAccessToken" {
+        return Ok(req);
+    }
+
+    let auth_token = req.metadata().get("authorization");
+    if auth_token.is_none() {
+        return Err(Status::unauthenticated("no auth token"));
+    }
+    let auth_token = auth_token.unwrap().to_str().unwrap();
+    let auth_token = auth_token.replace("Bearer ", "");
+    let auth_token = auth_token.trim();
+    println!("auth_token: {}, {}", auth_token, grpc_method);
+    Ok(req)
+}
+
 pub async fn start_server(
     addr: SocketAddr,
     is_grpc_web: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let rpc_impl = server::ServiceImpl::default();
-    let svc = MoniRpcServiceServer::new(rpc_impl);
+    let svc = MoniRpcServiceServer::with_interceptor(rpc_impl, auth_intercept);
     info!("RpcServer listening on {addr}");
     if is_grpc_web {
+        let cors_layer = CorsLayer::new()
+            .allow_origin(AllowOrigin::mirror_request())
+            .allow_credentials(true)
+            .max_age(DEFAULT_MAX_AGE)
+            .expose_headers(
+                DEFAULT_EXPOSED_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            )
+            .allow_headers(
+                DEFAULT_ALLOW_HEADERS
+                    .iter()
+                    .cloned()
+                    .map(HeaderName::from_static)
+                    .collect::<Vec<HeaderName>>(),
+            );
+
         info!("GRPC-Web is enabled");
         tonic::transport::Server::builder()
             .accept_http1(true)
-            .add_service(tonic_web::enable(svc))
+            .layer(cors_layer)
+            .layer(GrpcWebLayer::new())
+            .add_service(svc)
             .serve(addr)
             .await?;
         return Ok(());

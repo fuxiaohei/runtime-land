@@ -1,3 +1,5 @@
+import { getLocalUser } from "./login.js";
+
 const { MoniRpcServiceClient } = require("./proto/moni-rpc_grpc_web_pb.js");
 
 const RPC_CLIENT_ADDRESS = "http://127.0.0.1:38779";
@@ -15,11 +17,21 @@ async function callClient(request, callFunc) {
       reject("no such function");
       return;
     }
-    client[callFunc](request, {}, (err, response) => {
+    console.log("callClient", callFunc, request.toObject());
+    let metadata = {
+      "x-grpc-method": String(callFunc),
+    };
+    let user = getLocalUser();
+    if (user && user.accessToken) {
+      metadata["Authorization"] = "Bearer " + user.accessToken;
+    }
+    client[callFunc](request, metadata, (err, response) => {
       if (err) {
-        resolve({ error: err });
+        console.log("callClient error", err);
+        resolve({ error: String(err) });
         return;
       }
+      console.log("callClient response", response.toObject());
       resolve(response.toObject());
     });
   });
