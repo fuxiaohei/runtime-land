@@ -1,3 +1,4 @@
+import { ButtonLink } from "../components/ButtonLink";
 import DashboardNavbar from "../components/DashboardNavbar";
 import {
   Container,
@@ -29,7 +30,9 @@ function Dashboard() {
                     type="text"
                     placeholder="Search by project name, domain..."
                   />
-                  <Button variant="primary">+ New Project</Button>
+                  <ButtonLink to="/new" variant="primary">
+                    + New Project
+                  </ButtonLink>
                 </InputGroup>
               </Col>
             </Row>

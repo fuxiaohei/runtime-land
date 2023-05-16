@@ -16,6 +16,7 @@ import SettingsPage from "./pages/SettingsPage";
 
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import NewProjectPage from "./pages/NewProjectPage";
 TimeAgo.addDefaultLocale(en);
 
 function App() {
@@ -45,6 +46,14 @@ function App() {
             element={
               <RequireAuth>
                 <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/new"
+            element={
+              <RequireAuth>
+                <NewProjectPage />
               </RequireAuth>
             }
           />
