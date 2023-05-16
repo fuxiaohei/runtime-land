@@ -5,13 +5,13 @@ use crate::worker::http_incoming::http_incoming::{Request, Response};
 use anyhow::Result;
 use hyper::body::Body;
 use std::fmt::Debug;
-use wasi_cap_std_sync::WasiCtxBuilder;
-use wasi_host::WasiCtx;
+use wasi_common::{Table, WasiCtx, WasiCtxBuilder, WasiView};
 use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
 
 pub struct Context {
     wasi_ctx: WasiCtx,
+    table: Table,
     http_ctx: HttpContext,
 }
 
@@ -21,17 +21,32 @@ impl Default for Context {
     }
 }
 
+impl WasiView for Context {
+    fn table(&self) -> &Table {
+        &self.table
+    }
+    fn table_mut(&mut self) -> &mut Table {
+        &mut self.table
+    }
+    fn ctx(&self) -> &WasiCtx {
+        &self.wasi_ctx
+    }
+    fn ctx_mut(&mut self) -> &mut WasiCtx {
+        &mut self.wasi_ctx
+    }
+}
+
 impl Context {
     pub fn new(req_id: u64) -> Self {
+        let mut table = Table::new();
         Context {
-            wasi_ctx: WasiCtxBuilder::new().inherit_stdio().build().unwrap(),
+            wasi_ctx: WasiCtxBuilder::new()
+                .inherit_stdio()
+                .build(&mut table)
+                .unwrap(),
             http_ctx: HttpContext::new(req_id),
+            table,
         }
-    }
-
-    /// get wasi
-    pub fn wasi(&mut self) -> &mut WasiCtx {
-        &mut self.wasi_ctx
     }
 
     /// get http_ctx
@@ -90,7 +105,7 @@ impl Worker {
 
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
-        wasi_host::wasi::command::add_to_linker(&mut linker, Context::wasi)?;
+        wasi_common::wasi::command::add_to_linker(&mut linker)?;
         http_body::add_to_linker(&mut linker, Context::http_ctx)?;
         http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
 

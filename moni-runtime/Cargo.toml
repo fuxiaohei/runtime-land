@@ -13,8 +13,7 @@ hyper =  { workspace = true }
 reqwest = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-wasi-cap-std-sync = { workspace = true }
-wasi-host = { workspace = true }
+wasi-common = { workspace = true }
 wasmtime = { workspace = true }
 which = "4.4.0"
 wit-bindgen-core = { workspace = true }

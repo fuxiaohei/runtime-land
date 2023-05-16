@@ -169,7 +169,7 @@ pub fn compile_js(target: &str, src_js_path: &str, js_engine_path: Option<String
 pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
     debug!("Convert component, {path}");
     let file_bytes = std::fs::read(path).expect("parse wasm file error");
-    let wasi_adapter = include_bytes!("../engine/wasi_snapshot_preview1.reactor.wasm");
+    let wasi_adapter = include_bytes!("../engine/wasi_preview1_component_adapter.reactor.wasm");
 
     let component = ComponentEncoder::default()
         .module(&file_bytes)
