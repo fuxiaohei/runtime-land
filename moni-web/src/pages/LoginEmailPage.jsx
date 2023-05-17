@@ -34,7 +34,7 @@ function LoginEmailPage() {
         setAlertMessage(res.error);
         return;
       }
-      navigate("/dashboard");
+      navigate("/projects");
     }
   };
 

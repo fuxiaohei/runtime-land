@@ -24,7 +24,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route element={<Outlet />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/projects" replace />} />
           <Route
             path="/login"
             element={
@@ -42,10 +42,18 @@ function App() {
             }
           />
           <Route
-            path="/dashboard"
+            path="/projects"
             element={
               <RequireAuth>
                 <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/projects/:projectName"
+            element={
+              <RequireAuth>
+                <ProjectPage />
               </RequireAuth>
             }
           />
@@ -57,7 +65,7 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/project" element={<ProjectPage />} />
+
           <Route path="/signout" element={<SignoutPage />} />
           <Route
             path="/settings"

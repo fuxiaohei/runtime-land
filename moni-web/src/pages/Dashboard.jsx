@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ButtonLink } from "../components/ButtonLink";
 import DashboardNavbar from "../components/DashboardNavbar";
 import {
@@ -46,14 +47,14 @@ function Dashboard() {
                   <Card.Body>
                     <Row>
                       <Col md={8}>
-                        <a href="/project">
+                        <Link to="/projects/quick-trout-fox-22">
                           <Card.Title className="project-card-title">
                             quick-trout-fox-22
                           </Card.Title>
                           <Card.Text className="project-card-updated">
                             Updated at 3 hours ago
                           </Card.Text>
-                        </a>
+                        </Link>
                       </Col>
                       <Col md={4} className="project-view">
                         <Button>View</Button>

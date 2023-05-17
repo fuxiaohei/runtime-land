@@ -15,7 +15,7 @@ function ProjectPage() {
                 <p>Github / Pending</p>
               </Col>
               <Col id="project-header-right">
-                <Button variant="secondary" size="sm" href="/dashboard">
+                <Button variant="secondary" size="sm" href="/projects">
                   <BsFillArrowUpLeftSquareFill size={16} className="icon" />
                   Projects
                 </Button>

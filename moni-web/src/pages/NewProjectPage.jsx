@@ -12,8 +12,30 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { BiRefresh } from "react-icons/bi";
+import {
+  uniqueNamesGenerator,
+  NumberDictionary,
+  adjectives,
+  colors,
+} from "unique-names-generator";
+import React from "react";
 
 function NewProjectPage() {
+  const generateName = () => {
+    const numberDictionary = NumberDictionary.generate({ min: 100, max: 999 });
+    const shortName = uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, numberDictionary],
+      length: 3,
+      separator: "-",
+    });
+    return shortName;
+  };
+  const [autoName, setAutoName] = React.useState(generateName());
+
+  const handleRefreshGenerate = async (event) => {
+    setAutoName(generateName());
+  };
+
   return (
     <div>
       <DashboardNavbar />
@@ -32,24 +54,29 @@ function NewProjectPage() {
                 <Card.Body>
                   <Card.Title>Project Name</Card.Title>
                   <div className="project-name-div">
-                    <p>
+                    <div className="mb-3">
                       <InputGroup>
                         <Form.Control
                           type="text"
                           placeholder="Enter your project name"
+                          value={autoName}
+                          onChange={(event) => setAutoName(event?.target.value)}
                         />
                         <OverlayTrigger
                           placement="top"
                           delay={{ show: 0, hide: 200 }}
                           overlay={<Tooltip>Regenerate project name</Tooltip>}
                         >
-                          <Button variant="dark">
+                          <Button
+                            variant="dark"
+                            onClick={handleRefreshGenerate}
+                          >
                             <BiRefresh />
                           </Button>
                         </OverlayTrigger>
                       </InputGroup>
-                    </p>
-                    <p className="fs-6 text-muted">
+                    </div>
+                    <p className="fs-6 ms-2 text-muted">
                       Edit and deploy directly from a local project using
                       moni-cli.
                     </p>
@@ -69,10 +96,13 @@ function NewProjectPage() {
                       <p>Build with examples</p>
                     </div>
                     <div className="btn">
-                      <Button variant="light">Create</Button>
+                      <Button variant="light" disabled>Create</Button>
                     </div>
                   </Card.Title>
                   <hr />
+                  <div>
+                    Comming soon...
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
