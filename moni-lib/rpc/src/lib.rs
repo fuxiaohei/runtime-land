@@ -1,5 +1,7 @@
 use crate::moni_rpc_service_server::MoniRpcServiceServer;
 use http::HeaderName;
+use moni_lib::dao;
+use moni_lib::model::user_token;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tonic::{Request, Status};
@@ -7,6 +9,7 @@ use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tracing::info;
 
+pub mod client;
 mod server;
 
 tonic::include_proto!("moni");
@@ -23,7 +26,23 @@ const DEFAULT_ALLOW_HEADERS: [&str; 6] = [
     "x-grpc-method",
 ];
 
-fn auth_intercept(req: Request<()>) -> Result<Request<()>, Status> {
+pub(crate) struct UserContext {
+    token: String,
+}
+
+impl UserContext {
+    pub async fn get_token(&self) -> Result<user_token::Model, tonic::Status> {
+        let token = dao::token::find(self.token.clone())
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        if token.is_none() {
+            return Err(tonic::Status::unauthenticated("invalid auth token"));
+        }
+        Ok(token.unwrap())
+    }
+}
+
+fn auth_intercept(mut req: Request<()>) -> Result<Request<()>, Status> {
     let grpc_method = match req.metadata().get("x-grpc-method") {
         Some(grpc_method) => grpc_method.to_str().unwrap(),
         None => {
@@ -43,7 +62,10 @@ fn auth_intercept(req: Request<()>) -> Result<Request<()>, Status> {
     let auth_token = auth_token.unwrap().to_str().unwrap();
     let auth_token = auth_token.replace("Bearer ", "");
     let auth_token = auth_token.trim();
-    println!("auth_token: {}, {}", auth_token, grpc_method);
+    req.extensions_mut().insert(UserContext {
+        token: auth_token.to_string(),
+    });
+
     Ok(req)
 }
 

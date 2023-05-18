@@ -176,7 +176,11 @@ impl Serve {
 #[derive(Args, Debug)]
 pub struct Deploy {
     /// The token
+    #[clap(long)]
     pub token: String,
+    /// The project name
+    #[clap(long)]
+    pub project: Option<String>,
     /// The cloud api
     #[clap(long, default_value("http://127.0.0.1:38779"))]
     pub cloud: Option<String>,
@@ -185,5 +189,16 @@ pub struct Deploy {
 impl Deploy {
     pub async fn run(&self) {
         debug!("Deploy: {self:?}");
+
+        let mut meta = Meta::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
+        debug!("Meta: {meta:?}");
+
+        super::deploy::deploy(
+            &mut meta,
+            self.project.clone().unwrap_or_default(),
+            self.token.clone(),
+            self.cloud.clone().unwrap(),
+        )
+        .await;
     }
 }

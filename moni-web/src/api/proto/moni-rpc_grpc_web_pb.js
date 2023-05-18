@@ -440,5 +440,66 @@ proto.moni.MoniRpcServicePromiseClient.prototype.createProject =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.FetchProjectRequest,
+ *   !proto.moni.ProjectResponse>}
+ */
+const methodDescriptor_MoniRpcService_FetchProject = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/FetchProject',
+  grpc.web.MethodType.UNARY,
+  proto.moni.FetchProjectRequest,
+  proto.moni.ProjectResponse,
+  /**
+   * @param {!proto.moni.FetchProjectRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.ProjectResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.FetchProjectRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.ProjectResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.ProjectResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.fetchProject =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/FetchProject',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_FetchProject,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.FetchProjectRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.ProjectResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.fetchProject =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/FetchProject',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_FetchProject);
+};
+
+
 module.exports = proto.moni;
 

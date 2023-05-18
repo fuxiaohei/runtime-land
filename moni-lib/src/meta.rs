@@ -99,7 +99,7 @@ impl Meta {
     pub fn generate_project_name(&mut self) -> String {
         let rand_string: String = thread_rng()
             .sample_iter(&Alphanumeric)
-            .take(10)
+            .take(8)
             .map(char::from)
             .collect();
         self.project = format!("{}-{}", self.name, rand_string.to_lowercase());
