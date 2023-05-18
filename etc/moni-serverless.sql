@@ -47,7 +47,7 @@ CREATE TABLE `project_info` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'project name',
   `language` varchar(24) NOT NULL COMMENT 'project language',
-  `description` varchar(128) NOT NULL COMMENT 'project description',
+  `uuid` varchar(64) NOT NULL COMMENT 'project uuid',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'project created time',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'project updated time',
   `owner_id` int(11) DEFAULT '0',

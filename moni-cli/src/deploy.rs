@@ -18,15 +18,20 @@ pub async fn deploy(meta: &mut Meta, mut project_name: String, token: String, ad
     if project_name.is_empty() {
         project_name = meta.generate_project_name();
     }
-    info!("Project name: {}", project_name);
+    info!("Fetching Project '{project_name}'");
 
     let mut client = moni_rpc::client::Client::new(addr, token).await.unwrap();
 
     // fetch project
-    client
+    let project = client
         .fetch_project(project_name.clone(), meta.language.clone())
         .await
         .unwrap_or_else(|e| {
             warn!("fetch project failed: {:?}", e);
+            return None;
         });
+    // if project is not exist, create empty project with name
+    if project.is_none() {
+        info!("Project not found, create '{project_name}' project");
+    }
 }

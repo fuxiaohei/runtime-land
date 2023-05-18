@@ -1,3 +1,5 @@
+use crate::ProjectResponse;
+
 use super::moni_rpc_service_client::MoniRpcServiceClient;
 use tonic::codegen::InterceptedService;
 use tonic::metadata::MetadataValue;
@@ -37,10 +39,16 @@ impl Client {
         &mut self,
         name: String,
         language: String,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<Option<ProjectResponse>, Box<dyn std::error::Error>> {
         let req = tonic::Request::new(super::FetchProjectRequest { name, language });
-        let resp = self.client.fetch_project(req).await?;
-        println!("RESPONSE={:?}", resp);
-        Ok(())
+        let resp = self.client.fetch_project(req).await;
+        if resp.is_err() {
+            let err = resp.err().unwrap();
+            if err.code() == tonic::Code::NotFound {
+                return Ok(None);
+            }
+            return Err(err.into());
+        }
+        Ok(Some(resp.unwrap().into_inner()))
     }
 }
