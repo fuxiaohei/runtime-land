@@ -1,4 +1,6 @@
 use moni_lib::meta::Meta;
+use moni_rpc::client::Client;
+use moni_rpc::ProjectResponse;
 use std::path::Path;
 use tracing::{debug, info, warn};
 
@@ -21,10 +23,21 @@ pub async fn deploy(meta: &mut Meta, mut project_name: String, token: String, ad
     info!("Fetching Project '{project_name}'");
 
     let mut client = moni_rpc::client::Client::new(addr, token).await.unwrap();
+    let project = fetch_project(&mut client, project_name, meta.language.clone())
+        .await
+        .unwrap();
 
+    println!("project: {:?}", project);
+}
+
+async fn fetch_project(
+    client: &mut Client,
+    project_name: String,
+    language: String,
+) -> Option<ProjectResponse> {
     // fetch project
-    let project = client
-        .fetch_project(project_name.clone(), meta.language.clone())
+    let mut project = client
+        .fetch_project(project_name.clone(), language.clone())
         .await
         .unwrap_or_else(|e| {
             warn!("fetch project failed: {:?}", e);
@@ -33,5 +46,17 @@ pub async fn deploy(meta: &mut Meta, mut project_name: String, token: String, ad
     // if project is not exist, create empty project with name
     if project.is_none() {
         info!("Project not found, create '{project_name}' project");
+        project = client
+            .create_project(project_name.clone(), language.clone())
+            .await
+            .unwrap_or_else(|e| {
+                warn!("create project failed: {:?}", e);
+                return None;
+            });
+        info!(
+            "Project '{project_name}' created",
+            project_name = project_name
+        );
     }
+    project
 }

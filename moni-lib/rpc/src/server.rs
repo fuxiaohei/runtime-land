@@ -169,7 +169,52 @@ impl MoniRpcService for ServiceImpl {
             language: project.language,
             uuid: project.uuid,
             prod_deployment: project.prod_deploy_id,
-            update_at: project.updated_at.timestamp(),
+            updated_at: project.updated_at.timestamp(),
         }))
+    }
+
+    async fn create_empty_project(
+        &self,
+        req: tonic::Request<super::FetchProjectRequest>,
+    ) -> std::result::Result<tonic::Response<super::ProjectResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let req = req.into_inner();
+        let project = dao::project::create(req.name, req.language, token.owner_id)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        Ok(tonic::Response::new(super::ProjectResponse {
+            name: project.name,
+            language: project.language,
+            uuid: project.uuid,
+            prod_deployment: project.prod_deploy_id,
+            updated_at: project.updated_at.timestamp(),
+        }))
+    }
+
+    async fn list_projects(
+        &self,
+        req: tonic::Request<super::Empty>,
+    ) -> std::result::Result<tonic::Response<super::ListProjectsResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let projects = dao::project::list(token.owner_id)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        let resp = super::ListProjectsResponse {
+            data: projects
+                .into_iter()
+                .map(|p| super::ProjectResponse {
+                    name: p.name,
+                    language: p.language,
+                    uuid: p.uuid,
+                    prod_deployment: p.prod_deploy_id,
+                    updated_at: p.updated_at.timestamp(),
+                })
+                .collect(),
+        };
+        Ok(tonic::Response::new(resp))
     }
 }

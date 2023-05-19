@@ -2,7 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
+import ProjectsPage from "./pages/ProjectsPage";
 import ProjectPage from "./pages/ProjectPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import LoginEmailPage from "./pages/LoginEmailPage";
@@ -45,7 +45,7 @@ function App() {
             path="/projects"
             element={
               <RequireAuth>
-                <Dashboard />
+                <ProjectsPage />
               </RequireAuth>
             }
           />

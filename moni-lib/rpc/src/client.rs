@@ -51,4 +51,14 @@ impl Client {
         }
         Ok(Some(resp.unwrap().into_inner()))
     }
+
+    pub async fn create_project(
+        &mut self,
+        name: String,
+        language: String,
+    ) -> Result<Option<ProjectResponse>, Box<dyn std::error::Error>> {
+        let req = tonic::Request::new(super::FetchProjectRequest { name, language });
+        let resp = self.client.create_empty_project(req).await?;
+        Ok(Some(resp.into_inner()))
+    }
 }

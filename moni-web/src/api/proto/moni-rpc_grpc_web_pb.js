@@ -501,5 +501,127 @@ proto.moni.MoniRpcServicePromiseClient.prototype.fetchProject =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.FetchProjectRequest,
+ *   !proto.moni.ProjectResponse>}
+ */
+const methodDescriptor_MoniRpcService_CreateEmptyProject = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/CreateEmptyProject',
+  grpc.web.MethodType.UNARY,
+  proto.moni.FetchProjectRequest,
+  proto.moni.ProjectResponse,
+  /**
+   * @param {!proto.moni.FetchProjectRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.ProjectResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.FetchProjectRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.ProjectResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.ProjectResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.createEmptyProject =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateEmptyProject',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateEmptyProject,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.FetchProjectRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.ProjectResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.createEmptyProject =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateEmptyProject',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateEmptyProject);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.Empty,
+ *   !proto.moni.ListProjectsResponse>}
+ */
+const methodDescriptor_MoniRpcService_ListProjects = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/ListProjects',
+  grpc.web.MethodType.UNARY,
+  proto.moni.Empty,
+  proto.moni.ListProjectsResponse,
+  /**
+   * @param {!proto.moni.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.ListProjectsResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.ListProjectsResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.ListProjectsResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.listProjects =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/ListProjects',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ListProjects,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.ListProjectsResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.listProjects =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/ListProjects',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ListProjects);
+};
+
+
 module.exports = proto.moni;
 
