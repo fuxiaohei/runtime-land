@@ -17,7 +17,7 @@ async function callClient(request, callFunc) {
       reject("no such function");
       return;
     }
-    console.log("callClient", callFunc, request.toObject());
+    console.log("callClient:" + callFunc + ",request:", request.toObject());
     let metadata = {
       "x-grpc-method": String(callFunc),
     };
@@ -27,11 +27,11 @@ async function callClient(request, callFunc) {
     }
     client[callFunc](request, metadata, (err, response) => {
       if (err) {
-        console.log("callClient error", err);
+        console.log("callClient:" + callFunc + ",error:", err);
         resolve({ error: String(err) });
         return;
       }
-      console.log("callClient response", response.toObject());
+      console.log("callClient:" + callFunc + ",response:", response.toObject());
       resolve(response.toObject());
     });
   });
