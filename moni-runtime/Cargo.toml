@@ -19,6 +19,7 @@ which = "4.4.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-component = { workspace = true }
+moni-lib = { path = "../moni-lib" }
 
 [dev-dependencies]
 tokio = { workspace = true }

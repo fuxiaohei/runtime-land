@@ -4,7 +4,6 @@ import React from "react";
 import TimeAgo from "javascript-time-ago";
 
 function AccessTokensListGroup({ tokens, onRemoveClick }) {
-  console.log("--tokens", tokens, onRemoveClick);
   const timeAgo = new TimeAgo("en-US");
   const listItems = tokens.map((token) => (
     <ListGroup.Item

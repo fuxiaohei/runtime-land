@@ -3,6 +3,8 @@ fn main() {
 }
 
 fn build_proto() -> Result<(), Box<dyn std::error::Error>> {
-    tonic_build::compile_protos("./proto/moni-rpc.proto")?;
+    tonic_build::configure()
+        .protoc_arg("--experimental_allow_proto3_optional")
+        .compile(&["./proto/moni-rpc.proto"], &["./proto"])?;
     Ok(())
 }

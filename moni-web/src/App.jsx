@@ -2,7 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
+import ProjectsPage from "./pages/ProjectsPage";
 import ProjectPage from "./pages/ProjectPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import LoginEmailPage from "./pages/LoginEmailPage";
@@ -16,6 +16,7 @@ import SettingsPage from "./pages/SettingsPage";
 
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import NewProjectPage from "./pages/NewProjectPage";
 TimeAgo.addDefaultLocale(en);
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route element={<Outlet />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/projects" replace />} />
           <Route
             path="/login"
             element={
@@ -41,14 +42,30 @@ function App() {
             }
           />
           <Route
-            path="/dashboard"
+            path="/projects"
             element={
               <RequireAuth>
-                <Dashboard />
+                <ProjectsPage />
               </RequireAuth>
             }
           />
-          <Route path="/project" element={<ProjectPage />} />
+          <Route
+            path="/projects/:projectName"
+            element={
+              <RequireAuth>
+                <ProjectPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/new"
+            element={
+              <RequireAuth>
+                <NewProjectPage />
+              </RequireAuth>
+            }
+          />
+
           <Route path="/signout" element={<SignoutPage />} />
           <Route
             path="/settings"

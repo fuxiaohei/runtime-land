@@ -10,6 +10,7 @@ axum = { workspace = true }
 clap = { workspace = true }
 futures-util = "0.3.28"
 moni-lib = { path = "../moni-lib" }
+moni-rpc = { path = "../moni-lib/rpc" }
 moni-runtime = { path = "../moni-runtime" }
 rust-embed = "6.6.1"
 tokio = { workspace = true }

@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Build
+on:
+  push:
+    branches:
+      - main
+      - v*
+    tags: ["v*"]
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  build_all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "moni-serverless"
+      - name: Update local toolchain
+        run: |
+          rustup update stable
+          rustup component add clippy
+          rustup target add wasm32-wasi
+          cargo install wizer --all-features
+      - name: Install protobuf
+        run: |
+          sudo apt update
+          sudo apt install -y protobuf-compiler libprotobuf-dev
+      - name: Toolchain info
+        run: |
+          cargo --version --verbose
+          rustc --version
+          cargo clippy --version
+          wizer --version
+          protoc --version
+      - name: Run unit tests
+        run: |
+          cargo test --all --release
+      - name: Build all
+        run: |
+          cargo build --release
+          cargo build --release -p moni-cli
+          cargo build --release -p moni-runtime
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: moni-binary
+          path: |
+            target/release/moni-cli
+            target/release/moni-serverless
+            target/release/moni-runtime

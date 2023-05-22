@@ -20,12 +20,12 @@ function DashboardNavbar() {
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
-        <NavbarBrandLink to="/dashboard">Moni-Web</NavbarBrandLink>
+        <NavbarBrandLink to="/projects">Moni-Web</NavbarBrandLink>
         <Navbar.Toggle aria-controls="dashboard-navbar-nav" />
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">
             <NavDropdown title={avatarLogo} id="dashboard-nav-dropdown">
-              <NavDropdownItemLink id="current-account" to="/dashboard">
+              <NavDropdownItemLink id="current-account" to="/projects">
                 <BsCheckCircle size={16} />
                 <span className="account-name">{user.displayName}</span>
               </NavDropdownItemLink>
@@ -69,7 +69,7 @@ function DashboardNavbar() {
                 </p>
               </div>
               <NavDropdown.Divider />
-              <NavDropdownItemLink to="/dashboard">
+              <NavDropdownItemLink to="/projects">
                 Projects
               </NavDropdownItemLink>
               <NavDropdownItemLink to="/settings#access-token">

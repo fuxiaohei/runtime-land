@@ -72,7 +72,7 @@ function RequireUnauth({ children }) {
 
   if (auth.user) {
     console.log("RequireUnauth", auth.user, location);
-    return <Navigate to="/dashboard" state={{ from: location }} replace />;
+    return <Navigate to="/projects" state={{ from: location }} replace />;
   }
 
   return children;

@@ -1,6 +1,7 @@
 use super::moni_rpc_service_server::MoniRpcService;
+use crate::UserContext;
 use gravatar::{Gravatar, Rating};
-use moni_lib::dao::{project, token, user};
+use moni_lib::dao::{self, project, token, user};
 use tracing::warn;
 
 #[derive(Default)]
@@ -51,7 +52,7 @@ impl MoniRpcService for ServiceImpl {
         req: tonic::Request<super::CreateProjectRequest>,
     ) -> Result<tonic::Response<super::CreateProjectResponse>, tonic::Status> {
         let req = req.into_inner();
-        let project = match project::create(req.name, req.description, req.language, 101).await {
+        let project = match project::create(req.name, req.language, 101).await {
             Ok(p) => p,
             Err(e) => {
                 let resp = super::CreateProjectResponse {
@@ -77,9 +78,12 @@ impl MoniRpcService for ServiceImpl {
 
     async fn list_access_tokens(
         &self,
-        _req: tonic::Request<super::Empty>,
+        req: tonic::Request<super::Empty>,
     ) -> Result<tonic::Response<super::ListAccessTokensResponse>, tonic::Status> {
-        let tokens = token::list(1)
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let tk_value = user_context.get_token().await?;
+
+        let tokens = token::list(tk_value.owner_id)
             .await
             .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         let resp = super::ListAccessTokensResponse {
@@ -103,10 +107,18 @@ impl MoniRpcService for ServiceImpl {
         &self,
         req: tonic::Request<super::CreateAccessTokenRequest>,
     ) -> Result<tonic::Response<super::CreateAccessTokenResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let tk_value = user_context.get_token().await?;
+
         let req = req.into_inner();
-        let tk = token::create(1, req.name, "dashboard".to_string(), 365 * 24 * 3600)
-            .await
-            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        let tk = token::create(
+            tk_value.owner_id,
+            req.name,
+            "dashboard".to_string(),
+            365 * 24 * 3600,
+        )
+        .await
+        .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         let resp = super::CreateAccessTokenResponse {
             data: Some(super::AccessTokenData {
                 name: tk.name,
@@ -125,13 +137,84 @@ impl MoniRpcService for ServiceImpl {
         &self,
         req: tonic::Request<super::RemoveAccessTokenRequest>,
     ) -> std::result::Result<tonic::Response<super::NoDataResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let tk_value = user_context.get_token().await?;
+
         let req = req.into_inner();
-        token::remove(1, req.token_uuid)
+        token::remove(tk_value.owner_id, req.token_uuid)
             .await
             .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
         Ok(tonic::Response::new(super::NoDataResponse {
             code: 0,
             error: String::new(),
         }))
+    }
+
+    async fn fetch_project(
+        &self,
+        req: tonic::Request<super::FetchProjectRequest>,
+    ) -> std::result::Result<tonic::Response<super::ProjectResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let project = dao::project::find(token.owner_id, req.into_inner().name)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        if project.is_none() {
+            return Err(tonic::Status::not_found("project not found"));
+        }
+        let project = project.unwrap();
+        Ok(tonic::Response::new(super::ProjectResponse {
+            name: project.name,
+            language: project.language,
+            uuid: project.uuid,
+            prod_deployment: project.prod_deploy_id,
+            updated_at: project.updated_at.timestamp(),
+        }))
+    }
+
+    async fn create_empty_project(
+        &self,
+        req: tonic::Request<super::FetchProjectRequest>,
+    ) -> std::result::Result<tonic::Response<super::ProjectResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let req = req.into_inner();
+        let project = dao::project::create(req.name, req.language, token.owner_id)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        Ok(tonic::Response::new(super::ProjectResponse {
+            name: project.name,
+            language: project.language,
+            uuid: project.uuid,
+            prod_deployment: project.prod_deploy_id,
+            updated_at: project.updated_at.timestamp(),
+        }))
+    }
+
+    async fn list_projects(
+        &self,
+        req: tonic::Request<super::Empty>,
+    ) -> std::result::Result<tonic::Response<super::ListProjectsResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let projects = dao::project::list(token.owner_id)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        let resp = super::ListProjectsResponse {
+            data: projects
+                .into_iter()
+                .map(|p| super::ProjectResponse {
+                    name: p.name,
+                    language: p.language,
+                    uuid: p.uuid,
+                    prod_deployment: p.prod_deploy_id,
+                    updated_at: p.updated_at.timestamp(),
+                })
+                .collect(),
+        };
+        Ok(tonic::Response::new(resp))
     }
 }
