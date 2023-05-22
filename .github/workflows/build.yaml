@@ -41,6 +41,7 @@ jobs:
         run: |
           cargo build --release
           cargo build --release -p moni-cli
+          cargo build --release -p moni-runtime
       - name: Upload binaries
         uses: actions/upload-artifact@v3
         with:
@@ -48,3 +49,4 @@ jobs:
           path: |
             target/release/moni-cli
             target/release/moni-serverless
+            target/release/moni-runtime
