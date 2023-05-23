@@ -2,6 +2,8 @@ FROM rust as builder
 
 WORKDIR /usr/src/moni-serverless
 ADD . .
+RUN apt update
+RUN apt install -y protobuf-compiler libprotobuf-dev
 RUN rustup component add rustfmt
 RUN cargo build --release
 
