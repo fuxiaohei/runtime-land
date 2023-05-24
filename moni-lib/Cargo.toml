@@ -10,7 +10,7 @@ chrono = { workspace = true }
 futures = "0.3.28"
 lazy_static = { workspace = true }
 once_cell = { workspace = true }
-rand = "0.8.5"
+rand = { workspace = true }
 sea-orm = { version = "0.11.3", features = [
     "sqlx-mysql",
     "runtime-tokio-native-tls"

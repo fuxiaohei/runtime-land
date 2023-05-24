@@ -1,0 +1,40 @@
+version: '3'
+
+networks:
+  moni_serverless_network:
+    external: true
+
+services:
+  redis-server:
+    image: redis:7.0-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass 2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - moni_serverless_network
+  reverse-proxy:
+    image: traefik:v2.10
+    command: --api.insecure=true --providers.redis.endpoints=redis-server:6379 --providers.redis.password=2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
+    ports:
+      - "80:80"
+      - "8080:8080" # traefik dashboard
+    networks:
+      - moni_serverless_network
+    depends_on:
+      - redis-server
+  mysql-db:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=moni-serverless
+      - MYSQL_ROOT_PASSWORD=TJbP7C9ESkLjnS7HXa6y
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./moni-serverless.sql:/docker-entrypoint-initdb.d/init.sql

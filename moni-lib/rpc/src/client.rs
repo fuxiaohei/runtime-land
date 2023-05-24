@@ -1,6 +1,7 @@
-use crate::ProjectResponse;
-
 use super::moni_rpc_service_client::MoniRpcServiceClient;
+use crate::{DeploymentResponse, ProjectResponse};
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use tonic::codegen::InterceptedService;
 use tonic::metadata::MetadataValue;
 use tonic::service::Interceptor;
@@ -59,6 +60,27 @@ impl Client {
     ) -> Result<Option<ProjectResponse>, Box<dyn std::error::Error>> {
         let req = tonic::Request::new(super::FetchProjectRequest { name, language });
         let resp = self.client.create_empty_project(req).await?;
+        Ok(Some(resp.into_inner()))
+    }
+
+    pub async fn create_deployment(
+        &mut self,
+        project_name: String,
+        project_uuid: String,
+        binary: Vec<u8>,
+    ) -> Result<Option<DeploymentResponse>, Box<dyn std::error::Error>> {
+        let deploy_name: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(8)
+            .map(char::from)
+            .collect();
+        let req = tonic::Request::new(super::CreateDeploymentRequest {
+            project_name,
+            project_uuid,
+            deploy_name: deploy_name.to_lowercase(),
+            deploy_chunk: binary,
+        });
+        let resp = self.client.create_deployment(req).await?;
         Ok(Some(resp.into_inner()))
     }
 }

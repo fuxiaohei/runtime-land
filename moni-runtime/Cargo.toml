@@ -10,6 +10,7 @@ async-trait = { workspace = true }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 futures-util = "0.3.28"
 hyper =  { workspace = true }
+moni-lib = { path = "../moni-lib" }
 reqwest = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
@@ -19,7 +20,6 @@ which = "4.4.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-component = { workspace = true }
-moni-lib = { path = "../moni-lib" }
 
 [dev-dependencies]
 tokio = { workspace = true }

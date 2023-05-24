@@ -1,10 +1,16 @@
 use moni_lib::meta::Meta;
 use moni_rpc::client::Client;
-use moni_rpc::ProjectResponse;
+use moni_rpc::{DeploymentResponse, ProjectResponse};
 use std::path::Path;
 use tracing::{debug, info, warn};
 
-pub async fn deploy(meta: &mut Meta, mut project_name: String, token: String, addr: String) {
+pub async fn deploy(
+    meta: &mut Meta,
+    mut project_name: String,
+    token: String,
+    addr: String,
+    is_production: bool,
+) {
     println!("deploy: {:?}", meta);
     let output = meta.get_output();
     debug!("output: {:?}", output);
@@ -22,12 +28,26 @@ pub async fn deploy(meta: &mut Meta, mut project_name: String, token: String, ad
     }
     info!("Fetching Project '{project_name}'");
 
+    // fetch project info
     let mut client = moni_rpc::client::Client::new(addr, token).await.unwrap();
     let project = fetch_project(&mut client, project_name, meta.language.clone())
         .await
         .unwrap();
 
-    println!("project: {:?}", project);
+    // upload wasm file to project
+    let wasm_binary = std::fs::read(output).unwrap();
+    let deployment = create_deploy(&mut client, &project, wasm_binary)
+        .await
+        .unwrap();
+
+    println!("deployment: {:?}", deployment);
+
+    // TODO: waiting for deployment status is ready
+
+    // if is_production, set project prod_deployment
+    if is_production {
+        // TODO: set project prod_deployment
+    }
 }
 
 async fn fetch_project(
@@ -59,4 +79,19 @@ async fn fetch_project(
         );
     }
     project
+}
+
+async fn create_deploy(
+    client: &mut Client,
+    project: &ProjectResponse,
+    binary: Vec<u8>,
+) -> Option<DeploymentResponse> {
+    let response = client
+        .create_deployment(project.name.clone(), project.uuid.clone(), binary)
+        .await
+        .unwrap_or_else(|e| {
+            warn!("create deployment failed: {:?}", e);
+            return None;
+        });
+    response
 }

@@ -32,6 +32,15 @@ pub async fn find(owner_id: i32, name: String) -> Result<Option<Model>> {
     Ok(project)
 }
 
+pub async fn find_by_id(project_id: i32) -> Result<Option<Model>> {
+    let db = DB.get().unwrap();
+    let project = project_info::Entity::find()
+        .filter(project_info::Column::Id.eq(project_id))
+        .one(db)
+        .await?;
+    Ok(project)
+}
+
 pub async fn list(owner_id: i32) -> Result<Vec<Model>> {
     let db = DB.get().unwrap();
     let projects = project_info::Entity::find()

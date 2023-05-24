@@ -1,8 +1,7 @@
 use super::moni_rpc_service_server::MoniRpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
-use moni_lib::dao::{self, project, token, user};
-use tracing::warn;
+use moni_lib::dao::{self, token, user};
 
 #[derive(Default)]
 pub struct ServiceImpl {}
@@ -45,35 +44,6 @@ impl MoniRpcService for ServiceImpl {
             display_email: user.email,
             avatar_url: String::new(),
         }))
-    }
-
-    async fn create_project(
-        &self,
-        req: tonic::Request<super::CreateProjectRequest>,
-    ) -> Result<tonic::Response<super::CreateProjectResponse>, tonic::Status> {
-        let req = req.into_inner();
-        let project = match project::create(req.name, req.language, 101).await {
-            Ok(p) => p,
-            Err(e) => {
-                let resp = super::CreateProjectResponse {
-                    error: format!("{:?}", e),
-                    code: 1,
-                    data: None,
-                };
-                warn!("create project failed: {:?}", e);
-                return Ok(tonic::Response::new(resp));
-            }
-        };
-        let resp = super::CreateProjectResponse {
-            error: String::new(),
-            code: 0,
-            data: Some(crate::ProjectData {
-                uuid: String::from("123"),
-                name: project.name,
-                version: String::from("0.0.1"),
-            }),
-        };
-        Ok(tonic::Response::new(resp))
     }
 
     async fn list_access_tokens(
@@ -216,5 +186,51 @@ impl MoniRpcService for ServiceImpl {
                 .collect(),
         };
         Ok(tonic::Response::new(resp))
+    }
+
+    async fn create_deployment(
+        &self,
+        req: tonic::Request<super::CreateDeploymentRequest>,
+    ) -> std::result::Result<tonic::Response<super::DeploymentResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let req = req.into_inner();
+
+        // get project
+        let project = dao::project::find(token.owner_id, req.project_name)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        if project.is_none() {
+            return Err(tonic::Status::not_found("project not found"));
+        }
+        let project = project.unwrap();
+        if project.uuid != req.project_uuid {
+            return Err(tonic::Status::not_found("project not matched"));
+        }
+
+        // create deployment
+        let deployment = dao::deployment::create(
+            token.owner_id,
+            project.id as i32,
+            req.deploy_name.clone(),
+            format!("fs://{}", req.deploy_name.clone()),
+        )
+        .await
+        .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        let resp = super::DeploymentResponse {
+            domain: req.deploy_name,
+            uuid: deployment.uuid,
+            deploy_status: deployment.deploy_status,
+            prod_status: deployment.prod_status,
+        };
+        Ok(tonic::Response::new(resp))
+    }
+
+    async fn promote_deployment(
+        &self,
+        request: tonic::Request<super::PromoteDeploymentRequest>,
+    ) -> std::result::Result<tonic::Response<super::DeploymentResponse>, tonic::Status> {
+        Err(tonic::Status::unimplemented("Not yet implemented"))
     }
 }

@@ -1729,6 +1729,7 @@ dependencies = [
  "http",
  "moni-lib",
  "prost",
+ "rand",
  "tonic",
  "tonic-build",
  "tonic-web",

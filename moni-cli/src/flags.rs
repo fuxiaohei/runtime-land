@@ -178,6 +178,9 @@ pub struct Deploy {
     /// The token
     #[clap(long)]
     pub token: String,
+    /// Promote this deployment to production
+    #[clap(long, default_value("false"))]
+    pub production: bool,
     /// The project name
     #[clap(long)]
     pub project: Option<String>,
@@ -198,6 +201,7 @@ impl Deploy {
             self.project.clone().unwrap_or_default(),
             self.token.clone(),
             self.cloud.clone().unwrap(),
+            self.production,
         )
         .await;
     }

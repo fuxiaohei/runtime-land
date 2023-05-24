@@ -1,6 +1,6 @@
 manifest = "v1"
 name = "rust-basic"
-project = ""
+project = "rust-basic-example"
 description = "example rust project"
 authors = []
 language = "rust"

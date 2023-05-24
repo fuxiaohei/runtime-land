@@ -60,23 +60,6 @@ message CreateAccessTokenResponse { AccessTokenData data = 2; }
 // ListAccessTokensResponse is the response message for the ListAccessTokens
 message ListAccessTokensResponse { repeated AccessTokenData data = 1; }
 
-// CreateProjectRequest is the request message for the CreateProject method.
-message CreateProjectRequest {
-  string name = 1;
-  bytes code = 2;
-  string description = 3;
-  string md5 = 4;
-  string language = 5;
-  bool publish = 6;
-}
-
-// CreateProjectResponse is the response message for the CreateProject method.
-message CreateProjectResponse {
-  string error = 1;
-  ProjectData data = 2;
-  int64 code = 3;
-}
-
 // FetchProjectRequest is the request message for the FetchProject method.
 message FetchProjectRequest {
   string name = 1;
@@ -95,6 +78,28 @@ message ProjectResponse {
 // ListProjectsResponse is the response message for the ListProject method.
 message ListProjectsResponse  { repeated ProjectResponse data = 1; }
 
+// CreateDeploymentRequest is the request message for the CreateDeployment method.
+message CreateDeploymentRequest {
+  string project_name = 1;
+  string project_uuid = 2;
+  string deploy_name = 3;
+  bytes deploy_chunk = 4;
+}
+
+// DeploymentResponse is the response message for the CreateDeployment method.
+message DeploymentResponse {
+  string domain = 1;
+  string uuid = 2;
+  int32 deploy_status = 3;
+  int32 prod_status = 4;
+}
+
+// PromoteDeploymentRequest is the request message for the PromoteDeployment method.
+message PromoteDeploymentRequest{
+  int64 deploy_id = 1;
+  string deploy_uuid = 2;
+}
+
 service MoniRpcService {
   // LoginEmail logs in a user with the specified email and password
   rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
@@ -112,10 +117,6 @@ service MoniRpcService {
   // RemoveAccessToken removes the access token with the specified uuid
   rpc RemoveAccessToken(RemoveAccessTokenRequest) returns (NoDataResponse);
 
-  // CreateProject creates a new function project with the specified data and
-  // returns its information
-  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
-
   // FetchProject fetches the project with the specified name
   rpc FetchProject(FetchProjectRequest) returns (ProjectResponse);
 
@@ -124,4 +125,10 @@ service MoniRpcService {
 
   // ListProjects lists all projects of the current user
   rpc ListProjects(Empty) returns (ListProjectsResponse);
+
+  // CreateDeployment creates a new deployment for the specified projects
+  rpc CreateDeployment(CreateDeploymentRequest) returns (DeploymentResponse);
+
+  // PromoteDeployment promotes the specified deployment to production
+  rpc PromoteDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
 }
