@@ -35,7 +35,7 @@ members = [
 anyhow = "1.0.71"
 async-trait = "0.1.68"
 axum = "0.6.18"
-clap = { version = "4.3.0", features = ["derive"] }
+clap = { version = "4.3.0", features = ["derive", "env"] }
 chrono = "0.4.24"
 http = "0.2.9"
 hyper = { version = "0.14.26", features = ["full"] }

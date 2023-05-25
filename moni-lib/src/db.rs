@@ -1,17 +1,24 @@
 use anyhow::Result;
+use envconfig::Envconfig;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tracing::debug;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Envconfig, Debug, Serialize, Deserialize)]
 pub struct DbConfig {
+    #[envconfig(from = "MONI_DB_HOST", default = "localhost")]
     pub host: String,
+    #[envconfig(from = "MONI_DB_PORT", default = "3306")]
     pub port: u16,
+    #[envconfig(from = "MONI_DB_USER", default = "root")]
     pub user: String,
+    #[envconfig(from = "MONI_DB_PASSWORD", default = "")]
     pub password: String,
+    #[envconfig(from = "MONI_DB_NAME", default = "moni-serverless")]
     pub database: String,
+    #[envconfig(from = "MONI_DB_POOL_SIZE", default = "10")]
     pub pool_size: u32,
 }
 
@@ -41,7 +48,8 @@ impl Default for DbConfig {
 pub static DB: OnceCell<DatabaseConnection> = OnceCell::new();
 
 /// init initializes database connection pool
-pub async fn init(cfg: &DbConfig) -> Result<()> {
+pub async fn init() -> Result<()> {
+    let cfg = DbConfig::init_from_env().unwrap();
     let url = cfg.url();
     debug!("connect to database: {url}");
 

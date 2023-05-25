@@ -7,9 +7,11 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 chrono = { workspace = true }
+envconfig = "0.10.0"
 futures = "0.3.28"
 lazy_static = { workspace = true }
 once_cell = { workspace = true }
+opendal = { version = "0.35.0", default-features = false, features = ["services-fs"] }
 rand = { workspace = true }
 sea-orm = { version = "0.11.3", features = [
     "sqlx-mysql",

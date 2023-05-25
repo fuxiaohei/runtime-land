@@ -2,6 +2,7 @@ use super::moni_rpc_service_server::MoniRpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
 use moni_lib::dao::{self, token, user};
+use moni_lib::storage::{self, get_prefix, STORAGE};
 
 #[derive(Default)]
 pub struct ServiceImpl {}
@@ -217,7 +218,20 @@ impl MoniRpcService for ServiceImpl {
             format!("fs://{}", req.deploy_name.clone()),
         )
         .await
-        .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+        .map_err(|e| tonic::Status::internal(format!("create deployment failed: {:?}", e)))?;
+
+        // save file
+        let storage_path = format!("{}/{}.wasm", project.uuid, deployment.uuid);
+        let storage = STORAGE.get().unwrap();
+        storage
+            .write(&storage_path, req.deploy_chunk)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("save storage failed: {:?}", e)))?;
+        let storage_url = format!("{}{}", get_prefix(), storage_path);
+        dao::deployment::update_storage(deployment.id as i32, storage_url)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("update storage url failed: {:?}", e)))?;
+
         let resp = super::DeploymentResponse {
             domain: req.deploy_name,
             uuid: deployment.uuid,

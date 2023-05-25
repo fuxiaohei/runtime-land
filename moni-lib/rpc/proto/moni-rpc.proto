@@ -84,6 +84,7 @@ message CreateDeploymentRequest {
   string project_uuid = 2;
   string deploy_name = 3;
   bytes deploy_chunk = 4;
+  string deploy_content_type = 5;
 }
 
 // DeploymentResponse is the response message for the CreateDeployment method.

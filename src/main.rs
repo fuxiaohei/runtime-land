@@ -1,14 +1,14 @@
 use clap::Parser;
-use tracing::{debug, info, warn};
-
-mod config;
+use tracing::{debug, info};
 
 #[derive(Parser, Debug)]
 #[clap(name = "moni-serverless", version = moni_lib::version::get())]
 struct Cli {
-    /// The conf file
-    #[clap(long, default_value("moni-serverless.toml"))]
-    pub conf: Option<String>,
+    #[clap(long, env("MONI_GRPC_ADDR"), default_value("127.0.0.1:38779"))]
+    pub grpc_addr: String,
+
+    #[clap(long, env("MONI_GRPC_ENABLE_GRPCWEB"), default_value("true"))]
+    pub enable_grpc_web: bool,
 }
 
 #[tokio::main]
@@ -16,22 +16,20 @@ async fn main() {
     moni_lib::tracing::init();
 
     let args = Cli::parse();
-    let conf_file = args.conf.as_ref().unwrap();
-    // if conf_file is not exist, warn and exit
-    if !std::path::Path::new(conf_file).exists() {
-        warn!("conf file {} is not exist", conf_file);
-        std::process::exit(1);
-    }
+    debug!("load args: {:?}", args);
 
-    let conf = config::Config::from_file(conf_file).unwrap();
-    debug!("load conf: {:?}", conf);
+    // init storage
+    moni_lib::storage::init()
+        .await
+        .expect("init storage failed");
+    info!("Init storage success");
 
     // init db
-    moni_lib::db::init(&conf.db).await.expect("init db failed");
-    info!("init db success");
+    moni_lib::db::init().await.expect("init db failed");
+    info!("Init db success");
 
     // start rpc server
-    moni_rpc::start_server(conf.http.addr.parse().unwrap(), conf.http.enable_grpc_web)
+    moni_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
         .await
         .unwrap();
 }

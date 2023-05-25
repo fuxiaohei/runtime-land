@@ -56,6 +56,24 @@ pub async fn find(
     Ok(deployment)
 }
 
+pub async fn update_storage(deploy_id: i32, storage_path: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    let deployment = project_deployment::Entity::find()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
+        .one(db)
+        .await?;
+
+    if deployment.is_none() {
+        return Err(anyhow::anyhow!("deployment not found"));
+    }
+
+    let mut deployment_model: project_deployment::ActiveModel = deployment.unwrap().into();
+    deployment_model.storage_path = Set(storage_path);
+    deployment_model.update(db).await?;
+
+    Ok(())
+}
+
 pub async fn promote(deploy_id: i32, deploy_uuid: String) -> Result<project_deployment::Model> {
     let deployment = find(deploy_id, deploy_uuid).await?;
     if deployment.is_none() {

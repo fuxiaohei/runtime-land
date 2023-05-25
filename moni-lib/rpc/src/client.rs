@@ -68,6 +68,7 @@ impl Client {
         project_name: String,
         project_uuid: String,
         binary: Vec<u8>,
+        content_type: String,
     ) -> Result<Option<DeploymentResponse>, Box<dyn std::error::Error>> {
         let deploy_name: String = thread_rng()
             .sample_iter(&Alphanumeric)
@@ -79,6 +80,7 @@ impl Client {
             project_uuid,
             deploy_name: deploy_name.to_lowercase(),
             deploy_chunk: binary,
+            deploy_content_type: content_type,
         });
         let resp = self.client.create_deployment(req).await?;
         Ok(Some(resp.into_inner()))

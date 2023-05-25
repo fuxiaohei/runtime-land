@@ -36,6 +36,11 @@ pub async fn deploy(
 
     // upload wasm file to project
     let wasm_binary = std::fs::read(output).unwrap();
+    info!(
+        "Uploading assets to project '{project_name}', size: {size} KB",
+        project_name = project.name,
+        size = wasm_binary.len() / 1024,
+    );
     let deployment = create_deploy(&mut client, &project, wasm_binary)
         .await
         .unwrap();
@@ -87,7 +92,12 @@ async fn create_deploy(
     binary: Vec<u8>,
 ) -> Option<DeploymentResponse> {
     let response = client
-        .create_deployment(project.name.clone(), project.uuid.clone(), binary)
+        .create_deployment(
+            project.name.clone(),
+            project.uuid.clone(),
+            binary,
+            "application/wasm".to_string(),
+        )
         .await
         .unwrap_or_else(|e| {
             warn!("create deployment failed: {:?}", e);
