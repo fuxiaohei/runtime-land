@@ -16,17 +16,42 @@ concurrency:
 jobs:
   dockerize:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./deploy/moni-serverless.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/moni-serverless
+          - dockerfile: ./deploy/moni-runtime.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/moni-runtime
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "moni-dockerize"
+      - name: Update local toolchain
+        run: |
+          rustup update stable
+      - name: Install protobuf
+        run: |
+          sudo apt update
+          sudo apt install -y protobuf-compiler libprotobuf-dev
+      - name: Toolchain info
+        run: |
+          cargo --version --verbose
+          rustc --version
+          protoc --version
+      - name: Build all
+        run: |
+          cargo build --release
+          cargo build --release -p moni-runtime
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: |
-            ghcr.io/${{ github.repository_owner }}/moni-serverless
-          # https://github.com/docker/metadata-action#typesemver
+          images: ${{ matrix.image }}
           tags: |
             type=raw,value=latest,enable=true
             type=sha,enable=true,format=short
@@ -44,7 +69,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./deploy/moni-serverless.Dockerfile
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
