@@ -42,7 +42,13 @@ hyper = { version = "0.14.26", features = ["full"] }
 lazy_static = "1.4.0"
 names = { version = "0.14.0", default-features = false }
 once_cell = "1.17.1"
-reqwest = { version = "0.11.18", features = ["stream"] }
+reqwest = { version = "0.11.18", default-features = false, features = [
+    "stream",
+    "rustls-tls",
+    "blocking",
+    "json",
+    "multipart",
+] }
 rand = "0.8.5"
 serde = { version = "1.0.163", features = ["derive"] }
 time = "0.3.21"
@@ -62,7 +68,7 @@ wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", rev = "299131
 wit-bindgen = "0.6.0"
 wit-bindgen-core = "0.6.0"
 wit-bindgen-rust = "0.6.0"
-wit-component = "0.9.0"
+wit-component = "0.10.0"
 
 [workspace.package]
 version = "0.2.1"
