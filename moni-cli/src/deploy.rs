@@ -41,18 +41,15 @@ pub async fn deploy(
         project_name = project.name,
         size = wasm_binary.len() / 1024,
     );
-    let deployment = create_deploy(&mut client, &project, wasm_binary)
+    let deployment = create_deploy(&mut client, &project, wasm_binary, is_production)
         .await
         .unwrap();
 
-    println!("deployment: {:?}", deployment);
-
-    // TODO: waiting for deployment status is ready
-
-    // if is_production, set project prod_deployment
-    if is_production {
-        // TODO: set project prod_deployment
-    }
+    info!(
+        "Deployed to project '{project_name}', deploy domain: {deploy_name}",
+        project_name = project.name,
+        deploy_name = deployment.domain,
+    );
 }
 
 async fn fetch_project(
@@ -90,6 +87,7 @@ async fn create_deploy(
     client: &mut Client,
     project: &ProjectResponse,
     binary: Vec<u8>,
+    is_production: bool,
 ) -> Option<DeploymentResponse> {
     let response = client
         .create_deployment(
@@ -97,6 +95,7 @@ async fn create_deploy(
             project.uuid.clone(),
             binary,
             "application/wasm".to_string(),
+            is_production,
         )
         .await
         .unwrap_or_else(|e| {

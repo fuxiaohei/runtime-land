@@ -89,10 +89,11 @@ message CreateDeploymentRequest {
 
 // DeploymentResponse is the response message for the CreateDeployment method.
 message DeploymentResponse {
-  string domain = 1;
-  string uuid = 2;
-  int32 deploy_status = 3;
-  int32 prod_status = 4;
+  int32 id = 1;
+  string domain = 2;
+  string uuid = 3;
+  int32 deploy_status = 4;
+  int32 prod_status = 5;
 }
 
 // PromoteDeploymentRequest is the request message for the PromoteDeployment method.

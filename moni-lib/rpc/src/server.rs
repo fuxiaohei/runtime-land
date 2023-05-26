@@ -2,7 +2,8 @@ use super::moni_rpc_service_server::MoniRpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
 use moni_lib::dao::{self, token, user};
-use moni_lib::storage::{self, get_prefix, STORAGE};
+use moni_lib::storage::{self, STORAGE};
+use tracing::debug;
 
 #[derive(Default)]
 pub struct ServiceImpl {}
@@ -227,12 +228,18 @@ impl MoniRpcService for ServiceImpl {
             .write(&storage_path, req.deploy_chunk)
             .await
             .map_err(|e| tonic::Status::internal(format!("save storage failed: {:?}", e)))?;
-        let storage_url = format!("{}{}", get_prefix(), storage_path);
-        dao::deployment::update_storage(deployment.id as i32, storage_url)
+        let storage_url = format!("{}{}", storage::get_prefix(), storage_path);
+        dao::deployment::update_storage(deployment.id as i32, storage_url.clone())
             .await
             .map_err(|e| tonic::Status::internal(format!("update storage url failed: {:?}", e)))?;
+        debug!(
+            "save deployment {} to {}",
+            req.deploy_name.clone(),
+            storage_url
+        );
 
         let resp = super::DeploymentResponse {
+            id: deployment.id as i32,
             domain: req.deploy_name,
             uuid: deployment.uuid,
             deploy_status: deployment.deploy_status,
@@ -243,8 +250,25 @@ impl MoniRpcService for ServiceImpl {
 
     async fn promote_deployment(
         &self,
-        request: tonic::Request<super::PromoteDeploymentRequest>,
+        req: tonic::Request<super::PromoteDeploymentRequest>,
     ) -> std::result::Result<tonic::Response<super::DeploymentResponse>, tonic::Status> {
-        Err(tonic::Status::unimplemented("Not yet implemented"))
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let req = req.into_inner();
+        let deployment =
+            dao::deployment::promote(token.owner_id, req.deploy_id as i32, req.deploy_uuid)
+                .await
+                .map_err(|e| {
+                    tonic::Status::internal(format!("promote deployment failed: {:?}", e))
+                })?;
+        let resp = super::DeploymentResponse {
+            id: deployment.id as i32,
+            domain: deployment.name,
+            uuid: deployment.uuid,
+            deploy_status: deployment.deploy_status,
+            prod_status: deployment.prod_status,
+        };
+        Ok(tonic::Response::new(resp))
     }
 }

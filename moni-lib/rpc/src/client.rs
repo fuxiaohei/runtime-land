@@ -69,6 +69,7 @@ impl Client {
         project_uuid: String,
         binary: Vec<u8>,
         content_type: String,
+        is_production: bool,
     ) -> Result<Option<DeploymentResponse>, Box<dyn std::error::Error>> {
         let deploy_name: String = thread_rng()
             .sample_iter(&Alphanumeric)
@@ -83,6 +84,17 @@ impl Client {
             deploy_content_type: content_type,
         });
         let resp = self.client.create_deployment(req).await?;
-        Ok(Some(resp.into_inner()))
+        let mut deploy_resp = resp.into_inner();
+
+        // set production
+        if is_production {
+            let req = tonic::Request::new(super::PromoteDeploymentRequest {
+                deploy_id: deploy_resp.id as i64,
+                deploy_uuid: deploy_resp.uuid,
+            });
+            let resp2 = self.client.promote_deployment(req).await?;
+            deploy_resp = resp2.into_inner();
+        }
+        Ok(Some(deploy_resp))
     }
 }

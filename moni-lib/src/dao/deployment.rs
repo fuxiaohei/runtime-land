@@ -9,7 +9,6 @@ use super::project;
 enum DeploymentStatus {
     Deploying = 1,
     Deployed,
-    Failed,
 }
 
 enum DeploymentProdStatus {
@@ -69,12 +68,17 @@ pub async fn update_storage(deploy_id: i32, storage_path: String) -> Result<()> 
 
     let mut deployment_model: project_deployment::ActiveModel = deployment.unwrap().into();
     deployment_model.storage_path = Set(storage_path);
+    deployment_model.deploy_status = Set(DeploymentStatus::Deployed as i32);
     deployment_model.update(db).await?;
 
     Ok(())
 }
 
-pub async fn promote(deploy_id: i32, deploy_uuid: String) -> Result<project_deployment::Model> {
+pub async fn promote(
+    owner_id: i32,
+    deploy_id: i32,
+    deploy_uuid: String,
+) -> Result<project_deployment::Model> {
     let deployment = find(deploy_id, deploy_uuid).await?;
     if deployment.is_none() {
         return Err(anyhow::anyhow!("deployment not found"));
@@ -82,16 +86,17 @@ pub async fn promote(deploy_id: i32, deploy_uuid: String) -> Result<project_depl
 
     // get project
     let deployment = deployment.unwrap();
-    let project = project::find_by_id(deployment.project_id).await?;
+    let project = project::find_by_id(owner_id, deployment.project_id).await?;
     if project.is_none() {
         return Err(anyhow::anyhow!("project not found"));
     }
+    let project = project.unwrap();
 
     let db = DB.get().unwrap();
     let txn = db.begin().await?;
 
     // update project prod deployment id
-    let mut project_model: project_info::ActiveModel = project.unwrap().into();
+    let mut project_model: project_info::ActiveModel = project.into();
     project_model.prod_deploy_id = Set(Some(deployment.id as i32));
     project_model.update(&txn).await?;
 

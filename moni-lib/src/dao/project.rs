@@ -32,10 +32,11 @@ pub async fn find(owner_id: i32, name: String) -> Result<Option<Model>> {
     Ok(project)
 }
 
-pub async fn find_by_id(project_id: i32) -> Result<Option<Model>> {
+pub async fn find_by_id(owner_id: i32, project_id: i32) -> Result<Option<Model>> {
     let db = DB.get().unwrap();
     let project = project_info::Entity::find()
         .filter(project_info::Column::Id.eq(project_id))
+        .filter(project_info::Column::OwnerId.eq(owner_id))
         .one(db)
         .await?;
     Ok(project)
