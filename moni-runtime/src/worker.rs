@@ -116,6 +116,26 @@ impl Worker {
         })
     }
 
+    // from_binary is used to create worker from bytes
+    pub async fn from_binary(bytes: &[u8]) -> Result<Self> {
+        // create component
+        let config = create_wasmtime_config();
+        let engine = Engine::new(&config)?;
+        let component = Component::from_binary(&engine, bytes)?;
+
+        // create linker
+        let mut linker: Linker<Context> = Linker::new(&engine);
+        wasi_common::wasi::command::add_to_linker(&mut linker)?;
+        http_body::add_to_linker(&mut linker, Context::http_ctx)?;
+        http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
+
+        Ok(Self {
+            path: "bytes".to_string(),
+            engine,
+            instance_pre: linker.instantiate_pre(&component)?,
+        })
+    }
+
     /// handle_request is used to handle http request
     pub async fn handle_request(
         &mut self,

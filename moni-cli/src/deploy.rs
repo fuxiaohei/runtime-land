@@ -63,7 +63,7 @@ async fn fetch_project(
         .await
         .unwrap_or_else(|e| {
             warn!("fetch project failed: {:?}", e);
-            return None;
+            None
         });
     // if project is not exist, create empty project with name
     if project.is_none() {
@@ -73,7 +73,7 @@ async fn fetch_project(
             .await
             .unwrap_or_else(|e| {
                 warn!("create project failed: {:?}", e);
-                return None;
+                None
             });
         info!(
             "Project '{project_name}' created",
@@ -89,7 +89,7 @@ async fn create_deploy(
     binary: Vec<u8>,
     is_production: bool,
 ) -> Option<DeploymentResponse> {
-    let response = client
+    client
         .create_deployment(
             project.name.clone(),
             project.uuid.clone(),
@@ -100,7 +100,6 @@ async fn create_deploy(
         .await
         .unwrap_or_else(|e| {
             warn!("create deployment failed: {:?}", e);
-            return None;
-        });
-    response
+            None
+        })
 }

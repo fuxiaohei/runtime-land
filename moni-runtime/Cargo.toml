@@ -12,6 +12,8 @@ clap = { workspace = true }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 futures-util = "0.3.28"
 hyper = { workspace = true }
+lazy_static = { workspace = true }
+moka = { version = "0.11.0", default-features = false, features = ["sync"] }
 moni-lib = { path = "../moni-lib" }
 reqwest = { workspace = true }
 serde = { workspace = true }

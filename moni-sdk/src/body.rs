@@ -42,7 +42,7 @@ impl Body {
         let resp = http_body_read(self.body_handle);
         Ok(resp.unwrap())
     }
-    pub fn into_bytes(&self) -> Result<Vec<u8>> {
+    pub fn into_bytes(self) -> Result<Vec<u8>> {
         match http_body_read_all(self.body_handle) {
             Ok(resp) => Ok(resp),
             Err(e) => Err(e.into()),

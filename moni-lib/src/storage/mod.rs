@@ -14,7 +14,6 @@ pub struct Config {
 }
 
 pub static STORAGE: OnceCell<Operator> = OnceCell::new();
-pub static STORAGE_PREFIX: OnceCell<String> = OnceCell::new();
 
 pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
@@ -22,7 +21,6 @@ pub async fn init() -> Result<()> {
         "local" => {
             let op = init_local().await?;
             STORAGE.set(op).unwrap();
-            STORAGE_PREFIX.set("local://".to_string()).unwrap();
         }
         _ => {
             return Err(anyhow!("unknown storage type: {}", cfg.type_name));
@@ -30,9 +28,4 @@ pub async fn init() -> Result<()> {
     }
 
     Ok(())
-}
-
-// get_prefix returns the storage prefix
-pub fn get_prefix() -> String {
-    STORAGE_PREFIX.get().unwrap().clone()
 }

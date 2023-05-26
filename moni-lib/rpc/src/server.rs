@@ -2,7 +2,7 @@ use super::moni_rpc_service_server::MoniRpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
 use moni_lib::dao::{self, token, user};
-use moni_lib::storage::{self, STORAGE};
+use moni_lib::storage::STORAGE;
 use tracing::debug;
 
 #[derive(Default)]
@@ -228,14 +228,13 @@ impl MoniRpcService for ServiceImpl {
             .write(&storage_path, req.deploy_chunk)
             .await
             .map_err(|e| tonic::Status::internal(format!("save storage failed: {:?}", e)))?;
-        let storage_url = format!("{}{}", storage::get_prefix(), storage_path);
-        dao::deployment::update_storage(deployment.id as i32, storage_url.clone())
+        dao::deployment::update_storage(deployment.id as i32, storage_path.clone())
             .await
             .map_err(|e| tonic::Status::internal(format!("update storage url failed: {:?}", e)))?;
         debug!(
             "save deployment {} to {}",
             req.deploy_name.clone(),
-            storage_url
+            storage_path
         );
 
         let resp = super::DeploymentResponse {

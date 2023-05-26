@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, debug_span, Instrument};
+use tracing::{debug, debug_span, info, Instrument};
 
 pub mod rt_server;
 
@@ -17,6 +17,12 @@ async fn main() {
     let args = Cli::parse();
 
     debug!("load args: {:?}", args);
+
+    // init storage
+    moni_lib::storage::init()
+        .await
+        .expect("init storage failed");
+    info!("Init storage success");
 
     rt_server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[Http]"))
