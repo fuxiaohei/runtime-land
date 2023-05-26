@@ -5,10 +5,9 @@ on:
     branches:
       - main
       - v*
-    paths:
-      - "src/**"
-      - "deploy/**"
-
+    tags: ["v*"]
+env:
+  CARGO_TERM_COLOR: always
 concurrency:
   group: dockerize-${{ github.ref }}
   cancel-in-progress: true
