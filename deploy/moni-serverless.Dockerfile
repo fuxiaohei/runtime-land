@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM ubuntu:latest
 EXPOSE 38779
 WORKDIR /opt/bin/
 COPY target/release/moni-serverless /opt/bin/moni-serverless
