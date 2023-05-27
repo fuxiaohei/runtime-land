@@ -17,7 +17,7 @@ pub struct Context {
 
 impl Default for Context {
     fn default() -> Self {
-        Self::new(1)
+        Self::new(uuid::Uuid::new_v4().to_string())
     }
 }
 
@@ -37,7 +37,7 @@ impl WasiView for Context {
 }
 
 impl Context {
-    pub fn new(req_id: u64) -> Self {
+    pub fn new(req_id: String) -> Self {
         let mut table = Table::new();
         Context {
             wasi_ctx: WasiCtxBuilder::new()
@@ -62,6 +62,11 @@ impl Context {
     /// take body
     pub fn take_body(&mut self, handle: u32) -> Option<Body> {
         self.http_ctx.take_body(handle)
+    }
+
+    /// get request id
+    pub fn req_id(&self) -> String {
+        self.http_ctx.req_id.clone()
     }
 }
 

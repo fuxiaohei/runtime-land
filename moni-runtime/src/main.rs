@@ -1,8 +1,6 @@
 use clap::Parser;
 use tracing::{debug, debug_span, info, Instrument};
 
-pub mod rt_server;
-
 #[derive(Parser, Debug)]
 #[clap(name = "moni-runtime", version = moni_lib::version::get())]
 struct Cli {
@@ -24,7 +22,7 @@ async fn main() {
         .expect("init storage failed");
     info!("Init storage success");
 
-    rt_server::start(args.http_addr.parse().unwrap())
+    moni_runtime::server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[Http]"))
         .await
         .unwrap();

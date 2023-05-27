@@ -4,7 +4,7 @@ use std::sync::atomic::AtomicU32;
 
 pub struct HttpContext {
     /// req_id set related request id from main request
-    pub req_id: u64,
+    pub req_id: String,
     /// counter is used to count fetch times, limit 10. avoid creating too many requests
     pub counter: u16,
     /// body hash map
@@ -16,7 +16,7 @@ pub struct HttpContext {
 }
 
 impl HttpContext {
-    pub fn new(req_id: u64) -> Self {
+    pub fn new(req_id: String) -> Self {
         HttpContext {
             req_id,
             counter: 10,

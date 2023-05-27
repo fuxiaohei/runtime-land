@@ -1,0 +1,6 @@
+manifest = "v1"
+name = "js-basic"
+project = "js-basic-example"
+description = "example rust project"
+authors = []
+language = "js"

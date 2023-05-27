@@ -1,3 +1,6 @@
+use crate::host_call::http_incoming::http_incoming::Request as WasmRequest;
+use crate::Context;
+use crate::{create_pool, WorkerPool};
 use anyhow::{anyhow, Result};
 use axum::{
     body::Body,
@@ -5,16 +8,63 @@ use axum::{
     routing::any,
     Router,
 };
-use moni_runtime::host_call::http_incoming::http_incoming::Request as WasmRequest;
-use moni_runtime::Context;
+use lazy_static::lazy_static;
+use moka::sync::Cache;
+use moni_lib::storage::STORAGE;
+use once_cell::sync::OnceCell;
 use std::net::SocketAddr;
+use std::{sync::Arc, time::Duration};
+use tracing::debug;
 use tracing::info;
 
-mod rt;
+lazy_static! {
+    pub static ref WASM_INSTANCES: Cache<String,Arc<WorkerPool> > = Cache::builder()
+    // Time to live (TTL): 1 hours
+    .time_to_live(Duration::from_secs( 60 * 60))
+    // Time to idle (TTI):  10 minutes
+    .time_to_idle(Duration::from_secs(10 * 60))
+    // Create the cache.
+    .build();
+}
 
-async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Response<Body>> {
-    let pool = rt::prepare_worker_pool(moni_wasm).await?;
+// DEFAULT_WASM_PATH is used to set default wasm path
+pub static DEFAULT_WASM_PATH: OnceCell<String> = OnceCell::new();
+
+pub async fn prepare_worker_pool(key: &str) -> Result<Arc<WorkerPool>> {
+    let mut instances_pool = WASM_INSTANCES.get(key);
+
+    if instances_pool.is_some() {
+        return Ok(instances_pool.unwrap());
+    }
+
+    let storage = STORAGE.get().expect("storage is not initialized");
+    if !storage.is_exist(key).await? {
+        return Err(anyhow!("key not found: {}", key));
+    }
+    let binary = storage.read(key).await?;
+
+    // write binary to local file
+    let mut path = std::env::temp_dir();
+    path.push(key);
+    // create parent dir
+    let parent = path.parent().unwrap();
+    std::fs::create_dir_all(parent)?;
+    std::fs::write(&path, binary)?;
+    debug!("wasm temp binary write to {}", path.display());
+
+    // create wasm worker pool
+    let pool = create_pool(path.to_str().unwrap())?;
+    WASM_INSTANCES.insert(key.to_string(), Arc::new(pool));
+
+    instances_pool = WASM_INSTANCES.get(key);
+
+    Ok(instances_pool.unwrap())
+}
+
+pub async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Response<Body>> {
+    let pool = prepare_worker_pool(moni_wasm).await?;
     let mut worker = pool.get().await.map_err(|e| anyhow!(e.to_string()))?;
+    debug!("wasm worker pool get worker success: {}", moni_wasm);
 
     // convert request to host-call request
     let mut headers: Vec<(String, String)> = vec![];
@@ -25,7 +75,8 @@ async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Resp
 
     let uri = req.uri().to_string();
     let method = req.method().clone();
-    let mut context = Context::new(1);
+    let mut context = Context::default();
+    let req_id = context.req_id();
     let body = req.into_body();
     let body_handle = context.set_body(body);
     let wasm_req = WasmRequest {
@@ -48,6 +99,9 @@ async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Resp
     for (k, v) in wasm_resp.headers {
         builder = builder.header(k, v);
     }
+    if builder.headers_ref().unwrap().get("x-request-id").is_none() {
+        builder = builder.header("x-request-id", req_id);
+    }
     Ok(builder.body(wasm_resp_body).unwrap())
 }
 
@@ -55,10 +109,11 @@ async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Resp
 async fn default_handler(req: Request<Body>) -> Response<Body> {
     // get header moni-wasm
     let headers = req.headers().clone();
+    let empty_wasm_path = String::new();
     let moni_wasm = headers
         .get("moni-wasm")
         .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
+        .unwrap_or(DEFAULT_WASM_PATH.get().unwrap_or(&empty_wasm_path));
 
     if moni_wasm.is_empty() {
         let builder = Response::builder().status(404);
@@ -79,7 +134,7 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
         .route("/", any(default_handler))
         .route("/*path", any(default_handler));
 
-    info!("starting on {}", addr);
+    info!("Starting on {}", addr);
 
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
