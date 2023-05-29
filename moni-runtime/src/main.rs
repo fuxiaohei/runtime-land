@@ -23,7 +23,7 @@ async fn main() {
     info!("Init storage success");
 
     moni_runtime::server::start(args.http_addr.parse().unwrap())
-        .instrument(debug_span!("[Http]"))
+        .instrument(debug_span!("[Server]"))
         .await
         .unwrap();
 }

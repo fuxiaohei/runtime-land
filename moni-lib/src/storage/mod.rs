@@ -2,6 +2,7 @@ use anyhow::{anyhow, Result};
 use envconfig::Envconfig;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
+use tracing::debug;
 
 use self::local::init_local;
 
@@ -17,6 +18,7 @@ pub static STORAGE: OnceCell<Operator> = OnceCell::new();
 
 pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
+    debug!("init storage cfg: {:?}", cfg);
     match cfg.type_name.as_str() {
         "local" => {
             let op = init_local().await?;

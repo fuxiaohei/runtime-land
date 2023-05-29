@@ -38,3 +38,40 @@ services:
     volumes:
       - ./mysql_data:/var/lib/mysql
       - ./moni-serverless.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - moni_serverless_network
+  moni-runtime:
+    image: ghcr.io/fuxiaohei/moni-runtime:latest
+    environment:
+      - MONI_HTTP_ADDR=0.0.0.0:38889
+      - MONI_STORAGE_LOCAL_PATH=/data
+    deploy:
+      replicas: 2
+    ports:
+      - '38880-38881:38889'
+    networks:
+      - moni_serverless_network
+    volumes:
+      - ./moni_data:/data
+  moni-serverless:
+    image: ghcr.io/fuxiaohei/moni-serverless:latest
+    environment:
+      - MONI_GRPC_ADDR=0.0.0.0:38779
+      - MONI_STORAGE_LOCAL_PATH=/data
+      - MONI_DB_HOST=mysql-db
+      - MONI_DB_PORT=3306
+      - MONI_DB_USER=root
+      - MONI_DB_PASSWORD=TJbP7C9ESkLjnS7HXa6y
+      - MONI_DB_NAME=moni-serverless
+    ports:
+      - '38779:38779'
+    depends_on:
+      mysql-db:
+        condition: service_started
+        restart: true
+      redis-server:
+        condition: service_started
+    networks:
+      - moni_serverless_network
+    volumes:
+      - ./moni_data:/data

@@ -14,8 +14,7 @@ use moni_lib::storage::STORAGE;
 use once_cell::sync::OnceCell;
 use std::net::SocketAddr;
 use std::{sync::Arc, time::Duration};
-use tracing::debug;
-use tracing::info;
+use tracing::{debug, info, info_span, warn, Instrument};
 
 lazy_static! {
     pub static ref WASM_INSTANCES: Cache<String,Arc<WorkerPool> > = Cache::builder()
@@ -61,10 +60,14 @@ pub async fn prepare_worker_pool(key: &str) -> Result<Arc<WorkerPool>> {
     Ok(instances_pool.unwrap())
 }
 
-pub async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<Response<Body>> {
+pub async fn wasm_caller_handler(
+    req: Request<Body>,
+    moni_wasm: &str,
+    req_id: String,
+) -> Result<Response<Body>> {
     let pool = prepare_worker_pool(moni_wasm).await?;
     let mut worker = pool.get().await.map_err(|e| anyhow!(e.to_string()))?;
-    debug!("wasm worker pool get worker success: {}", moni_wasm);
+    debug!("[HTTP] wasm worker pool get worker success: {}", moni_wasm);
 
     // convert request to host-call request
     let mut headers: Vec<(String, String)> = vec![];
@@ -75,7 +78,7 @@ pub async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<
 
     let uri = req.uri().to_string();
     let method = req.method().clone();
-    let mut context = Context::default();
+    let mut context = Context::new(req_id);
     let req_id = context.req_id();
     let body = req.into_body();
     let body_handle = context.set_body(body);
@@ -85,6 +88,9 @@ pub async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<
         headers: &headers,
         body: Some(body_handle),
     };
+
+    let span = info_span!("[WASM]", moni_wasm = %moni_wasm, body = ?body_handle);
+    let _enter = span.enter();
 
     let (wasm_resp, wasm_resp_body) = match worker.handle_request(wasm_req, context).await {
         Ok((wasm_resp, wasm_resp_body)) => (wasm_resp, wasm_resp_body),
@@ -96,17 +102,23 @@ pub async fn wasm_caller_handler(req: Request<Body>, moni_wasm: &str) -> Result<
 
     // convert host-call response to response
     let mut builder = Response::builder().status(wasm_resp.status);
-    for (k, v) in wasm_resp.headers {
+    for (k, v) in wasm_resp.headers.clone() {
         builder = builder.header(k, v);
     }
     if builder.headers_ref().unwrap().get("x-request-id").is_none() {
-        builder = builder.header("x-request-id", req_id);
+        builder = builder.header("x-request-id", req_id.clone());
+    }
+    if wasm_resp.status >= 400 {
+        warn!( status=%wasm_resp.status, "[Response]");
+    } else {
+        info!( status=%wasm_resp.status, "[Response]");
     }
     Ok(builder.body(wasm_resp_body).unwrap())
 }
 
 // basic handler that responds with a static string
 async fn default_handler(req: Request<Body>) -> Response<Body> {
+    let req_id = uuid::Uuid::new_v4().to_string();
     // get header moni-wasm
     let headers = req.headers().clone();
     let empty_wasm_path = String::new();
@@ -115,12 +127,21 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
         .and_then(|v| v.to_str().ok())
         .unwrap_or(DEFAULT_WASM_PATH.get().unwrap_or(&empty_wasm_path));
 
+    let method = req.method().clone();
+    let uri = req.uri().to_string();
+    let span = info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri,);
+
     if moni_wasm.is_empty() {
+        let _enter = span.enter();
         let builder = Response::builder().status(404);
+        warn!(status = 404, "[Response] moni-wasm not found");
         return builder.body(Body::from("moni-wasm not found")).unwrap();
     }
 
-    match wasm_caller_handler(req, moni_wasm).await {
+    match wasm_caller_handler(req, moni_wasm, req_id)
+        .instrument(span)
+        .await
+    {
         Ok(resp) => resp,
         Err(e) => {
             let builder = Response::builder().status(500);

@@ -166,7 +166,7 @@ impl Serve {
         // start server
         let addr = self.addr.unwrap();
         crate::server::start(addr, &meta)
-            .instrument(debug_span!("[Http]"))
+            .instrument(debug_span!("[Server]"))
             .await
             .unwrap();
     }
