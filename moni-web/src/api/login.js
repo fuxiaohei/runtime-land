@@ -37,26 +37,14 @@ function getLocalUser() {
   return local_user;
 }
 
-function error_text(e) {
-  // generate text descrpition for grpc response code
-  switch (e.code) {
-    case 2:
-      return "unknown server error";
-  }
-  return e.message;
+function setLocalUser(user) {
+  console.log("setLocalUser:", user)
+  user.lastVerifyTime = Date.now();
+  localStorage.setItem("moni-web-user", JSON.stringify(user));
 }
 
-function handle_response(response, response_error, callback) {
-  if (response_error) {
-    callback({ code: 1, error: response_error });
-    return;
-  }
-  if (response.getCode()) {
-    console.log("error", response.getCode());
-    callback({ code: response.getCode(), error: response.getError() });
-    return;
-  }
-  callback(response);
+function removeLocalUser() {
+  localStorage.removeItem("moni-web-user");
 }
 
 async function loginByLocalUser(user) {
@@ -86,6 +74,8 @@ async function signupByEmail(email, password, nickname) {
 export {
   loginByEmail,
   getLocalUser,
+  setLocalUser,
+  removeLocalUser,
   loginByLocalUser,
   loginByMail,
   signupByEmail,

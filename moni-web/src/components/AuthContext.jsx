@@ -3,6 +3,8 @@ import {
   getLocalUser,
   loginByLocalUser,
   loginByMail,
+  removeLocalUser,
+  setLocalUser,
   signupByEmail,
 } from "../api/login";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
@@ -23,7 +25,7 @@ function AuthProvider({ children }) {
       let res = await loginByMail(newUser.email, newUser.password);
       if (!res.error) {
         setUser(res);
-        localStorage.setItem("moni-web-user", JSON.stringify(res));
+        setLocalUser(res);
       }
       return res;
     }
@@ -38,14 +40,14 @@ function AuthProvider({ children }) {
       );
       if (!res.error) {
         setUser(res);
-        localStorage.setItem("moni-web-user", JSON.stringify(res));
+        setLocalUser(res);
       }
       return res;
     }
   };
 
   let signout = async (user) => {
-    localStorage.removeItem("moni-web-user");
+    removeLocalUser();
     setUser(null);
   };
 
@@ -71,6 +73,12 @@ function RequireAuth({ children }) {
   React.useEffect(() => {
     if (!auth.user) {
       return;
+    }
+    let now = Date.now();
+    let duration = now - auth.user.lastVerifyTime;
+    if (duration < 300 * 1000) {
+      // 300s = 5min
+      // return;
     }
     fetchLogin();
   });

@@ -25,7 +25,6 @@ function LoginEmailPage() {
     if (validated) {
       event.preventDefault();
       event.stopPropagation();
-      console.log("-----login", email, password);
       let res = await signin({ email, password });
       if (res.error) {
         setShowAlert(true);

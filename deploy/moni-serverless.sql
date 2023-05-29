@@ -73,11 +73,13 @@ DROP TABLE IF EXISTS `user_info`;
 
 CREATE TABLE `user_info` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(128) NOT NULL,
-  `password` varchar(128) NOT NULL,
+  `email` varchar(128) NOT NULL COMMENT 'user email',
+  `password` varchar(128) NOT NULL COMMENT 'user password',
+  `password_salt` varchar(64) NOT NULL COMMENT 'user password salt',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `display_name` varchar(128) NOT NULL,
+  `display_name` varchar(128) NOT NULL COMMENT 'user display name in webpage',
+  `role` int(11) NOT NULL DEFAULT '2' COMMENT 'user role, admin=1/user=2',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
