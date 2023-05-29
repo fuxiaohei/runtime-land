@@ -1,6 +1,7 @@
 const {
   LoginEmailRequest,
   LoginAccessTokenRequest,
+  SignupEmailRequest,
 } = require("./proto/moni-rpc_pb.js");
 const { MoniRpcServiceClient } = require("./proto/moni-rpc_grpc_web_pb.js");
 const { RPC_CLIENT_ADDRESS, callClient } = require("./utils.js");
@@ -73,4 +74,19 @@ async function loginByMail(email, password) {
   return response;
 }
 
-export { loginByEmail, getLocalUser, loginByLocalUser, loginByMail };
+async function signupByEmail(email, password, nickname) {
+  let request = new SignupEmailRequest();
+  request.setEmail(email);
+  request.setPassword(password);
+  request.setNickname(nickname);
+  let response = await callClient(request, "signupEmail");
+  return response;
+}
+
+export {
+  loginByEmail,
+  getLocalUser,
+  loginByLocalUser,
+  loginByMail,
+  signupByEmail,
+};

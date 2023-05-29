@@ -3,25 +3,58 @@ use crate::UserContext;
 use gravatar::{Gravatar, Rating};
 use moni_lib::dao::{self, token, user};
 use moni_lib::storage::STORAGE;
-use tracing::debug;
+use tracing::{debug, warn};
 
 #[derive(Default)]
 pub struct ServiceImpl {}
 
 #[tonic::async_trait]
 impl MoniRpcService for ServiceImpl {
+    
+    #[tracing::instrument(skip(self, req))]
+    async fn signup_email(
+        &self,
+        req: tonic::Request<super::SignupEmailRequest>,
+    ) -> std::result::Result<tonic::Response<super::LoginResponse>, tonic::Status> {
+        let sign_req = req.into_inner();
+        let (user, token) =
+            user::signup_by_email(sign_req.email.clone(), sign_req.password, sign_req.nickname)
+                .await
+                .map_err(|e| {
+                    warn!("failed, {:?}, {:?}", sign_req.email, e);
+                    tonic::Status::internal(format!("{:?}", e))
+                })?;
+        let gravatar_url = Gravatar::new(&user.email)
+            .set_size(Some(400))
+            .set_rating(Some(Rating::Pg))
+            .image_url();
+        debug!("success, {:?}, {:?}", sign_req.email, token.uuid);
+        Ok(tonic::Response::new(super::LoginResponse {
+            access_token: token.token,
+            access_token_uuid: token.uuid,
+            display_name: user.display_name,
+            display_email: user.email,
+            avatar_url: gravatar_url.to_string(),
+        }))
+    }
+
+    #[tracing::instrument(skip(self, req))]
     async fn login_email(
         &self,
         req: tonic::Request<super::LoginEmailRequest>,
     ) -> Result<tonic::Response<super::LoginResponse>, tonic::Status> {
         let login_req = req.into_inner();
-        let (user, token) = user::login_by_email(login_req.email, login_req.password)
+        let (user, token) = user::login_by_email(login_req.email.clone(), login_req.password)
             .await
-            .map_err(|e| tonic::Status::internal(format!("{:?}", e)))?;
+            .map_err(|e| {
+                warn!("failed, {:?}, {:?}", login_req.email, e);
+                tonic::Status::internal(format!("{:?}", e))
+            })?;
         let gravatar_url = Gravatar::new(&user.email)
             .set_size(Some(400))
             .set_rating(Some(Rating::Pg))
             .image_url();
+        debug!("success, {:?}, {:?}", login_req.email, token.uuid);
         Ok(tonic::Response::new(super::LoginResponse {
             access_token: token.token,
             access_token_uuid: token.uuid,

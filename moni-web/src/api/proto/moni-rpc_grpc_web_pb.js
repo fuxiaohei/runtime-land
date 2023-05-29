@@ -77,6 +77,67 @@ proto.moni.MoniRpcServicePromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.SignupEmailRequest,
+ *   !proto.moni.LoginResponse>}
+ */
+const methodDescriptor_MoniRpcService_SignupEmail = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/SignupEmail',
+  grpc.web.MethodType.UNARY,
+  proto.moni.SignupEmailRequest,
+  proto.moni.LoginResponse,
+  /**
+   * @param {!proto.moni.SignupEmailRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.LoginResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.SignupEmailRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.LoginResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.LoginResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.signupEmail =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/SignupEmail',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_SignupEmail,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.SignupEmailRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.LoginResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.signupEmail =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/SignupEmail',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_SignupEmail);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
  *   !proto.moni.LoginEmailRequest,
  *   !proto.moni.LoginResponse>}
  */
@@ -382,67 +443,6 @@ proto.moni.MoniRpcServicePromiseClient.prototype.removeAccessToken =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.moni.CreateProjectRequest,
- *   !proto.moni.CreateProjectResponse>}
- */
-const methodDescriptor_MoniRpcService_CreateProject = new grpc.web.MethodDescriptor(
-  '/moni.MoniRpcService/CreateProject',
-  grpc.web.MethodType.UNARY,
-  proto.moni.CreateProjectRequest,
-  proto.moni.CreateProjectResponse,
-  /**
-   * @param {!proto.moni.CreateProjectRequest} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.moni.CreateProjectResponse.deserializeBinary
-);
-
-
-/**
- * @param {!proto.moni.CreateProjectRequest} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.moni.CreateProjectResponse)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.moni.CreateProjectResponse>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.moni.MoniRpcServiceClient.prototype.createProject =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/moni.MoniRpcService/CreateProject',
-      request,
-      metadata || {},
-      methodDescriptor_MoniRpcService_CreateProject,
-      callback);
-};
-
-
-/**
- * @param {!proto.moni.CreateProjectRequest} request The
- *     request proto
- * @param {?Object<string, string>=} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.moni.CreateProjectResponse>}
- *     Promise that resolves to the response
- */
-proto.moni.MoniRpcServicePromiseClient.prototype.createProject =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/moni.MoniRpcService/CreateProject',
-      request,
-      metadata || {},
-      methodDescriptor_MoniRpcService_CreateProject);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
  *   !proto.moni.FetchProjectRequest,
  *   !proto.moni.ProjectResponse>}
  */
@@ -620,6 +620,128 @@ proto.moni.MoniRpcServicePromiseClient.prototype.listProjects =
       request,
       metadata || {},
       methodDescriptor_MoniRpcService_ListProjects);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.CreateDeploymentRequest,
+ *   !proto.moni.DeploymentResponse>}
+ */
+const methodDescriptor_MoniRpcService_CreateDeployment = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/CreateDeployment',
+  grpc.web.MethodType.UNARY,
+  proto.moni.CreateDeploymentRequest,
+  proto.moni.DeploymentResponse,
+  /**
+   * @param {!proto.moni.CreateDeploymentRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.DeploymentResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.CreateDeploymentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.DeploymentResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.DeploymentResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.createDeployment =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateDeployment',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateDeployment,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.CreateDeploymentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.DeploymentResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.createDeployment =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/CreateDeployment',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_CreateDeployment);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.PromoteDeploymentRequest,
+ *   !proto.moni.DeploymentResponse>}
+ */
+const methodDescriptor_MoniRpcService_PromoteDeployment = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/PromoteDeployment',
+  grpc.web.MethodType.UNARY,
+  proto.moni.PromoteDeploymentRequest,
+  proto.moni.DeploymentResponse,
+  /**
+   * @param {!proto.moni.PromoteDeploymentRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.DeploymentResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.PromoteDeploymentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.DeploymentResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.DeploymentResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.promoteDeployment =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/PromoteDeployment',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_PromoteDeployment,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.PromoteDeploymentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.DeploymentResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.promoteDeployment =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/PromoteDeployment',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_PromoteDeployment);
 };
 
 

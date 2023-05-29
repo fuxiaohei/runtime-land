@@ -6,6 +6,7 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+bcrypt = "0.14.0"
 chrono = { workspace = true }
 envconfig = "0.10.0"
 futures = "0.3.28"

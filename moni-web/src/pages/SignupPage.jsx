@@ -4,14 +4,15 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginNavbar from "../components/LoginNavbar";
 import { userAuthContext } from "../components/AuthContext";
 
-function LoginEmailPage() {
+function SignupPage() {
   const [email, setEmail] = useState("");
+  const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [validated, setValidated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
-  const { signin } = userAuthContext();
+  const { signup } = userAuthContext();
 
   const handleSubmit = async (event) => {
     const form = event.currentTarget;
@@ -25,8 +26,7 @@ function LoginEmailPage() {
     if (validated) {
       event.preventDefault();
       event.stopPropagation();
-      console.log("-----login", email, password);
-      let res = await signin({ email, password });
+      let res = await signup({ email, password, nickname });
       if (res.error) {
         setShowAlert(true);
         setAlertMessage(res.error);
@@ -40,7 +40,7 @@ function LoginEmailPage() {
     <div>
       <LoginNavbar />
       <Container className="login-container">
-        <h3 className="login-container-header">Login to Moni-Web</h3>
+        <h3 className="login-container-header">Sign up Moni-Web</h3>
         <hr />
         <Form
           id="login-email-form"
@@ -62,6 +62,20 @@ function LoginEmailPage() {
             </Form.Control.Feedback>
           </Form.Group>
 
+          <Form.Group className="mb-3" controlId="formDisplayName">
+            <Form.Label>Display Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter display name or nickname"
+              required
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid">
+              Please provide a nickname.
+            </Form.Control.Feedback>
+          </Form.Group>
+
           <Form.Group className="mb-4" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
@@ -80,24 +94,16 @@ function LoginEmailPage() {
           </Alert>
           <div className="d-flex mb-4 justify-content-between">
             <Button variant="primary" type="submit" className="w-100">
-              Sign in
+              Sign up
             </Button>
           </div>
           <div className="d-flex justify-content-between login-email-link">
-            <Link to="/signup">Sign up</Link>
-            <Link to="/forgotpassword">Forget Password?</Link>
+            <Link to="/login-email">Have an account? Sign In</Link>
           </div>
         </Form>
-        {/*<hr />
-        <div className="d-grid gap-2">
-          <ButtonLink variant="link" to="/login" className="login-email-back">
-            <BsFillCaretLeftSquareFill size={16} />
-            Other Login Options
-          </ButtonLink>
-  </div>*/}
       </Container>
     </div>
   );
 }
 
-export default LoginEmailPage;
+export default SignupPage;

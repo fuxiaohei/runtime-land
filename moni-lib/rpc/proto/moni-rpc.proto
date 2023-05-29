@@ -11,6 +11,13 @@ message NoDataResponse{
   int64 code = 2;
 }
 
+// SignupEmailRequest is the request message for the SignupEmail method.
+message SignupEmailRequest {
+  string email = 1;
+  string password = 2;
+  string nickname = 3;
+}
+
 // LoginEmailRequest is the request message for the LoginEmail method.
 message LoginEmailRequest {
   string email = 1;
@@ -103,6 +110,9 @@ message PromoteDeploymentRequest{
 }
 
 service MoniRpcService {
+  // SignupEmail signs up a user with the specified email and password
+  rpc SignupEmail(SignupEmailRequest) returns (LoginResponse);
+  
   // LoginEmail logs in a user with the specified email and password
   rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
 

@@ -13,10 +13,11 @@ import {
   SignoutPage,
 } from "./components/AuthContext";
 import SettingsPage from "./pages/SettingsPage";
-
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import NewProjectPage from "./pages/NewProjectPage";
+import SignupPage from "./pages/SignupPage";
+
 TimeAgo.addDefaultLocale(en);
 
 function App() {
@@ -25,19 +26,27 @@ function App() {
       <Routes>
         <Route element={<Outlet />}>
           <Route path="/" element={<Navigate to="/projects" replace />} />
-          <Route
+          {/** <Route
             path="/login"
             element={
               <RequireUnauth>
                 <LoginPage />
               </RequireUnauth>
             }
-          />
+          />*/}
           <Route
             path="/login-email"
             element={
               <RequireUnauth>
                 <LoginEmailPage />
+              </RequireUnauth>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <RequireUnauth>
+                <SignupPage />
               </RequireUnauth>
             }
           />

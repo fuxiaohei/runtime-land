@@ -8,6 +8,7 @@ use tonic::{Request, Status};
 use tonic_web::GrpcWebLayer;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tracing::info;
+use tracing::log::warn;
 
 pub mod client;
 mod server;
@@ -50,13 +51,17 @@ fn auth_intercept(mut req: Request<()>) -> Result<Request<()>, Status> {
         }
     };
 
-    // if grpc_method is loginEmail or LoginAccessToken, no need to check auth token
-    if grpc_method == "loginEmail" || grpc_method == "loginAccessToken" {
+    // if grpc_method is signupEmail or loginEmail or LoginAccessToken, no need to check auth token
+    if grpc_method == "loginEmail"
+        || grpc_method == "loginAccessToken"
+        || grpc_method == "signupEmail"
+    {
         return Ok(req);
     }
 
     let auth_token = req.metadata().get("authorization");
     if auth_token.is_none() {
+        warn!("no auth token, grpc_method:{}", grpc_method);
         return Err(Status::unauthenticated("no auth token"));
     }
     let auth_token = auth_token.unwrap().to_str().unwrap();

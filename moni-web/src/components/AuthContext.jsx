@@ -1,5 +1,10 @@
 import React from "react";
-import { getLocalUser, loginByLocalUser, loginByMail } from "../api/login";
+import {
+  getLocalUser,
+  loginByLocalUser,
+  loginByMail,
+  signupByEmail,
+} from "../api/login";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import LoginLoadingPage from "../pages/LoginLoadingPage";
 
@@ -24,12 +29,27 @@ function AuthProvider({ children }) {
     }
   };
 
+  let signup = async (newUser) => {
+    if (newUser.email && newUser.password) {
+      let res = await signupByEmail(
+        newUser.email,
+        newUser.password,
+        newUser.nickname
+      );
+      if (!res.error) {
+        setUser(res);
+        localStorage.setItem("moni-web-user", JSON.stringify(res));
+      }
+      return res;
+    }
+  };
+
   let signout = async (user) => {
     localStorage.removeItem("moni-web-user");
     setUser(null);
   };
 
-  let value = { user, signin, signout };
+  let value = { user, signin, signout, signup };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
@@ -57,7 +77,7 @@ function RequireAuth({ children }) {
 
   if (!auth.user) {
     console.log("[auth] no browser token");
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login-email" state={{ from: location }} replace />;
   }
   if (!logged) {
     return <LoginLoadingPage />;
@@ -83,7 +103,7 @@ function SignoutPage() {
   const navigate = useNavigate();
   const handleLogout = async () => {
     await auth.signout(auth.user);
-    navigate("/login");
+    navigate("/login-email");
   };
 
   // Call handleLogout when the component is mounted
