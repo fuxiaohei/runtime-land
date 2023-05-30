@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tracing::{debug, info};
 use which::which;
-use wit_bindgen_core::wit_parser::{Resolve, UnresolvedPackage};
+use wit_bindgen_core::wit_parser::Resolve;
 use wit_bindgen_core::{Files, WorldGenerator};
 use wit_component::ComponentEncoder;
 
@@ -36,18 +36,14 @@ impl GuestGeneratorType {
 
 /// parse wit file and return world id
 pub fn generate_guest(
-    wit: PathBuf,
+    wit_dir: &Path,
     world: Option<String>,
     t: GuestGeneratorType,
 ) -> Result<HashMap<String, String>> {
     let mut generator = t.create_generator()?;
 
     let mut resolve = Resolve::default();
-    let pkg = if wit.is_dir() {
-        resolve.push_dir(&wit)?.0
-    } else {
-        resolve.push(UnresolvedPackage::parse_file(&wit)?, &Default::default())?
-    };
+    let pkg = resolve.push_dir(wit_dir)?.0;
 
     let mut output_maps = HashMap::new();
     let mut files = Files::default();
@@ -189,18 +185,14 @@ pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::generate_guest;
-    use std::path::PathBuf;
+    use std::path::Path;
 
     #[test]
     fn test_compile() {
-        let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../wit");
-        let outputs = generate_guest(
-            wit_dir,
-            Some(String::from("http-incoming")),
-            super::GuestGeneratorType::Rust,
-        )
-        .unwrap();
+        let wit_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../wit-v2");
+        let outputs =
+            generate_guest(wit_dir.as_path(), None, super::GuestGeneratorType::Rust).unwrap();
         assert_eq!(outputs.len(), 1);
-        assert_eq!(outputs.contains_key("http_incoming.rs"), true);
+        assert_eq!(outputs.contains_key("http_service.rs"), true);
     }
 }

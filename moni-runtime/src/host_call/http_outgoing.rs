@@ -1,15 +1,12 @@
-use self::http_outgoing::{RedirectPolicy, Request, RequestError, RequestOptions, Response};
+use super::host::moni::moni::http_outgoing::{
+    Host, Request, RequestError, RequestOptions, Response,
+};
+use super::host::moni::moni::http_types::RedirectPolicy;
 use super::HttpContext;
 use hyper::Body;
 use reqwest::redirect;
 use std::str::FromStr;
 use tracing::{debug, instrument, warn};
-
-wasmtime::component::bindgen!({
-    world:"http-outgoing",
-    path: "../wit",
-    async: true,
-});
 
 impl Default for RequestOptions {
     fn default() -> Self {
@@ -34,9 +31,9 @@ impl TryFrom<RedirectPolicy> for redirect::Policy {
 }
 
 #[async_trait::async_trait]
-impl http_outgoing::Host for HttpContext {
+impl Host for HttpContext {
     #[instrument(skip_all, name = "[Fetch]", level = "debug", fields(req_id = self.req_id, counter = self.counter))]
-    async fn fetch(
+    async fn fetch_request(
         &mut self,
         request: Request,
         options: RequestOptions,

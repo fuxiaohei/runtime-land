@@ -29,8 +29,9 @@ members = [
     "moni-runtime",
     "moni-sdk",
     "moni-sdk/macro",
+    "tests/wit-v2-gen",
     "tests/wit-v2-guest",
-    "tests/wit-v2-host"
+    "tests/wit-v2-host",
 ]
 
 [workspace.dependencies]
@@ -68,10 +69,10 @@ wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", features = [
     "async"
 ] }
 wasmtime-wasi = { git = "https://github.com/bytecodealliance/wasmtime" }
-wit-bindgen = "0.6.0"
-wit-bindgen-core = "0.6.0"
-wit-bindgen-rust = "0.6.0"
-wit-component = "0.10.0"
+wit-bindgen = "0.7.0"
+wit-bindgen-core = "0.7.0"
+wit-bindgen-rust = "0.7.0"
+wit-component = "0.11.0"
 uuid = { version = "1.3.3", features = ["v4"] }
 
 [workspace.package]

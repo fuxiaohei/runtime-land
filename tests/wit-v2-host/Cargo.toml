@@ -4,11 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-async-trait = "0.1.68"
-wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", features = [
-    "component-model",
-    "async"
-] }
-wasmtime-wasi = { git = "https://github.com/bytecodealliance/wasmtime" }
-wit-component = "0.11.0"
-tokio = { version = "1.28.2", features = ["full"] }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }
+wit-component = { workspace = true }

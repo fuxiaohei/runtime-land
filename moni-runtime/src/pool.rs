@@ -47,7 +47,7 @@ pub fn create_pool(path: &str) -> Result<WorkerPool> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{host_call::http_incoming::http_incoming::Request, worker::Context};
+    use crate::{host_call::Request, worker::Context};
     use hyper::Body;
 
     #[tokio::test]
@@ -69,13 +69,13 @@ mod tests {
 
             let headers: Vec<(String, String)> = vec![];
             let req = Request {
-                method: "GET",
-                uri: "/abc",
-                headers: &headers,
+                method: "GET".to_string(),
+                uri: "/abc".to_string(),
+                headers,
                 body: Some(body_handle),
             };
 
-            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
+            let (resp, _body) = worker.handle_request(&req, context).await.unwrap();
             assert_eq!(resp.status, 200);
             assert_eq!(resp.body, Some(2));
 

@@ -1,13 +1,10 @@
-use crate::host_call::http_body::http_body;
-use crate::host_call::http_outgoing::http_outgoing;
-use crate::host_call::{http_incoming, http_incoming::HttpIncoming, HttpContext};
-use crate::worker::http_incoming::http_incoming::{Request, Response};
+use crate::host_call::{HttpContext, HttpService, Request, Response};
 use anyhow::Result;
 use hyper::body::Body;
 use std::fmt::Debug;
-use wasi_common::{Table, WasiCtx, WasiCtxBuilder, WasiView};
 use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
+use wasmtime_wasi::preview2::{Table, WasiCtx, WasiCtxBuilder, WasiView};
 
 pub struct Context {
     wasi_ctx: WasiCtx,
@@ -103,22 +100,8 @@ impl Debug for Worker {
 impl Worker {
     /// new a worker
     pub async fn new(path: &str) -> Result<Self> {
-        // create component
-        let config = create_wasmtime_config();
-        let engine = Engine::new(&config)?;
-        let component = Component::from_file(&engine, path)?;
-
-        // create linker
-        let mut linker: Linker<Context> = Linker::new(&engine);
-        wasi_common::wasi::command::add_to_linker(&mut linker)?;
-        http_body::add_to_linker(&mut linker, Context::http_ctx)?;
-        http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
-
-        Ok(Self {
-            path: path.to_string(),
-            engine,
-            instance_pre: linker.instantiate_pre(&component)?,
-        })
+        let binary = std::fs::read(path)?;
+        Self::from_binary(&binary).await
     }
 
     // from_binary is used to create worker from bytes
@@ -130,9 +113,10 @@ impl Worker {
 
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
-        wasi_common::wasi::command::add_to_linker(&mut linker)?;
-        http_body::add_to_linker(&mut linker, Context::http_ctx)?;
-        http_outgoing::add_to_linker(&mut linker, Context::http_ctx)?;
+        // init wasi context
+        wasmtime_wasi::preview2::wasi::command::add_to_linker(&mut linker)
+            .expect("add wasmtime_wasi::preview2 failed");
+        HttpService::add_to_linker(&mut linker, Context::http_ctx)?;
 
         Ok(Self {
             path: "bytes".to_string(),
@@ -144,7 +128,7 @@ impl Worker {
     /// handle_request is used to handle http request
     pub async fn handle_request(
         &mut self,
-        req: Request<'_>,
+        req: &Request,
         context: Context,
     ) -> Result<(Response, Body)> {
         // create store
@@ -152,9 +136,9 @@ impl Worker {
 
         // get exports and call handle_request
         let (exports, _instance) =
-            HttpIncoming::instantiate_pre(&mut store, &self.instance_pre).await?;
+            HttpService::instantiate_pre(&mut store, &self.instance_pre).await?;
         let resp = exports
-            .http_incoming()
+            .moni_moni_http_incoming()
             .call_handle_request(&mut store, req)
             .await?;
         let body = store.data_mut().take_body(resp.body.unwrap()).unwrap();
@@ -165,7 +149,7 @@ impl Worker {
 #[cfg(test)]
 mod tests {
     use crate::{
-        host_call::http_incoming::http_incoming::Request,
+        host_call::Request,
         worker::{Context, Worker},
     };
     use hyper::Body;
@@ -183,13 +167,13 @@ mod tests {
             let body_handle = context.set_body(body);
 
             let req = Request {
-                method: "GET",
-                uri: "/abc",
-                headers: &headers,
+                method: "GET".to_string(),
+                uri: "/abc".to_string(),
+                headers,
                 body: Some(body_handle),
             };
 
-            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
+            let (resp, _body) = worker.handle_request(&req, context).await.unwrap();
             assert_eq!(resp.status, 200);
             // this wasm return request's body
             // so the body handler u32 is 2, same as request's body
