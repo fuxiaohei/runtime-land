@@ -1,17 +1,11 @@
-use self::http_body::{BodyError, HttpBodyHandle};
+use super::host::moni::http::http_body::{BodyError, Host, HttpBodyHandle};
 use super::HttpContext;
 use futures_util::StreamExt;
 use hyper::body::Body;
 use tracing::{debug, instrument};
 
-wasmtime::component::bindgen!({
-    world:"http-body",
-    path: "../wit",
-    async: true,
-});
-
 #[async_trait::async_trait]
-impl http_body::Host for HttpContext {
+impl Host for HttpContext {
     #[instrument(skip_all, name = "[Body]", level = "debug", fields(req_id = self.req_id))]
     async fn http_body_read(
         &mut self,

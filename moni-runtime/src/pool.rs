@@ -47,7 +47,7 @@ pub fn create_pool(path: &str) -> Result<WorkerPool> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{host_call::http_incoming::http_incoming::Request, worker::Context};
+    use crate::{host_call::Request, worker::Context};
     use hyper::Body;
 
     #[tokio::test]

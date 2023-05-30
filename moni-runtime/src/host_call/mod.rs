@@ -2,6 +2,17 @@ use hyper::body::{Body, Sender};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicU32;
 
+mod guest;
+pub use guest::exports::moni::http::http_incoming::{Request, Response};
+pub use guest::HttpHandler;
+
+mod host;
+pub use host::HttpService;
+
+pub mod http_body;
+pub mod http_outgoing;
+pub mod http_types;
+
 pub struct HttpContext {
     /// req_id set related request id from main request
     pub req_id: String,
@@ -45,7 +56,3 @@ impl HttpContext {
         self.body_sender_map.insert(id, sender);
     }
 }
-
-pub mod http_body;
-pub mod http_incoming;
-pub mod http_outgoing;

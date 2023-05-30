@@ -3,27 +3,27 @@ use std::path::{Path, PathBuf};
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=wit/*.wit");
+    println!("cargo:rerun-if-changed=wit-v2/*.wit");
 
     build_wit_guest_code();
 }
 
 fn build_wit_guest_code() {
-    let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
-    let worlds = vec![
-        ("http-incoming", "http_incoming.rs"),
-        ("http-outgoing", "http_outgoing.rs"),
-        ("http-body", "http_body.rs"),
-    ];
-    for world in worlds {
+    let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit-v2");
+
+    let worlds = vec!["http-handler", "http-service"];
+    for world_name in worlds {
         let outputs = generate_guest(
-            wit_dir.clone(),
-            Some(String::from(world.0)),
+            wit_dir.as_path(),
+            Some(world_name.to_string()),
             GuestGeneratorType::Rust,
         )
         .unwrap();
-        let content = outputs.get(world.1).unwrap();
-        let target_rs = wit_dir.join(Path::new(world.1));
-        std::fs::write(target_rs, content).unwrap();
+
+        // for range outputs, write content with key name
+        for (name, content) in outputs.iter() {
+            let target_rs = wit_dir.join(Path::new(name));
+            std::fs::write(target_rs, content).unwrap();
+        }
     }
 }

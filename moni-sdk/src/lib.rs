@@ -1,6 +1,7 @@
 pub mod http;
 pub mod router;
 
+mod host;
 mod body;
 mod fetch;
 

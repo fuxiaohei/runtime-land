@@ -7,7 +7,7 @@ edition = "2021"
 anyhow = "1.0.70"
 http = "0.2.9"
 moni-sdk = { path = "../../moni-sdk" }
-wit-bindgen = "0.6.0"
+wit-bindgen = "0.7.0"
 
 [lib]
 crate-type = ["cdylib"]

@@ -1,0 +1,10 @@
+[package]
+name = "wit-v2-guest"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wit-bindgen = { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]

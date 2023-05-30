@@ -1,4 +1,4 @@
-use crate::host_call::http_incoming::http_incoming::Request as WasmRequest;
+use crate::host_call::Request as WasmRequest;
 use crate::Context;
 use crate::{create_pool, WorkerPool};
 use anyhow::{anyhow, Result};
