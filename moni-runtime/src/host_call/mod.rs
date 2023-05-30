@@ -2,8 +2,11 @@ use hyper::body::{Body, Sender};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicU32;
 
+mod guest;
+pub use guest::exports::moni::http::http_incoming::{Request, Response};
+pub use guest::HttpHandler;
+
 mod host;
-pub use host::exports::moni::moni::http_incoming::{Request, Response};
 pub use host::HttpService;
 
 pub mod http_body;

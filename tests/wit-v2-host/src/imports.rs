@@ -1,10 +1,10 @@
 wasmtime::component::bindgen!({
+    world: "http-service",
     path: "../../wit-v2",
     async:true,
 });
 
-use moni::moni::{http_body, http_outgoing, http_types};
-
+use moni::http::{http_body, http_outgoing, http_types};
 pub struct HttpServiceHostImpl {}
 
 impl http_types::Host for HttpServiceHostImpl {}

@@ -1,4 +1,4 @@
-use crate::host_call::{HttpContext, HttpService, Request, Response};
+use crate::host_call::{HttpContext, HttpHandler, HttpService, Request, Response};
 use anyhow::Result;
 use hyper::body::Body;
 use std::fmt::Debug;
@@ -128,7 +128,7 @@ impl Worker {
     /// handle_request is used to handle http request
     pub async fn handle_request(
         &mut self,
-        req: &Request,
+        req: Request<'_>,
         context: Context,
     ) -> Result<(Response, Body)> {
         // create store
@@ -136,9 +136,9 @@ impl Worker {
 
         // get exports and call handle_request
         let (exports, _instance) =
-            HttpService::instantiate_pre(&mut store, &self.instance_pre).await?;
+            HttpHandler::instantiate_pre(&mut store, &self.instance_pre).await?;
         let resp = exports
-            .moni_moni_http_incoming()
+            .moni_http_http_incoming()
             .call_handle_request(&mut store, req)
             .await?;
         let body = store.data_mut().take_body(resp.body.unwrap()).unwrap();
@@ -167,13 +167,13 @@ mod tests {
             let body_handle = context.set_body(body);
 
             let req = Request {
-                method: "GET".to_string(),
-                uri: "/abc".to_string(),
-                headers,
+                method: "GET",
+                uri: "/abc",
+                headers: &headers,
                 body: Some(body_handle),
             };
 
-            let (resp, _body) = worker.handle_request(&req, context).await.unwrap();
+            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
             assert_eq!(resp.status, 200);
             // this wasm return request's body
             // so the body handler u32 is 2, same as request's body

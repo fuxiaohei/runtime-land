@@ -83,16 +83,16 @@ pub async fn wasm_caller_handler(
     let body = req.into_body();
     let body_handle = context.set_body(body);
     let wasm_req = WasmRequest {
-        method: method.to_string(),
-        uri,
-        headers,
+        method: method.as_str(),
+        uri: uri.as_str(),
+        headers: &headers,
         body: Some(body_handle),
     };
 
     let span = info_span!("[WASM]", moni_wasm = %moni_wasm, body = ?body_handle);
     let _enter = span.enter();
 
-    let (wasm_resp, wasm_resp_body) = match worker.handle_request(&wasm_req, context).await {
+    let (wasm_resp, wasm_resp_body) = match worker.handle_request(wasm_req, context).await {
         Ok((wasm_resp, wasm_resp_body)) => (wasm_resp, wasm_resp_body),
         Err(e) => {
             let builder = Response::builder().status(500);

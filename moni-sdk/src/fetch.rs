@@ -1,7 +1,6 @@
-include!("../../wit/http_outgoing.rs");
-
-use self::http_outgoing::{RedirectPolicy, RequestError, RequestOptions};
 use super::http::{Body, Request, Response};
+use super::host::moni::http::http_outgoing::{fetch_request, RequestError, RequestOptions};
+use super::host::moni::http::http_types::{self, RedirectPolicy};
 
 impl Default for RequestOptions {
     fn default() -> Self {
@@ -20,13 +19,13 @@ pub fn fetch(req: Request, options: RequestOptions) -> Result<Response, RequestE
     let uri = req.uri().clone().to_string();
     let method = req.method().clone();
 
-    let fetch_req = http_outgoing::Request {
-        headers: &headers,
-        uri: uri.as_str(),
-        method: method.as_str(),
+    let fetch_req = http_types::Request {
+        headers,
+        uri,
+        method: method.to_string(),
         body: Some(req.body().body_handle()),
     };
-    let fetch_resp = http_outgoing::fetch(fetch_req, options)?;
+    let fetch_resp = fetch_request(&fetch_req, options)?;
 
     let mut builder = http::Response::builder().status(fetch_resp.status);
     for (key, value) in fetch_resp.headers {

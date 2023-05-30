@@ -1,7 +1,7 @@
-use super::host::moni::moni::http_outgoing::{
+use super::host::moni::http::http_outgoing::{
     Host, Request, RequestError, RequestOptions, Response,
 };
-use super::host::moni::moni::http_types::RedirectPolicy;
+use super::host::moni::http::http_types::RedirectPolicy;
 use super::HttpContext;
 use hyper::Body;
 use reqwest::redirect;

@@ -1,0 +1,8 @@
+package moni:http
+
+interface http-incoming {
+    use http-types.{request,response}
+
+    // handle request function
+    handle-request: func(req: request) -> response
+}

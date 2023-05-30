@@ -1,10 +1,8 @@
-use self::http_body::{
+use super::host::moni::http::http_body::{
     http_body_new, http_body_new_stream, http_body_read, http_body_read_all, http_body_write,
     HttpBodyHandle,
 };
 use anyhow::Result;
-
-include!("../../wit/http_body.rs");
 
 /// Body is a wrapper around the wasi http_body API
 pub struct Body {

@@ -6,10 +6,13 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let func = syn::parse_macro_input!(item as syn::ItemFn);
     let func_name = func.sig.ident.clone();
 
-    let wit_guest_rs = include_str!("../../../wit/http_incoming.rs").to_string();
-    let iface: TokenStream = wit_guest_rs.parse().expect("cannot parse http_incoming.rs");
+    let wit_guest_rs = include_str!("../../../wit-v2/http_handler.rs").to_string();
+    let iface: TokenStream = wit_guest_rs.parse().expect("cannot parse http_handler.rs");
 
     let iface_impl = quote!(
+
+        use exports::moni::http::http_incoming;
+        
         struct HttpImpl;
 
         impl TryFrom<http_incoming::Request> for Request {
@@ -70,7 +73,7 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        export_http_incoming!(HttpImpl);
+        export_http_handler!(HttpImpl);
 
     );
     let value = format!("{iface}\n{iface_impl}");

@@ -19,13 +19,21 @@ fn main() {
     let mut resolve = Resolve::default();
     let path = Path::new("./wit-v2");
     let pkg = resolve.push_dir(path).unwrap().0;
+    let worlds = vec!["http-handler", "http-service"];
 
-    let world = resolve.select_world(pkg, None).unwrap();
+    for world_name in worlds {
+        let world = resolve.select_world(pkg, Some(world_name)).unwrap();
 
-    let mut files = Files::default();
-    generator.generate(&resolve, world, &mut files);
+        let mut files = Files::default();
+        generator.generate(&resolve, world, &mut files);
 
-    for (name, contents) in files.iter() {
-        println!("{}: {}", name, String::from_utf8_lossy(contents).len());
+        for (name, contents) in files.iter() {
+            println!(
+                "{}: {}: {}",
+                world_name,
+                name,
+                String::from_utf8_lossy(contents).len()
+            );
+        }
     }
 }

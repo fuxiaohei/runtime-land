@@ -5,12 +5,13 @@ use wasmtime::{
 use wasmtime_wasi::preview2::{Table, WasiCtx, WasiCtxBuilder, WasiView};
 use wit_component::ComponentEncoder;
 
-mod host;
+mod guest;
+mod imports;
 
 pub struct Context {
     wasi_ctx: WasiCtx,
     table: Table,
-    http_host: host::HttpServiceHostImpl,
+    http_host: imports::HttpServiceHostImpl,
 }
 
 impl WasiView for Context {
@@ -37,12 +38,12 @@ impl Context {
                 .build(&mut table)
                 .unwrap(),
             table,
-            http_host: host::HttpServiceHostImpl {},
+            http_host: imports::HttpServiceHostImpl {},
         }
     }
 
     /// get http_ctx
-    pub fn http_host(&mut self) -> &mut host::HttpServiceHostImpl {
+    pub fn http_host(&mut self) -> &mut imports::HttpServiceHostImpl {
         &mut self.http_host
     }
 }
@@ -94,7 +95,7 @@ async fn call_wasm() {
     // init wasi context
     wasmtime_wasi::preview2::wasi::command::add_to_linker(&mut linker)
         .expect("add wasi::command linker failed");
-    host::HttpService::add_to_linker(&mut linker, Context::http_host)
+    imports::HttpService::add_to_linker(&mut linker, Context::http_host)
         .expect("add http service failed");
 
     // init context
@@ -102,18 +103,19 @@ async fn call_wasm() {
     let mut store = Store::new(&engine, context);
 
     // get export function
-    let (exports, _) = host::HttpService::instantiate_async(&mut store, &component, &linker)
-        .await
-        .unwrap();
-    let req_arg = host::exports::moni::moni::http_incoming::Request {
-        method: "GET".to_string(),
-        uri: "/abc".to_string(),
-        headers: vec![(String::from("x-a"), String::from("b"))],
+    let (exports, _) =
+        crate::guest::HttpHandler::instantiate_async(&mut store, &component, &linker)
+            .await
+            .unwrap();
+    let req_arg = guest::exports::moni::http::http_incoming::Request {
+        method: "GET",
+        uri: "/abc",
+        headers: &vec![(String::from("x-a"), String::from("b"))],
         body: None,
     };
     let resp = exports
-        .moni_moni_http_incoming()
-        .call_handle_request(&mut store, &req_arg)
+        .moni_http_http_incoming()
+        .call_handle_request(&mut store, req_arg)
         .await
         .unwrap();
     println!("resp: {:?}", resp);

@@ -165,7 +165,7 @@ pub fn compile_js(target: &str, src_js_path: &str, js_engine_path: Option<String
 pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
     debug!("Convert component, {path}");
     let file_bytes = std::fs::read(path).expect("parse wasm file error");
-    let wasi_adapter = include_bytes!("../engine/wasi_preview1_component_adapter.reactor.wasm");
+    let wasi_adapter = include_bytes!("../engine/wasi_snapshot_preview1.reactor.wasm");
 
     let component = ComponentEncoder::default()
         .module(&file_bytes)
@@ -190,8 +190,12 @@ mod tests {
     #[test]
     fn test_compile() {
         let wit_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../wit-v2");
-        let outputs =
-            generate_guest(wit_dir.as_path(), None, super::GuestGeneratorType::Rust).unwrap();
+        let outputs = generate_guest(
+            wit_dir.as_path(),
+            Some("http-service".to_string()),
+            super::GuestGeneratorType::Rust,
+        )
+        .unwrap();
         assert_eq!(outputs.len(), 1);
         assert_eq!(outputs.contains_key("http_service.rs"), true);
     }
