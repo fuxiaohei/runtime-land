@@ -313,6 +313,10 @@ body {
     margin-top: 1.5rem;
 }
 
-.project-no-prod-card{
+.project-no-prod-card {
     background-color: #fafbe7;
+}
+
+.deployment-metadata .status-icon {
+    color: #087d25;
 }
