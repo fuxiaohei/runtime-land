@@ -131,10 +131,6 @@ body {
     margin-right: .5rem;
 }
 
-#project-tabs-container {
-    margin: 0 10px;
-}
-
 #project-tabs-container .nav-tabs {
     border: none;
 }
@@ -315,4 +311,8 @@ body {
 
 #new-project-container .project-name-div {
     margin-top: 1.5rem;
+}
+
+.project-no-prod-card{
+    background-color: #fafbe7;
 }
