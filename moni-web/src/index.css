@@ -3,6 +3,10 @@ body {
     background-color: #FAFAFA;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .login-navbar,
 .dashboard-navbar {
     border-bottom: 1px solid #ccc;
@@ -44,7 +48,7 @@ body {
 #project-container,
 #account-settings-container {
     margin-top: 40px;
-    max-width: 900px;
+    max-width: 1024px;
 }
 
 #dashboard-header-left h2,
@@ -142,7 +146,8 @@ body {
     color: #444;
 }
 
-#project-tabs-container .nav-link.active {
+#project-tabs-container .nav-link.active,
+#project-tabs-container .nav-link.active:hover {
     border: none;
     background-color: #444;
     color: #DDD;
@@ -314,9 +319,25 @@ body {
 }
 
 .project-no-prod-card {
-    background-color: #fafbe7;
+    background-color: #feffea;
 }
 
 .deployment-metadata .status-icon {
     color: #087d25;
+}
+
+.deployment-promotion .dropdown-toggle {
+    color: #666;
+}
+
+.project-prod-card {
+    background-color: #e9ffef;
+}
+
+.project-prod-domains .list-group-item {
+    background-color: transparent;
+}
+
+.project-prod-domains a {
+    color: #444;
 }

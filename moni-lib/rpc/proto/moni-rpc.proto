@@ -109,6 +109,31 @@ message PromoteDeploymentRequest{
   string deploy_uuid = 2;
 }
 
+// ProjectProductionDeployment
+message ProjectProductionDeployment{
+  int32 id = 1;
+  string name = 2;
+  repeated string domains = 3;
+  string uuid = 4;
+  int64 updated_at = 5;
+}
+
+// ProjectOverviewResponse is the overview of a project
+message ProjectOverviewResponse {
+  int32 id = 1;
+  string name = 2;
+  string uuid = 3;
+  int64 updated_at = 4;
+  int32 prod_deployment_id = 5;
+  optional ProjectProductionDeployment prod_deployment = 6;
+  repeated DeploymentResponse deployments = 7;
+}
+
+// ProjectOverviewRequest is the request message for the ProjectOverview method.
+message ProjectOverviewRequest{
+  string name = 1;
+}
+
 service MoniRpcService {
   // SignupEmail signs up a user with the specified email and password
   rpc SignupEmail(SignupEmailRequest) returns (LoginResponse);
@@ -143,4 +168,7 @@ service MoniRpcService {
 
   // PromoteDeployment promotes the specified deployment to production
   rpc PromoteDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
+
+  // ProjectOverview returns the overview of the specified project
+  rpc ProjectOverview(ProjectOverviewRequest) returns (ProjectOverviewResponse);
 }

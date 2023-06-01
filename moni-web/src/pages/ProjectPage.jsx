@@ -2,92 +2,69 @@ import {
   Container,
   Row,
   Col,
-  Button,
-  Nav,
   Card,
   ListGroup,
+  Dropdown,
 } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
-import {
-  BsClouds,
-  BsCheck2Circle,
-  BsFillArrowUpLeftSquareFill,
-} from "react-icons/bs";
+import { BsCheck2Circle, BsAppIndicator } from "react-icons/bs";
+import { ButtonLink } from "../components/ButtonLink";
+import ProjectHeader from "../components/ProjectHeader";
+import ProjectTabs from "../components/ProjectTabs";
+import { useParams } from "react-router-dom";
+import { getProjectOverview } from "../api/project";
+import React, { useEffect } from "react";
+import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
+import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
 
 function ProjectPage() {
+  const { projectName } = useParams();
+  const [projectOverview, setProjectOverview] = React.useState(null);
+
+  const fetchProjectOverview = async () => {
+    let project = await getProjectOverview(projectName);
+    if (project.error) {
+      return;
+    }
+    setProjectOverview(project);
+  };
+
+  useEffect(() => {
+    if (!projectOverview) {
+      fetchProjectOverview();
+    }
+  });
+
   return (
     <div>
       <DashboardNavbar />
       <Container id="project-container">
-        <header id="project-header">
-          <Container>
-            <Row>
-              <Col md={4} sm={4} xs={4} id="project-header-left">
-                <h2>dry-toad-81</h2>
-                <p>Github / Pending</p>
-              </Col>
-              <Col id="project-header-right">
-                <Button variant="secondary" size="sm" href="/projects">
-                  <BsFillArrowUpLeftSquareFill size={16} className="icon" />
-                  Projects
-                </Button>
-                <Button variant="primary" size="sm">
-                  <BsClouds size={16} className="icon" />
-                  View
-                </Button>
-              </Col>
-            </Row>
-          </Container>
-        </header>
-        <div id="project-tabs-container">
-          <Container>
-            <Nav activeKey="link-overview">
-              <Nav.Item>
-                <Nav.Link eventKey="link-overview" href="#overview">
-                  Overview
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="link-1" href="#link-1">
-                  Deployments
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="link-2" href="#link-2">
-                  Settings
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="disabled" disabled>
-                  Logs
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="disabled" disabled>
-                  Analytics
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
-          </Container>
-        </div>
+        <ProjectHeader projectName={projectName} />
+        <ProjectTabs projectName={projectName} activeKey="overview" />
         <div id="project-overview-container" className="mt-4">
           <Container>
             <Row>
-              <Col lg={9} md={12} id="project-overview-left">
-                <Card className="project-no-prod-card mb-3">
-                  <Card.Body>
-                    <Card.Title>No Prodution Deployment</Card.Title>
-                    <p className="text-muted">
-                      Promote a preview deployment to production to get started,{" "}
-                      <br />
-                      or use <span>moni-cli deploy --prodution</span> to deploy
-                      directly from your local project.
-                    </p>
-                  </Card.Body>
-                </Card>
+              <Col lg={8} md={12} id="project-overview-left">
+                {projectOverview && projectOverview.prodDeploymentId ? (
+                  <ProjectProdDeploymentCard />
+                ) : (
+                  <ProjectNoDeploymentCard />
+                )}
                 <Card className="project-deployment-card">
                   <Card.Body>
-                    <Card.Title>Latest Deployments</Card.Title>
+                    <Card.Title className="d-flex justify-content-between">
+                      <div>
+                        Latest Deployments
+                        <span className="text-muted small fs-6 deployment-recent fw-normal d-block py-2">
+                          the recent 10 deployments
+                        </span>
+                      </div>
+                      <div className="deployment-show-all">
+                        <ButtonLink to="./deployments" variant="light">
+                          Show all
+                        </ButtonLink>
+                      </div>
+                    </Card.Title>
                     <ListGroup
                       variant="flush"
                       className="project-deployment-list"
@@ -98,15 +75,26 @@ function ProjectPage() {
                             className="status-icon me-2"
                             size={20}
                           />
-                          <span className="name">
-                            quick-trout-91-3hz5hraraa40.deno.dev
-                          </span>
+                          <span className="name">quick-trout-91.deno.dev</span>
                         </div>
                         <div className="deployment-promotion">
                           <span className="time-ago small text-muted">
                             3 weeks ago
                           </span>
-                          <span className="promote-btn">...</span>
+                          <Dropdown className="promote-btn ms-2 d-inline-block">
+                            <Dropdown.Toggle as="a" className="cursor-pointer">
+                              <BsAppIndicator size={12} />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu className="lh-1 text-muted">
+                              <Dropdown.Item className="small">
+                                Promote to Production
+                              </Dropdown.Item>
+                              <Dropdown.Divider />
+                              <Dropdown.Item className="small">
+                                Logs
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
                         </div>
                       </ListGroup.Item>
                       <ListGroup.Item className="lh-lg">
@@ -123,12 +111,22 @@ function ProjectPage() {
                 </Card>
               </Col>
               <Col
-                lg={3}
+                lg={4}
                 md="auto"
                 className="d-none d-lg-block d-xl-block d-xxl-block"
                 id="project-overview-right"
               >
-                right
+                <Card className="project-tips mb-3">
+                  <Card.Body>
+                    <Card.Title>Tips</Card.Title>
+                    <p className="text-muted">
+                      Promote a preview deployment to Production to get started,{" "}
+                      <br />
+                      or use <span>moni-cli deploy --production</span> to deploy
+                      directly from your local project.
+                    </p>
+                  </Card.Body>
+                </Card>
               </Col>
             </Row>
           </Container>

@@ -17,6 +17,8 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import NewProjectPage from "./pages/NewProjectPage";
 import SignupPage from "./pages/SignupPage";
+import ProjectDeploymentPage from "./pages/ProjectDeploymentPage";
+import ProjectSettingsPage from "./pages/ProjectSettingsPage";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -63,6 +65,22 @@ function App() {
             element={
               <RequireAuth>
                 <ProjectPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/projects/:projectName/deployments"
+            element={
+              <RequireAuth>
+                <ProjectDeploymentPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/projects/:projectName/settings"
+            element={
+              <RequireAuth>
+                <ProjectSettingsPage />
               </RequireAuth>
             }
           />

@@ -745,5 +745,66 @@ proto.moni.MoniRpcServicePromiseClient.prototype.promoteDeployment =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.moni.ProjectOverviewRequest,
+ *   !proto.moni.ProjectOverviewResponse>}
+ */
+const methodDescriptor_MoniRpcService_ProjectOverview = new grpc.web.MethodDescriptor(
+  '/moni.MoniRpcService/ProjectOverview',
+  grpc.web.MethodType.UNARY,
+  proto.moni.ProjectOverviewRequest,
+  proto.moni.ProjectOverviewResponse,
+  /**
+   * @param {!proto.moni.ProjectOverviewRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.moni.ProjectOverviewResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.moni.ProjectOverviewRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.moni.ProjectOverviewResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.moni.ProjectOverviewResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.moni.MoniRpcServiceClient.prototype.projectOverview =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/moni.MoniRpcService/ProjectOverview',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ProjectOverview,
+      callback);
+};
+
+
+/**
+ * @param {!proto.moni.ProjectOverviewRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.moni.ProjectOverviewResponse>}
+ *     Promise that resolves to the response
+ */
+proto.moni.MoniRpcServicePromiseClient.prototype.projectOverview =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/moni.MoniRpcService/ProjectOverview',
+      request,
+      metadata || {},
+      methodDescriptor_MoniRpcService_ProjectOverview);
+};
+
+
 module.exports = proto.moni;
 

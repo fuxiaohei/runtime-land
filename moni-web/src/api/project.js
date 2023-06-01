@@ -1,6 +1,6 @@
 import { callClient } from "./utils.js";
 
-const { Empty } = require("./proto/moni-rpc_pb.js");
+const { Empty, ProjectOverviewRequest } = require("./proto/moni-rpc_pb.js");
 
 async function listProjects() {
   let req = new Empty();
@@ -8,4 +8,11 @@ async function listProjects() {
   return response;
 }
 
-export { listProjects };
+async function getProjectOverview(projectName) {
+  let req = new ProjectOverviewRequest();
+  req.setName(projectName);
+  let response = await callClient(req, "projectOverview");
+  return response;
+}
+
+export { listProjects, getProjectOverview };

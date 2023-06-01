@@ -10,7 +10,6 @@ pub struct ServiceImpl {}
 
 #[tonic::async_trait]
 impl MoniRpcService for ServiceImpl {
-    
     #[tracing::instrument(skip(self, req))]
     async fn signup_email(
         &self,
@@ -301,6 +300,68 @@ impl MoniRpcService for ServiceImpl {
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
         };
+        Ok(tonic::Response::new(resp))
+    }
+
+    async fn project_overview(
+        &self,
+        req: tonic::Request<super::ProjectOverviewRequest>,
+    ) -> std::result::Result<tonic::Response<super::ProjectOverviewResponse>, tonic::Status> {
+        let user_context: &UserContext = req.extensions().get().unwrap();
+        let token = user_context.get_token().await?;
+
+        let req = req.into_inner();
+        let project = dao::project::find(token.owner_id, req.name)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("find project failed: {:?}", e)))?;
+        if project.is_none() {
+            return Err(tonic::Status::not_found("project not found"));
+        }
+        let project = project.unwrap();
+
+        let mut resp = super::ProjectOverviewResponse {
+            id: project.id as i32,
+            name: project.name,
+            uuid: project.uuid,
+            prod_deployment_id: project.prod_deploy_id.unwrap_or(0),
+            updated_at: project.updated_at.timestamp(),
+            deployments: vec![],
+            prod_deployment: None,
+        };
+
+        // if production deployment is set, load deployment data
+        if resp.prod_deployment_id > 0 {
+            let prod_deployment = dao::deployment::find_by_id(resp.prod_deployment_id)
+                .await
+                .map_err(|e| {
+                    tonic::Status::internal(format!("find prod deployment failed: {:?}", e))
+                })?;
+            if prod_deployment.is_some() {
+                let prod_deployment = prod_deployment.unwrap();
+                resp.prod_deployment = Some(super::ProjectProductionDeployment {
+                    id: prod_deployment.id as i32,
+                    name: prod_deployment.name.clone(),
+                    uuid: prod_deployment.uuid,
+                    updated_at: prod_deployment.updated_at.timestamp(),
+                    domains: vec![prod_deployment.name],
+                });
+            }
+        }
+
+        let deployments = dao::deployment::list(token.owner_id, project.id as i32, 10)
+            .await
+            .map_err(|e| tonic::Status::internal(format!("list deployments failed: {:?}", e)))?;
+        resp.deployments = deployments
+            .into_iter()
+            .map(|d| super::DeploymentResponse {
+                id: d.id as i32,
+                domain: d.name,
+                uuid: d.uuid,
+                deploy_status: d.deploy_status,
+                prod_status: d.prod_status,
+            })
+            .collect();
+
         Ok(tonic::Response::new(resp))
     }
 }

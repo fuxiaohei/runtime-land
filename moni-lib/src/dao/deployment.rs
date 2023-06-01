@@ -2,7 +2,10 @@ use crate::db::DB;
 use crate::model::{project_deployment, project_info};
 use anyhow::Result;
 use sea_orm::sea_query::Expr;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set, TransactionTrait};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, QuerySelect, Set,
+    TransactionTrait,
+};
 
 use super::project;
 
@@ -50,6 +53,15 @@ pub async fn find(
     let deployment = project_deployment::Entity::find()
         .filter(project_deployment::Column::Id.eq(deploy_id))
         .filter(project_deployment::Column::Uuid.eq(deploy_uuid))
+        .one(db)
+        .await?;
+    Ok(deployment)
+}
+
+pub async fn find_by_id(deploy_id: i32) -> Result<Option<project_deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployment = project_deployment::Entity::find()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
         .one(db)
         .await?;
     Ok(deployment)
@@ -118,4 +130,20 @@ pub async fn promote(
     txn.commit().await?;
 
     Ok(deployment)
+}
+
+pub async fn list(
+    owner_id: i32,
+    project_id: i32,
+    limits: u64,
+) -> Result<Vec<project_deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployments = project_deployment::Entity::find()
+        .filter(project_deployment::Column::OwnerId.eq(owner_id))
+        .filter(project_deployment::Column::ProjectId.eq(project_id))
+        .order_by_desc(project_deployment::Column::UpdatedAt)
+        .limit(limits)
+        .all(db)
+        .await?;
+    Ok(deployments)
 }
