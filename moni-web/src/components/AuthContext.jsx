@@ -67,18 +67,19 @@ function RequireAuth({ children }) {
       auth.signout();
       return;
     }
+    auth.user.lastVerifyTime = Date.now();
+    setLocalUser(auth.user);
     setLogged(true);
   };
 
   React.useEffect(() => {
-    if (!auth.user) {
-      return;
-    }
-    let now = Date.now();
-    let duration = now - auth.user.lastVerifyTime;
-    if (duration < 300 * 1000) {
-      // 300s = 5min
-      // return;
+    if (auth.user) {
+      let now = Date.now();
+      let duration = now - auth.user.lastVerifyTime;
+      if (duration < 300 * 1000) {
+        setLogged(true);
+        return;
+      }
     }
     fetchLogin();
   });
