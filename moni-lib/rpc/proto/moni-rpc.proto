@@ -6,7 +6,7 @@ package moni;
 message Empty {}
 
 // NoDataResponse is the response message without data
-message NoDataResponse{
+message NoDataResponse {
   string error = 1;
   int64 code = 2;
 }
@@ -37,7 +37,7 @@ message LoginResponse {
 }
 
 // RemoveAccessTokenRequest is the request message for the RemoveAccessToken
-message RemoveAccessTokenRequest{ string token_uuid = 1;}
+message RemoveAccessTokenRequest { string token_uuid = 1; }
 
 // ProjectData contains the data of a function created by the CreateProject
 // method.
@@ -83,9 +83,10 @@ message ProjectResponse {
 }
 
 // ListProjectsResponse is the response message for the ListProject method.
-message ListProjectsResponse  { repeated ProjectResponse data = 1; }
+message ListProjectsResponse { repeated ProjectResponse data = 1; }
 
-// CreateDeploymentRequest is the request message for the CreateDeployment method.
+// CreateDeploymentRequest is the request message for the CreateDeployment
+// method.
 message CreateDeploymentRequest {
   string project_name = 1;
   string project_uuid = 2;
@@ -98,19 +99,23 @@ message CreateDeploymentRequest {
 message DeploymentResponse {
   int32 id = 1;
   string domain = 2;
-  string uuid = 3;
-  int32 deploy_status = 4;
-  int32 prod_status = 5;
+  string prod_domain = 3;
+  string uuid = 4;
+  int32 deploy_status = 5;
+  int32 prod_status = 6;
+  int64 updated_at = 7;
+  string url = 8;
 }
 
-// PromoteDeploymentRequest is the request message for the PromoteDeployment method.
-message PromoteDeploymentRequest{
+// PromoteDeploymentRequest is the request message for the PromoteDeployment
+// method.
+message PromoteDeploymentRequest {
   int64 deploy_id = 1;
   string deploy_uuid = 2;
 }
 
 // ProjectProductionDeployment
-message ProjectProductionDeployment{
+message ProjectProductionDeployment {
   int32 id = 1;
   string name = 2;
   repeated string domains = 3;
@@ -130,14 +135,12 @@ message ProjectOverviewResponse {
 }
 
 // ProjectOverviewRequest is the request message for the ProjectOverview method.
-message ProjectOverviewRequest{
-  string name = 1;
-}
+message ProjectOverviewRequest { string name = 1; }
 
 service MoniRpcService {
   // SignupEmail signs up a user with the specified email and password
   rpc SignupEmail(SignupEmailRequest) returns (LoginResponse);
-  
+
   // LoginEmail logs in a user with the specified email and password
   rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
 

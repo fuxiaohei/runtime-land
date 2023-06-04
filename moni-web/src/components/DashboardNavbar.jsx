@@ -34,7 +34,7 @@ function DashboardNavbar() {
                 <BsPlus size={16} />
                 <span className="create-org">New Team</span>
               </NavDropdownItemLink>
-              <NavDropdown.Item href="#BBB">BBB Inc.</NavDropdown.Item>
+              <NavDropdown.Item href="#BBB">DEMO Inc.</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
@@ -69,11 +69,13 @@ function DashboardNavbar() {
                 </p>
               </div>
               <NavDropdown.Divider />
-              <NavDropdownItemLink to="/projects">
-                Projects
-              </NavDropdownItemLink>
+              <NavDropdownItemLink to="/projects">Projects</NavDropdownItemLink>
               <NavDropdownItemLink to="/settings#access-token">
                 Access Tokens
+              </NavDropdownItemLink>
+              <NavDropdown.Divider />
+              <NavDropdownItemLink disabled to="/admin/">
+                Admin Panel
               </NavDropdownItemLink>
               <NavDropdown.Divider />
               <NavDropdownItemLink to="/signout">Sign Out</NavDropdownItemLink>

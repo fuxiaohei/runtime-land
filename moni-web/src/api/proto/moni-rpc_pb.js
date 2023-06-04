@@ -3459,9 +3459,12 @@ proto.moni.DeploymentResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     domain: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    uuid: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    deployStatus: jspb.Message.getFieldWithDefault(msg, 4, 0),
-    prodStatus: jspb.Message.getFieldWithDefault(msg, 5, 0)
+    prodDomain: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    uuid: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    deployStatus: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    prodStatus: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    updatedAt: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    url: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -3508,15 +3511,27 @@ proto.moni.DeploymentResponse.deserializeBinaryFromReader = function(msg, reader
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUuid(value);
+      msg.setProdDomain(value);
       break;
     case 4:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setDeployStatus(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUuid(value);
       break;
     case 5:
       var value = /** @type {number} */ (reader.readInt32());
+      msg.setDeployStatus(value);
+      break;
+    case 6:
+      var value = /** @type {number} */ (reader.readInt32());
       msg.setProdStatus(value);
+      break;
+    case 7:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setUpdatedAt(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
       break;
     default:
       reader.skipField();
@@ -3561,24 +3576,45 @@ proto.moni.DeploymentResponse.serializeBinaryToWriter = function(message, writer
       f
     );
   }
-  f = message.getUuid();
+  f = message.getProdDomain();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
+  f = message.getUuid();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
   f = message.getDeployStatus();
   if (f !== 0) {
     writer.writeInt32(
-      4,
+      5,
       f
     );
   }
   f = message.getProdStatus();
   if (f !== 0) {
     writer.writeInt32(
-      5,
+      6,
+      f
+    );
+  }
+  f = message.getUpdatedAt();
+  if (f !== 0) {
+    writer.writeInt64(
+      7,
+      f
+    );
+  }
+  f = message.getUrl();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
       f
     );
   }
@@ -3622,10 +3658,10 @@ proto.moni.DeploymentResponse.prototype.setDomain = function(value) {
 
 
 /**
- * optional string uuid = 3;
+ * optional string prod_domain = 3;
  * @return {string}
  */
-proto.moni.DeploymentResponse.prototype.getUuid = function() {
+proto.moni.DeploymentResponse.prototype.getProdDomain = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
@@ -3634,34 +3670,34 @@ proto.moni.DeploymentResponse.prototype.getUuid = function() {
  * @param {string} value
  * @return {!proto.moni.DeploymentResponse} returns this
  */
-proto.moni.DeploymentResponse.prototype.setUuid = function(value) {
+proto.moni.DeploymentResponse.prototype.setProdDomain = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
 /**
- * optional int32 deploy_status = 4;
+ * optional string uuid = 4;
+ * @return {string}
+ */
+proto.moni.DeploymentResponse.prototype.getUuid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.moni.DeploymentResponse} returns this
+ */
+proto.moni.DeploymentResponse.prototype.setUuid = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional int32 deploy_status = 5;
  * @return {number}
  */
 proto.moni.DeploymentResponse.prototype.getDeployStatus = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.moni.DeploymentResponse} returns this
- */
-proto.moni.DeploymentResponse.prototype.setDeployStatus = function(value) {
-  return jspb.Message.setProto3IntField(this, 4, value);
-};
-
-
-/**
- * optional int32 prod_status = 5;
- * @return {number}
- */
-proto.moni.DeploymentResponse.prototype.getProdStatus = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
@@ -3670,8 +3706,62 @@ proto.moni.DeploymentResponse.prototype.getProdStatus = function() {
  * @param {number} value
  * @return {!proto.moni.DeploymentResponse} returns this
  */
-proto.moni.DeploymentResponse.prototype.setProdStatus = function(value) {
+proto.moni.DeploymentResponse.prototype.setDeployStatus = function(value) {
   return jspb.Message.setProto3IntField(this, 5, value);
+};
+
+
+/**
+ * optional int32 prod_status = 6;
+ * @return {number}
+ */
+proto.moni.DeploymentResponse.prototype.getProdStatus = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.moni.DeploymentResponse} returns this
+ */
+proto.moni.DeploymentResponse.prototype.setProdStatus = function(value) {
+  return jspb.Message.setProto3IntField(this, 6, value);
+};
+
+
+/**
+ * optional int64 updated_at = 7;
+ * @return {number}
+ */
+proto.moni.DeploymentResponse.prototype.getUpdatedAt = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.moni.DeploymentResponse} returns this
+ */
+proto.moni.DeploymentResponse.prototype.setUpdatedAt = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional string url = 8;
+ * @return {string}
+ */
+proto.moni.DeploymentResponse.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.moni.DeploymentResponse} returns this
+ */
+proto.moni.DeploymentResponse.prototype.setUrl = function(value) {
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 

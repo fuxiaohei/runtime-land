@@ -6,7 +6,7 @@ function ProjectNoDeploymentCard() {
       <Card.Body>
         <Card.Title>No Production Deployment</Card.Title>
         <p className="text-muted">
-          Promote a preview deployment to Production to get started, <br />
+          Publish a preview deployment to Production to get started, <br />
           or use <span>moni-cli deploy --production</span> to deploy directly
           from your local project.
         </p>

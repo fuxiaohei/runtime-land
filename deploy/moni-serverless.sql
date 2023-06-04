@@ -27,20 +27,19 @@ DROP TABLE IF EXISTS `project_deployment`;
 
 CREATE TABLE `project_deployment` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `owner_id` int(11) NOT NULL COMMENT 'project owner id',
+  `owner_id` int(11) NOT NULL COMMENT 'project id',
   `project_id` int(11) NOT NULL COMMENT 'project id',
-  `name` varchar(128) NOT NULL COMMENT 'deployment name',
-  `uuid` varchar(128) NOT NULL COMMENT 'deployment uuid',
-  `storage_path` varchar(128) NOT NULL COMMENT 'binary storage path',
+  `domain` varchar(64) NOT NULL,
+  `prod_domain` varchar(64) NOT NULL,
+  `uuid` varchar(128) NOT NULL,
+  `storage_path` varchar(128) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `prod_status` int(11) NOT NULL DEFAULT '0' COMMENT 'deployment is in production or not',
-  `deploy_status` int(11) NOT NULL DEFAULT '0' COMMENT 'deploy status, waiting, success, failed',
+  `prod_status` int(11) NOT NULL DEFAULT '0',
+  `deploy_status` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uuid` (`uuid`),
-  KEY `project_id` (`project_id`),
-  KEY `name` (`name`),
-  KEY `owner_id` (`owner_id`)
+  UNIQUE KEY `dev_domain` (`domain`),
+  KEY `project_id` (`project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -53,15 +52,14 @@ DROP TABLE IF EXISTS `project_info`;
 CREATE TABLE `project_info` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL COMMENT 'project name',
-  `uuid` varchar(128) NOT NULL COMMENT 'project uuid',
   `language` varchar(24) NOT NULL COMMENT 'project language',
+  `uuid` varchar(64) NOT NULL COMMENT 'project description',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'project created time',
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'project updated time',
-  `owner_id` int(11) DEFAULT '0' COMMENT 'project owner id',
+  `owner_id` int(11) DEFAULT '0',
   `prod_deploy_id` int(11) DEFAULT '0' COMMENT 'production deployment id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `uuid` (`uuid`),
   KEY `owner_id` (`owner_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -83,7 +81,6 @@ CREATE TABLE `user_info` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 
 # Dump of table user_token

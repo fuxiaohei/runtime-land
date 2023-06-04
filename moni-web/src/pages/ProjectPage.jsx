@@ -16,6 +16,7 @@ import { getProjectOverview } from "../api/project";
 import React, { useEffect } from "react";
 import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
+import ProjectDeploymentsListGroup from "../components/ProjectDeploymentsListGroup";
 
 function ProjectPage() {
   const { projectName } = useParams();
@@ -65,48 +66,9 @@ function ProjectPage() {
                         </ButtonLink>
                       </div>
                     </Card.Title>
-                    <ListGroup
-                      variant="flush"
-                      className="project-deployment-list"
-                    >
-                      <ListGroup.Item className="lh-lg d-flex justify-content-between">
-                        <div className="deployment-metadata text-truncate">
-                          <BsCheck2Circle
-                            className="status-icon me-2"
-                            size={20}
-                          />
-                          <span className="name">quick-trout-91.deno.dev</span>
-                        </div>
-                        <div className="deployment-promotion">
-                          <span className="time-ago small text-muted">
-                            3 weeks ago
-                          </span>
-                          <Dropdown className="promote-btn ms-2 d-inline-block">
-                            <Dropdown.Toggle as="a" className="cursor-pointer">
-                              <BsAppIndicator size={12} />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="lh-1 text-muted">
-                              <Dropdown.Item className="small">
-                                Promote to Production
-                              </Dropdown.Item>
-                              <Dropdown.Divider />
-                              <Dropdown.Item className="small">
-                                Logs
-                              </Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown>
-                        </div>
-                      </ListGroup.Item>
-                      <ListGroup.Item className="lh-lg">
-                        Dapibus ac facilisis in
-                      </ListGroup.Item>
-                      <ListGroup.Item className="lh-lg">
-                        Morbi leo risus
-                      </ListGroup.Item>
-                      <ListGroup.Item className="lh-lg">
-                        Porta ac consectetur ac
-                      </ListGroup.Item>
-                    </ListGroup>
+                    <ProjectDeploymentsListGroup
+                      deploymentsList={projectOverview?.deploymentsList || []}
+                    />
                   </Card.Body>
                 </Card>
               </Col>

@@ -9,8 +9,9 @@ pub struct Model {
     pub id: u32,
     pub owner_id: i32,
     pub project_id: i32,
-    pub name: String,
     #[sea_orm(unique)]
+    pub domain: String,
+    pub prod_domain: String,
     pub uuid: String,
     pub storage_path: String,
     pub created_at: DateTimeUtc,

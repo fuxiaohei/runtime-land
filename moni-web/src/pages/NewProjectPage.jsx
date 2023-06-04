@@ -40,13 +40,15 @@ function NewProjectPage() {
     <div>
       <DashboardNavbar />
       <Container id="dashboard-container">
-        <header id="new-project-header">
-          <h2>New Project</h2>
-          <h3>
-            Create a new project by entering the project name and selecting the
-            template.
-          </h3>
-        </header>
+        <Container className="px-0">
+          <header id="new-project-header">
+            <h2>New Project</h2>
+            <h3>
+              Create a new project by entering the project name and selecting
+              the template.
+            </h3>
+          </header>
+        </Container>
         <Container id="new-project-cards">
           <Row>
             <Col md={5}>
@@ -96,13 +98,13 @@ function NewProjectPage() {
                       <p>Build with examples</p>
                     </div>
                     <div className="btn">
-                      <Button variant="light" disabled>Create</Button>
+                      <Button variant="light" disabled>
+                        Create
+                      </Button>
                     </div>
                   </Card.Title>
                   <hr />
-                  <div>
-                    Comming soon...
-                  </div>
+                  <div>Comming soon...</div>
                 </Card.Body>
               </Card>
             </Col>
