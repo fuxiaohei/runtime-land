@@ -28,6 +28,11 @@ async fn main() {
     moni_lib::db::init().await.expect("init db failed");
     info!("Init db success");
 
+    // init prod const
+    moni_lib::init_prod_const()
+        .await
+        .expect("init prod const failed");
+
     // start rpc server
     moni_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
         .await

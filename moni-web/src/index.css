@@ -338,6 +338,15 @@ body {
     background-color: transparent;
 }
 
-.project-prod-domains a {
+.project-prod-domains a,
+.deployment-metadata a.name {
     color: #444;
+}
+
+.deployment-metadata a.name {
+    text-decoration: none;
+}
+
+.deployment-metadata a.name:hover {
+    text-decoration: underline;
 }

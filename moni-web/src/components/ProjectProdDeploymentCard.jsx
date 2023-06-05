@@ -1,8 +1,17 @@
 import { Card, ListGroup } from "react-bootstrap";
 import { ButtonLink } from "./ButtonLink";
 import { BsClock } from "react-icons/bs";
+import TimeAgo from "javascript-time-ago";
 
-function ProjectProdDeploymentCard() {
+function ProjectProdDeploymentCard({ deployment }) {
+  const timeAgo = new TimeAgo("en-US");
+  const listDomains = deployment.domainsList.map((domain, index) => (
+    <ListGroup.Item key={domain}>
+      <a href={deployment.urlsList[index]} target="_blank">
+        {domain}
+      </a>
+    </ListGroup.Item>
+  ));
   return (
     <Card className="project-prod-card mb-3">
       <Card.Body>
@@ -16,21 +25,10 @@ function ProjectProdDeploymentCard() {
         </Card.Title>
         <div>
           <ListGroup variant="flush" className="project-prod-domains">
-            <ListGroup.Item>
-              <a href="https://quick-trout-91.deno.dev/" target="_blank">
-                quick-trout-91.deno.dev
-              </a>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <a
-                href="https://quick-trout-91-m9t91f4cbqh0.deno.dev/"
-                target="_blank"
-              >
-                quick-trout-91-m9t91f4cbqh0.deno.dev
-              </a>
-            </ListGroup.Item>
+            {listDomains}
             <ListGroup.Item className="text-end small text-muted text-uppercase">
-              <BsClock size={10} className="me-1"/>3 months ago
+              <BsClock size={10} className="me-1" />
+              {timeAgo.format(deployment.updatedAt * 1000)}
             </ListGroup.Item>
           </ListGroup>
         </div>

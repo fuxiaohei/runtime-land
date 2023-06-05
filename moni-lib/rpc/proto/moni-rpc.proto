@@ -119,8 +119,9 @@ message ProjectProductionDeployment {
   int32 id = 1;
   string name = 2;
   repeated string domains = 3;
-  string uuid = 4;
-  int64 updated_at = 5;
+  repeated string urls = 4;
+  string uuid = 5;
+  int64 updated_at = 6;
 }
 
 // ProjectOverviewResponse is the overview of a project
@@ -169,8 +170,8 @@ service MoniRpcService {
   // CreateDeployment creates a new deployment for the specified projects
   rpc CreateDeployment(CreateDeploymentRequest) returns (DeploymentResponse);
 
-  // PromoteDeployment promotes the specified deployment to production
-  rpc PromoteDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
+  // PublishDeployment publish the specified deployment to production
+  rpc PublishDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
 
   // ProjectOverview returns the overview of the specified project
   rpc ProjectOverview(ProjectOverviewRequest) returns (ProjectOverviewResponse);

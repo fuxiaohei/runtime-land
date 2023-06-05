@@ -268,7 +268,7 @@ impl MoniRpcService for ServiceImpl {
             req.deploy_name.clone(),
             storage_path
         );
-
+        let prod_domain = moni_lib::PROD_DOMAIN.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -277,12 +277,12 @@ impl MoniRpcService for ServiceImpl {
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
-            url: format!("http://{}.127-0-0-1.nip.io", deployment.domain),
+            url: format!("http://{}.{}", deployment.domain, prod_domain),
         };
         Ok(tonic::Response::new(resp))
     }
 
-    async fn promote_deployment(
+    async fn publish_deployment(
         &self,
         req: tonic::Request<super::PromoteDeploymentRequest>,
     ) -> std::result::Result<tonic::Response<super::DeploymentResponse>, tonic::Status> {
@@ -296,6 +296,7 @@ impl MoniRpcService for ServiceImpl {
                 .map_err(|e| {
                     tonic::Status::internal(format!("promote deployment failed: {:?}", e))
                 })?;
+        let prod_domain = moni_lib::PROD_DOMAIN.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -304,7 +305,7 @@ impl MoniRpcService for ServiceImpl {
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
-            url: format!("http://{}.127-0-0-1.nip.io", deployment.domain),
+            url: format!("http://{}.{}", deployment.domain, prod_domain),
         };
         Ok(tonic::Response::new(resp))
     }
@@ -325,6 +326,7 @@ impl MoniRpcService for ServiceImpl {
         }
         let project = project.unwrap();
 
+        let prod_domain = moni_lib::PROD_DOMAIN.get().unwrap().clone();
         let mut resp = super::ProjectOverviewResponse {
             id: project.id as i32,
             name: project.name.clone(),
@@ -349,7 +351,14 @@ impl MoniRpcService for ServiceImpl {
                     name: prod_deployment.domain.clone(),
                     uuid: prod_deployment.uuid,
                     updated_at: prod_deployment.updated_at.timestamp(),
-                    domains: vec![prod_deployment.domain],
+                    domains: vec![
+                        format!("{}.{}", prod_deployment.prod_domain.clone(), prod_domain),
+                        format!("{}.{}", prod_deployment.domain.clone(), prod_domain),
+                    ],
+                    urls: vec![
+                        format!("http://{}.{}", prod_deployment.prod_domain, prod_domain),
+                        format!("http://{}.{}", prod_deployment.domain, prod_domain),
+                    ],
                 });
             }
         }
@@ -367,7 +376,7 @@ impl MoniRpcService for ServiceImpl {
                 deploy_status: d.deploy_status,
                 prod_status: d.prod_status,
                 updated_at: d.updated_at.timestamp(),
-                url: format!("http://{}.127-0-0-1.nip.io", d.domain),
+                url: format!("http://{}.{}", d.domain, prod_domain),
             })
             .collect();
 

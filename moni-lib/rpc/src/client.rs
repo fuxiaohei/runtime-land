@@ -92,7 +92,7 @@ impl Client {
                 deploy_id: deploy_resp.id as i64,
                 deploy_uuid: deploy_resp.uuid,
             });
-            let resp2 = self.client.promote_deployment(req).await?;
+            let resp2 = self.client.publish_deployment(req).await?;
             deploy_resp = resp2.into_inner();
         }
         Ok(Some(deploy_resp))

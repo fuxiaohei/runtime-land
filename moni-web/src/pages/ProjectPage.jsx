@@ -47,7 +47,9 @@ function ProjectPage() {
             <Row>
               <Col lg={8} md={12} id="project-overview-left">
                 {projectOverview && projectOverview.prodDeploymentId ? (
-                  <ProjectProdDeploymentCard />
+                  <ProjectProdDeploymentCard
+                    deployment={projectOverview.prodDeployment || {}}
+                  />
                 ) : (
                   <ProjectNoDeploymentCard />
                 )}
@@ -81,12 +83,7 @@ function ProjectPage() {
                 <Card className="project-tips mb-3">
                   <Card.Body>
                     <Card.Title>Tips</Card.Title>
-                    <p className="text-muted">
-                      Promote a preview deployment to Production to get started,{" "}
-                      <br />
-                      or use <span>moni-cli deploy --production</span> to deploy
-                      directly from your local project.
-                    </p>
+                    <p className="text-muted">// TODO</p>
                   </Card.Body>
                 </Card>
               </Col>

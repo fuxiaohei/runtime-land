@@ -3931,7 +3931,7 @@ proto.moni.PromoteDeploymentRequest.prototype.setDeployUuid = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.moni.ProjectProductionDeployment.repeatedFields_ = [3];
+proto.moni.ProjectProductionDeployment.repeatedFields_ = [3,4];
 
 
 
@@ -3967,8 +3967,9 @@ proto.moni.ProjectProductionDeployment.toObject = function(includeInstance, msg)
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     domainsList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f,
-    uuid: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    updatedAt: jspb.Message.getFieldWithDefault(msg, 5, 0)
+    urlsList: (f = jspb.Message.getRepeatedField(msg, 4)) == null ? undefined : f,
+    uuid: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    updatedAt: jspb.Message.getFieldWithDefault(msg, 6, 0)
   };
 
   if (includeInstance) {
@@ -4019,9 +4020,13 @@ proto.moni.ProjectProductionDeployment.deserializeBinaryFromReader = function(ms
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUuid(value);
+      msg.addUrls(value);
       break;
     case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUuid(value);
+      break;
+    case 6:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setUpdatedAt(value);
       break;
@@ -4075,17 +4080,24 @@ proto.moni.ProjectProductionDeployment.serializeBinaryToWriter = function(messag
       f
     );
   }
+  f = message.getUrlsList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      4,
+      f
+    );
+  }
   f = message.getUuid();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      5,
       f
     );
   }
   f = message.getUpdatedAt();
   if (f !== 0) {
     writer.writeInt64(
-      5,
+      6,
       f
     );
   }
@@ -4166,11 +4178,48 @@ proto.moni.ProjectProductionDeployment.prototype.clearDomainsList = function() {
 
 
 /**
- * optional string uuid = 4;
+ * repeated string urls = 4;
+ * @return {!Array<string>}
+ */
+proto.moni.ProjectProductionDeployment.prototype.getUrlsList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 4));
+};
+
+
+/**
+ * @param {!Array<string>} value
+ * @return {!proto.moni.ProjectProductionDeployment} returns this
+ */
+proto.moni.ProjectProductionDeployment.prototype.setUrlsList = function(value) {
+  return jspb.Message.setField(this, 4, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ * @return {!proto.moni.ProjectProductionDeployment} returns this
+ */
+proto.moni.ProjectProductionDeployment.prototype.addUrls = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 4, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.moni.ProjectProductionDeployment} returns this
+ */
+proto.moni.ProjectProductionDeployment.prototype.clearUrlsList = function() {
+  return this.setUrlsList([]);
+};
+
+
+/**
+ * optional string uuid = 5;
  * @return {string}
  */
 proto.moni.ProjectProductionDeployment.prototype.getUuid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
@@ -4179,16 +4228,16 @@ proto.moni.ProjectProductionDeployment.prototype.getUuid = function() {
  * @return {!proto.moni.ProjectProductionDeployment} returns this
  */
 proto.moni.ProjectProductionDeployment.prototype.setUuid = function(value) {
-  return jspb.Message.setProto3StringField(this, 4, value);
+  return jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
 /**
- * optional int64 updated_at = 5;
+ * optional int64 updated_at = 6;
  * @return {number}
  */
 proto.moni.ProjectProductionDeployment.prototype.getUpdatedAt = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
@@ -4197,7 +4246,7 @@ proto.moni.ProjectProductionDeployment.prototype.getUpdatedAt = function() {
  * @return {!proto.moni.ProjectProductionDeployment} returns this
  */
 proto.moni.ProjectProductionDeployment.prototype.setUpdatedAt = function(value) {
-  return jspb.Message.setProto3IntField(this, 5, value);
+  return jspb.Message.setProto3IntField(this, 6, value);
 };
 
 
