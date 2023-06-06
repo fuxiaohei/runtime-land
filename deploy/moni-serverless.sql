@@ -102,7 +102,16 @@ CREATE TABLE `user_token` (
   UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+# Mock data for table user_info
+# ------------------------------------------------------------
 
+INSERT INTO `user_info` (`email`, `password`, `password_salt`, `created_at`, `updated_at`, `display_name`, `role`)
+VALUES
+	('abc@abc.com', '$2b$12$FqoBc8isppfw6aLY28zPy.xpDm.U21TRQgkoKYPaOFQsJV09hOBUy', 'g4L0JdxhOG', '2023-04-27 13:45:04', '2023-05-29 15:16:35', 'batman', 1);
+
+INSERT INTO `user_token` (`owner_id`, `token`, `uuid`, `name`, `created_at`, `updated_at`, `origin`, `expired_at`)
+VALUES
+	(1, 'b5bddtoxjjnT7yS9Mm1ngDoscveYeWetGCff4xk8', 'fb366c76-def9-4161-bf06-8621b497275f', 'cli-test', '2023-05-18 10:42:12', '2023-06-06 16:18:42', 'dashboard', 1715913732);
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

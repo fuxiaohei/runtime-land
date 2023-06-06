@@ -273,12 +273,25 @@ impl MoniRpcService for ServiceImpl {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
             prod_domain: String::new(),
-            uuid: deployment.uuid,
+            uuid: deployment.uuid.clone(),
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
             url: format!("http://{}.{}", deployment.domain, prod_domain),
         };
+
+        // deploy wasm in async task with deployment id
+        // in future, deploy behavior should be a queue. It provides a better way to control.
+        // Rpc need a method to get deployment status.
+        let deploy_id = deployment.id;
+        let deploy_uuid = deployment.uuid;
+        tokio::spawn(async move {
+            let res = moni_lib::region::local::deploy(deploy_id, deploy_uuid).await;
+            if res.is_err() {
+                warn!("deploy failed: {:?}", res.err().unwrap());
+            }
+        });
+
         Ok(tonic::Response::new(resp))
     }
 

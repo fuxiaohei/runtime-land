@@ -32,3 +32,16 @@ services:
       - --name=iamfoo
     networks:
       - traefik_demo_network
+  moni-runtime:
+    image: ghcr.io/fuxiaohei/moni-runtime:latest
+    environment:
+      - MONI_HTTP_ADDR=0.0.0.0:38889
+      - MONI_STORAGE_LOCAL_PATH=/data
+    deploy:
+      replicas: 2
+    ports:
+      - '38880-38881:38889'
+    networks:
+      - traefik_demo_network
+    volumes:
+      - ./moni_data:/data

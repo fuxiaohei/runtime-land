@@ -6,6 +6,7 @@ pub mod dao;
 pub mod db;
 pub mod meta;
 pub mod model;
+pub mod region;
 pub mod storage;
 pub mod tracing;
 pub mod version;

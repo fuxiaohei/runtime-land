@@ -34,7 +34,7 @@ services:
       - MYSQL_DATABASE=moni-serverless
       - MYSQL_ROOT_PASSWORD=TJbP7C9ESkLjnS7HXa6y
     ports:
-      - '3306:3306'
+      - '3366:3306'
     volumes:
       - ./mysql_data:/var/lib/mysql
       - ./moni-serverless.sql:/docker-entrypoint-initdb.d/init.sql
@@ -63,6 +63,9 @@ services:
       - MONI_DB_USER=root
       - MONI_DB_PASSWORD=TJbP7C9ESkLjnS7HXa6y
       - MONI_DB_NAME=moni-serverless
+      - LOCAL_REGION_REDIS_ADDR=redis-server:6379
+      - LOCAL_REGION_REDIS_PASSWORD=2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
+      - LOCAL_REGION_RUNTIME=http://moni-runtime:38889
     ports:
       - '38779:38779'
     depends_on:

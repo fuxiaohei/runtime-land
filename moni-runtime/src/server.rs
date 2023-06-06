@@ -119,11 +119,11 @@ pub async fn wasm_caller_handler(
 // basic handler that responds with a static string
 async fn default_handler(req: Request<Body>) -> Response<Body> {
     let req_id = uuid::Uuid::new_v4().to_string();
-    // get header moni-wasm
+    // get header x-moni-wasm
     let headers = req.headers().clone();
     let empty_wasm_path = String::new();
     let moni_wasm = headers
-        .get("moni-wasm")
+        .get("x-moni-wasm")
         .and_then(|v| v.to_str().ok())
         .unwrap_or(DEFAULT_WASM_PATH.get().unwrap_or(&empty_wasm_path));
 
@@ -134,8 +134,8 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     if moni_wasm.is_empty() {
         let _enter = span.enter();
         let builder = Response::builder().status(404);
-        warn!(status = 404, "[Response] moni-wasm not found");
-        return builder.body(Body::from("moni-wasm not found")).unwrap();
+        warn!(status = 404, "[Response] x-moni-wasm not found");
+        return builder.body(Body::from("x-moni-wasm not found")).unwrap();
     }
 
     match wasm_caller_handler(req, moni_wasm, req_id)

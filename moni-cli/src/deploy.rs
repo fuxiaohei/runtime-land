@@ -11,7 +11,8 @@ pub async fn deploy(
     addr: String,
     is_production: bool,
 ) {
-    println!("deploy: {:?}", meta);
+    debug!("deploy: {:?}", meta);
+
     let output = meta.get_output();
     debug!("output: {:?}", output);
 
@@ -65,6 +66,7 @@ async fn fetch_project(
             warn!("fetch project failed: {:?}", e);
             None
         });
+
     // if project is not exist, create empty project with name
     if project.is_none() {
         info!("Project not found, create '{project_name}' project");

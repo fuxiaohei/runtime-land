@@ -32,6 +32,13 @@ async fn main() {
     moni_lib::init_prod_const()
         .await
         .expect("init prod const failed");
+    info!("Init prod const success");
+
+    // init local region
+    moni_lib::region::local::init()
+        .await
+        .expect("init local region failed");
+    info!("Init local region success");
 
     // start rpc server
     moni_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
