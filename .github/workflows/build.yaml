@@ -34,9 +34,6 @@ jobs:
           cargo clippy --version
           wizer --version
           protoc --version
-      - name: Run test-wit-v2
-        run: |
-          make test-wit-v2
       - name: Run unit tests
         run: |
           cargo test --all --release
@@ -53,3 +50,28 @@ jobs:
             target/release/moni-cli
             target/release/moni-serverless
             target/release/moni-runtime
+
+  test-wit-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "test-wit-v2"
+      - name: Update local toolchain
+        run: |
+          rustup update stable
+          rustup target add wasm32-wasi
+      - name: Install protobuf
+        run: |
+          sudo apt update
+          sudo apt install -y protobuf-compiler libprotobuf-dev
+      - name: Toolchain info
+        run: |
+          cargo --version --verbose
+          rustc --version
+          cargo clippy --version
+          protoc --version
+      - name: Run test-wit-v2
+        run: |
+          make test-wit-v2
