@@ -104,6 +104,7 @@ pub async fn promote(
         return Err(anyhow::anyhow!("project not found"));
     }
     let project = project.unwrap();
+    let prod_domain = project.name.clone();
 
     let db = DB.get().unwrap();
     let txn = db.begin().await?;
@@ -126,6 +127,7 @@ pub async fn promote(
     // update current deployment to prod
     let mut deployment_model: project_deployment::ActiveModel = deployment.into();
     deployment_model.prod_status = Set(DeploymentProdStatus::Prod as i32);
+    deployment_model.prod_domain = Set(prod_domain);
     let deployment = deployment_model.update(&txn).await?;
 
     txn.commit().await?;

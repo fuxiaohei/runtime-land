@@ -50,7 +50,7 @@ pub async fn signup_by_email(
         .map(char::from)
         .collect();
     let full_password = format!("{}{}", password, password_salt);
-    let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?.to_string();
+    let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
 
     let now = chrono::Utc::now();
     let user_model = user_info::Model {

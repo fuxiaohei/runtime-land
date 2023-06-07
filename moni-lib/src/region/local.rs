@@ -38,7 +38,7 @@ pub async fn init() -> Result<()> {
 }
 
 async fn register_runtime(runtimes: &str) -> Result<()> {
-    let values = runtimes.split(",").collect::<Vec<&str>>();
+    let values = runtimes.split(',').collect::<Vec<&str>>();
     println!("values: {:?}", values);
 
     let op = LOCAL_REGION.get().unwrap();
@@ -54,9 +54,7 @@ async fn register_runtime(runtimes: &str) -> Result<()> {
     Ok(())
 }
 
-pub async fn deploy(deploy_id: u32, deploy_uuid: String) -> Result<()> {
-    println!("deploy: {} {}", deploy_id, deploy_uuid);
-
+pub async fn deploy(deploy_id: u32, mut deploy_uuid: String, is_production: bool) -> Result<()> {
     let deployment = crate::dao::deployment::find(deploy_id as i32, deploy_uuid.clone()).await?;
     if deployment.is_none() {
         return Err(anyhow::anyhow!("deployment not found"));
@@ -64,9 +62,23 @@ pub async fn deploy(deploy_id: u32, deploy_uuid: String) -> Result<()> {
     let deployment = deployment.unwrap();
     let mut commands: Vec<(String, String)> = vec![];
 
+    if is_production {
+        // if is production, set deploy_uuid to PROD-project-uuid
+        let project =
+            crate::dao::project::find_by_id(deployment.owner_id, deployment.project_id).await?;
+        if project.is_none() {
+            return Err(anyhow::anyhow!("project not found"));
+        }
+        let project = project.unwrap();
+        deploy_uuid = format!("PROD-{}", project.uuid);
+    }
+
     // generate Host(domain) url
     let prod_domain = crate::PROD_DOMAIN.get().unwrap().clone();
-    let domain = format!("{}.{}", deployment.domain, prod_domain);
+    let mut domain = format!("{}.{}", deployment.domain, prod_domain);
+    if is_production {
+        domain = format!("{}.{}", deployment.prod_domain, prod_domain);
+    }
     commands.push((
         format!("traefik/http/routers/{}/rule", deploy_uuid),
         format!("Host(`{}`)", domain),

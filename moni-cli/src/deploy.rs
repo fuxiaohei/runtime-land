@@ -27,7 +27,7 @@ pub async fn deploy(
     if project_name.is_empty() {
         project_name = meta.generate_project_name();
     }
-    info!("Fetching Project '{project_name}'");
+    println!("Fetching Project '{project_name}'");
 
     // fetch project info
     let mut client = moni_rpc::client::Client::new(addr, token).await.unwrap();
@@ -37,7 +37,7 @@ pub async fn deploy(
 
     // upload wasm file to project
     let wasm_binary = std::fs::read(output).unwrap();
-    info!(
+    println!(
         "Uploading assets to project '{project_name}', size: {size} KB",
         project_name = project.name,
         size = wasm_binary.len() / 1024,
@@ -46,11 +46,14 @@ pub async fn deploy(
         .await
         .unwrap();
 
-    info!(
-        "Deployed to project '{project_name}', deploy domain: {deploy_name}",
-        project_name = project.name,
-        deploy_name = deployment.domain,
-    );
+    debug!("deploy: {:?}", deployment);
+
+    println!("Deployed to project '{}' success\n", project.name,);
+    if is_production {
+        println!("Deploy to Production");
+    }
+    println!("View at:");
+    println!("- {}", deployment.url);
 }
 
 async fn fetch_project(

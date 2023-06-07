@@ -286,7 +286,7 @@ impl MoniRpcService for ServiceImpl {
         let deploy_id = deployment.id;
         let deploy_uuid = deployment.uuid;
         tokio::spawn(async move {
-            let res = moni_lib::region::local::deploy(deploy_id, deploy_uuid).await;
+            let res = moni_lib::region::local::deploy(deploy_id, deploy_uuid, false).await;
             if res.is_err() {
                 warn!("deploy failed: {:?}", res.err().unwrap());
             }
@@ -303,6 +303,7 @@ impl MoniRpcService for ServiceImpl {
         let token = user_context.get_token().await?;
 
         let req = req.into_inner();
+        debug!("publish deployment: {:?}", req);
         let deployment =
             dao::deployment::promote(token.owner_id, req.deploy_id as i32, req.deploy_uuid)
                 .await
@@ -314,12 +315,22 @@ impl MoniRpcService for ServiceImpl {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
             prod_domain: String::new(),
-            uuid: deployment.uuid,
+            uuid: deployment.uuid.clone(),
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
-            url: format!("http://{}.{}", deployment.domain, prod_domain),
+            url: format!("http://{}.{}", deployment.prod_domain, prod_domain),
         };
+
+        let deploy_id = deployment.id;
+        let deploy_uuid = deployment.uuid;
+        tokio::spawn(async move {
+            let res = moni_lib::region::local::deploy(deploy_id, deploy_uuid, true).await;
+            if res.is_err() {
+                warn!("deploy failed: {:?}", res.err().unwrap());
+            }
+        });
+
         Ok(tonic::Response::new(resp))
     }
 
@@ -358,21 +369,22 @@ impl MoniRpcService for ServiceImpl {
                     tonic::Status::internal(format!("find prod deployment failed: {:?}", e))
                 })?;
             if prod_deployment.is_some() {
-                let prod_deployment = prod_deployment.unwrap();
-                resp.prod_deployment = Some(super::ProjectProductionDeployment {
-                    id: prod_deployment.id as i32,
-                    name: prod_deployment.domain.clone(),
-                    uuid: prod_deployment.uuid,
-                    updated_at: prod_deployment.updated_at.timestamp(),
-                    domains: vec![
-                        format!("{}.{}", prod_deployment.prod_domain.clone(), prod_domain),
-                        format!("{}.{}", prod_deployment.domain.clone(), prod_domain),
-                    ],
-                    urls: vec![
-                        format!("http://{}.{}", prod_deployment.prod_domain, prod_domain),
-                        format!("http://{}.{}", prod_deployment.domain, prod_domain),
-                    ],
-                });
+                if let Some(d) = prod_deployment {
+                    resp.prod_deployment = Some(super::ProjectProductionDeployment {
+                        id: d.id as i32,
+                        name: d.domain.clone(),
+                        uuid: d.uuid,
+                        updated_at: d.updated_at.timestamp(),
+                        domains: vec![
+                            format!("{}.{}", d.prod_domain, prod_domain),
+                            format!("{}.{}", d.domain, prod_domain),
+                        ],
+                        urls: vec![
+                            format!("http://{}.{}", d.prod_domain, prod_domain),
+                            format!("http://{}.{}", d.domain, prod_domain),
+                        ],
+                    });
+                }
             }
         }
 
