@@ -113,7 +113,7 @@ mod tests {
     /// test manifest from_file
     #[test]
     fn from_file() {
-        let manifest = Meta::from_file("../tests/data/meta.toml").unwrap();
+        let manifest = Meta::from_file("../../tests/data/meta.toml").unwrap();
         assert_eq!(manifest.manifest, "v1");
         assert_eq!(manifest.name, "rust-basic");
         assert_eq!(manifest.description, "example rust project");
@@ -128,9 +128,9 @@ mod tests {
     /// test manifest to file
     #[test]
     fn to_file() {
-        let manifest = Meta::from_file("../tests/data/meta.toml").unwrap();
-        manifest.to_file("../tests/data/meta2.toml").unwrap();
-        let manifest2 = Meta::from_file("../tests/data/meta2.toml").unwrap();
+        let manifest = Meta::from_file("../../tests/data/meta.toml").unwrap();
+        manifest.to_file("../../tests/data/meta2.toml").unwrap();
+        let manifest2 = Meta::from_file("../../tests/data/meta2.toml").unwrap();
         assert_eq!(manifest.manifest, manifest2.manifest);
         assert_eq!(manifest.name, manifest2.name);
         assert_eq!(manifest.description, manifest2.description);
@@ -140,6 +140,6 @@ mod tests {
             manifest.build.as_ref().unwrap().rust_target_dir,
             manifest2.build.as_ref().unwrap().rust_target_dir
         );
-        std::fs::remove_file("../tests/data/meta2.toml").unwrap();
+        std::fs::remove_file("../../tests/data/meta2.toml").unwrap();
     }
 }

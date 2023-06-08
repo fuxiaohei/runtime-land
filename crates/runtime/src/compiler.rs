@@ -189,7 +189,7 @@ mod tests {
 
     #[test]
     fn test_compile() {
-        let wit_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../wit-v2");
+        let wit_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../wit-v2");
         let outputs = generate_guest(
             wit_dir.as_path(),
             Some("http-service".to_string()),

@@ -52,7 +52,7 @@ mod tests {
 
     #[tokio::test]
     async fn run_worker_pool_test() {
-        let wasm_file = "../tests/data/rust_impl.component.wasm";
+        let wasm_file = "../../tests/data/rust_impl.component.wasm";
         let pool = super::create_pool(wasm_file).unwrap();
 
         let status = pool.status();

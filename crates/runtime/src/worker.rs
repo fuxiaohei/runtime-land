@@ -156,7 +156,7 @@ mod tests {
 
     #[tokio::test]
     async fn run_wasm() {
-        let wasm_file = "../tests/data/rust_impl.component.wasm";
+        let wasm_file = "../../tests/data/rust_impl.component.wasm";
         let mut worker = Worker::new(wasm_file).await.unwrap();
 
         for _ in 1..10 {
