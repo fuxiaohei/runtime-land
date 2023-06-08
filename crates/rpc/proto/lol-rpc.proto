@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package moni;
+package lol;
 
 // Empty is the empty message
 message Empty {}
@@ -138,7 +138,7 @@ message ProjectOverviewResponse {
 // ProjectOverviewRequest is the request message for the ProjectOverview method.
 message ProjectOverviewRequest { string name = 1; }
 
-service MoniRpcService {
+service RpcService {
   // SignupEmail signs up a user with the specified email and password
   rpc SignupEmail(SignupEmailRequest) returns (LoginResponse);
 

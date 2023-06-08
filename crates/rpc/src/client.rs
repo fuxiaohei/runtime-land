@@ -1,4 +1,4 @@
-use super::moni_rpc_service_client::MoniRpcServiceClient;
+use super::rpc_service_client::RpcServiceClient;
 use crate::{DeploymentResponse, ProjectResponse};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -25,14 +25,13 @@ impl Interceptor for ClientTokenInterceptor {
 }
 
 pub struct Client {
-    client: MoniRpcServiceClient<InterceptedService<Channel, ClientTokenInterceptor>>,
+    client: RpcServiceClient<InterceptedService<Channel, ClientTokenInterceptor>>,
 }
 
 impl Client {
     pub async fn new(addr: String, token: String) -> Result<Self, Box<dyn std::error::Error>> {
         let channel = Channel::from_shared(addr)?.connect().await?;
-        let client =
-            MoniRpcServiceClient::with_interceptor(channel, ClientTokenInterceptor { token });
+        let client = RpcServiceClient::with_interceptor(channel, ClientTokenInterceptor { token });
         Ok(Client { client })
     }
 

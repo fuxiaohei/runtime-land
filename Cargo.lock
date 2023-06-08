@@ -1857,7 +1857,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "lol-serverless"
+name = "lol-server"
 version = "0.2.5"
 dependencies = [
  "anyhow",

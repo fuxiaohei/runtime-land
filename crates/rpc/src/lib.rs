@@ -1,4 +1,4 @@
-use crate::moni_rpc_service_server::MoniRpcServiceServer;
+use crate::rpc_service_server::RpcServiceServer;
 use http::HeaderName;
 use lol_core::dao;
 use lol_core::model::user_token;
@@ -13,7 +13,7 @@ use tracing::log::warn;
 pub mod client;
 mod server;
 
-tonic::include_proto!("moni");
+tonic::include_proto!("lol");
 
 const DEFAULT_MAX_AGE: Duration = Duration::from_secs(24 * 60 * 60);
 const DEFAULT_EXPOSED_HEADERS: [&str; 3] =
@@ -79,7 +79,7 @@ pub async fn start_server(
     is_grpc_web: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let rpc_impl = server::ServiceImpl::default();
-    let svc = MoniRpcServiceServer::with_interceptor(rpc_impl, auth_intercept);
+    let svc = RpcServiceServer::with_interceptor(rpc_impl, auth_intercept);
     info!("RpcServer listening on {addr}");
     if is_grpc_web {
         let cors_layer = CorsLayer::new()

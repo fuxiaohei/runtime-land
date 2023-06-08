@@ -19,17 +19,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./deploy/moni-serverless.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/moni-serverless
-          - dockerfile: ./deploy/moni-runtime.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/moni-runtime
+          - dockerfile: ./deploy/lol-server.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/lol-server
+          - dockerfile: ./deploy/lol-runtime.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/lol-runtime
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: Swatinem/rust-cache@v2
         with:
-          prefix-key: "moni-dockerize"
+          prefix-key: "lol-image"
       - name: Update local toolchain
         run: |
           rustup update stable
@@ -45,7 +45,7 @@ jobs:
       - name: Build all
         run: |
           cargo build --release
-          cargo build --release -p moni-runtime
+          cargo build --release -p lol-runtime
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -79,8 +79,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./deploy/moni-web.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/moni-web
+          - dockerfile: ./deploy/lol-web.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/lol-web
     steps:
       - uses: actions/checkout@v3
         with:

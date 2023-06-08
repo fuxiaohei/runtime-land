@@ -1,4 +1,4 @@
-use super::moni_rpc_service_server::MoniRpcService;
+use super::rpc_service_server::RpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
 use lol_core::dao::{self, token, user};
@@ -9,7 +9,7 @@ use tracing::{debug, warn};
 pub struct ServiceImpl {}
 
 #[tonic::async_trait]
-impl MoniRpcService for ServiceImpl {
+impl RpcService for ServiceImpl {
     #[tracing::instrument(skip(self, req))]
     async fn signup_email(
         &self,

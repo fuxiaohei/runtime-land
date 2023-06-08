@@ -2,7 +2,7 @@ use clap::Parser;
 use tracing::{debug, info};
 
 #[derive(Parser, Debug)]
-#[clap(name = "lol-serverless", version = lol_core::version::get())]
+#[clap(name = "lol-server", version = lol_core::version::get())]
 struct Cli {
     #[clap(long, env("MONI_GRPC_ADDR"), default_value("127.0.0.1:38779"))]
     pub grpc_addr: String,
