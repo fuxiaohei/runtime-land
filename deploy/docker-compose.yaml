@@ -31,7 +31,7 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=moni-serverless
+      - MYSQL_DATABASE=lol-serverless
       - MYSQL_ROOT_PASSWORD=TJbP7C9ESkLjnS7HXa6y
     ports:
       - '3366:3306'

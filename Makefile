@@ -6,20 +6,20 @@ test-wit-v2:
 	@cargo run -p wit-v2-gen
 
 build-core:
-	@echo "Building moni-serverless..."
+	@echo "Building lol-serverless..."
 	@cargo build --release
 
 build-runtime:
-	@echo "Building moni-serverless runtime..."
-	@cargo build --release -p moni-runtime
+	@echo "Building lol-serverless runtime..."
+	@cargo build --release -p lol-runtime
 
 build-cli:
-	@echo "Building moni-serverless CLI..."
-	@cargo build --release -p moni-cli
+	@echo "Building lol-serverless CLI..."
+	@cargo build --release -p lol-cli
 
 build-web:
-	@echo "Building moni-serverless web..."
-	@cd moni-web && npm install && npm run build
+	@echo "Building lol-serverless web..."
+	@cd web && npm install && npm run build
 
 build: build-core build-runtime build-cli build-web
 

@@ -1,5 +1,5 @@
 [package]
-name = "moni-serverless"
+name = "lol-serverless"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -8,27 +8,27 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
-moni-lib = { path = "./moni-lib" }
-moni-rpc = { path = "./moni-lib/rpc" }
+lol-core = { path = "crates/core" }
+lol-rpc = { path = "crates/rpc" }
 serde = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
 tracing = { workspace = true }
 
 [build-dependencies]
-moni-runtime = { path = "moni-runtime" }
+lol-runtime = { path = "crates/runtime" }
 
 [workspace]
 members = [
     "examples/rust-basic",
     "examples/rust-fetch",
     "examples/rust-router",
-    "moni-cli",
-    "moni-lib",
-    "moni-lib/rpc",
-    "moni-runtime",
-    "moni-sdk",
-    "moni-sdk/macro",
+    "crates/cli",
+    "crates/core",
+    "crates/rpc",
+    "crates/runtime",
+    "crates/sdk",
+    "crates/sdk/macro",
     "tests/wit-v2-gen",
     "tests/wit-v2-guest",
     "tests/wit-v2-host",
@@ -76,6 +76,6 @@ wit-component = "0.11.0"
 uuid = { version = "1.3.3", features = ["v4"] }
 
 [workspace.package]
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]

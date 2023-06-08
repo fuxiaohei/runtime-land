@@ -1,0 +1,28 @@
+{
+    "name": "lol-web-rspack",
+    "private": true,
+    "version": "0.2.0",
+    "scripts": {
+        "dev": "rspack serve",
+        "build": "rspack build"
+    },
+    "dependencies": {
+        "boostrap": "^2.0.0",
+        "bootstrap": "^5.2.3",
+        "google-protobuf": "^3.21.2",
+        "grpc-web": "^1.4.2",
+        "javascript-time-ago": "^2.5.9",
+        "react": "^18.2.0",
+        "react-bootstrap": "^2.7.2",
+        "react-copy-to-clipboard": "^5.1.0",
+        "react-dom": "^18.2.0",
+        "react-icons": "^4.8.0",
+        "react-router-dom": "^6.9.0",
+        "unique-names-generator": "^4.7.1"
+    },
+    "devDependencies": {
+        "@rspack/cli": "latest",
+        "@types/react": "^18.0.25",
+        "@types/react-dom": "^18.0.8"
+    }
+}

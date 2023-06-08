@@ -1,0 +1,1 @@
+include!("../../../wit-v2/http_service.rs");

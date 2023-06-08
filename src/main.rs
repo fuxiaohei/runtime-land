@@ -2,7 +2,7 @@ use clap::Parser;
 use tracing::{debug, info};
 
 #[derive(Parser, Debug)]
-#[clap(name = "moni-serverless", version = moni_lib::version::get())]
+#[clap(name = "lol-serverless", version = lol_core::version::get())]
 struct Cli {
     #[clap(long, env("MONI_GRPC_ADDR"), default_value("127.0.0.1:38779"))]
     pub grpc_addr: String,
@@ -13,35 +13,35 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
-    moni_lib::tracing::init();
+    lol_core::tracing::init();
 
     let args = Cli::parse();
     debug!("load args: {:?}", args);
 
     // init storage
-    moni_lib::storage::init()
+    lol_core::storage::init()
         .await
         .expect("init storage failed");
     info!("Init storage success");
 
     // init db
-    moni_lib::db::init().await.expect("init db failed");
+    lol_core::db::init().await.expect("init db failed");
     info!("Init db success");
 
     // init prod const
-    moni_lib::init_prod_const()
+    lol_core::init_prod_const()
         .await
         .expect("init prod const failed");
     info!("Init prod const success");
 
     // init local region
-    moni_lib::region::local::init()
+    lol_core::region::local::init()
         .await
         .expect("init local region failed");
     info!("Init local region success");
 
     // start rpc server
-    moni_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
+    lol_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
         .await
         .unwrap();
 }

@@ -1748,6 +1748,131 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "518ef76f2f87365916b142844c16d8fefd85039bc5699050210a7778ee1cd1de"
 
 [[package]]
+name = "lol-cli"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "futures-util",
+ "lol-core",
+ "lol-rpc",
+ "lol-runtime",
+ "rust-embed",
+ "tokio",
+ "tracing",
+ "which",
+]
+
+[[package]]
+name = "lol-core"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "bcrypt",
+ "chrono",
+ "envconfig",
+ "futures",
+ "lazy_static",
+ "once_cell",
+ "opendal",
+ "rand",
+ "sea-orm",
+ "serde",
+ "time 0.3.21",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "vergen",
+]
+
+[[package]]
+name = "lol-rpc"
+version = "0.2.5"
+dependencies = [
+ "gravatar",
+ "http",
+ "lol-core",
+ "prost",
+ "rand",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tonic-web",
+ "tower-http",
+ "tracing",
+]
+
+[[package]]
+name = "lol-runtime"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "clap",
+ "deadpool",
+ "futures-util",
+ "hyper",
+ "lazy_static",
+ "lol-core",
+ "moka",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+ "uuid",
+ "wasmtime",
+ "wasmtime-wasi",
+ "which",
+ "wit-bindgen-core",
+ "wit-bindgen-rust",
+ "wit-component",
+]
+
+[[package]]
+name = "lol-sdk"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "http",
+ "lazy_static",
+ "lol-sdk-macro",
+ "matchit",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "lol-sdk-macro"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "http",
+ "quote",
+ "syn 2.0.18",
+]
+
+[[package]]
+name = "lol-serverless"
+version = "0.2.5"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "lol-core",
+ "lol-rpc",
+ "lol-runtime",
+ "serde",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+]
+
+[[package]]
 name = "mach"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1880,131 +2005,6 @@ dependencies = [
  "thiserror",
  "triomphe",
  "uuid",
-]
-
-[[package]]
-name = "moni-cli"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "futures-util",
- "moni-lib",
- "moni-rpc",
- "moni-runtime",
- "rust-embed",
- "tokio",
- "tracing",
- "which",
-]
-
-[[package]]
-name = "moni-lib"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "bcrypt",
- "chrono",
- "envconfig",
- "futures",
- "lazy_static",
- "once_cell",
- "opendal",
- "rand",
- "sea-orm",
- "serde",
- "time 0.3.21",
- "tokio",
- "toml 0.7.4",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "vergen",
-]
-
-[[package]]
-name = "moni-rpc"
-version = "0.2.4"
-dependencies = [
- "gravatar",
- "http",
- "moni-lib",
- "prost",
- "rand",
- "tokio",
- "tonic",
- "tonic-build",
- "tonic-web",
- "tower-http",
- "tracing",
-]
-
-[[package]]
-name = "moni-runtime"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "clap",
- "deadpool",
- "futures-util",
- "hyper",
- "lazy_static",
- "moka",
- "moni-lib",
- "once_cell",
- "reqwest",
- "serde",
- "tokio",
- "toml 0.7.4",
- "tracing",
- "uuid",
- "wasmtime",
- "wasmtime-wasi",
- "which",
- "wit-bindgen-core",
- "wit-bindgen-rust",
- "wit-component",
-]
-
-[[package]]
-name = "moni-sdk"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "http",
- "lazy_static",
- "matchit",
- "moni-sdk-macro",
- "wit-bindgen",
-]
-
-[[package]]
-name = "moni-sdk-macro"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "http",
- "quote",
- "syn 2.0.18",
-]
-
-[[package]]
-name = "moni-serverless"
-version = "0.2.4"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "moni-lib",
- "moni-rpc",
- "moni-runtime",
- "serde",
- "tokio",
- "toml 0.7.4",
- "tracing",
 ]
 
 [[package]]
@@ -2803,7 +2803,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "moni-sdk",
+ "lol-sdk",
  "wit-bindgen",
 ]
 
@@ -2847,7 +2847,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "moni-sdk",
+ "lol-sdk",
  "wit-bindgen",
 ]
 
@@ -2857,7 +2857,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "moni-sdk",
+ "lol-sdk",
  "wit-bindgen",
 ]
 

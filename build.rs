@@ -1,4 +1,4 @@
-use moni_runtime::{generate_guest, GuestGeneratorType};
+use lol_runtime::{generate_guest, GuestGeneratorType};
 use std::path::{Path, PathBuf};
 
 fn main() {

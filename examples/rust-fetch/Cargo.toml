@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.70"
 http = "0.2.9"
-moni-sdk = { path = "../../moni-sdk" }
+lol-sdk = { path = "../../crates/sdk" }
 wit-bindgen = "0.7.0"
 
 [lib]

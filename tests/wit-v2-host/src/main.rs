@@ -57,7 +57,7 @@ impl Context {
 fn encode_wasm_component(path: &str, output: Option<String>) {
     let file_bytes = std::fs::read(path).expect("parse wasm file error");
     let wasi_adapter =
-        std::fs::read("./moni-runtime/engine/wasi_snapshot_preview1.reactor.wasm").unwrap();
+        std::fs::read("./crates/runtime/engine/wasi_snapshot_preview1.reactor.wasm").unwrap();
 
     let component = ComponentEncoder::default()
         .module(&file_bytes)
