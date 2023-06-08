@@ -1,4 +1,4 @@
-# Moni-Web
+# Web
 
 ## Generate Grpc Web
 
@@ -12,6 +12,6 @@ npm install -g protoc-gen-js protoc-gen-grpc-web
 genrate grpc-web code:
 
 ```bash
-cd moni-serverless
-protoc -I crates/rpc --js_out=import_style=commonjs:web/src/api --grpc-web_out=import_style=commonjs,mode=grpcweb:web/src/api crates/rpc/proto/moni-rpc.proto
+cd lol-serverless
+protoc -I crates/rpc --js_out=import_style=commonjs:web/src/api --grpc-web_out=import_style=commonjs,mode=grpcweb:web/src/api crates/rpc/proto/lol-rpc.proto
 ```

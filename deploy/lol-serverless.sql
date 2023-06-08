@@ -6,7 +6,7 @@
 # https://github.com/Sequel-Ace/Sequel-Ace
 #
 # Host: 127.0.0.1 (MySQL 5.7.39)
-# Database: moni-serverless
+# Database: lol-serverless
 # Generation Time: 2023-04-26 22:50:53 +0000
 # ************************************************************
 
