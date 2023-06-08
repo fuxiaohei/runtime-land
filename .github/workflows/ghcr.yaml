@@ -20,8 +20,10 @@ jobs:
         include:
           - dockerfile: ./deploy/lol-server.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/lol-server
+            make_subcommand: "build-server"
           - dockerfile: ./deploy/lol-runtime.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/lol-runtime
+            make_subcommand: "build-runtime"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -41,7 +43,7 @@ jobs:
           cargo --version --verbose
           rustc --version
           protoc --version
-      - name: Build all
+      - name: Build
         run: |
           cargo build --release
           cargo build --release -p lol-runtime

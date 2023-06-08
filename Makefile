@@ -1,11 +1,11 @@
-.PHONY: build, build-core, build-runtime, build-cli, build-web, test-wit-v2
+.PHONY: build, build-server, build-runtime, build-cli, build-web, test-wit-v2
 
 test-wit-v2:
 	@cargo build --release --target wasm32-wasi -p wit-v2-guest
 	@cargo run -p wit-v2-host
 	@cargo run -p wit-v2-gen
 
-build-core:
+build-server:
 	@echo "Building server..."
 	@cargo build --release
 
@@ -21,5 +21,5 @@ build-web:
 	@echo "Building web..."
 	@cd web && npm install && npm run build
 
-build: build-core build-runtime build-cli build-web
+build: build-server build-runtime build-cli build-web
 
