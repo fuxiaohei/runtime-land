@@ -1,5 +1,5 @@
 [package]
-name = "moni-serverless"
+name = "lol-server"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -8,44 +8,54 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
-moni-lib = { path = "./moni-lib" }
-moni-rpc = { path = "./moni-lib/rpc" }
+lol-core = { path = "crates/core" }
+lol-rpc = { path = "crates/rpc" }
 serde = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
 tracing = { workspace = true }
 
 [build-dependencies]
-moni-runtime = { path = "moni-runtime" }
+lol-runtime = { path = "crates/runtime" }
 
 [workspace]
 members = [
     "examples/rust-basic",
     "examples/rust-fetch",
     "examples/rust-router",
-    "moni-cli",
-    "moni-lib",
-    "moni-lib/rpc",
-    "moni-runtime",
-    "moni-sdk",
-    "moni-sdk/macro",
+    "crates/cli",
+    "crates/core",
+    "crates/rpc",
+    "crates/runtime",
+    "crates/sdk",
+    "crates/sdk/macro",
+    "tests/wit-v2-gen",
+    "tests/wit-v2-guest",
+    "tests/wit-v2-host",
 ]
 
 [workspace.dependencies]
 anyhow = "1.0.71"
 async-trait = "0.1.68"
 axum = "0.6.18"
-clap = { version = "4.3.0", features = ["derive"] }
-chrono = "0.4.24"
+clap = { version = "4.3.2", features = ["derive", "env"] }
+chrono = "0.4.26"
 http = "0.2.9"
 hyper = { version = "0.14.26", features = ["full"] }
 lazy_static = "1.4.0"
 names = { version = "0.14.0", default-features = false }
-once_cell = "1.17.1"
-reqwest = { version = "0.11.18", features = ["stream"] }
+once_cell = "1.18.0"
+reqwest = { version = "0.11.18", default-features = false, features = [
+    "stream",
+    "rustls-tls",
+    "blocking",
+    "json",
+    "multipart",
+] }
+rand = "0.8.5"
 serde = { version = "1.0.163", features = ["derive"] }
 time = "0.3.21"
-tokio = { version = "1.28.1", features = ["full"] }
+tokio = { version = "1.28.2", features = ["full"] }
 toml = "0.7.4"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.17", features = [
@@ -53,17 +63,19 @@ tracing-subscriber = { version = "0.3.17", features = [
     "local-time",
     "env-filter"
 ] }
-wasi-common = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
-wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", rev = "299131ae2d6655c49138bfab2c4469650763ef3b", features = [
+# wasi-common = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
+wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", features = [
     "component-model",
     "async"
 ] }
-wit-bindgen = "0.6.0"
-wit-bindgen-core = "0.6.0"
-wit-bindgen-rust = "0.6.0"
-wit-component = "0.9.0"
+wasmtime-wasi = { git = "https://github.com/bytecodealliance/wasmtime" }
+wit-bindgen = "0.7.0"
+wit-bindgen-core = "0.7.0"
+wit-bindgen-rust = "0.7.0"
+wit-component = "0.11.0"
+uuid = { version = "1.3.3", features = ["v4"] }
 
 [workspace.package]
-version = "0.2.1"
+version = "0.2.5"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]

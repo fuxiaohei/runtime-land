@@ -1,0 +1,18 @@
+[package]
+name = "lol-cli"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+futures-util = "0.3.28"
+lol-core = { path = "../core" }
+lol-rpc = { path = "../rpc" }
+lol-runtime = { path = "../runtime" }
+rust-embed = "6.6.1"
+tokio = { workspace = true }
+tracing = { workspace = true }
+which = "4.4.0"

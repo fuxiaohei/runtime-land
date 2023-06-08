@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package lol;
+
+// Empty is the empty message
+message Empty {}
+
+// NoDataResponse is the response message without data
+message NoDataResponse {
+  string error = 1;
+  int64 code = 2;
+}
+
+// SignupEmailRequest is the request message for the SignupEmail method.
+message SignupEmailRequest {
+  string email = 1;
+  string password = 2;
+  string nickname = 3;
+}
+
+// LoginEmailRequest is the request message for the LoginEmail method.
+message LoginEmailRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// LoginAccessTokenRequest is the request message for the LoginAccessToken
+message LoginAccessTokenRequest { string access_token = 1; }
+
+// LoginResponse is the response message for the LoginEmail method.
+message LoginResponse {
+  string access_token = 1;
+  string access_token_uuid = 2;
+  string display_name = 3;
+  string display_email = 4;
+  string avatar_url = 5;
+}
+
+// RemoveAccessTokenRequest is the request message for the RemoveAccessToken
+message RemoveAccessTokenRequest { string token_uuid = 1; }
+
+// ProjectData contains the data of a function created by the CreateProject
+// method.
+message ProjectData {
+  string uuid = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// AccessToken is the struct of an access token
+message AccessTokenData {
+  string name = 1;
+  int64 created_at = 2;
+  int64 updated_at = 3;
+  int64 expires_at = 4;
+  string origin = 5;
+  string uuid = 6;
+  optional string value = 7;
+}
+
+// CreateAccessTokenRequest is the request message for the CreateAccessToken
+message CreateAccessTokenRequest { string name = 1; }
+
+// CreateAccessTokenResponse is the response message for the CreateAccessToken
+message CreateAccessTokenResponse { AccessTokenData data = 2; }
+
+// ListAccessTokensResponse is the response message for the ListAccessTokens
+message ListAccessTokensResponse { repeated AccessTokenData data = 1; }
+
+// FetchProjectRequest is the request message for the FetchProject method.
+message FetchProjectRequest {
+  string name = 1;
+  string language = 2;
+}
+
+// ProjectResponse is the response message for the FetchProject method.
+message ProjectResponse {
+  string name = 1;
+  string language = 2;
+  string uuid = 3;
+  int64 updated_at = 4;
+  optional int32 prod_deployment = 5;
+}
+
+// ListProjectsResponse is the response message for the ListProject method.
+message ListProjectsResponse { repeated ProjectResponse data = 1; }
+
+// CreateDeploymentRequest is the request message for the CreateDeployment
+// method.
+message CreateDeploymentRequest {
+  string project_name = 1;
+  string project_uuid = 2;
+  string deploy_name = 3;
+  bytes deploy_chunk = 4;
+  string deploy_content_type = 5;
+}
+
+// DeploymentResponse is the response message for the CreateDeployment method.
+message DeploymentResponse {
+  int32 id = 1;
+  string domain = 2;
+  string prod_domain = 3;
+  string uuid = 4;
+  int32 deploy_status = 5;
+  int32 prod_status = 6;
+  int64 updated_at = 7;
+  string url = 8;
+}
+
+// PromoteDeploymentRequest is the request message for the PromoteDeployment
+// method.
+message PromoteDeploymentRequest {
+  int64 deploy_id = 1;
+  string deploy_uuid = 2;
+}
+
+// ProjectProductionDeployment
+message ProjectProductionDeployment {
+  int32 id = 1;
+  string name = 2;
+  repeated string domains = 3;
+  repeated string urls = 4;
+  string uuid = 5;
+  int64 updated_at = 6;
+}
+
+// ProjectOverviewResponse is the overview of a project
+message ProjectOverviewResponse {
+  int32 id = 1;
+  string name = 2;
+  string uuid = 3;
+  int64 updated_at = 4;
+  int32 prod_deployment_id = 5;
+  optional ProjectProductionDeployment prod_deployment = 6;
+  repeated DeploymentResponse deployments = 7;
+}
+
+// ProjectOverviewRequest is the request message for the ProjectOverview method.
+message ProjectOverviewRequest { string name = 1; }
+
+service RpcService {
+  // SignupEmail signs up a user with the specified email and password
+  rpc SignupEmail(SignupEmailRequest) returns (LoginResponse);
+
+  // LoginEmail logs in a user with the specified email and password
+  rpc LoginEmail(LoginEmailRequest) returns (LoginResponse);
+
+  // LoginAccessToken logs in a user with the specified access token
+  rpc LoginAccessToken(LoginAccessTokenRequest) returns (LoginResponse);
+
+  // CreateAccessToken creates a new access token for the current user
+  rpc CreateAccessToken(CreateAccessTokenRequest)
+      returns (CreateAccessTokenResponse);
+
+  // ListAccessTokens lists all access tokens of the current user
+  rpc ListAccessTokens(Empty) returns (ListAccessTokensResponse);
+
+  // RemoveAccessToken removes the access token with the specified uuid
+  rpc RemoveAccessToken(RemoveAccessTokenRequest) returns (NoDataResponse);
+
+  // FetchProject fetches the project with the specified name
+  rpc FetchProject(FetchProjectRequest) returns (ProjectResponse);
+
+  // CreateEmptyProject creates an empty project with the specified name
+  rpc CreateEmptyProject(FetchProjectRequest) returns (ProjectResponse);
+
+  // ListProjects lists all projects of the current user
+  rpc ListProjects(Empty) returns (ListProjectsResponse);
+
+  // CreateDeployment creates a new deployment for the specified projects
+  rpc CreateDeployment(CreateDeploymentRequest) returns (DeploymentResponse);
+
+  // PublishDeployment publish the specified deployment to production
+  rpc PublishDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
+
+  // ProjectOverview returns the overview of the specified project
+  rpc ProjectOverview(ProjectOverviewRequest) returns (ProjectOverviewResponse);
+}

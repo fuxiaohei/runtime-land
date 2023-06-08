@@ -1,0 +1,16 @@
+[package]
+name = "lol-sdk"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+http = { workspace = true }
+lazy_static = { workspace = true }
+matchit = "0.7.0"
+lol-sdk-macro = { path = "./macro" }
+wit-bindgen = { workspace = true }
+
+[lib]
+doctest = false

@@ -1,0 +1,352 @@
+html,
+body {
+    background-color: #FAFAFA;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.login-navbar,
+.dashboard-navbar {
+    border-bottom: 1px solid #ccc;
+    /* add shadow in bottom*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container {
+    margin-top: 90px;
+    width: 360px;
+    /* Set the width of the login container */
+    padding: 30px 40px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    /* add shadow in bottom*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container-header {
+    text-align: center;
+    padding-bottom: .3em;
+    padding-top: .5em;
+}
+
+.login-container .login-connection {
+    margin: 2em 0;
+}
+
+.login-container .login-connection .item {
+    margin-bottom: 1em;
+}
+
+.login-container .login-connection .item .fa {
+    margin-right: .4em;
+    size: 26px;
+}
+
+#dashboard-container,
+#project-container,
+#account-settings-container {
+    margin-top: 40px;
+    max-width: 1024px;
+}
+
+#dashboard-header-left h2,
+#project-header-left h2,
+#account-settings-header h2,
+#new-project-header h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#dashboard-header-left h3,
+#new-project-header h3 {
+    font-size: 1.1em;
+    color: #AAA;
+    font-weight: normal;
+}
+
+#project-header-left p {
+    color: #AAA;
+}
+
+#dashboard-header-right {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#project-header-right {
+    text-align: right;
+    line-height: 70px;
+}
+
+.project-card {
+    margin-top: 40px;
+    transition: box-shadow .15s ease-in-out;
+}
+
+.project-card:hover {
+    border-color: #AAA;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.project-card:hover .project-card-title {
+    color: #111;
+}
+
+.project-card a {
+    text-decoration: none;
+}
+
+.project-card .card-body {
+    padding: 24px 16px;
+}
+
+.project-card-title {
+    font-size: 1.2rem;
+    line-height: 1.25rem;
+    color: #666;
+}
+
+.project-card-title:hover {
+    color: #111;
+}
+
+.project-card-updated {
+    font-size: .8rem;
+    color: #AAA;
+    padding-left: .1rem;
+}
+
+.project-view {
+    text-align: right;
+    line-height: 48px;
+}
+
+#project-header-right button {
+    margin-left: 1rem;
+}
+
+#project-header-right .icon,
+.login-email-back svg {
+    margin-right: .5rem;
+}
+
+#project-tabs-container .nav-tabs {
+    border: none;
+}
+
+#project-tabs-container .nav-link {
+    padding: .2rem .4rem;
+    margin-right: .3rem;
+    border-radius: 0.3rem;
+    color: #444;
+}
+
+#project-tabs-container .nav-link.active,
+#project-tabs-container .nav-link.active:hover {
+    border: none;
+    background-color: #444;
+    color: #DDD;
+}
+
+#project-tabs-container .nav-link:hover {
+    background-color: #DDD;
+    color: #444;
+}
+
+#project-tabs-container .nav-link.disabled {
+    color: #AAA
+}
+
+#notfound-container,
+#login-loading-container {
+    margin-top: 90px;
+    width: 900px;
+    line-height: 2rem;
+}
+
+#notfound-container h1,
+#login-loading-container h1 {
+    font-size: 2rem;
+}
+
+.login-email-link {
+    text-align: right;
+}
+
+.login-email-link a,
+.login-email-back {
+    color: #AAA;
+    text-decoration: none;
+    font-size: .9rem;
+}
+
+.login-email-link a:hover,
+.login-email-back:hover {
+    color: #666;
+}
+
+#login-email-form .form-label {
+    font-size: .9rem;
+    color: #666;
+}
+
+.dashboard-navbar-avatar {
+    margin-right: 6px;
+    margin-top: -2px;
+}
+
+#current-account .account-name {
+    margin-left: .5rem;
+}
+
+#create-org-nav .create-org {
+    margin-left: .5rem;
+    font-size: 0.9rem;
+    color: #AAA;
+}
+
+.profile-avatar {
+    text-align: center;
+}
+
+.profile-avatar h5 {
+    line-height: 2em;
+}
+
+.profile-displayname {
+    font-size: 1.3rem;
+}
+
+#logging-out {
+    margin: 1rem 2rem;
+}
+
+.account-settings-card {
+    margin-top: 30px;
+}
+
+#access-tokens-container .card-subtitle {
+    line-height: 2rem;
+    color: #666;
+    font-weight: normal;
+}
+
+#access-tokens-existing-list {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+#access-tokens-new-value {
+    margin-bottom: 1.5rem;
+}
+
+.access-tokens-list .list-group-item {
+    background-color: #f1f5f9;
+}
+
+.access-tokens-list .list-group-item .desc .extra {
+    font-size: .8rem;
+    color: #888;
+}
+
+.access-tokens-list .list-group-item .del-button {
+    color: #666;
+    padding: 0;
+}
+
+.access-tokens-list .list-group-item .del-button:hover {
+    color: #dc3545;
+}
+
+#create-access-token-modal {
+    width: 500px;
+}
+
+#access-tokens-new-value p.name,
+#access-tokens-new-value p.value {
+    margin-bottom: 0;
+}
+
+#access-tokens-new-value p.value {
+    margin-left: 24px;
+}
+
+#access-tokens-new-value .list-group-item {
+    border-color: #a3cfbb;
+    background-color: #e6f4ed;
+}
+
+#access-tokens-new-value .copy-btn {
+    margin-left: .5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.access-tokens-loading {
+    margin: 1rem 0;
+}
+
+#new-project-container {
+    margin-bottom: 2rem;
+    background-color: #f1f5f9;
+}
+
+#new-project-cards {
+    padding: 30px 0 0 0;
+}
+
+#project-template-container .title h3 {
+    font-size: 1.25rem;
+}
+
+#project-template-container .title p {
+    font-size: 1rem;
+    color: #aaa;
+    margin-bottom: 0;
+}
+
+#project-template-container .card-title {
+    margin-bottom: 0;
+}
+
+#new-project-container .project-name-div {
+    margin-top: 1.5rem;
+}
+
+.project-no-prod-card {
+    background-color: #feffea;
+}
+
+.deployment-metadata .status-icon {
+    color: #087d25;
+}
+
+.deployment-promotion .dropdown-toggle {
+    color: #666;
+}
+
+.project-prod-card {
+    background-color: #e9ffef;
+}
+
+.project-prod-domains .list-group-item {
+    background-color: transparent;
+}
+
+.project-prod-domains a,
+.deployment-metadata a.name {
+    color: #444;
+}
+
+.deployment-metadata a.name {
+    text-decoration: none;
+}
+
+.deployment-metadata a.name:hover {
+    text-decoration: underline;
+}

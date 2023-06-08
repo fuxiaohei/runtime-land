@@ -1,6 +1,6 @@
-use moni_sdk::http::{Body, Request, Response};
-use moni_sdk::http_main;
-use moni_sdk::router;
+use lol_sdk::http::{Body, Request, Response};
+use lol_sdk::http_main;
+use lol_sdk::router;
 
 #[http_main]
 pub fn handle_http_request(mut req: Request) -> Response {

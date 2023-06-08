@@ -1,5 +1,5 @@
-use moni_sdk::http::{fetch, Body, Request, RequestOptions, Response};
-use moni_sdk::http_main;
+use lol_sdk::http::{fetch, Body, Request, RequestOptions, Response};
+use lol_sdk::http_main;
 
 #[http_main]
 pub fn handle_request(_req: Request) -> Response {
