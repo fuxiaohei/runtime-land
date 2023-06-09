@@ -20,15 +20,15 @@ lol-runtime = { path = "crates/runtime" }
 
 [workspace]
 members = [
-    "examples/rust-basic",
-    "examples/rust-fetch",
-    "examples/rust-router",
     "crates/cli",
     "crates/core",
     "crates/rpc",
     "crates/runtime",
     "crates/sdk",
     "crates/sdk/macro",
+    "examples/rust-basic",
+    "examples/rust-fetch",
+    "examples/rust-router",
     "tests/wit-v2-gen",
     "tests/wit-v2-guest",
     "tests/wit-v2-host",
@@ -53,8 +53,8 @@ reqwest = { version = "0.11.18", default-features = false, features = [
     "multipart",
 ] }
 rand = "0.8.5"
-serde = { version = "1.0.163", features = ["derive"] }
-time = "0.3.21"
+serde = { version = "1.0.164", features = ["derive"] }
+time = "0.3.22"
 tokio = { version = "1.28.2", features = ["full"] }
 toml = "0.7.4"
 tracing = "0.1.37"

@@ -13,8 +13,8 @@ deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 futures-util = "0.3.28"
 hyper = { workspace = true }
 lazy_static = { workspace = true }
-moka = { version = "0.11.1", default-features = false, features = ["sync"] }
 lol-core = { path = "../core" }
+moka = { version = "0.11.2", default-features = false, features = ["sync"] }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

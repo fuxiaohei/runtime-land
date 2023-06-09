@@ -12,7 +12,7 @@ futures-util = "0.3.28"
 lol-core = { path = "../core" }
 lol-rpc = { path = "../rpc" }
 lol-runtime = { path = "../runtime" }
-rust-embed = "6.6.1"
+rust-embed = "6.7.0"
 tokio = { workspace = true }
 tracing = { workspace = true }
 which = "4.4.0"
