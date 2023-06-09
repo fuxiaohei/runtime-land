@@ -107,9 +107,9 @@ message DeploymentResponse {
   string url = 8;
 }
 
-// PromoteDeploymentRequest is the request message for the PromoteDeployment
+// PublishDeploymentRequest is the request message for the PublishDeployment
 // method.
-message PromoteDeploymentRequest {
+message PublishDeploymentRequest {
   int64 deploy_id = 1;
   string deploy_uuid = 2;
 }
@@ -171,7 +171,7 @@ service RpcService {
   rpc CreateDeployment(CreateDeploymentRequest) returns (DeploymentResponse);
 
   // PublishDeployment publish the specified deployment to production
-  rpc PublishDeployment(PromoteDeploymentRequest) returns (DeploymentResponse);
+  rpc PublishDeployment(PublishDeploymentRequest) returns (DeploymentResponse);
 
   // ProjectOverview returns the overview of the specified project
   rpc ProjectOverview(ProjectOverviewRequest) returns (ProjectOverviewResponse);

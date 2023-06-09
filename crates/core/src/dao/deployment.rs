@@ -87,7 +87,7 @@ pub async fn update_storage(deploy_id: i32, storage_path: String) -> Result<()> 
     Ok(())
 }
 
-pub async fn promote(
+pub async fn publish(
     owner_id: i32,
     deploy_id: i32,
     deploy_uuid: String,

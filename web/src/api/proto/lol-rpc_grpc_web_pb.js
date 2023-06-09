@@ -687,16 +687,16 @@ proto.lol.RpcServicePromiseClient.prototype.createDeployment =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.lol.PromoteDeploymentRequest,
+ *   !proto.lol.PublishDeploymentRequest,
  *   !proto.lol.DeploymentResponse>}
  */
 const methodDescriptor_RpcService_PublishDeployment = new grpc.web.MethodDescriptor(
   '/lol.RpcService/PublishDeployment',
   grpc.web.MethodType.UNARY,
-  proto.lol.PromoteDeploymentRequest,
+  proto.lol.PublishDeploymentRequest,
   proto.lol.DeploymentResponse,
   /**
-   * @param {!proto.lol.PromoteDeploymentRequest} request
+   * @param {!proto.lol.PublishDeploymentRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -707,7 +707,7 @@ const methodDescriptor_RpcService_PublishDeployment = new grpc.web.MethodDescrip
 
 
 /**
- * @param {!proto.lol.PromoteDeploymentRequest} request The
+ * @param {!proto.lol.PublishDeploymentRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -728,7 +728,7 @@ proto.lol.RpcServiceClient.prototype.publishDeployment =
 
 
 /**
- * @param {!proto.lol.PromoteDeploymentRequest} request The
+ * @param {!proto.lol.PublishDeploymentRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata

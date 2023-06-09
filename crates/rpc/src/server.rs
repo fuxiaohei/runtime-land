@@ -297,7 +297,7 @@ impl RpcService for ServiceImpl {
 
     async fn publish_deployment(
         &self,
-        req: tonic::Request<super::PromoteDeploymentRequest>,
+        req: tonic::Request<super::PublishDeploymentRequest>,
     ) -> std::result::Result<tonic::Response<super::DeploymentResponse>, tonic::Status> {
         let user_context: &UserContext = req.extensions().get().unwrap();
         let token = user_context.get_token().await?;
@@ -305,7 +305,7 @@ impl RpcService for ServiceImpl {
         let req = req.into_inner();
         debug!("publish deployment: {:?}", req);
         let deployment =
-            dao::deployment::promote(token.owner_id, req.deploy_id as i32, req.deploy_uuid)
+            dao::deployment::publish(token.owner_id, req.deploy_id as i32, req.deploy_uuid)
                 .await
                 .map_err(|e| {
                     tonic::Status::internal(format!("promote deployment failed: {:?}", e))

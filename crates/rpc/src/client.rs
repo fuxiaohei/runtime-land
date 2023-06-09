@@ -87,7 +87,7 @@ impl Client {
 
         // set production
         if is_production {
-            let req = tonic::Request::new(super::PromoteDeploymentRequest {
+            let req = tonic::Request::new(super::PublishDeploymentRequest {
                 deploy_id: deploy_resp.id as i64,
                 deploy_uuid: deploy_resp.uuid,
             });

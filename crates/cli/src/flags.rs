@@ -178,7 +178,7 @@ pub struct Deploy {
     /// The token
     #[clap(long)]
     pub token: String,
-    /// Promote this deployment to production
+    /// Publish this deployment to production
     #[clap(long, default_value("false"))]
     pub production: bool,
     /// The project name
