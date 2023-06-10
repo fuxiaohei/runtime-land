@@ -1,5 +1,5 @@
 [package]
-name = "lol-core"
+name = "land-core"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }

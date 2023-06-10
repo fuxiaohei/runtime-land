@@ -2,8 +2,8 @@ const {
   LoginEmailRequest,
   LoginAccessTokenRequest,
   SignupEmailRequest,
-} = require("./proto/lol-rpc_pb.js");
-const { MoniRpcServiceClient } = require("./proto/lol-rpc_grpc_web_pb.js");
+} = require("./proto/land-rpc_pb.js");
+const { MoniRpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
 const { RPC_CLIENT_ADDRESS, callClient } = require("./utils.js");
 
 function loginByEmail(email, password) {

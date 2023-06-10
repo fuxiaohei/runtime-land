@@ -11,11 +11,11 @@ build-server:
 
 build-runtime:
 	@echo "Building runtime..."
-	@cargo build --release -p lol-runtime
+	@cargo build --release -p land-runtime
 
 build-cli:
 	@echo "Building CLI..."
-	@cargo build --release -p lol-cli
+	@cargo build --release -p land-cli
 
 build-web:
 	@echo "Building web..."

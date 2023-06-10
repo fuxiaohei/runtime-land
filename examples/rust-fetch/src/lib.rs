@@ -1,5 +1,5 @@
-use lol_sdk::http::{fetch, Body, Request, RequestOptions, Response};
-use lol_sdk::http_main;
+use land_sdk::http::{fetch, Body, Request, RequestOptions, Response};
+use land_sdk::http_main;
 
 #[http_main]
 pub fn handle_request(_req: Request) -> Response {

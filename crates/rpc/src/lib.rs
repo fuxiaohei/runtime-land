@@ -1,7 +1,7 @@
 use crate::rpc_service_server::RpcServiceServer;
 use http::HeaderName;
-use lol_core::dao;
-use lol_core::model::user_token;
+use land_core::dao;
+use land_core::model::user_token;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tonic::{Request, Status};
@@ -13,7 +13,7 @@ use tracing::log::warn;
 pub mod client;
 mod server;
 
-tonic::include_proto!("lol");
+tonic::include_proto!("land");
 
 const DEFAULT_MAX_AGE: Duration = Duration::from_secs(24 * 60 * 60);
 const DEFAULT_EXPOSED_HEADERS: [&str; 3] =

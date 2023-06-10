@@ -1,5 +1,5 @@
 use clap::Args;
-use lol_core::meta::{Meta, DEFAULT_METADATA_FILE};
+use land_core::meta::{Meta, DEFAULT_METADATA_FILE};
 use std::path::{Path, PathBuf};
 use tracing::{debug, debug_span, info, Instrument};
 
@@ -99,8 +99,8 @@ impl Init {
             .to_string();
         content = content.replace(template, name);
         content = content.replace(
-            "path = \"../../lol-sdk\"",
-            "git = \"https://github.com/fuxiaohei/lol-serverless\"",
+            "path = \"../../crates/sdk\"",
+            "git = \"https://github.com/fuxiaohei/runtime.land\"",
         );
         std::fs::write(target_file.to_str().unwrap(), content).unwrap();
 
@@ -131,10 +131,10 @@ impl Build {
         // call cargo to build wasm
         match meta.language.as_str() {
             "rust" => {
-                lol_runtime::compile_rust(&arch, &target).expect("Build failed");
+                land_runtime::compile_rust(&arch, &target).expect("Build failed");
             }
             "js" => {
-                lol_runtime::compile_js(&target, "src/index.js", self.js_engine.clone())
+                land_runtime::compile_js(&target, "src/index.js", self.js_engine.clone())
                     .expect("Build failed");
             }
             _ => {
@@ -144,7 +144,7 @@ impl Build {
 
         // convert wasm module to component
         let output = meta.get_output();
-        lol_runtime::convert_component(&target, Some(output)).expect("Convert failed");
+        land_runtime::convert_component(&target, Some(output)).expect("Convert failed");
     }
 }
 

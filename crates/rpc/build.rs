@@ -5,6 +5,6 @@ fn main() {
 fn build_proto() -> Result<(), Box<dyn std::error::Error>> {
     tonic_build::configure()
         .protoc_arg("--experimental_allow_proto3_optional")
-        .compile(&["./proto/lol-rpc.proto"], &["./proto"])?;
+        .compile(&["./proto/land-rpc.proto"], &["./proto"])?;
     Ok(())
 }

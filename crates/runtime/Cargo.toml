@@ -1,5 +1,5 @@
 [package]
-name = "lol-runtime"
+name = "land-runtime"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -13,7 +13,7 @@ deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 futures-util = "0.3.28"
 hyper = { workspace = true }
 lazy_static = { workspace = true }
-lol-core = { path = "../core" }
+land-core = { path = "../core" }
 moka = { version = "0.11.2", default-features = false, features = ["sync"] }
 once_cell = { workspace = true }
 reqwest = { workspace = true }

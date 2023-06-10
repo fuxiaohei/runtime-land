@@ -1,10 +1,10 @@
-# Runtime.lol
+# Runtime.land
 
-lol-serverless (runtime.lol) is a serverless platform for running webassembly (wasm) functions. It supports multiple languages, and is designed to be easy to use, and easy to deploy. It provides:
+**runtime.land** is a serverless platform for running webassembly (wasm) functions. It supports multiple languages, and is designed to be easy to use, and easy to deploy. It provides:
 
-- `lol-cli`: a command line interface for deploying and managing functions
-- `lol-runtime`: a runner for executing functions
-- `lol-server`: a server for managing functions
+- `land-cli`: a command line interface for deploying and managing functions
+- `land-runtime`: a runner for executing functions
+- `land-server`: a server for managing functions
 
 **This is an experimental project, and is not ready for production use.**
 
@@ -31,7 +31,7 @@ TODO
 use sea-orm to create model:
 
 ```bash
-sea-orm-cli generate entity -u=mysql://root:@localhost/lol-serverless -o crates/core/src/model
+sea-orm-cli generate entity -u=mysql://root:@localhost/land-serverless -o crates/core/src/model
 ```
 
 use protoc to generate grpc-web code:
@@ -41,7 +41,7 @@ use protoc to generate grpc-web code:
 brew install protobuf
 npm install -g protoc-gen-js protoc-gen-grpc-web
 # genrate grpc-web code
-protoc -I crates/rpc --js_out=import_style=commonjs:web/src/api --grpc-web_out=import_style=commonjs,mode=grpcweb:web/src/api crates/rpc/proto/lol-rpc.proto
+protoc -I crates/rpc --js_out=import_style=commonjs:web/src/api --grpc-web_out=import_style=commonjs,mode=grpcweb:web/src/api crates/rpc/proto/land-rpc.proto
 ```
 
 

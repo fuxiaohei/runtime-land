@@ -1,6 +1,6 @@
 use clap::Parser;
-use lol_core::tracing;
-use lol_core::version;
+use land_core::tracing;
+use land_core::version;
 
 mod deploy;
 mod embed;
@@ -9,7 +9,7 @@ mod server;
 
 /// cli command line
 #[derive(Parser)]
-#[clap(name = "lol-cli", version = version::get())]
+#[clap(name = "land-cli", version = version::get())]
 enum Cli {
     /// Init creates a new project
     Init(flags::Init),
