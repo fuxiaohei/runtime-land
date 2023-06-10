@@ -1,5 +1,5 @@
 [package]
-name = "lol-sdk-macro"
+name = "land-sdk-macro"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }

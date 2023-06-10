@@ -4,7 +4,7 @@ const {
   CreateAccessTokenRequest,
   RemoveAccessTokenRequest,
   Empty,
-} = require("./proto/lol-rpc_pb.js");
+} = require("./proto/land-rpc_pb.js");
 
 async function createAccessToken(name) {
   let req = new CreateAccessTokenRequest();

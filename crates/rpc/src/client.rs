@@ -18,7 +18,7 @@ impl Interceptor for ClientTokenInterceptor {
         let token: MetadataValue<_> = token_value.parse().unwrap();
         req.metadata_mut().insert("authorization", token);
 
-        let grpc_method: MetadataValue<_> = "lol-cli".parse().unwrap();
+        let grpc_method: MetadataValue<_> = "land-cli".parse().unwrap();
         req.metadata_mut().insert("x-grpc-method", grpc_method);
         Ok(req)
     }

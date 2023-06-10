@@ -16,7 +16,7 @@ pub struct DbConfig {
     pub user: String,
     #[envconfig(from = "DB_PASSWORD", default = "")]
     pub password: String,
-    #[envconfig(from = "DB_NAME", default = "lol-serverless")]
+    #[envconfig(from = "DB_NAME", default = "land-serverless")]
     pub database: String,
     #[envconfig(from = "DB_POOL_SIZE", default = "10")]
     pub pool_size: u32,

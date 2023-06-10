@@ -1,6 +1,6 @@
 import { callClient } from "./utils.js";
 
-const { Empty, ProjectOverviewRequest } = require("./proto/lol-rpc_pb.js");
+const { Empty, ProjectOverviewRequest } = require("./proto/land-rpc_pb.js");
 
 async function listProjects() {
   let req = new Empty();

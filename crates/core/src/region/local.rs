@@ -30,7 +30,7 @@ pub async fn init() -> Result<()> {
 
     // write once as ping to validate redis connection
     let op = Operator::new(builder)?.finish();
-    op.write("lol-serverless", "setup").await?;
+    op.write("land-serverless", "setup").await?;
     LOCAL_REGION.set(op).unwrap();
 
     // register local runtime service to traefik
@@ -46,7 +46,7 @@ async fn register_runtime(runtimes: &str) -> Result<()> {
     let op = LOCAL_REGION.get().unwrap();
     for (i, x) in values.iter().enumerate() {
         let svc_key = format!(
-            "traefik/http/services/lol-runtime/loadbalancer/servers/{}/url",
+            "traefik/http/services/land-runtime/loadbalancer/servers/{}/url",
             i
         );
         op.write(&svc_key, String::from(*x)).await?;
@@ -89,20 +89,20 @@ pub async fn deploy(deploy_id: u32, mut deploy_uuid: String, is_production: bool
     // set routes backend service
     commands.push((
         format!("traefik/http/routers/{}/service", deploy_uuid),
-        String::from("lol-runtime"),
+        String::from("land-runtime"),
     ));
 
-    // add custom-header for lol-wasm
+    // add custom-header for land-wasm
     commands.push((
         format!(
-            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-lol-wasm",
+            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
             deploy_uuid
         ),
         deployment.storage_path,
     ));
     commands.push((
         format!(
-            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-lol-uuid",
+            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-uuid",
             deploy_uuid
         ),
         deploy_uuid.clone(),

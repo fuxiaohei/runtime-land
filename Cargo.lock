@@ -1699,6 +1699,131 @@ dependencies = [
 ]
 
 [[package]]
+name = "land-cli"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "futures-util",
+ "land-core",
+ "land-rpc",
+ "land-runtime",
+ "rust-embed",
+ "tokio",
+ "tracing",
+ "which",
+]
+
+[[package]]
+name = "land-core"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "bcrypt",
+ "chrono",
+ "envconfig",
+ "futures",
+ "lazy_static",
+ "once_cell",
+ "opendal",
+ "rand",
+ "sea-orm",
+ "serde",
+ "time 0.3.22",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "vergen",
+]
+
+[[package]]
+name = "land-rpc"
+version = "0.2.6"
+dependencies = [
+ "gravatar",
+ "http",
+ "land-core",
+ "prost",
+ "rand",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tonic-web",
+ "tower-http",
+ "tracing",
+]
+
+[[package]]
+name = "land-runtime"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "clap",
+ "deadpool",
+ "futures-util",
+ "hyper",
+ "land-core",
+ "lazy_static",
+ "moka",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+ "uuid",
+ "wasmtime",
+ "wasmtime-wasi",
+ "which",
+ "wit-bindgen-core",
+ "wit-bindgen-rust",
+ "wit-component",
+]
+
+[[package]]
+name = "land-sdk"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "http",
+ "land-sdk-macro",
+ "lazy_static",
+ "matchit",
+ "wit-bindgen",
+]
+
+[[package]]
+name = "land-sdk-macro"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "http",
+ "quote",
+ "syn 2.0.18",
+]
+
+[[package]]
+name = "land-server"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "land-core",
+ "land-rpc",
+ "land-runtime",
+ "serde",
+ "tokio",
+ "toml 0.7.4",
+ "tracing",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1746,131 +1871,6 @@ name = "log"
 version = "0.4.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "518ef76f2f87365916b142844c16d8fefd85039bc5699050210a7778ee1cd1de"
-
-[[package]]
-name = "lol-cli"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "futures-util",
- "lol-core",
- "lol-rpc",
- "lol-runtime",
- "rust-embed",
- "tokio",
- "tracing",
- "which",
-]
-
-[[package]]
-name = "lol-core"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "bcrypt",
- "chrono",
- "envconfig",
- "futures",
- "lazy_static",
- "once_cell",
- "opendal",
- "rand",
- "sea-orm",
- "serde",
- "time 0.3.22",
- "tokio",
- "toml 0.7.4",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "vergen",
-]
-
-[[package]]
-name = "lol-rpc"
-version = "0.2.5"
-dependencies = [
- "gravatar",
- "http",
- "lol-core",
- "prost",
- "rand",
- "tokio",
- "tonic",
- "tonic-build",
- "tonic-web",
- "tower-http",
- "tracing",
-]
-
-[[package]]
-name = "lol-runtime"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "clap",
- "deadpool",
- "futures-util",
- "hyper",
- "lazy_static",
- "lol-core",
- "moka",
- "once_cell",
- "reqwest",
- "serde",
- "tokio",
- "toml 0.7.4",
- "tracing",
- "uuid",
- "wasmtime",
- "wasmtime-wasi",
- "which",
- "wit-bindgen-core",
- "wit-bindgen-rust",
- "wit-component",
-]
-
-[[package]]
-name = "lol-sdk"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "http",
- "lazy_static",
- "lol-sdk-macro",
- "matchit",
- "wit-bindgen",
-]
-
-[[package]]
-name = "lol-sdk-macro"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "http",
- "quote",
- "syn 2.0.18",
-]
-
-[[package]]
-name = "lol-server"
-version = "0.2.5"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "lol-core",
- "lol-rpc",
- "lol-runtime",
- "serde",
- "tokio",
- "toml 0.7.4",
- "tracing",
-]
 
 [[package]]
 name = "mach"
@@ -2802,7 +2802,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "lol-sdk",
+ "land-sdk",
  "wit-bindgen",
 ]
 
@@ -2846,7 +2846,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "lol-sdk",
+ "land-sdk",
  "wit-bindgen",
 ]
 
@@ -2856,7 +2856,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "http",
- "lol-sdk",
+ "land-sdk",
  "wit-bindgen",
 ]
 

@@ -18,11 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./deploy/lol-server.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/lol-server
+          - dockerfile: ./deploy/land-server.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/land-server
             make_subcommand: "build-server"
-          - dockerfile: ./deploy/lol-runtime.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/lol-runtime
+          - dockerfile: ./deploy/land-runtime.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/land-runtime
             make_subcommand: "build-runtime"
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
       - uses: Swatinem/rust-cache@v2
         with:
-          prefix-key: "lol-image"
+          prefix-key: "build-image"
       - name: Update local toolchain
         run: |
           rustup update stable
@@ -45,8 +45,8 @@ jobs:
           protoc --version
       - name: Build
         run: |
-          cargo build --release
-          cargo build --release -p lol-runtime
+          cargo build --release -p land-server
+          cargo build --release -p land-runtime
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -80,8 +80,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./deploy/lol-web.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/lol-web
+          - dockerfile: ./deploy/land-web.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/land-web
     steps:
       - uses: actions/checkout@v3
         with:

@@ -8,8 +8,8 @@ use axum::{
     routing::any,
     Router,
 };
+use land_core::storage::STORAGE;
 use lazy_static::lazy_static;
-use lol_core::storage::STORAGE;
 use moka::sync::Cache;
 use once_cell::sync::OnceCell;
 use std::net::SocketAddr;
@@ -119,11 +119,11 @@ pub async fn wasm_caller_handler(
 // basic handler that responds with a static string
 async fn default_handler(req: Request<Body>) -> Response<Body> {
     let req_id = uuid::Uuid::new_v4().to_string();
-    // get header x-lol-wasm
+    // get header x-land-wasm
     let headers = req.headers().clone();
     let empty_wasm_path = String::new();
     let moni_wasm = headers
-        .get("x-lol-wasm")
+        .get("x-land-wasm")
         .and_then(|v| v.to_str().ok())
         .unwrap_or(DEFAULT_WASM_PATH.get().unwrap_or(&empty_wasm_path));
 
@@ -134,8 +134,8 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     if moni_wasm.is_empty() {
         let _enter = span.enter();
         let builder = Response::builder().status(404);
-        warn!(status = 404, "[Response] x-lol-wasm not found");
-        return builder.body(Body::from("x-lol-wasm not found")).unwrap();
+        warn!(status = 404, "[Response] x-land-wasm not found");
+        return builder.body(Body::from("x-land-wasm not found")).unwrap();
     }
 
     match wasm_caller_handler(req, moni_wasm, req_id)

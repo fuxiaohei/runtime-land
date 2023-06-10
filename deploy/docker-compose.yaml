@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  lol_serverless_network:
+  land_serverless_network:
     external: true
 
 services:
@@ -14,7 +14,7 @@ services:
     volumes:
       - ./redis_data:/data
     networks:
-      - lol_serverless_network
+      - land_serverless_network
   reverse-proxy:
     image: traefik:v2.10
     command: --api.insecure=true --providers.redis.endpoints=redis-server:6379 --providers.redis.password=2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
@@ -22,7 +22,7 @@ services:
       - "80:80"
       - "8080:8080" # traefik dashboard
     networks:
-      - lol_serverless_network
+      - land_serverless_network
     depends_on:
       - redis-server
   mysql-db:
@@ -31,17 +31,17 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=lol-serverless
+      - MYSQL_DATABASE=land-serverless
       - MYSQL_ROOT_PASSWORD=TJbP7C9ESkLjnS7HXa6y
     ports:
       - '3366:3306'
     volumes:
       - ./mysql_data:/var/lib/mysql
-      - ./lol-serverless.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./land-serverless.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - lol_serverless_network
-  lol-runtime:
-    image: ghcr.io/fuxiaohei/lol-runtime:latest
+      - land_serverless_network
+  land-runtime:
+    image: ghcr.io/fuxiaohei/land-runtime:latest
     environment:
       - MONI_HTTP_ADDR=0.0.0.0:38889
       - MONI_STORAGE_LOCAL_PATH=/data
@@ -50,11 +50,11 @@ services:
     ports:
       - '38880-38881:38889'
     networks:
-      - lol_serverless_network
+      - land_serverless_network
     volumes:
-      - ./lol_data:/data
-  lol-serverless:
-    image: ghcr.io/fuxiaohei/lol-server:latest
+      - ./land_data:/data
+  land-serverless:
+    image: ghcr.io/fuxiaohei/land-server:latest
     environment:
       - MONI_GRPC_ADDR=0.0.0.0:38779
       - MONI_STORAGE_LOCAL_PATH=/data
@@ -62,10 +62,10 @@ services:
       - MONI_DB_PORT=3306
       - MONI_DB_USER=root
       - MONI_DB_PASSWORD=TJbP7C9ESkLjnS7HXa6y
-      - MONI_DB_NAME=lol-serverless
+      - MONI_DB_NAME=land-serverless
       - LOCAL_REGION_REDIS_ADDR=redis-server:6379
       - LOCAL_REGION_REDIS_PASSWORD=2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
-      - LOCAL_REGION_RUNTIME=http://lol-runtime:38889
+      - LOCAL_REGION_RUNTIME=http://land-runtime:38889
     ports:
       - '38779:38779'
     depends_on:
@@ -75,6 +75,6 @@ services:
       redis-server:
         condition: service_started
     networks:
-      - lol_serverless_network
+      - land_serverless_network
     volumes:
-      - ./lol_data:/data
+      - ./land_data:/data

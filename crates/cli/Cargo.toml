@@ -1,5 +1,5 @@
 [package]
-name = "lol-cli"
+name = "land-cli"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -9,9 +9,9 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
 futures-util = "0.3.28"
-lol-core = { path = "../core" }
-lol-rpc = { path = "../rpc" }
-lol-runtime = { path = "../runtime" }
+land-core = { path = "../core" }
+land-rpc = { path = "../rpc" }
+land-runtime = { path = "../runtime" }
 rust-embed = "6.7.0"
 tokio = { workspace = true }
 tracing = { workspace = true }

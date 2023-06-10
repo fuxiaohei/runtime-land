@@ -1,6 +1,6 @@
-use lol_sdk::http::{Body, Request, Response};
-use lol_sdk::http_main;
-use lol_sdk::router;
+use land_sdk::http::{Body, Request, Response};
+use land_sdk::http_main;
+use land_sdk::router;
 
 #[http_main]
 pub fn handle_http_request(mut req: Request) -> Response {

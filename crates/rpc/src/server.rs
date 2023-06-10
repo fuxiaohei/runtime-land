@@ -1,8 +1,8 @@
 use super::rpc_service_server::RpcService;
 use crate::UserContext;
 use gravatar::{Gravatar, Rating};
-use lol_core::dao::{self, token, user};
-use lol_core::storage::STORAGE;
+use land_core::dao::{self, token, user};
+use land_core::storage::STORAGE;
 use tracing::{debug, warn};
 
 #[derive(Default)]
@@ -268,7 +268,7 @@ impl RpcService for ServiceImpl {
             req.deploy_name.clone(),
             storage_path
         );
-        let prod_domain: String = lol_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_domain: String = land_core::PROD_DOMAIN.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -286,7 +286,7 @@ impl RpcService for ServiceImpl {
         let deploy_id = deployment.id;
         let deploy_uuid = deployment.uuid;
         tokio::spawn(async move {
-            let res = lol_core::region::local::deploy(deploy_id, deploy_uuid, false).await;
+            let res = land_core::region::local::deploy(deploy_id, deploy_uuid, false).await;
             if res.is_err() {
                 warn!("deploy failed: {:?}", res.err().unwrap());
             }
@@ -310,7 +310,7 @@ impl RpcService for ServiceImpl {
                 .map_err(|e| {
                     tonic::Status::internal(format!("promote deployment failed: {:?}", e))
                 })?;
-        let prod_domain = lol_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -325,7 +325,7 @@ impl RpcService for ServiceImpl {
         let deploy_id = deployment.id;
         let deploy_uuid = deployment.uuid;
         tokio::spawn(async move {
-            let res = lol_core::region::local::deploy(deploy_id, deploy_uuid, true).await;
+            let res = land_core::region::local::deploy(deploy_id, deploy_uuid, true).await;
             if res.is_err() {
                 warn!("deploy failed: {:?}", res.err().unwrap());
             }
@@ -350,7 +350,7 @@ impl RpcService for ServiceImpl {
         }
         let project = project.unwrap();
 
-        let prod_domain = lol_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
         let mut resp = super::ProjectOverviewResponse {
             id: project.id as i32,
             name: project.name.clone(),

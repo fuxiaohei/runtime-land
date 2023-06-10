@@ -1,6 +1,6 @@
 import { getLocalUser } from "./login.js";
 
-const { MoniRpcServiceClient } = require("./proto/lol-rpc_grpc_web_pb.js");
+const { MoniRpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
 
 const RPC_CLIENT_ADDRESS = "http://127.0.0.1:38779";
 

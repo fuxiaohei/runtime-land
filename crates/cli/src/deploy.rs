@@ -1,6 +1,6 @@
-use lol_core::meta::Meta;
-use lol_rpc::client::Client;
-use lol_rpc::{DeploymentResponse, ProjectResponse};
+use land_core::meta::Meta;
+use land_rpc::client::Client;
+use land_rpc::{DeploymentResponse, ProjectResponse};
 use std::path::Path;
 use tracing::{debug, info, warn};
 
@@ -18,7 +18,7 @@ pub async fn deploy(
 
     // if output file is not exist, suggest to run build command
     if !Path::new(&output).exists() {
-        warn!("output file not found, \nplease run `lol-cli build`");
+        warn!("output file not found, \nplease run `land-cli build`");
         return;
     }
     if project_name.is_empty() {
