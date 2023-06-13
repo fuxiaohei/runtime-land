@@ -9,7 +9,7 @@ function LoginPage() {
     <div>
       <LoginNavbar />
       <Container className="login-container">
-        <h3 className="login-container-header">Login to Moni-Web</h3>
+        <h3 className="login-container-header">Login to Runtime.land</h3>
         <hr />
         <div className="d-grid gap-2 login-connection">
           <Button className="item" variant="dark" disabled>

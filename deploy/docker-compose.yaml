@@ -43,8 +43,8 @@ services:
   land-runtime:
     image: ghcr.io/fuxiaohei/land-runtime:latest
     environment:
-      - MONI_HTTP_ADDR=0.0.0.0:38889
-      - MONI_STORAGE_LOCAL_PATH=/data
+      - HTTP_ADDR=0.0.0.0:38889
+      - STORAGE_LOCAL_PATH=/data
     deploy:
       replicas: 2
     ports:
@@ -56,13 +56,13 @@ services:
   land-serverless:
     image: ghcr.io/fuxiaohei/land-server:latest
     environment:
-      - MONI_GRPC_ADDR=0.0.0.0:38779
-      - MONI_STORAGE_LOCAL_PATH=/data
-      - MONI_DB_HOST=mysql-db
-      - MONI_DB_PORT=3306
-      - MONI_DB_USER=root
-      - MONI_DB_PASSWORD=TJbP7C9ESkLjnS7HXa6y
-      - MONI_DB_NAME=land-serverless
+      - GRPC_ADDR=0.0.0.0:38779
+      - STORAGE_LOCAL_PATH=/data
+      - DB_HOST=mysql-db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=TJbP7C9ESkLjnS7HXa6y
+      - DB_NAME=land-serverless
       - LOCAL_REGION_REDIS_ADDR=redis-server:6379
       - LOCAL_REGION_REDIS_PASSWORD=2486765c496f5c7fcaeaae4f1d3e7c1c63c4fd45d5cc8004ccaf4dfba83f8c9d
       - LOCAL_REGION_RUNTIME=http://land-runtime:38889

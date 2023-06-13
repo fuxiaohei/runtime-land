@@ -3,11 +3,11 @@ const {
   LoginAccessTokenRequest,
   SignupEmailRequest,
 } = require("./proto/land-rpc_pb.js");
-const { MoniRpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
+const { RpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
 const { RPC_CLIENT_ADDRESS, callClient } = require("./utils.js");
 
 function loginByEmail(email, password) {
-  let client = new MoniRpcServiceClient(RPC_CLIENT_ADDRESS);
+  let client = new RpcServiceClient(RPC_CLIENT_ADDRESS);
   let request = new LoginEmailRequest();
   request.setEmail(email);
   request.setPassword(password);
@@ -30,7 +30,7 @@ function loginByEmail(email, password) {
 }
 
 function getLocalUser() {
-  let local_user = localStorage.getItem("moni-web-user") || null;
+  let local_user = localStorage.getItem("runtime-land-user") || null;
   if (local_user) {
     local_user = JSON.parse(local_user);
   }
@@ -40,11 +40,11 @@ function getLocalUser() {
 function setLocalUser(user) {
   console.log("setLocalUser:", user)
   user.lastVerifyTime = Date.now();
-  localStorage.setItem("moni-web-user", JSON.stringify(user));
+  localStorage.setItem("runtime-land-user", JSON.stringify(user));
 }
 
 function removeLocalUser() {
-  localStorage.removeItem("moni-web-user");
+  localStorage.removeItem("runtime-land-user");
 }
 
 async function loginByLocalUser(user) {

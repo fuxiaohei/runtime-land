@@ -5,7 +5,7 @@ use tracing::{debug, debug_span, info, Instrument};
 #[derive(Parser, Debug)]
 #[clap(name = "land-runtime", version = version::get())]
 struct Cli {
-    #[clap(long, env("MONI_HTTP_ADDR"), default_value("127.0.0.1:38889"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:38889"))]
     pub http_addr: String,
 }
 

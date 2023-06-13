@@ -40,7 +40,7 @@ function SignupPage() {
     <div>
       <LoginNavbar />
       <Container className="login-container">
-        <h3 className="login-container-header">Sign up Moni-Web</h3>
+        <h3 className="login-container-header">Sign up Runtime.land</h3>
         <hr />
         <Form
           id="login-email-form"

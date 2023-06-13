@@ -1,11 +1,11 @@
 import { getLocalUser } from "./login.js";
 
-const { MoniRpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
+const { RpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
 
-const RPC_CLIENT_ADDRESS = "http://127.0.0.1:38779";
+const RPC_CLIENT_ADDRESS = GRPC_ADDR;
 
 function createClient() {
-  let client = new MoniRpcServiceClient(RPC_CLIENT_ADDRESS);
+  let client = new RpcServiceClient(RPC_CLIENT_ADDRESS);
   return client;
 }
 
@@ -37,5 +37,7 @@ async function callClient(request, callFunc) {
   });
   return promise;
 }
+
+console.log("RPC_CLIENT_ADDRESS:", RPC_CLIENT_ADDRESS)
 
 export { RPC_CLIENT_ADDRESS, callClient };

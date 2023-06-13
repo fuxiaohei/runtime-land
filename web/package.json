@@ -4,7 +4,7 @@
     "version": "0.2.0",
     "scripts": {
         "dev": "rspack serve",
-        "build": "rspack build"
+        "build": "rspack build --mode=production"
     },
     "dependencies": {
         "boostrap": "^2.0.0",

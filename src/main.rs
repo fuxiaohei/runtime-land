@@ -4,10 +4,10 @@ use tracing::{debug, info};
 #[derive(Parser, Debug)]
 #[clap(name = "land-server", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("MONI_GRPC_ADDR"), default_value("127.0.0.1:38779"))]
+    #[clap(long, env("GRPC_ADDR"), default_value("127.0.0.1:38779"))]
     pub grpc_addr: String,
 
-    #[clap(long, env("MONI_GRPC_ENABLE_GRPCWEB"), default_value("true"))]
+    #[clap(long, env("GRPC_ENABLE_GRPCWEB"), default_value("true"))]
     pub enable_grpc_web: bool,
 }
 

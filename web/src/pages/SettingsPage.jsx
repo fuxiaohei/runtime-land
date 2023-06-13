@@ -82,7 +82,7 @@ function SettingsPage() {
           <Card.Body>
             <Card.Title id="access-tokens">Access Tokens</Card.Title>
             <Card.Subtitle>
-              Personal access tokens can be used to access Moni-Web API.
+              Personal access tokens can be used to access Runtime.land API.
             </Card.Subtitle>
             {tokensList.length ? (
               <AccessTokensListGroup

@@ -20,7 +20,7 @@ function DashboardNavbar() {
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
-        <NavbarBrandLink to="/projects">Moni-Web</NavbarBrandLink>
+        <NavbarBrandLink to="/projects">Runtime.land</NavbarBrandLink>
         <Navbar.Toggle aria-controls="dashboard-navbar-nav" />
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">

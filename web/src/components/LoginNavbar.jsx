@@ -4,7 +4,7 @@ function LoginNavbar() {
   return (
     <Navbar className="login-navbar" expand="lg">
       <Container>
-        <Navbar.Brand href="/">Moni-Web</Navbar.Brand>
+        <Navbar.Brand href="/">Runtime.land</Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           <Nav>

@@ -6,7 +6,7 @@ use tracing::debug;
 
 #[derive(Envconfig, Debug)]
 pub struct LocalConfig {
-    #[envconfig(from = "MONI_STORAGE_LOCAL_PATH", default = "/tmp/moni")]
+    #[envconfig(from = "STORAGE_LOCAL_PATH", default = "/tmp/moni")]
     pub path: String,
 }
 

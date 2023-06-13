@@ -61,7 +61,7 @@ function RequireAuth({ children }) {
   let [logged, setLogged] = React.useState(false);
 
   const fetchLogin = async () => {
-    let response = await loginByLocalUser(auth.user);
+    let response = await loginByLocalUser(auth.user || {});
     if (response.error) {
       console.log("[auth] browser token error", response.error);
       auth.signout();
