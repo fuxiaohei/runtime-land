@@ -1,3 +1,4 @@
+use anyhow::Result;
 use land_core::meta::Meta;
 use land_rpc::client::Client;
 use land_rpc::{DeploymentResponse, ProjectResponse};
@@ -33,6 +34,7 @@ pub async fn deploy(
     let mut client = Client::new(addr, token).await.unwrap();
     let project = fetch_project(&mut client, project_name, meta.language.clone())
         .await
+        .expect("Fetch project '{project_name}' failed")
         .unwrap();
 
     // upload wasm file to project
@@ -60,15 +62,12 @@ async fn fetch_project(
     client: &mut Client,
     project_name: String,
     language: String,
-) -> Option<ProjectResponse> {
+) -> Result<Option<ProjectResponse>> {
     // fetch project
     let mut project = client
         .fetch_project(project_name.clone(), language.clone())
         .await
-        .unwrap_or_else(|e| {
-            warn!("fetch project failed: {:?}", e);
-            None
-        });
+        .map_err(|e| anyhow::anyhow!("fetch project failed: {:?}", e))?;
 
     // if project is not exist, create empty project with name
     if project.is_none() {
@@ -85,7 +84,7 @@ async fn fetch_project(
             project_name = project_name
         );
     }
-    project
+    Ok(project)
 }
 
 async fn create_deploy(

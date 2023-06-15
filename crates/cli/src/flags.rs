@@ -185,7 +185,7 @@ pub struct Deploy {
     #[clap(long)]
     pub project: Option<String>,
     /// The cloud api
-    #[clap(long, default_value("http://127.0.0.1:38779"))]
+    #[clap(long, default_value("http://grpc.127-0-0-1.nip.io"))]
     pub cloud: Option<String>,
 }
 

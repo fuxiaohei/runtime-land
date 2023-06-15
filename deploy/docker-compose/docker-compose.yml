@@ -14,7 +14,7 @@ services:
     networks:
       - land_serverless_network
   proxy:
-    image: traefik:v2.10
+    image: traefik:3.0
     command: --api.insecure=true --providers.redis.endpoints=redis:6379 --providers.redis.password=${REDIS_PASSWORD} --providers.docker=true --providers.docker.exposedByDefault=false
     ports:
       - "80:80"
@@ -38,3 +38,46 @@ services:
       - ${MYSQL_INIT_SQL}:/docker-entrypoint-initdb.d/init.sql
     networks:
       - land_serverless_network
+  land-server:
+    image: ghcr.io/fuxiaohei/land-server:latest
+    restart: always
+    environment:
+      - GRPC_ADDR=${LAND_SERVER_GRPC_ADDR}
+      - STORAGE_LOCAL_PATH=/data
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+      - LOCAL_REGION_ENABLED=true
+      - LOCAL_REGION_REDIS_ADDR=redis:6379
+      - LOCAL_REGION_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - LOCAL_REGION_RUNTIME=land-runtime-docker-compose@docker
+      - PROD_DOMAIN=${LAND_SERVER_PROD_DOMAIN}
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ${LAND_SERVER_STORAGE_DIR}:/data
+    networks:
+      - land_serverless_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land-server.rule=Host(`${LAND_SERVER_DOMAIN}`)
+      - traefik.http.routers.land-server.middlewares=land-server-grpcweb@docker
+      - traefik.http.middlewares.land-server-grpcweb.grpcweb.allowOrigins=* # this feature need traefik 3.0
+      - traefik.http.services.land-server-docker-compose.loadbalancer.server.scheme=h2c
+  land-runtime:
+    image: ghcr.io/fuxiaohei/land-runtime:latest
+    restart: always
+    environment:
+      - HTTP_ADDR=${LAND_RUMTIME_HTTP_ADDR}
+      - STORAGE_LOCAL_PATH=/data
+    deploy:
+      replicas: 2
+    networks:
+      - land_serverless_network
+    volumes:
+      - ${LAND_RUMTIME_STORAGE_DIR}:/data
+    labels:
+      - traefik.enable=true

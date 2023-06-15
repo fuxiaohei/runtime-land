@@ -56,18 +56,21 @@ pub async fn prepare_worker_pool(key: &str) -> Result<Arc<WorkerPool>> {
     WASM_INSTANCES.insert(key.to_string(), Arc::new(pool));
 
     instances_pool = WASM_INSTANCES.get(key);
+    info!("worker pool created");
 
     Ok(instances_pool.unwrap())
 }
 
 pub async fn wasm_caller_handler(
     req: Request<Body>,
-    moni_wasm: &str,
+    wasm_path: &str,
     req_id: String,
 ) -> Result<Response<Body>> {
-    let pool = prepare_worker_pool(moni_wasm).await?;
+    let pool = prepare_worker_pool(wasm_path)
+        .instrument(info_span!("[WASM]", wasm_path = %wasm_path))
+        .await?;
     let mut worker = pool.get().await.map_err(|e| anyhow!(e.to_string()))?;
-    debug!("[HTTP] wasm worker pool get worker success: {}", moni_wasm);
+    debug!("[HTTP] wasm worker pool get worker success: {}", wasm_path);
 
     // convert request to host-call request
     let mut headers: Vec<(String, String)> = vec![];
@@ -89,7 +92,7 @@ pub async fn wasm_caller_handler(
         body: Some(body_handle),
     };
 
-    let span = info_span!("[WASM]", moni_wasm = %moni_wasm, body = ?body_handle);
+    let span = info_span!("[WASM]", wasm_path = %wasm_path, body = ?body_handle);
     let _enter = span.enter();
 
     let (wasm_resp, wasm_resp_body) = match worker.handle_request(wasm_req, context).await {

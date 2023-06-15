@@ -2,26 +2,37 @@ use anyhow::Result;
 use envconfig::Envconfig;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
-use tracing::debug;
+use tracing::{debug, info};
 
 // LOCAL_REGION is the local region operator
 pub static LOCAL_REGION: OnceCell<Operator> = OnceCell::new();
 
+// LOCAL_REGION_RUNTIME is the local region runtime service name
+pub static LOCAL_REGION_RUNTIME: OnceCell<String> = OnceCell::new();
+
 #[derive(Envconfig, Debug)]
 pub struct LocalConfig {
+    #[envconfig(from = "LOCAL_REGION_ENABLED", default = "false")]
+    pub enable: bool,
     #[envconfig(from = "LOCAL_REGION_REDIS_ADDR", default = "127.0.0.1:6379")]
     pub redis_addr: String,
     #[envconfig(from = "LOCAL_REGION_REDIS_PASSWORD", default = "")]
     pub redis_password: String,
     #[envconfig(from = "LOCAL_REGION_REDIS_DB", default = "0")]
     pub redis_db: i64,
-    #[envconfig(from = "LOCAL_REGION_RUNTIME", default = "127.0.0.1:38999")]
+    // runtime is the runtime service name in docker-compose.yml
+    #[envconfig(from = "LOCAL_REGION_RUNTIME", default = "land-runtime")]
     pub runtime: String,
 }
 
 // init initializes the local region
+#[tracing::instrument(name = "[LOCAL_REGION]")]
 pub async fn init() -> Result<()> {
     let cfg = LocalConfig::init_from_env()?;
+    if !cfg.enable {
+        info!("Disabled");
+        return Ok(());
+    }
     let mut builder = opendal::services::Redis::default();
     builder
         .endpoint(&cfg.redis_addr)
@@ -31,27 +42,9 @@ pub async fn init() -> Result<()> {
     // write once as ping to validate redis connection
     let op = Operator::new(builder)?.finish();
     op.write("land-serverless", "setup").await?;
+
     LOCAL_REGION.set(op).unwrap();
-
-    // register local runtime service to traefik
-    register_runtime(&cfg.runtime).await?;
-
-    Ok(())
-}
-
-async fn register_runtime(runtimes: &str) -> Result<()> {
-    let values = runtimes.split(',').collect::<Vec<&str>>();
-    println!("values: {:?}", values);
-
-    let op = LOCAL_REGION.get().unwrap();
-    for (i, x) in values.iter().enumerate() {
-        let svc_key = format!(
-            "traefik/http/services/land-runtime/loadbalancer/servers/{}/url",
-            i
-        );
-        op.write(&svc_key, String::from(*x)).await?;
-        debug!("register local runtime: {} : {}", x, svc_key);
-    }
+    LOCAL_REGION_RUNTIME.set(cfg.runtime).unwrap();
 
     Ok(())
 }
@@ -87,9 +80,10 @@ pub async fn deploy(deploy_id: u32, mut deploy_uuid: String, is_production: bool
     ));
 
     // set routes backend service
+    let service_name = LOCAL_REGION_RUNTIME.get().unwrap().clone();
     commands.push((
         format!("traefik/http/routers/{}/service", deploy_uuid),
-        String::from("land-runtime"),
+        service_name,
     ));
 
     // add custom-header for land-wasm

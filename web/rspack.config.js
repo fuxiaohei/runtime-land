@@ -2,10 +2,7 @@
  * @type {import('@rspack/cli').Configuration}
  */
 
-const isProduction = process.env.NODE_ENV === "production";
-
 module.exports = {
-  // mode: isProduction ? "production" : "development",
   context: __dirname,
   entry: {
     main: "./src/main.jsx",
@@ -22,10 +19,13 @@ module.exports = {
         favicon: "./public/favicon.png",
       },
     ],
-    define: {
-      GRPC_ADDR: isProduction
-        ? "'https://grpcapi.runtime.land'"
-        : "'http://127.0.0.1:38779'",
+    copy: {
+      patterns: [
+        {
+          from: "src/config.js",
+          to: "config.js",
+        },
+      ],
     },
   },
   module: {
@@ -36,6 +36,10 @@ module.exports = {
       },
       {
         test: /\.png$/,
+        type: "asset",
+      },
+      {
+        test: /\.config.js/,
         type: "asset",
       },
     ],

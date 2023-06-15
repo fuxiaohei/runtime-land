@@ -1,6 +1,6 @@
 use clap::Parser;
 use land_core::{storage, version};
-use tracing::{debug, debug_span, info, Instrument};
+use tracing::{debug, debug_span, Instrument};
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-runtime", version = version::get())]
@@ -11,7 +11,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
-    land_core::tracing::init();
+    land_core::trace::init();
 
     let args = Cli::parse();
 
@@ -19,10 +19,9 @@ async fn main() {
 
     // init storage
     storage::init().await.expect("init storage failed");
-    info!("Init storage success");
 
     land_runtime::server::start(args.http_addr.parse().unwrap())
-        .instrument(debug_span!("[Server]"))
+        .instrument(debug_span!("[SERVER]"))
         .await
         .unwrap();
 }

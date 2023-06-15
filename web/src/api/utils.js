@@ -2,7 +2,7 @@ import { getLocalUser } from "./login.js";
 
 const { RpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
 
-const RPC_CLIENT_ADDRESS = GRPC_ADDR;
+const RPC_CLIENT_ADDRESS = window.API_ADDRESS || "http://127.0.0.1:38779";
 
 function createClient() {
   let client = new RpcServiceClient(RPC_CLIENT_ADDRESS);
@@ -38,6 +38,6 @@ async function callClient(request, callFunc) {
   return promise;
 }
 
-console.log("RPC_CLIENT_ADDRESS:", RPC_CLIENT_ADDRESS)
+console.log("RPC_CLIENT_ADDRESS:", RPC_CLIENT_ADDRESS);
 
 export { RPC_CLIENT_ADDRESS, callClient };

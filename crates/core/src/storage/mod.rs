@@ -10,15 +10,17 @@ mod local;
 
 #[derive(Envconfig, Debug)]
 pub struct Config {
-    #[envconfig(from = "MONI_STORAGE_TYPE", default = "local")]
+    #[envconfig(from = "STORAGE_TYPE", default = "local")]
     pub type_name: String,
 }
 
 pub static STORAGE: OnceCell<Operator> = OnceCell::new();
 
+
+#[tracing::instrument(name="[STORAGE]")]
 pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
-    debug!("init storage cfg: {:?}", cfg);
+    debug!("Init storage cfg: {:?}", cfg);
     match cfg.type_name.as_str() {
         "local" => {
             let op = init_local().await?;

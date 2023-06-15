@@ -1,5 +1,5 @@
 use clap::Parser;
-use land_core::tracing;
+use land_core::trace;
 use land_core::version;
 
 mod deploy;
@@ -23,7 +23,7 @@ enum Cli {
 
 #[tokio::main]
 async fn main() {
-    tracing::init();
+    trace::init();
 
     let args = Cli::parse();
     match args {

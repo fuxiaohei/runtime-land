@@ -4,7 +4,7 @@ use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use tracing::debug;
+use tracing::{debug, info};
 
 #[derive(Envconfig, Debug, Serialize, Deserialize)]
 pub struct DbConfig {
@@ -29,6 +29,12 @@ impl DbConfig {
             self.user, self.password, self.host, self.port, self.database
         )
     }
+    pub fn url_safe(&self) -> String {
+        format!(
+            "mysql://{}:{}@{}:{}/{}",
+            self.user, "******", self.host, self.port, self.database
+        )
+    }
 }
 
 impl Default for DbConfig {
@@ -48,12 +54,12 @@ impl Default for DbConfig {
 pub static DB: OnceCell<DatabaseConnection> = OnceCell::new();
 
 /// init initializes database connection pool
+#[tracing::instrument(name="[DB]")]
 pub async fn init() -> Result<()> {
     let cfg = DbConfig::init_from_env().unwrap();
-    let url = cfg.url();
-    debug!("connect to database: {url}");
+    debug!("Connecting: {}", cfg.url_safe());
 
-    let mut opt = ConnectOptions::new(url);
+    let mut opt = ConnectOptions::new(cfg.url());
     opt.max_connections(cfg.pool_size)
         .min_connections(1)
         .connect_timeout(Duration::from_secs(10))
@@ -64,5 +70,6 @@ pub async fn init() -> Result<()> {
 
     let db = Database::connect(opt).await?;
     DB.set(db).unwrap();
+    info!("Init success: {}", cfg.url_safe());
     Ok(())
 }

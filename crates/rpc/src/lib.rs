@@ -74,13 +74,14 @@ fn auth_intercept(mut req: Request<()>) -> Result<Request<()>, Status> {
     Ok(req)
 }
 
+#[tracing::instrument(name = "[SERVER]", skip_all)]
 pub async fn start_server(
     addr: SocketAddr,
     is_grpc_web: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let rpc_impl = server::ServiceImpl::default();
     let svc = RpcServiceServer::with_interceptor(rpc_impl, auth_intercept);
-    info!("RpcServer listening on {addr}");
+    info!("Listening on {addr}");
     if is_grpc_web {
         let cors_layer = CorsLayer::new()
             .allow_origin(AllowOrigin::mirror_request())
@@ -101,7 +102,7 @@ pub async fn start_server(
                     .collect::<Vec<HeaderName>>(),
             );
 
-        info!("GRPC-Web is enabled");
+        info!("Grpc-Web enabled");
         tonic::transport::Server::builder()
             .accept_http1(true)
             .layer(cors_layer)

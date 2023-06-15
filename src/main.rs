@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, info};
+use tracing::debug;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-server", version = land_core::version::get())]
@@ -13,7 +13,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
-    land_core::tracing::init();
+    land_core::trace::init();
 
     let args = Cli::parse();
     debug!("load args: {:?}", args);
@@ -22,17 +22,19 @@ async fn main() {
     land_core::storage::init()
         .await
         .expect("init storage failed");
-    info!("Init storage success");
 
     // init db
     land_core::db::init().await.expect("init db failed");
-    info!("Init db success");
 
     // init prod const
     land_core::init_prod_const()
         .await
         .expect("init prod const failed");
-    info!("Init prod const success");
+
+    // init local region
+    land_core::region::local::init()
+        .await
+        .expect("init local region failed");
 
     // start rpc server
     land_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)

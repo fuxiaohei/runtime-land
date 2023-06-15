@@ -2,7 +2,7 @@ use anyhow::Result;
 use envconfig::Envconfig;
 use opendal::services::Fs;
 use opendal::Operator;
-use tracing::debug;
+use tracing::info;
 
 #[derive(Envconfig, Debug)]
 pub struct LocalConfig {
@@ -12,11 +12,9 @@ pub struct LocalConfig {
 
 pub async fn init_local() -> Result<Operator> {
     let cfg = LocalConfig::init_from_env()?;
-    debug!("init local storage cfg: {:?}", cfg);
-
     let mut builder = Fs::default();
     builder.root(&cfg.path);
     let op: Operator = Operator::new(builder)?.finish();
-
+    info!("Init local storage success, path: {}", cfg.path);
     Ok(op)
 }
