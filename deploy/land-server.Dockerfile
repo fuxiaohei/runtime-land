@@ -2,6 +2,7 @@ FROM rust:1.70.0 as builder
 WORKDIR /usr/src/runtime.land
 ADD . .
 RUN apt update && apt install -y protobuf-compiler libprotobuf-dev
+RUN rustup component add rustfmt
 RUN cargo --version --verbose
 RUN rustc --version
 RUN protoc --version
