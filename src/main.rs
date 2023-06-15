@@ -34,12 +34,6 @@ async fn main() {
         .expect("init prod const failed");
     info!("Init prod const success");
 
-    // init local region
-    land_core::region::local::init()
-        .await
-        .expect("init local region failed");
-    info!("Init local region success");
-
     // start rpc server
     land_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
         .await
