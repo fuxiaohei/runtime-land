@@ -81,3 +81,4 @@ services:
       - ${LAND_RUMTIME_STORAGE_DIR}:/data
     labels:
       - traefik.enable=true
+      - traefik.http.routers.land-server.rule=Host(`${LAND_RUNTIME_DOMAIN}`)
