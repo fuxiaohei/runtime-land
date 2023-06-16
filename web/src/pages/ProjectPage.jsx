@@ -1,13 +1,5 @@
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  ListGroup,
-  Dropdown,
-} from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
-import { BsCheck2Circle, BsAppIndicator } from "react-icons/bs";
 import { ButtonLink } from "../components/ButtonLink";
 import ProjectHeader from "../components/ProjectHeader";
 import ProjectTabs from "../components/ProjectTabs";
@@ -17,10 +9,13 @@ import React, { useEffect } from "react";
 import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
 import ProjectDeploymentsListGroup from "../components/ProjectDeploymentsListGroup";
+import DeployToProductionModal from "../components/DeployToProductionModal";
 
 function ProjectPage() {
   const { projectName } = useParams();
   const [projectOverview, setProjectOverview] = React.useState(null);
+  const [showDeployToProduction, setShowDeployToProduction] =
+    React.useState(false);
 
   const fetchProjectOverview = async () => {
     let project = await getProjectOverview(projectName);
@@ -35,6 +30,10 @@ function ProjectPage() {
       fetchProjectOverview();
     }
   });
+
+  const handleDeployToProduction = async (id, uuid) => {
+    console.log("-----handleDeployToProduction", id, uuid);
+  };
 
   return (
     <div>
@@ -70,6 +69,7 @@ function ProjectPage() {
                     </Card.Title>
                     <ProjectDeploymentsListGroup
                       deploymentsList={projectOverview?.deploymentsList || []}
+                      onDeployToProduction={handleDeployToProduction}
                     />
                   </Card.Body>
                 </Card>
@@ -91,6 +91,7 @@ function ProjectPage() {
           </Container>
         </div>
       </Container>
+      <DeployToProductionModal show={showDeployToProduction} />
     </div>
   );
 }

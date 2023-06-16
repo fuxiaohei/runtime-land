@@ -2,8 +2,14 @@ import { ListGroup, Dropdown } from "react-bootstrap";
 import { BsCheck2Circle, BsAppIndicator } from "react-icons/bs";
 import TimeAgo from "javascript-time-ago";
 
-function ProjectDeploymentsListGroup({ deploymentsList }) {
+function ProjectDeploymentsListGroup({ deploymentsList,onDeployToProduction }) {
   const timeAgo = new TimeAgo("en-US");
+  const buildHandleDeployToProduction = (id, uuid) => {
+    return async (event) => {
+      console.log("deploy to production", id, uuid);
+      onDeployToProduction(id, uuid);
+    };
+  };
   const listItems = deploymentsList.map((deployment) => (
     <ListGroup.Item
       className="lh-lg d-flex justify-content-between ps-0"
@@ -24,7 +30,13 @@ function ProjectDeploymentsListGroup({ deploymentsList }) {
             <BsAppIndicator size={12} />
           </Dropdown.Toggle>
           <Dropdown.Menu className="lh-1 text-muted">
-            <Dropdown.Item className="small">
+            <Dropdown.Item
+              className="small"
+              onClick={buildHandleDeployToProduction(
+                deployment.id,
+                deployment.uuid
+              )}
+            >
               Deploy to Production
             </Dropdown.Item>
             <Dropdown.Divider />

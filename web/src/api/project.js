@@ -1,6 +1,10 @@
 import { callClient } from "./utils.js";
 
-const { Empty, ProjectOverviewRequest } = require("./proto/land-rpc_pb.js");
+const {
+  Empty,
+  ProjectOverviewRequest,
+  FetchProjectRequest,
+} = require("./proto/land-rpc_pb.js");
 
 async function listProjects() {
   let req = new Empty();
@@ -15,4 +19,12 @@ async function getProjectOverview(projectName) {
   return response;
 }
 
-export { listProjects, getProjectOverview };
+async function createEmptyProject(projectName, projectLanguage) {
+  let req = new FetchProjectRequest();
+  req.setName(projectName);
+  req.setLanguage(projectLanguage);
+  let response = await callClient(req, "createEmptyProject");
+  return response;
+}
+
+export { listProjects, getProjectOverview, createEmptyProject };

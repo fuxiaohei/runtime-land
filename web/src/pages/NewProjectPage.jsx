@@ -1,4 +1,5 @@
 import { ButtonLink } from "../components/ButtonLink";
+import { createEmptyProject } from "../api/project";
 import DashboardNavbar from "../components/DashboardNavbar";
 import {
   Container,
@@ -10,6 +11,7 @@ import {
   Card,
   OverlayTrigger,
   Tooltip,
+  Alert,
 } from "react-bootstrap";
 import { BiRefresh } from "react-icons/bi";
 import {
@@ -19,6 +21,7 @@ import {
   colors,
 } from "unique-names-generator";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function NewProjectPage() {
   const generateName = () => {
@@ -31,9 +34,35 @@ function NewProjectPage() {
     return shortName;
   };
   const [autoName, setAutoName] = React.useState(generateName());
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const navigate = useNavigate();
 
   const handleRefreshGenerate = async (event) => {
     setAutoName(generateName());
+  };
+
+  const handleSubmitNewProject = async (event) => {
+    if (!autoName) {
+      setShowAlert(true);
+      setAlertMessage("Project name cannot be empty");
+      return;
+    }
+    setShowAlert(false);
+    let response = await createEmptyProject(autoName, "rust"); // only support rust now
+    if (response.error) {
+      setShowAlert(true);
+      setAlertMessage(response.error);
+      return;
+    }
+    navigate(`/projects/${autoName}`);
+  };
+
+  const renderAlert = () => {
+    if (showAlert) {
+      return <Alert variant="danger">{alertMessage}</Alert>;
+    }
+    return null;
   };
 
   return (
@@ -81,12 +110,15 @@ function NewProjectPage() {
                           </OverlayTrigger>
                         </InputGroup>
                       </div>
+                      {renderAlert()}
                       <p className="fs-6 ms-2 text-muted">
                         Edit and deploy directly from a local project using
                         land-cli.
                       </p>
                       <p className="text-end">
-                        <Button>Create Empty Project</Button>
+                        <Button onClick={handleSubmitNewProject}>
+                          Create Empty Project
+                        </Button>
                       </p>
                     </div>
                   </Card.Body>
