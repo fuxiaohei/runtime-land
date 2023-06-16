@@ -1,4 +1,4 @@
-package moni:http
+package land:http
 
 interface http-body {
     use http-types.{http-body-handle}

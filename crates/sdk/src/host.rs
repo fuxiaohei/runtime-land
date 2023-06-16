@@ -1,1 +1,1 @@
-include!("../../../wit-v2/http_service.rs");
+include!("../../../wit/http_service.rs");

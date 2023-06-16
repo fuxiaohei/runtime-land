@@ -1,4 +1,4 @@
-package moni:http
+package land:http
 
 interface http-outgoing {
     use http-types.{request,response,request-error,request-options}

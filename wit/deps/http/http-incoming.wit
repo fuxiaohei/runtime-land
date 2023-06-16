@@ -1,4 +1,4 @@
-package moni:http
+package land:http
 
 interface http-incoming {
     use http-types.{request,response}

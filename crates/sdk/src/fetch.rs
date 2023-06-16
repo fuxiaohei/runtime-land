@@ -1,6 +1,6 @@
+use super::host::land::http::http_outgoing::{fetch_request, RequestError, RequestOptions};
+use super::host::land::http::http_types::{self, RedirectPolicy};
 use super::http::{Body, Request, Response};
-use super::host::moni::http::http_outgoing::{fetch_request, RequestError, RequestOptions};
-use super::host::moni::http::http_types::{self, RedirectPolicy};
 
 impl Default for RequestOptions {
     fn default() -> Self {

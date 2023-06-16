@@ -1,6 +1,0 @@
-package moni:serverless
-
-world http-service {
-    import moni:http/http-body
-    import moni:http/http-outgoing
-}

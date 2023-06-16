@@ -1,8 +1,8 @@
-wit_bindgen::generate!("http-handler" in "../../wit-v2");
+wit_bindgen::generate!("http-handler" in "../../wit");
 
 struct HttpServiceImpl {}
 
-use exports::moni::http::http_incoming;
+use exports::land::http::http_incoming;
 
 impl http_incoming::HttpIncoming for HttpServiceImpl {
     fn handle_request(_req: http_incoming::Request) -> http_incoming::Response {

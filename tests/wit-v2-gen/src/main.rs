@@ -17,7 +17,7 @@ fn main() {
     let mut generator = create_generator().unwrap();
 
     let mut resolve = Resolve::default();
-    let path = Path::new("./wit-v2");
+    let path = Path::new("./wit");
     let pkg = resolve.push_dir(path).unwrap().0;
     let worlds = vec!["http-handler", "http-service"];
 

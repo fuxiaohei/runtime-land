@@ -3,13 +3,13 @@ use std::path::{Path, PathBuf};
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=wit-v2/*.wit");
+    println!("cargo:rerun-if-changed=wit/*.wit");
 
     build_wit_guest_code();
 }
 
 fn build_wit_guest_code() {
-    let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit-v2");
+    let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
 
     let worlds = vec!["http-handler", "http-service"];
     for world_name in worlds {

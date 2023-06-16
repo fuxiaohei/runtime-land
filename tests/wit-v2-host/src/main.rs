@@ -113,14 +113,14 @@ async fn call_wasm() {
         crate::guest::HttpHandler::instantiate_async(&mut store, &component, &linker)
             .await
             .unwrap();
-    let req_arg = guest::exports::moni::http::http_incoming::Request {
+    let req_arg = guest::exports::land::http::http_incoming::Request {
         method: "GET",
         uri: "/abc",
         headers: &vec![(String::from("x-a"), String::from("b"))],
         body: None,
     };
     let resp = exports
-        .moni_http_http_incoming()
+        .land_http_http_incoming()
         .call_handle_request(&mut store, req_arg)
         .await
         .unwrap();

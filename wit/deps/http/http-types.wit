@@ -1,4 +1,6 @@
-interface http-outgoing-imports {
+package land:http
+
+interface http-types {
     // HTTP Status Codes
     type http-status-code = u16
 
@@ -7,9 +9,6 @@ interface http-outgoing-imports {
 
     // HTTP Request Headers
     type http-headers = list<tuple<string, string>>
-
-    // HTTP Request Body
-    type http-body = list<u8>
 
     // HTTP URI
     type http-uri = string
@@ -65,12 +64,4 @@ interface http-outgoing-imports {
         // Follow redirects.
         redirect: redirect-policy,
     }
-
-    // request remote function
-    fetch: func(req: request, options: request-options) -> result<response,request-error>
-}
-
-// import http-outgoing
-default world http-outgoing {
-    import http-outgoing: self.http-outgoing-imports
 }

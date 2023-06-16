@@ -1,5 +1,0 @@
-package moni:serverless
-
-world http-handler {
-    export moni:http/http-incoming
-}

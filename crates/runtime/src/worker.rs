@@ -138,7 +138,7 @@ impl Worker {
         let (exports, _instance) =
             HttpHandler::instantiate_pre(&mut store, &self.instance_pre).await?;
         let resp = exports
-            .moni_http_http_incoming()
+            .land_http_http_incoming()
             .call_handle_request(&mut store, req)
             .await?;
         let body = store.data_mut().take_body(resp.body.unwrap()).unwrap();

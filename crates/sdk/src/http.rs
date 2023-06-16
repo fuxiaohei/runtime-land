@@ -7,7 +7,7 @@ pub type Response = http::Response<Body>;
 
 // re-export http_outgoing into http crate
 pub use super::fetch::fetch;
-pub use super::host::moni::http::http_outgoing::{RequestError, RequestOptions};
+pub use super::host::land::http::http_outgoing::{RequestError, RequestOptions};
 
 pub fn error_response(status: http::StatusCode, message: String) -> Response {
     let mut response = Response::new(message.into());
