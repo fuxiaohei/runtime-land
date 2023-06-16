@@ -42,7 +42,7 @@ function ProjectPage() {
       <Container id="project-container">
         <ProjectHeader projectName={projectName} />
         <ProjectTabs projectName={projectName} activeKey="overview" />
-        <div id="project-overview-container" className="mt-4">
+        <div id="project-overview-container" className="pt-4 pb-5">
           <Container>
             <Row>
               <Col lg={8} md={12} id="project-overview-left">

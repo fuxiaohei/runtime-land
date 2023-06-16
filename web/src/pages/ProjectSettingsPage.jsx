@@ -12,8 +12,8 @@ function ProjectSettingsPage() {
       <Container id="project-container">
         <ProjectHeader projectName={projectName} />
         <ProjectTabs projectName={projectName} activeKey="settings" />
-        <div id="project-overview-container" className="mt-4">
-          <Container>Settings</Container>
+        <div id="project-overview-container" className="pt-4 pb-5">
+          <Container>TODO:(settings)</Container>
         </div>
       </Container>
     </div>

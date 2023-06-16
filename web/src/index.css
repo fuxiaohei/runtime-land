@@ -74,7 +74,7 @@ body {
     text-align: right;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
 }
 
 #project-header-right {
@@ -83,7 +83,7 @@ body {
 }
 
 .project-card {
-    margin-top: 40px;
+    margin-top: 24px;
     transition: box-shadow .15s ease-in-out;
 }
 
@@ -102,7 +102,7 @@ body {
 }
 
 .project-card .card-body {
-    padding: 24px 16px;
+    padding: 28px 20px;
 }
 
 .project-card-title {

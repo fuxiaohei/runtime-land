@@ -18,13 +18,19 @@ services:
     command: --api.insecure=true --providers.redis.endpoints=redis:6379 --providers.redis.password=${REDIS_PASSWORD} --providers.docker=true --providers.docker.exposedByDefault=false
     ports:
       - "80:80"
-      - "8080:8080" # traefik dashboard
+      # - "8080:8080" # traefik dashboard
     networks:
       - land_serverless_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_BASIC_AUTH}"
   mysql:
     image: mysql:8.0
     cap_add:
@@ -81,4 +87,14 @@ services:
       - ${LAND_RUMTIME_STORAGE_DIR}:/data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.land-server.rule=Host(`${LAND_RUNTIME_DOMAIN}`)
+      - traefik.http.routers.land-runtime.rule=Host(`${LAND_RUNTIME_DOMAIN}`)
+  land-web:
+    image: ghcr.io/fuxiaohei/land-web:latest
+    restart: always
+    environment:
+      - API_ADDR=${LAND_WEB_API_ADDR}
+    networks:
+      - land_serverless_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land-web.rule=Host(`${LAND_WEB_DOMAIN}`)

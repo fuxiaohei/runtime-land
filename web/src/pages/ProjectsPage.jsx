@@ -61,20 +61,14 @@ function ProjectsPage() {
                 </h3>
               </Col>
               <Col id="dashboard-header-right">
-                <InputGroup>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search by project name, domain..."
-                  />
-                  <ButtonLink to="/new" variant="primary">
-                    + New Project
-                  </ButtonLink>
-                </InputGroup>
+                <ButtonLink to="/new" variant="primary">
+                  + New Project
+                </ButtonLink>
               </Col>
             </Row>
           </Container>
         </header>
-        <section id="dashboard-projects">
+        <section id="dashboard-projects" className="pt-2">
           {loadingStatus.loading ? (
             <Spinner className="projects-loading m-4" animation="border" />
           ) : (

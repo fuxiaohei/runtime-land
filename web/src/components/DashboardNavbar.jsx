@@ -20,7 +20,16 @@ function DashboardNavbar() {
   return (
     <Navbar bg="light" expand="lg" className="dashboard-navbar">
       <Container>
-        <NavbarBrandLink to="/projects">Runtime.land</NavbarBrandLink>
+        <NavbarBrandLink to="/projects">
+          <img
+            alt=""
+            src="/public/runtime-land-logo-240.svg"
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+          />{" "}
+          Runtime.land
+        </NavbarBrandLink>
         <Navbar.Toggle aria-controls="dashboard-navbar-nav" />
         <Navbar.Collapse id="dashboard-navbar-nav">
           <Nav className="me-auto">
@@ -40,8 +49,12 @@ function DashboardNavbar() {
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
           <Nav>
-            <Nav.Link href="#home">Docs</Nav.Link>
-            <Nav.Link href="#link">Feedback</Nav.Link>
+            <Nav.Link href={window.DOCS_ADDRESS} target="_blank">
+              Docs
+            </Nav.Link>
+            <Nav.Link href={window.FEEDBACK_ADDRESS} target="_blank">
+              Feedback
+            </Nav.Link>
             <NavDropdown
               title={
                 <Image

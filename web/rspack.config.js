@@ -9,6 +9,7 @@ module.exports = {
   },
   output: {
     filename: "[name].[contenthash].bundle.js",
+    publicPath: "/",
   },
   target: "web",
   builtins: {
@@ -16,7 +17,7 @@ module.exports = {
       {
         template: "./index.html",
         title: "Runtime.land | a tiny Function as a Service (FaaS) platform ",
-        favicon: "./public/favicon.png",
+        favicon: "./public/runtime-land-logo-32.ico",
       },
     ],
     copy: {
@@ -24,6 +25,9 @@ module.exports = {
         {
           from: "src/config.js",
           to: "config.js",
+        },
+        {
+          from: "public/**/*",
         },
       ],
     },

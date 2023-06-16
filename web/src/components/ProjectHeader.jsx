@@ -6,9 +6,9 @@ function ProjectHeader({ projectName }) {
     <header id="project-header">
       <Container>
         <Row>
-          <Col md={4} sm={4} xs={4} id="project-header-left">
+          <Col md={6} sm={6} xs={5} id="project-header-left">
             <h2>{projectName}</h2>
-            <p>Github / Pending</p>
+            <p>Only preview deployment</p>
           </Col>
           <Col id="project-header-right">
             <Button variant="secondary" size="sm" href="/projects">
