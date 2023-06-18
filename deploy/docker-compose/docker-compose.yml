@@ -60,6 +60,7 @@ services:
       - LOCAL_REGION_REDIS_PASSWORD=${REDIS_PASSWORD}
       - LOCAL_REGION_RUNTIME=land-runtime-docker-compose@docker
       - PROD_DOMAIN=${LAND_SERVER_PROD_DOMAIN}
+      - PROD_PROTOCOL=${LAND_SERVER_PROD_PROTOCOL}
     depends_on:
       - mysql
       - redis

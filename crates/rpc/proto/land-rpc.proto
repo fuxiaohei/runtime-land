@@ -133,6 +133,7 @@ message ProjectOverviewResponse {
   int32 prod_deployment_id = 5;
   optional ProjectProductionDeployment prod_deployment = 6;
   repeated DeploymentResponse deployments = 7;
+  string prod_url = 8;
 }
 
 // ProjectOverviewRequest is the request message for the ProjectOverview method.

@@ -2,12 +2,14 @@ import { ListGroup, Dropdown } from "react-bootstrap";
 import { BsCheck2Circle, BsAppIndicator } from "react-icons/bs";
 import TimeAgo from "javascript-time-ago";
 
-function ProjectDeploymentsListGroup({ deploymentsList,onDeployToProduction }) {
+function ProjectDeploymentsListGroup({
+  deploymentsList,
+  onDeployToProduction,
+}) {
   const timeAgo = new TimeAgo("en-US");
-  const buildHandleDeployToProduction = (id, uuid) => {
+  const buildHandleDeployToProduction = (deployment) => {
     return async (event) => {
-      console.log("deploy to production", id, uuid);
-      onDeployToProduction(id, uuid);
+      onDeployToProduction(deployment);
     };
   };
   const listItems = deploymentsList.map((deployment) => (
@@ -18,7 +20,7 @@ function ProjectDeploymentsListGroup({ deploymentsList,onDeployToProduction }) {
       <div className="deployment-metadata text-truncate">
         <BsCheck2Circle className="status-icon me-2" size={20} />
         <a className="name" href={deployment.url} target="_blank">
-          {deployment.domain}.127-0-0-1.nip.io
+          {new URL(deployment.url).host}
         </a>
       </div>
       <div className="deployment-promotion">
@@ -32,10 +34,7 @@ function ProjectDeploymentsListGroup({ deploymentsList,onDeployToProduction }) {
           <Dropdown.Menu className="lh-1 text-muted">
             <Dropdown.Item
               className="small"
-              onClick={buildHandleDeployToProduction(
-                deployment.id,
-                deployment.uuid
-              )}
+              onClick={buildHandleDeployToProduction(deployment)}
             >
               Deploy to Production
             </Dropdown.Item>

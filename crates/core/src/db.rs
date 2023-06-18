@@ -66,7 +66,7 @@ pub async fn init() -> Result<()> {
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(10))
         .max_lifetime(Duration::from_secs(10))
-        .sqlx_logging(true);
+        .sqlx_logging(false);
 
     let db = Database::connect(opt).await?;
     DB.set(db).unwrap();

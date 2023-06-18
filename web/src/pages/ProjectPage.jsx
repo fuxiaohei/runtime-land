@@ -4,7 +4,7 @@ import { ButtonLink } from "../components/ButtonLink";
 import ProjectHeader from "../components/ProjectHeader";
 import ProjectTabs from "../components/ProjectTabs";
 import { useParams } from "react-router-dom";
-import { getProjectOverview } from "../api/project";
+import { getProjectOverview, publishDeployment } from "../api/project";
 import React, { useEffect } from "react";
 import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
@@ -15,6 +15,10 @@ function ProjectPage() {
   const { projectName } = useParams();
   const [projectOverview, setProjectOverview] = React.useState(null);
   const [showDeployToProduction, setShowDeployToProduction] =
+    React.useState(false);
+  const [currentDeployToProduction, setCurrentDeployToProduction] =
+    React.useState(null);
+  const [loadingDeployToProduction, setLoadingDeployToProduction] =
     React.useState(false);
 
   const fetchProjectOverview = async () => {
@@ -31,15 +35,38 @@ function ProjectPage() {
     }
   });
 
-  const handleDeployToProduction = async (id, uuid) => {
-    console.log("-----handleDeployToProduction", id, uuid);
+  const handleDeployToProduction = async (deployment) => {
+    setCurrentDeployToProduction(deployment);
+    setShowDeployToProduction(true);
+  };
+
+  const handleDeployToProductionCancel = async () => {
+    setShowDeployToProduction(false);
+  };
+
+  const handleDeployToProductionConfirm = async (event) => {
+    setLoadingDeployToProduction(true);
+    let response = await publishDeployment(
+      currentDeployToProduction.id,
+      currentDeployToProduction.uuid
+    );
+    if (response.error) {
+      // FIXME: show error message
+      return;
+    }
+    await fetchProjectOverview(); // refresh project overview
+    setLoadingDeployToProduction(false);
+    setShowDeployToProduction(false);
   };
 
   return (
     <div>
       <DashboardNavbar />
       <Container id="project-container">
-        <ProjectHeader projectName={projectName} />
+        <ProjectHeader
+          projectName={projectName}
+          project={projectOverview || {}}
+        />
         <ProjectTabs projectName={projectName} activeKey="overview" />
         <div id="project-overview-container" className="pt-4 pb-5">
           <Container>
@@ -91,7 +118,15 @@ function ProjectPage() {
           </Container>
         </div>
       </Container>
-      <DeployToProductionModal show={showDeployToProduction} />
+      <DeployToProductionModal
+        show={showDeployToProduction}
+        loading={loadingDeployToProduction.toString()}
+        current={currentDeployToProduction || {}}
+        prev={projectOverview?.prodDeployment || {}}
+        produrl={projectOverview?.prodUrl || ""}
+        onCancel={handleDeployToProductionCancel}
+        onSubmit={handleDeployToProductionConfirm}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ const {
   Empty,
   ProjectOverviewRequest,
   FetchProjectRequest,
+  PublishDeploymentRequest,
 } = require("./proto/land-rpc_pb.js");
 
 async function listProjects() {
@@ -27,4 +28,12 @@ async function createEmptyProject(projectName, projectLanguage) {
   return response;
 }
 
-export { listProjects, getProjectOverview, createEmptyProject };
+async function publishDeployment(deployID, deployUUID) {
+  let req = new PublishDeploymentRequest();
+  req.setDeployId(deployID);
+  req.setDeployUuid(deployUUID);
+  let response = await callClient(req, "publishDeployment");
+  return response;
+}
+
+export { listProjects, getProjectOverview, createEmptyProject, publishDeployment };

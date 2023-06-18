@@ -268,7 +268,8 @@ impl RpcService for ServiceImpl {
             req.deploy_name.clone(),
             storage_path
         );
-        let prod_domain: String = land_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -277,7 +278,7 @@ impl RpcService for ServiceImpl {
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
-            url: format!("http://{}.{}", deployment.domain, prod_domain),
+            url: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
         };
 
         // deploy wasm in async task with deployment id
@@ -311,6 +312,7 @@ impl RpcService for ServiceImpl {
                     tonic::Status::internal(format!("promote deployment failed: {:?}", e))
                 })?;
         let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let resp = super::DeploymentResponse {
             id: deployment.id as i32,
             domain: deployment.domain.clone(),
@@ -319,7 +321,10 @@ impl RpcService for ServiceImpl {
             deploy_status: deployment.deploy_status,
             prod_status: deployment.prod_status,
             updated_at: deployment.updated_at.timestamp(),
-            url: format!("http://{}.{}", deployment.prod_domain, prod_domain),
+            url: format!(
+                "{}://{}.{}",
+                prod_protocol, deployment.prod_domain, prod_domain
+            ),
         };
 
         let deploy_id = deployment.id;
@@ -351,6 +356,7 @@ impl RpcService for ServiceImpl {
         let project = project.unwrap();
 
         let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
+        let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let mut resp = super::ProjectOverviewResponse {
             id: project.id as i32,
             name: project.name.clone(),
@@ -359,6 +365,12 @@ impl RpcService for ServiceImpl {
             updated_at: project.updated_at.timestamp(),
             deployments: vec![],
             prod_deployment: None,
+            prod_url: format!(
+                "{}://{}.{}",
+                prod_protocol,
+                project.name.clone(),
+                prod_domain
+            ),
         };
 
         // if production deployment is set, load deployment data
@@ -380,8 +392,8 @@ impl RpcService for ServiceImpl {
                             format!("{}.{}", d.domain, prod_domain),
                         ],
                         urls: vec![
-                            format!("http://{}.{}", d.prod_domain, prod_domain),
-                            format!("http://{}.{}", d.domain, prod_domain),
+                            format!("{}://{}.{}", prod_protocol, d.prod_domain, prod_domain),
+                            format!("{}://{}.{}", prod_protocol, d.domain, prod_domain),
                         ],
                     });
                 }
@@ -401,7 +413,7 @@ impl RpcService for ServiceImpl {
                 deploy_status: d.deploy_status,
                 prod_status: d.prod_status,
                 updated_at: d.updated_at.timestamp(),
-                url: format!("http://{}.{}", d.domain, prod_domain),
+                url: format!("{}://{}.{}", prod_protocol, d.domain, prod_domain),
             })
             .collect();
 

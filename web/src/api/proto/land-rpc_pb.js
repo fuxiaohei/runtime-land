@@ -4296,7 +4296,8 @@ proto.land.ProjectOverviewResponse.toObject = function(includeInstance, msg) {
     prodDeploymentId: jspb.Message.getFieldWithDefault(msg, 5, 0),
     prodDeployment: (f = msg.getProdDeployment()) && proto.land.ProjectProductionDeployment.toObject(includeInstance, f),
     deploymentsList: jspb.Message.toObjectList(msg.getDeploymentsList(),
-    proto.land.DeploymentResponse.toObject, includeInstance)
+    proto.land.DeploymentResponse.toObject, includeInstance),
+    prodUrl: jspb.Message.getFieldWithDefault(msg, 8, "")
   };
 
   if (includeInstance) {
@@ -4362,6 +4363,10 @@ proto.land.ProjectOverviewResponse.deserializeBinaryFromReader = function(msg, r
       var value = new proto.land.DeploymentResponse;
       reader.readMessage(value,proto.land.DeploymentResponse.deserializeBinaryFromReader);
       msg.addDeployments(value);
+      break;
+    case 8:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProdUrl(value);
       break;
     default:
       reader.skipField();
@@ -4441,6 +4446,13 @@ proto.land.ProjectOverviewResponse.serializeBinaryToWriter = function(message, w
       7,
       f,
       proto.land.DeploymentResponse.serializeBinaryToWriter
+    );
+  }
+  f = message.getProdUrl();
+  if (f.length > 0) {
+    writer.writeString(
+      8,
+      f
     );
   }
 };
@@ -4608,6 +4620,24 @@ proto.land.ProjectOverviewResponse.prototype.addDeployments = function(opt_value
  */
 proto.land.ProjectOverviewResponse.prototype.clearDeploymentsList = function() {
   return this.setDeploymentsList([]);
+};
+
+
+/**
+ * optional string prod_url = 8;
+ * @return {string}
+ */
+proto.land.ProjectOverviewResponse.prototype.getProdUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.land.ProjectOverviewResponse} returns this
+ */
+proto.land.ProjectOverviewResponse.prototype.setProdUrl = function(value) {
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 
