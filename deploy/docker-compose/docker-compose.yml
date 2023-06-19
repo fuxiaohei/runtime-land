@@ -41,7 +41,6 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - ${MYSQL_DATA_DIR}:/var/lib/mysql
-      - ${MYSQL_INIT_SQL}:/docker-entrypoint-initdb.d/init.sql
     networks:
       - land_serverless_network
   land-server:

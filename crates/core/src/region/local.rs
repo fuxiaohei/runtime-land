@@ -49,8 +49,8 @@ pub async fn init() -> Result<()> {
     Ok(())
 }
 
-pub async fn deploy(deploy_id: u32, mut deploy_uuid: String, is_production: bool) -> Result<()> {
-    let deployment = crate::dao::deployment::find(deploy_id as i32, deploy_uuid.clone()).await?;
+pub async fn deploy(deploy_id: i32, mut deploy_uuid: String, is_production: bool) -> Result<()> {
+    let deployment = crate::dao::deployment::find(deploy_id, deploy_uuid.clone()).await?;
     if deployment.is_none() {
         return Err(anyhow::anyhow!("deployment not found"));
     }

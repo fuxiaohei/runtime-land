@@ -12,9 +12,9 @@ pub async fn create(name: String, language: String, owner_id: i32) -> Result<Mod
         uuid,
         created_at: now,
         updated_at: now,
-        owner_id: Some(owner_id),
+        owner_id,
         language,
-        prod_deploy_id: Some(0),
+        prod_deploy_id: 0,
     };
     let active_model: ActiveModel = project.into();
     let db = DB.get().unwrap();

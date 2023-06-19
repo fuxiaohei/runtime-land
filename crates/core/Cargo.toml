@@ -28,6 +28,7 @@ toml = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
+migration = { path = "../migration" }
 
 [build-dependencies]
 vergen = { version = "8.2.1", features = ["build", "cargo"] }

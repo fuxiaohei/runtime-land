@@ -23,7 +23,7 @@ pub async fn find(token: String) -> Result<Option<user_token::Model>> {
     Ok(token)
 }
 
-pub async fn update_login(token_id: u32) -> Result<()> {
+pub async fn update_login(token_id: i32) -> Result<()> {
     let db = DB.get().unwrap();
     let now = chrono::Utc::now();
 

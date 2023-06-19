@@ -1,5 +1,6 @@
 use anyhow::Result;
 use envconfig::Envconfig;
+use migration::MigratorTrait;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use serde::{Deserialize, Serialize};
@@ -54,7 +55,7 @@ impl Default for DbConfig {
 pub static DB: OnceCell<DatabaseConnection> = OnceCell::new();
 
 /// init initializes database connection pool
-#[tracing::instrument(name="[DB]")]
+#[tracing::instrument(name = "[DB]")]
 pub async fn init() -> Result<()> {
     let cfg = DbConfig::init_from_env().unwrap();
     debug!("Connecting: {}", cfg.url_safe());
@@ -66,9 +67,13 @@ pub async fn init() -> Result<()> {
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(10))
         .max_lifetime(Duration::from_secs(10))
-        .sqlx_logging(false);
+        .sqlx_logging(true);
 
     let db = Database::connect(opt).await?;
+
+    // run migrations
+    migration::Migrator::up(&db, None).await?;
+
     DB.set(db).unwrap();
     info!("Init success: {}", cfg.url_safe());
     Ok(())

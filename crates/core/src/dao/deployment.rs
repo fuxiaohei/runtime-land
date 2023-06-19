@@ -111,7 +111,7 @@ pub async fn publish(
 
     // update project prod deployment id
     let mut project_model: project_info::ActiveModel = project.into();
-    project_model.prod_deploy_id = Set(Some(deployment.id as i32));
+    project_model.prod_deploy_id = Set(deployment.id);
     project_model.update(&txn).await?;
 
     // update all other deployments to preview

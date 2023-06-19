@@ -172,7 +172,7 @@ impl RpcService for ServiceImpl {
             name: project.name,
             language: project.language,
             uuid: project.uuid,
-            prod_deployment: project.prod_deploy_id,
+            prod_deployment: Some(project.prod_deploy_id),
             updated_at: project.updated_at.timestamp(),
         }))
     }
@@ -192,7 +192,7 @@ impl RpcService for ServiceImpl {
             name: project.name,
             language: project.language,
             uuid: project.uuid,
-            prod_deployment: project.prod_deploy_id,
+            prod_deployment: Some(project.prod_deploy_id),
             updated_at: project.updated_at.timestamp(),
         }))
     }
@@ -214,7 +214,7 @@ impl RpcService for ServiceImpl {
                     name: p.name,
                     language: p.language,
                     uuid: p.uuid,
-                    prod_deployment: p.prod_deploy_id,
+                    prod_deployment: Some(p.prod_deploy_id),
                     updated_at: p.updated_at.timestamp(),
                 })
                 .collect(),
@@ -246,7 +246,7 @@ impl RpcService for ServiceImpl {
         // create deployment
         let deployment = dao::deployment::create(
             token.owner_id,
-            project.id as i32,
+            project.id,
             format!("{}-{}", project.name, req.deploy_name),
             format!("fs://{}", req.deploy_name.clone()),
         )
@@ -260,7 +260,7 @@ impl RpcService for ServiceImpl {
             .write(&storage_path, req.deploy_chunk)
             .await
             .map_err(|e| tonic::Status::internal(format!("save storage failed: {:?}", e)))?;
-        dao::deployment::update_storage(deployment.id as i32, storage_path.clone())
+        dao::deployment::update_storage(deployment.id, storage_path.clone())
             .await
             .map_err(|e| tonic::Status::internal(format!("update storage url failed: {:?}", e)))?;
         debug!(
@@ -271,7 +271,7 @@ impl RpcService for ServiceImpl {
         let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
         let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let resp = super::DeploymentResponse {
-            id: deployment.id as i32,
+            id: deployment.id,
             domain: deployment.domain.clone(),
             prod_domain: String::new(),
             uuid: deployment.uuid.clone(),
@@ -314,7 +314,7 @@ impl RpcService for ServiceImpl {
         let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
         let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let resp = super::DeploymentResponse {
-            id: deployment.id as i32,
+            id: deployment.id,
             domain: deployment.domain.clone(),
             prod_domain: String::new(),
             uuid: deployment.uuid.clone(),
@@ -358,10 +358,10 @@ impl RpcService for ServiceImpl {
         let prod_domain = land_core::PROD_DOMAIN.get().unwrap().clone();
         let prod_protocol = land_core::PROD_PROTOCOL.get().unwrap().clone();
         let mut resp = super::ProjectOverviewResponse {
-            id: project.id as i32,
+            id: project.id,
             name: project.name.clone(),
             uuid: project.uuid,
-            prod_deployment_id: project.prod_deploy_id.unwrap_or(0),
+            prod_deployment_id: project.prod_deploy_id,
             updated_at: project.updated_at.timestamp(),
             deployments: vec![],
             prod_deployment: None,
@@ -383,7 +383,7 @@ impl RpcService for ServiceImpl {
             if prod_deployment.is_some() {
                 if let Some(d) = prod_deployment {
                     resp.prod_deployment = Some(super::ProjectProductionDeployment {
-                        id: d.id as i32,
+                        id: d.id,
                         name: d.domain.clone(),
                         uuid: d.uuid,
                         updated_at: d.updated_at.timestamp(),
@@ -400,13 +400,13 @@ impl RpcService for ServiceImpl {
             }
         }
 
-        let deployments = dao::deployment::list(token.owner_id, project.id as i32, 10)
+        let deployments = dao::deployment::list(token.owner_id, project.id, 10)
             .await
             .map_err(|e| tonic::Status::internal(format!("list deployments failed: {:?}", e)))?;
         resp.deployments = deployments
             .into_iter()
             .map(|d| super::DeploymentResponse {
-                id: d.id as i32,
+                id: d.id,
                 domain: d.domain.clone(),
                 prod_domain: String::new(),
                 uuid: d.uuid,
