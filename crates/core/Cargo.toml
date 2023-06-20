@@ -11,6 +11,7 @@ chrono = { workspace = true }
 envconfig = "0.10.0"
 futures = "0.3.28"
 lazy_static = { workspace = true }
+migration = { path = "../migration" }
 once_cell = { workspace = true }
 opendal = { version = "0.37.0", default-features = false, features = [
     "services-fs",
@@ -28,7 +29,6 @@ toml = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
-migration = { path = "../migration" }
 
 [build-dependencies]
 vergen = { version = "8.2.1", features = ["build", "cargo"] }

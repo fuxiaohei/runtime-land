@@ -9,7 +9,6 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
 land-core = { path = "crates/core" }
-land-rpc = { path = "crates/rpc" }
 land-restful = { path = "crates/restful" }
 serde = { workspace = true }
 tokio = { workspace = true }
@@ -23,8 +22,9 @@ land-runtime = { path = "crates/runtime" }
 members = [
     "crates/cli",
     "crates/core",
-    "crates/rpc",
+    "crates/migration",
     "crates/restful",
+    "crates/rpc",
     "crates/runtime",
     "crates/sdk",
     "crates/sdk/macro",
@@ -34,7 +34,6 @@ members = [
     "tests/wit-v2-gen",
     "tests/wit-v2-guest",
     "tests/wit-v2-host",
-    "crates/migration",
 ]
 
 [workspace.dependencies]

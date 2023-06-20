@@ -4,11 +4,8 @@ use tracing::debug;
 #[derive(Parser, Debug)]
 #[clap(name = "land-server", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("GRPC_ADDR"), default_value("127.0.0.1:38779"))]
-    pub grpc_addr: String,
-
-    #[clap(long, env("GRPC_ENABLE_GRPCWEB"), default_value("true"))]
-    pub enable_grpc_web: bool,
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:38779"))]
+    pub http_addr: String,
 }
 
 #[tokio::main]
@@ -36,12 +33,8 @@ async fn main() {
         .await
         .expect("init local region failed");
 
-    land_restful::start_server(args.grpc_addr.parse().unwrap())
-        .await
-        .unwrap();
-
-    // start rpc server
-    land_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
+    // start restful server
+    land_restful::start_server(args.http_addr.parse().unwrap())
         .await
         .unwrap();
 }

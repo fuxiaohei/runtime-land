@@ -6,12 +6,13 @@ authors = { workspace = true }
 publish = false
 
 [dependencies]
-gravatar = "0.2.0"
-axum = { workspace = true }
-tracing = { workspace = true }
 anyhow = { workspace = true }
-serde = { workspace = true }
 async-trait = { workspace = true }
-thiserror = "1.0.40"
-validator = { version = "0.16.0", features = ["derive"] }
+axum = { workspace = true }
+gravatar = "0.2.0"
 land-core = { path = "../core" }
+serde = { workspace = true }
+thiserror = "1.0.40"
+tokio = { workspace = true }
+tracing = { workspace = true }
+validator = { version = "0.16.0", features = ["derive"] }

@@ -9,6 +9,7 @@ use std::net::SocketAddr;
 use tracing::info;
 
 mod auth;
+mod deployments;
 mod login;
 mod params;
 mod projects;
@@ -34,6 +35,9 @@ fn api_router() -> Router {
         .route("/v1/project", get(projects::fetch_handler))
         .route("/v1/project", post(projects::create_handler))
         .route("/v1/projects", get(projects::list_handler))
+        .route("/v1/project/overview", get(projects::overview_handler))
+        .route("/v1/deployment", post(deployments::create_handler))
+        .route("/v1/deployment/publish", post(deployments::publish_handler))
         .route_layer(middleware::from_fn(auth::auth))
 }
 

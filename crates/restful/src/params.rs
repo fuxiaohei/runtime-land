@@ -90,6 +90,7 @@ pub struct ProjectOverview {
 #[derive(Serialize, Debug)]
 pub struct DeploymentData {
     pub id: i32,
+    pub project_id: i32,
     pub domain: String,
     pub domain_url: String,
     pub prod_domain: String,
@@ -99,4 +100,23 @@ pub struct DeploymentData {
     pub created_at: i64,
     pub updated_at: i64,
     pub deploy_status: i32,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct CreateDeployRequest {
+    #[validate(length(min = 3))]
+    pub project_name: String,
+    #[validate(length(min = 3))]
+    pub project_uuid: String,
+    #[validate(length(min = 3))]
+    pub deploy_name: String,
+    pub deploy_chunk: Vec<u8>,
+    pub deploy_content_type: String,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct PublishDeployRequest {
+    pub deploy_id: i32,
+    #[validate(length(min = 3))]
+    pub deploy_uuid: String,
 }

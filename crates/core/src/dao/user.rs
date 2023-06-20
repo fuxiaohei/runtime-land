@@ -23,7 +23,7 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, user_t
 
     // create token from webpage, expire in 3 days
     let token = super::token::create(
-        user.id as i32,
+        user.id,
         String::from("Web Dashboard"),
         String::from("web-dashboard"),
         3 * 24 * 3600,
@@ -69,7 +69,7 @@ pub async fn signup_by_email(
 
     // create token from webpage, expire in 3 days
     let token = super::token::create(
-        user_model.id as i32,
+        user_model.id,
         String::from("Web Dashboard"),
         String::from("web-dashboard"),
         3 * 24 * 3600,

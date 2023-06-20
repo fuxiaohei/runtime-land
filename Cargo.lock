@@ -1982,6 +1982,7 @@ dependencies = [
  "land-core",
  "serde",
  "thiserror",
+ "tokio",
  "tracing",
  "validator",
 ]
@@ -2064,7 +2065,6 @@ dependencies = [
  "clap 4.3.2",
  "land-core",
  "land-restful",
- "land-rpc",
  "land-runtime",
  "serde",
  "tokio",
