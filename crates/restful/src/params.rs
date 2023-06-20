@@ -73,3 +73,30 @@ pub struct ProjectData {
     pub updated_at: i64,
     pub prod_deployment: i32,
 }
+
+#[derive(Serialize, Debug)]
+pub struct ProjectOverview {
+    pub id: i32,
+    pub name: String,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub prod_url: String,
+    pub prod_deployment_id: i32,
+    pub deployments: Vec<DeploymentData>,
+    pub prod_deployment: Option<DeploymentData>,
+}
+
+#[derive(Serialize, Debug)]
+pub struct DeploymentData {
+    pub id: i32,
+    pub domain: String,
+    pub domain_url: String,
+    pub prod_domain: String,
+    pub prod_url: String,
+    pub prod_status: i32,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub deploy_status: i32,
+}
