@@ -10,6 +10,7 @@ axum = { workspace = true }
 clap = { workspace = true }
 land-core = { path = "crates/core" }
 land-rpc = { path = "crates/rpc" }
+land-restful = { path = "crates/restful" }
 serde = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
@@ -23,6 +24,7 @@ members = [
     "crates/cli",
     "crates/core",
     "crates/rpc",
+    "crates/restful",
     "crates/runtime",
     "crates/sdk",
     "crates/sdk/macro",

@@ -67,7 +67,7 @@ async fn fetch_project(
     let mut project = client
         .fetch_project(project_name.clone(), language.clone())
         .await
-        .map_err(|e| anyhow::anyhow!("fetch project failed: {:?}", e))?;
+        .map_err(|e| anyhow::anyhow!("fetch project failed: {:?}", e.to_string()))?;
 
     // if project is not exist, create empty project with name
     if project.is_none() {

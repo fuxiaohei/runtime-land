@@ -62,11 +62,11 @@ pub async fn init() -> Result<()> {
 
     let mut opt = ConnectOptions::new(cfg.url());
     opt.max_connections(cfg.pool_size)
-        .min_connections(1)
+        .min_connections(3)
         .connect_timeout(Duration::from_secs(10))
         .acquire_timeout(Duration::from_secs(10))
-        .idle_timeout(Duration::from_secs(10))
-        .max_lifetime(Duration::from_secs(10))
+        .idle_timeout(Duration::from_secs(600))
+        .max_lifetime(Duration::from_secs(1800))
         .sqlx_logging(true);
 
     let db = Database::connect(opt).await?;

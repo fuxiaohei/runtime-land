@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use super::rpc_service_client::RpcServiceClient;
 use crate::{DeploymentResponse, ProjectResponse};
 use rand::distributions::Alphanumeric;
@@ -7,6 +9,7 @@ use tonic::metadata::MetadataValue;
 use tonic::service::Interceptor;
 use tonic::transport::Channel;
 use tonic::{Request, Status};
+use tower::timeout::Timeout;
 
 /// ClientTokenInterceptor is a interceptor to add jwt token to request
 pub struct ClientTokenInterceptor {
@@ -25,13 +28,17 @@ impl Interceptor for ClientTokenInterceptor {
 }
 
 pub struct Client {
-    client: RpcServiceClient<InterceptedService<Channel, ClientTokenInterceptor>>,
+    client: RpcServiceClient<
+        InterceptedService<tower::timeout::Timeout<Channel>, ClientTokenInterceptor>,
+    >,
 }
 
 impl Client {
     pub async fn new(addr: String, token: String) -> Result<Self, Box<dyn std::error::Error>> {
         let channel = Channel::from_shared(addr)?.connect().await?;
-        let client = RpcServiceClient::with_interceptor(channel, ClientTokenInterceptor { token });
+        let timeout_channel = Timeout::new(channel, Duration::from_secs(20));
+        let client =
+            RpcServiceClient::with_interceptor(timeout_channel, ClientTokenInterceptor { token });
         Ok(Client { client })
     }
 

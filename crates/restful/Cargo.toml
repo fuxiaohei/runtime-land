@@ -1,0 +1,17 @@
+[package]
+name = "land-restful"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+publish = false
+
+[dependencies]
+gravatar = "0.2.0"
+axum = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+async-trait = { workspace = true }
+thiserror = "1.0.40"
+validator = { version = "0.16.0", features = ["derive"] }
+land-core = { path = "../core" }

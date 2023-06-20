@@ -36,6 +36,10 @@ async fn main() {
         .await
         .expect("init local region failed");
 
+    land_restful::start_server(args.grpc_addr.parse().unwrap())
+        .await
+        .unwrap();
+
     // start rpc server
     land_rpc::start_server(args.grpc_addr.parse().unwrap(), args.enable_grpc_web)
         .await

@@ -49,9 +49,9 @@ services:
     environment:
       - GRPC_ADDR=${LAND_SERVER_GRPC_ADDR}
       - STORAGE_LOCAL_PATH=/data
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
+      - DB_HOST=${MYSQL_HOST}
+      - DB_PORT=${MYSQL_PORT}
+      - DB_USER=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=${MYSQL_DATABASE}
       - LOCAL_REGION_ENABLED=true
@@ -92,7 +92,7 @@ services:
     image: ghcr.io/fuxiaohei/land-web:latest
     restart: always
     environment:
-      - API_ADDR=${LAND_WEB_API_ADDR}
+      - API_ADDRESS=${LAND_WEB_API_ADDR}
     networks:
       - land_serverless_network
     labels:
