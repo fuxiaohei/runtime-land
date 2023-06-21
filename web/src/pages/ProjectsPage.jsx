@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import React, { useEffect } from "react";
 import ProjectsGroup from "../components/ProjectsGroup";
-import { listProjects } from "../api/project";
+import { listProjects } from "../cloud/projects";
 
 function ProjectsPage() {
   const [loadingStatus, setLoadingStatus] = React.useState({
@@ -31,8 +31,8 @@ function ProjectsPage() {
     }
     setLoadingStatus({ loading: false });
     setProjects({
-      data: response.dataList || [],
-      counter: response.dataList.length,
+      data: response.data || [],
+      counter: response.data.length,
     });
   };
 

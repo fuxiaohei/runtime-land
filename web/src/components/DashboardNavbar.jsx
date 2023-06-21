@@ -9,12 +9,12 @@ function DashboardNavbar() {
     <span>
       <Image
         className="dashboard-navbar-avatar"
-        src={user.avatarUrl}
+        src={user.avatar_url}
         rounded
         width={26}
         height={26}
       />
-      <span>{user.displayName}</span>
+      <span>{user.display_name}</span>
     </span>
   );
   return (
@@ -36,7 +36,7 @@ function DashboardNavbar() {
             <NavDropdown title={avatarLogo} id="dashboard-nav-dropdown">
               <NavDropdownItemLink id="current-account" to="/projects">
                 <BsCheckCircle size={16} />
-                <span className="account-name">{user.displayName}</span>
+                <span className="account-name">{user.display_name}</span>
               </NavDropdownItemLink>
               <NavDropdown.Divider />
               <NavDropdownItemLink to="/org/team" id="create-org-nav" disabled>
@@ -59,7 +59,7 @@ function DashboardNavbar() {
               title={
                 <Image
                   className="dashboard-navbar-avatar"
-                  src={user.avatarUrl}
+                  src={user.avatar_url}
                   rounded
                   width={26}
                   height={26}
@@ -70,14 +70,14 @@ function DashboardNavbar() {
             >
               <div className="profile-avatar">
                 <Image
-                  src={user.avatarUrl}
+                  src={user.avatar_url}
                   roundedCircle
                   width={80}
                   height={80}
                 />
                 <p>
                   <strong className="profile-displayname">
-                    {user.displayName}
+                    {user.display_name}
                   </strong>
                 </p>
               </div>

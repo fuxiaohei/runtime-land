@@ -1,12 +1,6 @@
 import React from "react";
-import {
-  getLocalUser,
-  loginByLocalUser,
-  loginByMail,
-  removeLocalUser,
-  setLocalUser,
-  signupByEmail,
-} from "../api/login";
+import { loginByEmail, loginByLocal, signupEmail } from "../cloud/login";
+import { getLocalUser, removeLocalUser, setLocalUser } from "../cloud/cloud";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import LoginLoadingPage from "../pages/LoginLoadingPage";
 
@@ -22,7 +16,7 @@ function AuthProvider({ children }) {
 
   let signin = async (newUser) => {
     if (newUser.email && newUser.password) {
-      let res = await loginByMail(newUser.email, newUser.password);
+      let res = await loginByEmail(newUser.email, newUser.password);
       if (!res.error) {
         setUser(res);
         setLocalUser(res);
@@ -33,7 +27,7 @@ function AuthProvider({ children }) {
 
   let signup = async (newUser) => {
     if (newUser.email && newUser.password) {
-      let res = await signupByEmail(
+      let res = await signupEmail(
         newUser.email,
         newUser.password,
         newUser.nickname
@@ -61,7 +55,7 @@ function RequireAuth({ children }) {
   let [logged, setLogged] = React.useState(false);
 
   const fetchLogin = async () => {
-    let response = await loginByLocalUser(auth.user || {});
+    let response = await loginByLocal(auth.user || {});
     if (response.error) {
       console.log("[auth] browser token error", response.error);
       auth.signout();

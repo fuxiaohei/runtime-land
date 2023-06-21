@@ -3,31 +3,7 @@ const {
   LoginAccessTokenRequest,
   SignupEmailRequest,
 } = require("./proto/land-rpc_pb.js");
-const { RpcServiceClient } = require("./proto/land-rpc_grpc_web_pb.js");
-const { RPC_CLIENT_ADDRESS, callClient } = require("./utils.js");
-
-function loginByEmail(email, password) {
-  let client = new RpcServiceClient(RPC_CLIENT_ADDRESS);
-  let request = new LoginEmailRequest();
-  request.setEmail(email);
-  request.setPassword(password);
-
-  let promise = new Promise((resolve, reject) => {
-    client.loginEmail(request, {}, (err, response) => {
-      if (err) {
-        resolve({ code: 1, error: err });
-        return;
-      }
-      if (response.getCode()) {
-        resolve({ code: response.getCode(), error: response.getError() });
-        return;
-      }
-      let data = response.getData().toObject();
-      resolve({ code: 0, data: data });
-    });
-  });
-  return promise;
-}
+const { callClient } = require("./utils.js");
 
 function getLocalUser() {
   let local_user = localStorage.getItem("runtime-land-user") || null;
@@ -38,7 +14,7 @@ function getLocalUser() {
 }
 
 function setLocalUser(user) {
-  console.log("setLocalUser:", user)
+  console.log("setLocalUser:", user);
   user.lastVerifyTime = Date.now();
   localStorage.setItem("runtime-land-user", JSON.stringify(user));
 }

@@ -5,7 +5,7 @@ use validator::Validate;
 pub struct SignupEmailRequest {
     #[validate(email)]
     pub email: String,
-    #[validate(length(min = 12))]
+    #[validate(length(min = 8))]
     pub password: String,
     #[validate(length(min = 4))]
     pub nickname: String,
@@ -24,7 +24,7 @@ pub struct LoginResponse {
 pub struct LoginEmailRequest {
     #[validate(email)]
     pub email: String,
-    #[validate(length(min = 12))]
+    #[validate(length(min = 8))]
     pub password: String,
 }
 
@@ -72,6 +72,7 @@ pub struct ProjectData {
     pub created_at: i64,
     pub updated_at: i64,
     pub prod_deployment: i32,
+    pub prod_url: String,
 }
 
 #[derive(Serialize, Debug)]

@@ -7,6 +7,7 @@ use axum::response::IntoResponse;
 use axum::routing::{any, delete, get, post};
 use axum::{Json, Router};
 use std::net::SocketAddr;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
 mod auth;
@@ -45,12 +46,18 @@ fn api_router() -> Router {
 }
 
 pub async fn start_server(addr: SocketAddr) -> Result<()> {
+    let cors = CorsLayer::new()
+        .allow_headers(Any)
+        .allow_methods(Any)
+        .allow_origin(Any);
+
     let app = Router::new()
         .merge(login_router())
         .merge(api_router())
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
-        .layer(DefaultBodyLimit::max(10 * 1024 * 1024));
+        .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
+        .layer(cors);
 
     info!("Starting on {}", addr);
 

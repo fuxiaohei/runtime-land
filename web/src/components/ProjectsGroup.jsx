@@ -26,13 +26,15 @@ function ProjectsGroup({ projects }) {
                     {project.name}
                   </Card.Title>
                   <Card.Text className="project-card-updated">
-                    Updated at {timeAgo.format(project.updatedAt * 1000)}
+                    Updated at {timeAgo.format(project.updated_at * 1000)}
                   </Card.Text>
                 </Link>
               </Col>
               <Col md={4} className="project-view">
-                {project.prodDeployment ? (
-                  <Button>View</Button>
+                {project.prod_deployment ? (
+                  <Button href={project.prod_url} target="_blank">
+                    View
+                  </Button>
                 ) : (
                   <Button variant="light">Dev</Button>
                 )}

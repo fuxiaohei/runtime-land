@@ -29,6 +29,16 @@ pub async fn fetch_handler(
         "fetch_project success, userid:{}, name:{}",
         current_user.id, payload.name
     );
+    let prod_url = if project.prod_deploy_id > 0 {
+        format!(
+            "{}://{}.{}",
+            PROD_PROTOCOL.get().unwrap(),
+            project.name.clone(),
+            PROD_DOMAIN.get().unwrap()
+        )
+    } else {
+        String::new()
+    };
     Ok((
         StatusCode::OK,
         Json(params::ProjectData {
@@ -38,6 +48,7 @@ pub async fn fetch_handler(
             prod_deployment: project.prod_deploy_id,
             created_at: project.created_at.timestamp(),
             updated_at: project.updated_at.timestamp(),
+            prod_url,
         }),
     ))
 }
@@ -63,6 +74,7 @@ pub async fn create_handler(
             prod_deployment: project.prod_deploy_id,
             created_at: project.created_at.timestamp(),
             updated_at: project.updated_at.timestamp(),
+            prod_url: String::new(),
         }),
     ))
 }
@@ -74,15 +86,33 @@ pub async fn list_handler(
     let projects = dao::project::list(current_user.id).await?;
     let values: Vec<params::ProjectData> = projects
         .into_iter()
-        .map(|p| params::ProjectData {
-            name: p.name,
-            language: p.language,
-            uuid: p.uuid,
-            prod_deployment: p.prod_deploy_id,
-            created_at: p.created_at.timestamp(),
-            updated_at: p.updated_at.timestamp(),
+        .map(|p| {
+            let prod_url = if p.prod_deploy_id > 0 {
+                format!(
+                    "{}://{}.{}",
+                    PROD_PROTOCOL.get().unwrap(),
+                    p.name.clone(),
+                    PROD_DOMAIN.get().unwrap()
+                )
+            } else {
+                String::new()
+            };
+            params::ProjectData {
+                name: p.name,
+                language: p.language,
+                uuid: p.uuid,
+                prod_deployment: p.prod_deploy_id,
+                created_at: p.created_at.timestamp(),
+                updated_at: p.updated_at.timestamp(),
+                prod_url,
+            }
         })
         .collect();
+    info!(
+        "list_projects success, userid:{}, count:{}",
+        current_user.id,
+        values.len()
+    );
     Ok((StatusCode::OK, Json(values)))
 }
 

@@ -16,6 +16,7 @@ reqwest = { workspace = true }
 serde = { workspace = true }
 thiserror = "1.0.40"
 tokio = { workspace = true }
+tower-http = { version = "0.4.1", features = ["cors"] }
 tracing = { workspace = true }
 url = "2.4.0"
 validator = { version = "0.16.0", features = ["derive"] }

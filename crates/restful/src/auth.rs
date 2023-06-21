@@ -27,7 +27,7 @@ pub async fn auth<B>(mut request: Request<B>, next: Next<B>) -> Result<Response,
         return Err(StatusCode::UNAUTHORIZED);
     }
     request.extensions_mut().insert(CurrentUser {
-        id: token.unwrap().id,
+        id: token.unwrap().owner_id,
     });
 
     let response = next.run(request).await;

@@ -1,5 +1,4 @@
-import { ButtonLink } from "../components/ButtonLink";
-import { createEmptyProject } from "../api/project";
+import { createProject } from "../cloud/projects";
 import DashboardNavbar from "../components/DashboardNavbar";
 import {
   Container,
@@ -49,7 +48,7 @@ function NewProjectPage() {
       return;
     }
     setShowAlert(false);
-    let response = await createEmptyProject(autoName, "rust"); // only support rust now
+    let response = await createProject(autoName, "rust"); // only support rust now
     if (response.error) {
       setShowAlert(true);
       setAlertMessage(response.error);
