@@ -29,7 +29,7 @@ pub async fn deploy(
     println!("Fetching Project '{project_name}'");
 
     // fetch project info
-    let client = Client::new(addr, token);
+    let client = Client::new(addr, token).expect("Create cloud client failed");
     let mut project = client
         .fetch_project(project_name.clone(), meta.language.clone())
         .await
