@@ -24,7 +24,6 @@ members = [
     "crates/core",
     "crates/migration",
     "crates/restful",
-    "crates/rpc",
     "crates/runtime",
     "crates/sdk",
     "crates/sdk/macro",

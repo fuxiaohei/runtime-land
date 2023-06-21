@@ -57,14 +57,14 @@ pub struct RemoveTokenRequest {
     pub uuid: String,
 }
 
-#[derive(Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct FetchProjectRequest {
     #[validate(length(min = 3))]
     pub name: String,
     pub language: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ProjectData {
     pub name: String,
     pub language: String,
@@ -87,7 +87,7 @@ pub struct ProjectOverview {
     pub prod_deployment: Option<DeploymentData>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeploymentData {
     pub id: i32,
     pub project_id: i32,
@@ -102,7 +102,7 @@ pub struct DeploymentData {
     pub deploy_status: i32,
 }
 
-#[derive(Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct CreateDeployRequest {
     #[validate(length(min = 3))]
     pub project_name: String,
@@ -114,7 +114,7 @@ pub struct CreateDeployRequest {
     pub deploy_content_type: String,
 }
 
-#[derive(Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct PublishDeployRequest {
     pub deploy_id: i32,
     #[validate(length(min = 3))]

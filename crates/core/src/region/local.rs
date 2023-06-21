@@ -2,13 +2,16 @@ use anyhow::Result;
 use envconfig::Envconfig;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 // LOCAL_REGION is the local region operator
 pub static LOCAL_REGION: OnceCell<Operator> = OnceCell::new();
 
 // LOCAL_REGION_RUNTIME is the local region runtime service name
 pub static LOCAL_REGION_RUNTIME: OnceCell<String> = OnceCell::new();
+
+// LOCAL_REGION_ENABLED is the local region enabled
+static LOCAL_REGION_ENABLED: OnceCell<bool> = OnceCell::new();
 
 #[derive(Envconfig, Debug)]
 pub struct LocalConfig {
@@ -31,8 +34,11 @@ pub async fn init() -> Result<()> {
     let cfg = LocalConfig::init_from_env()?;
     if !cfg.enable {
         info!("Disabled");
+        LOCAL_REGION_ENABLED.set(false).unwrap();
         return Ok(());
     }
+    LOCAL_REGION_ENABLED.set(true).unwrap();
+
     let mut builder = opendal::services::Redis::default();
     builder
         .endpoint(&cfg.redis_addr)
@@ -50,6 +56,10 @@ pub async fn init() -> Result<()> {
 }
 
 pub async fn deploy(deploy_id: i32, mut deploy_uuid: String, is_production: bool) -> Result<()> {
+    if !LOCAL_REGION_ENABLED.get().unwrap() {
+        warn!("local region disabled");
+        return Ok(());
+    }
     let deployment = crate::dao::deployment::find(deploy_id, deploy_uuid.clone()).await?;
     if deployment.is_none() {
         return Err(anyhow::anyhow!("deployment not found"));

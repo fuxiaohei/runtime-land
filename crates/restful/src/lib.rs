@@ -1,5 +1,6 @@
 use anyhow::Result;
 use axum::body::Body;
+use axum::extract::DefaultBodyLimit;
 use axum::http::{Request, Response, StatusCode};
 use axum::middleware;
 use axum::response::IntoResponse;
@@ -15,9 +16,11 @@ mod params;
 mod projects;
 mod tokens;
 
+pub mod client;
+
 // basic handler that responds with a static string
 async fn default_handler(_req: Request<Body>) -> Response<Body> {
-    Response::new(Body::from("Hello, World!"))
+    Response::new(Body::from("Hello, Runtime.land!"))
 }
 
 fn login_router() -> Router {
@@ -46,7 +49,8 @@ pub async fn start_server(addr: SocketAddr) -> Result<()> {
         .merge(login_router())
         .merge(api_router())
         .route("/", any(default_handler))
-        .route("/*path", any(default_handler));
+        .route("/*path", any(default_handler))
+        .layer(DefaultBodyLimit::max(10 * 1024 * 1024));
 
     info!("Starting on {}", addr);
 
@@ -57,7 +61,7 @@ pub async fn start_server(addr: SocketAddr) -> Result<()> {
 }
 
 // Make our own error that wraps `anyhow::Error`.
-pub struct AppError(anyhow::Error);
+pub struct AppError(anyhow::Error, StatusCode);
 
 #[derive(serde::Serialize)]
 struct AppErrorJson {
@@ -68,7 +72,7 @@ struct AppErrorJson {
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            self.1,
             Json::from(AppErrorJson {
                 message: self.0.to_string(),
             }),
@@ -84,6 +88,6 @@ where
     E: Into<anyhow::Error>,
 {
     fn from(err: E) -> Self {
-        Self(err.into())
+        Self(err.into(), StatusCode::INTERNAL_SERVER_ERROR)
     }
 }

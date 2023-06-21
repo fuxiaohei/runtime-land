@@ -10,8 +10,9 @@ axum = { workspace = true }
 clap = { workspace = true }
 futures-util = "0.3.28"
 land-core = { path = "../core" }
-land-rpc = { path = "../rpc" }
+land-restful = { path = "../restful" }
 land-runtime = { path = "../runtime" }
+reqwest = { workspace = true }
 rust-embed = "6.7.0"
 tokio = { workspace = true }
 tracing = { workspace = true }

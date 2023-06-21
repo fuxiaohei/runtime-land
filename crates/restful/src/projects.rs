@@ -2,7 +2,7 @@ use crate::auth::CurrentUser;
 use crate::{params, AppError};
 use axum::extract::Extension;
 use axum::http::StatusCode;
-use axum::Json;
+use axum::{Form, Json};
 use land_core::{dao, PROD_DOMAIN, PROD_PROTOCOL};
 use tracing::{info, warn};
 use validator::Validate;
@@ -10,7 +10,7 @@ use validator::Validate;
 /// lfetch_handler fetches a project by uuid for current user.
 pub async fn fetch_handler(
     Extension(current_user): Extension<CurrentUser>,
-    Json(payload): Json<params::FetchProjectRequest>,
+    Form(payload): Form<params::FetchProjectRequest>,
 ) -> Result<(StatusCode, Json<params::ProjectData>), AppError> {
     payload.validate()?;
     let project = dao::project::find(current_user.id, payload.name.clone()).await?;
@@ -19,7 +19,10 @@ pub async fn fetch_handler(
             "project not found, userid:{}, name:{}",
             current_user.id, payload.name
         );
-        return Err(anyhow::anyhow!("project not found").into());
+        return Err(AppError(
+            anyhow::anyhow!("project not found"),
+            StatusCode::NOT_FOUND,
+        ));
     }
     let project = project.unwrap();
     info!(

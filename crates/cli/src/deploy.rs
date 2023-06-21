@@ -1,9 +1,7 @@
-use anyhow::Result;
 use land_core::meta::Meta;
-use land_rpc::client::Client;
-use land_rpc::{DeploymentResponse, ProjectResponse};
+use land_restful::client::Client;
 use std::path::Path;
-use tracing::{debug, info, warn};
+use tracing::{debug, warn};
 
 pub async fn deploy(
     meta: &mut Meta,
@@ -31,79 +29,55 @@ pub async fn deploy(
     println!("Fetching Project '{project_name}'");
 
     // fetch project info
-    let mut client = Client::new(addr, token).await.unwrap();
-    let project = fetch_project(&mut client, project_name, meta.language.clone())
+    let client = Client::new(addr, token);
+    let mut project = client
+        .fetch_project(project_name.clone(), meta.language.clone())
         .await
-        .expect("Fetch project '{project_name}' failed")
-        .unwrap();
+        .expect("Fetch project '{project_name}' failed");
+    // if project is not exist, create a new one
+    if project.is_none() {
+        println!("Project '{project_name}' not found, creating project");
+        let project2 = client
+            .create_project(project_name.clone(), meta.language.clone())
+            .await
+            .expect("Create project '{project_name}' failed");
+        project = Some(project2);
+    }
+    let project = project.unwrap();
+    debug!("project: {:?}", project);
 
-    // upload wasm file to project
+    // prepare wasm binary
     let wasm_binary = std::fs::read(output).unwrap();
     println!(
         "Uploading assets to project '{project_name}', size: {size} KB",
         project_name = project.name,
         size = wasm_binary.len() / 1024,
     );
-    let deployment = create_deploy(&mut client, &project, wasm_binary, is_production)
-        .await
-        .unwrap();
-
-    debug!("deploy: {:?}", deployment);
-
-    println!("Deployed to project '{}' success\n", project.name,);
-    if is_production {
-        println!("Deploy to Production");
-    }
-    println!("View at:");
-    println!("- {}", deployment.url);
-}
-
-async fn fetch_project(
-    client: &mut Client,
-    project_name: String,
-    language: String,
-) -> Result<Option<ProjectResponse>> {
-    // fetch project
-    let mut project = client
-        .fetch_project(project_name.clone(), language.clone())
-        .await
-        .map_err(|e| anyhow::anyhow!("fetch project failed: {:?}", e.to_string()))?;
-
-    // if project is not exist, create empty project with name
-    if project.is_none() {
-        info!("Project not found, create '{project_name}' project");
-        project = client
-            .create_project(project_name.clone(), language.clone())
-            .await
-            .unwrap_or_else(|e| {
-                warn!("create project failed: {:?}", e);
-                None
-            });
-        info!(
-            "Project '{project_name}' created",
-            project_name = project_name
-        );
-    }
-    Ok(project)
-}
-
-async fn create_deploy(
-    client: &mut Client,
-    project: &ProjectResponse,
-    binary: Vec<u8>,
-    is_production: bool,
-) -> Option<DeploymentResponse> {
-    client
-        .create_deployment(
+    let mut deployment = client
+        .create_deploy(
             project.name.clone(),
             project.uuid.clone(),
-            binary,
+            wasm_binary,
             "application/wasm".to_string(),
-            is_production,
         )
         .await
-        .unwrap_or_else(|e| {
-            warn!("create deployment failed: {:?}", e);
-            None
-        })
+        .expect("Create deploy failed");
+    debug!("deployment: {:?}", deployment);
+    println!("Deployed to project '{}' success\n", project.name,);
+
+    if is_production {
+        deployment = client
+            .publish_deploy(deployment.id, deployment.uuid)
+            .await
+            .expect("Publish deploy failed");
+        debug!("production deployment: {:?}", deployment);
+
+        println!("Deploy to Production");
+        println!("View at:");
+        println!("- {}", deployment.prod_url);
+        return;
+    }
+
+    println!("View at:");
+    println!("- {}", deployment.domain_url);
 }
