@@ -1,5 +1,5 @@
 use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
-#[folder = "../../examples"]
+#[folder = "./examples"]
 pub struct TemplateAssets;

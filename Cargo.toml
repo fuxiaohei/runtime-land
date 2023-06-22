@@ -1,5 +1,5 @@
 [package]
-name = "land-server"
+name = "land-cli"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -16,25 +16,28 @@ homepage = "https://runtime.land"
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
+futures-util = "0.3.28"
 land-core = { workspace = true }
 land-restful = { workspace = true }
-serde = { workspace = true }
+land-runtime = { workspace = true }
+reqwest = { workspace = true }
+rust-embed = "6.7.0"
 tokio = { workspace = true }
-toml = { workspace = true }
 tracing = { workspace = true }
+which = "4.4.0"
 
 [build-dependencies]
 land-runtime = { workspace = true }
 
 [workspace]
 members = [
-    "crates/cli",
     "crates/core",
     "crates/migration",
     "crates/restful",
     "crates/runtime",
     "crates/sdk",
     "crates/sdk/macro",
+    "crates/server",
     "examples/rust-basic",
     "examples/rust-fetch",
     "examples/rust-router",

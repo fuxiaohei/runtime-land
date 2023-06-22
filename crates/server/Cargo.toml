@@ -1,32 +1,24 @@
 [package]
-name = "land-cli"
+name = "land-server"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-description = "The CLI for the Runtime Land"
+description = "A tiny serverless platform for WebAssembly"
 license = "Apache-2.0"
 documentation = "https://runtime.land"
 categories = ["wasm"]
 keywords = ["webassembly", "wasm", "serverless"]
 repository = "https://github.com/fuxiaohei/runtime.land"
-include = [
-    "../../examples/",
-]
-
-[[bin]]
-name = "land-cli"
-path = "src/main.rs"
+readme = "README.md"
+homepage = "https://runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
-futures-util = "0.3.28"
 land-core = { workspace = true }
 land-restful = { workspace = true }
-land-runtime = { workspace = true }
-reqwest = { workspace = true }
-rust-embed = "6.7.0"
+serde = { workspace = true }
 tokio = { workspace = true }
+toml = { workspace = true }
 tracing = { workspace = true }
-which = "4.4.0"

@@ -1,40 +1,35 @@
 use clap::Parser;
-use tracing::debug;
+use land_core::trace;
+use land_core::version;
 
-#[derive(Parser, Debug)]
-#[clap(name = "land-server", version = land_core::version::get())]
-struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:38779"))]
-    pub http_addr: String,
+mod deploy;
+mod embed;
+mod flags;
+mod server;
+
+/// cli command line
+#[derive(Parser)]
+#[clap(name = "land-cli", version = version::get())]
+enum Cli {
+    /// Init creates a new project
+    Init(flags::Init),
+    /// Build compiles the project
+    Build(flags::Build),
+    /// Serve runs the project
+    Serve(flags::Serve),
+    /// Deploy to cloud server
+    Deploy(flags::Deploy),
 }
 
 #[tokio::main]
 async fn main() {
-    land_core::trace::init();
+    trace::init();
 
     let args = Cli::parse();
-    debug!("load args: {:?}", args);
-
-    // init storage
-    land_core::storage::init()
-        .await
-        .expect("init storage failed");
-
-    // init db
-    land_core::db::init().await.expect("init db failed");
-
-    // init prod const
-    land_core::init_prod_const()
-        .await
-        .expect("init prod const failed");
-
-    // init local region
-    land_core::region::local::init()
-        .await
-        .expect("init local region failed");
-
-    // start restful server
-    land_restful::start_server(args.http_addr.parse().unwrap())
-        .await
-        .unwrap();
+    match args {
+        Cli::Init(cmd) => cmd.run().await,
+        Cli::Build(cmd) => cmd.run().await,
+        Cli::Serve(cmd) => cmd.run().await,
+        Cli::Deploy(cmd) => cmd.run().await,
+    }
 }
