@@ -20,10 +20,8 @@ jobs:
         include:
           - dockerfile: ./deploy/land-server.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/land-server
-            make_subcommand: "build-server"
           - dockerfile: ./deploy/land-runtime.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/land-runtime
-            make_subcommand: "build-runtime"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -33,9 +31,6 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ matrix.image }}
-          tags: |
-            type=raw,value=latest,enable=true
-            type=sha,enable=true,format=short
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx

@@ -7,7 +7,7 @@ test-wit-v2:
 
 build-server:
 	@echo "Building server..."
-	@cargo build --release
+	@cargo build --release -p land-server
 
 build-runtime:
 	@echo "Building runtime..."
