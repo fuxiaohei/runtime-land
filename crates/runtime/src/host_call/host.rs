@@ -1,5 +1,5 @@
 wasmtime::component::bindgen!({
     world: "http-service",
-    path: "../../wit",
+    path: "./wit",
     async:true,
 });

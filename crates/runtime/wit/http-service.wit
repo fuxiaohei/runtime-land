@@ -1,0 +1,6 @@
+package land:serverless
+
+world http-service {
+    import land:http/http-body
+    import land:http/http-outgoing
+}
