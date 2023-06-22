@@ -4,14 +4,14 @@ import { ButtonLink } from "./ButtonLink";
 
 function ProjectHeader({ project, projectName }) {
   const renderViewButton = () => {
-    if (project.prodDeploymentId) {
+    if (project.prod_deployment_id) {
       return (
         <Button
           variant="primary"
           size="sm"
           className="ms-2"
           target="_blank"
-          href={project.prodDeployment.urlsList[0]}
+          href={project.prod_deployment.prod_url}
         >
           <BsClouds size={16} className="icon" />
           View
@@ -28,7 +28,7 @@ function ProjectHeader({ project, projectName }) {
           <Col md={6} sm={6} xs={5} id="project-header-left">
             <h2>{projectName}</h2>
             <p>
-              {project.prodDeploymentId ? "In Production" : "No Deployment"}
+              {project.prod_deployment_id ? "In Production" : "No Deployment"}
             </p>
           </Col>
           <Col id="project-header-right">

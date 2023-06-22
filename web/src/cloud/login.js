@@ -1,4 +1,4 @@
-import { createClient } from "./cloud";
+import { createClient, format_axios_error } from "./cloud";
 
 async function loginByEmail(email, password) {
   let client = createClient();
@@ -10,7 +10,7 @@ async function loginByEmail(email, password) {
     console.log("loginByEmail:", email);
     return response.data || {};
   } catch (error) {
-    return { error: error };
+    return { error: format_axios_error(error) };
   }
 }
 
@@ -23,7 +23,7 @@ async function loginByLocal(user) {
     console.log("loginByLocal:", user.access_token);
     return response.data || {};
   } catch (error) {
-    return { error: error };
+    return { error: format_axios_error(error) };
   }
 }
 
@@ -38,7 +38,7 @@ async function signupEmail(email, password, nickname) {
     console.log("signup:", email);
     return response.data || {};
   } catch (error) {
-    return { error: error };
+    return { error: format_axios_error(error) };
   }
 }
 

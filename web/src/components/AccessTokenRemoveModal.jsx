@@ -3,9 +3,8 @@ import { TbWebhook, TbSquareKey } from "react-icons/tb";
 import TimeAgo from "javascript-time-ago";
 
 function AccessTokenRemoveModal(props) {
-  const token = props.token || { updatedAt: 0, expiresAt: 0, origin: "" };
+  const token = props.token || { updated_at: 0, expired_at: 0, origin: "" };
   const timeAgo = new TimeAgo("en-US");
-
   return (
     <Modal
       {...props}
@@ -34,8 +33,8 @@ function AccessTokenRemoveModal(props) {
               )}
               <span className="ps-1 align-text-top fw-bold">{token.name}</span>
               <span className="ps-2 extra">
-                Logged {timeAgo.format(token.updatedAt * 1000)}, expires{" "}
-                {timeAgo.format(token.expiresAt * 1000)}
+                Logged {timeAgo.format(token.updated_at * 1000)}, expires{" "}
+                {timeAgo.format(token.expired_at * 1000)}
               </span>
             </div>
           </ListGroup.Item>

@@ -4,11 +4,7 @@ import AccessTokenCreateModal from "../components/AccessTokenCreateModal";
 import AccessTokenCreatedItem from "../components/AccessTokenCreatedItem";
 import AccessTokensListGroup from "../components/AccessTokensListGroup";
 import React, { useEffect } from "react";
-import {
-  createAccessToken,
-  listAccessTokens,
-  removeAccessToken,
-} from "../api/token";
+import { listTokens, createToken, removeToken } from "../cloud/token";
 import AccessTokenRemoveModal from "../components/AccessTokenRemoveModal";
 
 function SettingsPage() {
@@ -28,7 +24,7 @@ function SettingsPage() {
     event.preventDefault();
     event.stopPropagation();
 
-    let response = await createAccessToken(tokenName);
+    let response = await createToken(tokenName);
     if (response.error) {
       return;
     }
@@ -47,15 +43,15 @@ function SettingsPage() {
   };
 
   const fetchTokens = async () => {
-    let response = await listAccessTokens();
+    let response = await listTokens();
     if (response.error) {
       return;
     }
-    setTokensList(response.dataList || []);
+    setTokensList(response || []);
   };
 
   const handleRemoveSubmit = async (token) => {
-    let response = await removeAccessToken(token.uuid);
+    let response = await removeToken(token.uuid);
     if (response.error) {
       return;
     }
@@ -75,44 +71,46 @@ function SettingsPage() {
     <div>
       <DashboardNavbar />
       <Container id="account-settings-container">
-        <header id="account-settings-header">
-          <h2>Account Settings</h2>
-        </header>
-        <Card id="access-tokens-container" className="account-settings-card">
-          <Card.Body>
-            <Card.Title id="access-tokens">Access Tokens</Card.Title>
-            <Card.Subtitle>
-              Personal access tokens can be used to access Runtime.land API.
-            </Card.Subtitle>
-            {tokensList.length ? (
-              <AccessTokensListGroup
-                tokens={tokensList}
-                onRemoveClick={handleRemoveClick}
-              />
-            ) : (
-              <Spinner
-                className="access-tokens-loading"
-                animation="border"
-                size="sm"
-              />
-            )}
-            {createdToken ? (
-              <AccessTokenCreatedItem
-                onDoneClick={handleDoneClick}
-                value={createdToken}
-              />
-            ) : null}
-            <Card.Text>
-              <Button
-                variant="dark"
-                size="sm"
-                onClick={() => setTokenModelShow(true)}
-              >
-                Create Access Token
-              </Button>
-            </Card.Text>
-          </Card.Body>
-        </Card>
+        <Container>
+          <header id="account-settings-header">
+            <h2>Account Settings</h2>
+          </header>
+          <Card id="access-tokens-container" className="account-settings-card">
+            <Card.Body>
+              <Card.Title id="access-tokens">Access Tokens</Card.Title>
+              <Card.Subtitle>
+                Personal access tokens can be used to access Runtime.land API.
+              </Card.Subtitle>
+              {tokensList.length ? (
+                <AccessTokensListGroup
+                  tokens={tokensList}
+                  onRemoveClick={handleRemoveClick}
+                />
+              ) : (
+                <Spinner
+                  className="access-tokens-loading"
+                  animation="border"
+                  size="sm"
+                />
+              )}
+              {createdToken ? (
+                <AccessTokenCreatedItem
+                  onDoneClick={handleDoneClick}
+                  value={createdToken}
+                />
+              ) : null}
+              <Card.Text>
+                <Button
+                  variant="dark"
+                  size="sm"
+                  onClick={() => setTokenModelShow(true)}
+                >
+                  Create Access Token
+                </Button>
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Container>
       </Container>
       <AccessTokenCreateModal
         show={tokenModelShow}

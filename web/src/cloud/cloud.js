@@ -34,10 +34,28 @@ function createClient() {
   return instance;
 }
 
+function format_axios_error(error) {
+  let message = error.toString();
+  if (error.response) {
+    let data = error.response.data;
+    if (typeof data === "object") {
+      if (data.message) {
+        message = data.message;
+      } else {
+        message = JSON.stringify(data);
+      }
+    } else {
+      message = data;
+    }
+  }
+  return message;
+}
+
 export {
   RPC_CLIENT_ADDRESS,
   createClient,
   getLocalUser,
   removeLocalUser,
   setLocalUser,
+  format_axios_error
 };

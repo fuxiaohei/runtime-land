@@ -19,13 +19,13 @@ function ProjectDeploymentsListGroup({
     >
       <div className="deployment-metadata text-truncate">
         <BsCheck2Circle className="status-icon me-2" size={20} />
-        <a className="name" href={deployment.url} target="_blank">
-          {new URL(deployment.url).host}
+        <a className="name" href={deployment.domain_url} target="_blank">
+          {new URL(deployment.domain_url).host}
         </a>
       </div>
       <div className="deployment-promotion">
         <span className="time-ago small text-muted">
-          {timeAgo.format(deployment.updatedAt * 1000)}
+          {timeAgo.format(deployment.updated_at * 1000)}
         </span>
         <Dropdown className="promote-btn ms-2 d-inline-block">
           <Dropdown.Toggle as="a" className="cursor-pointer">

@@ -119,7 +119,7 @@ pub async fn list_handler(
 /// overview_handler returns a project overview.
 pub async fn overview_handler(
     Extension(current_user): Extension<CurrentUser>,
-    Json(payload): Json<params::FetchProjectRequest>,
+    Form(payload): Form<params::FetchProjectRequest>,
 ) -> Result<(StatusCode, Json<params::ProjectOverview>), AppError> {
     payload.validate()?;
     let project = dao::project::find(current_user.id, payload.name.clone()).await?;

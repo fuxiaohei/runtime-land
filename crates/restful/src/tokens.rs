@@ -1,6 +1,6 @@
 use crate::auth::CurrentUser;
 use crate::{params, AppError};
-use axum::extract::Extension;
+use axum::extract::{Extension, Query};
 use axum::http::StatusCode;
 use axum::Json;
 use land_core::dao;
@@ -66,7 +66,7 @@ pub async fn create_handler(
 /// remove_handler removes a token of current user.
 pub async fn remove_handler(
     Extension(current_user): Extension<CurrentUser>,
-    Json(payload): Json<params::RemoveTokenRequest>,
+    Query(payload): Query<params::RemoveTokenRequest>,
 ) -> Result<StatusCode, AppError> {
     payload.validate()?;
     dao::token::remove(current_user.id, payload.uuid.clone()).await?;

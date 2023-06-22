@@ -18,8 +18,8 @@ function AccessTokensListGroup({ tokens, onRemoveClick }) {
         )}
         <span className="ps-1 align-text-top fw-bold">{token.name}</span>
         <span className="ps-2 extra">
-          Logged {timeAgo.format(token.updatedAt * 1000)}, expires{" "}
-          {timeAgo.format(token.expiresAt * 1000)}
+          Logged {timeAgo.format(token.updated_at * 1000)}, expires{" "}
+          {timeAgo.format(token.expired_at * 1000)}
         </span>
       </div>
       <Button

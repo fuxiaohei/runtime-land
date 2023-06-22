@@ -28,7 +28,9 @@ function DeployToProductionModal(props) {
         will proxy to
         <br />
         <strong>
-          {props.current.url ? new URL(props.current.url).host : ""}
+          {props.current.domain_url
+            ? new URL(props.current.domain_url).host
+            : ""}
         </strong>
       </Modal.Body>
       <Modal.Footer>

@@ -5,13 +5,6 @@ import TimeAgo from "javascript-time-ago";
 
 function ProjectProdDeploymentCard({ deployment }) {
   const timeAgo = new TimeAgo("en-US");
-  const listDomains = deployment.domainsList.map((domain, index) => (
-    <ListGroup.Item key={domain}>
-      <a href={deployment.urlsList[index]} target="_blank">
-        {domain}
-      </a>
-    </ListGroup.Item>
-  ));
   return (
     <Card className="project-prod-card mb-3">
       <Card.Body>
@@ -25,10 +18,19 @@ function ProjectProdDeploymentCard({ deployment }) {
         </Card.Title>
         <div>
           <ListGroup variant="flush" className="project-prod-domains">
-            {listDomains}
+            <ListGroup.Item>
+              <a href={deployment.prod_url} target="_blank">
+                {new URL(deployment.prod_url).host}
+              </a>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <a href={deployment.domain_url} target="_blank">
+                {new URL(deployment.domain_url).host}
+              </a>
+            </ListGroup.Item>
             <ListGroup.Item className="text-end small text-muted text-uppercase">
               <BsClock size={10} className="me-1" />
-              {timeAgo.format(deployment.updatedAt * 1000)}
+              {timeAgo.format(deployment.updated_at * 1000)}
             </ListGroup.Item>
           </ListGroup>
         </div>

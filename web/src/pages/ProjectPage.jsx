@@ -4,7 +4,7 @@ import { ButtonLink } from "../components/ButtonLink";
 import ProjectHeader from "../components/ProjectHeader";
 import ProjectTabs from "../components/ProjectTabs";
 import { useParams } from "react-router-dom";
-import { getProjectOverview, publishDeployment } from "../api/project";
+import { getProjectOverview, publishDeployment } from "../cloud/projects";
 import React, { useEffect } from "react";
 import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
@@ -72,9 +72,9 @@ function ProjectPage() {
           <Container>
             <Row>
               <Col lg={8} md={12} id="project-overview-left">
-                {projectOverview && projectOverview.prodDeploymentId ? (
+                {projectOverview && projectOverview.prod_deployment_id ? (
                   <ProjectProdDeploymentCard
-                    deployment={projectOverview.prodDeployment || {}}
+                    deployment={projectOverview.prod_deployment || {}}
                   />
                 ) : (
                   <ProjectNoDeploymentCard />
@@ -95,7 +95,7 @@ function ProjectPage() {
                       </div>
                     </Card.Title>
                     <ProjectDeploymentsListGroup
-                      deploymentsList={projectOverview?.deploymentsList || []}
+                      deploymentsList={projectOverview?.deployments || []}
                       onDeployToProduction={handleDeployToProduction}
                     />
                   </Card.Body>
@@ -122,8 +122,8 @@ function ProjectPage() {
         show={showDeployToProduction}
         loading={loadingDeployToProduction.toString()}
         current={currentDeployToProduction || {}}
-        prev={projectOverview?.prodDeployment || {}}
-        produrl={projectOverview?.prodUrl || ""}
+        prev={projectOverview?.prod_deployment || {}}
+        produrl={projectOverview?.prod_url || ""}
         onCancel={handleDeployToProductionCancel}
         onSubmit={handleDeployToProductionConfirm}
       />
