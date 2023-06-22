@@ -1903,7 +1903,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "axum",
@@ -1921,7 +1921,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "bcrypt",
@@ -1946,7 +1946,7 @@ dependencies = [
 
 [[package]]
 name = "land-restful"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1966,7 +1966,7 @@ dependencies = [
 
 [[package]]
 name = "land-runtime"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1995,7 +1995,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "http",
@@ -2007,7 +2007,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "http",
@@ -2017,7 +2017,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "axum",
@@ -2165,7 +2165,7 @@ dependencies = [
 
 [[package]]
 name = "migration"
-version = "0.0.9"
+version = "0.0.3"
 dependencies = [
  "async-std",
  "sea-orm-migration",

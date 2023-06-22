@@ -3,6 +3,13 @@ name = "land-server"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
+license = { workspace = true }
+documenation = { workspace = true }
+categories = { workspace = true }
+keywords = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+publish = false
 
 [dependencies]
 anyhow = { workspace = true }
@@ -80,3 +87,10 @@ uuid = { version = "1.3.3", features = ["v4"] }
 version = "0.0.3"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
+license = "Apache-2.0"
+documenation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
+readme = "README.md"
+homepage = "https://runtime.land"

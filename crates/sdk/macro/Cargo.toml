@@ -3,6 +3,10 @@ name = "land-sdk-macro"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
+documenation = { workspace = true }
+categories = { workspace = true }
+keywords = { workspace = true }
+repository = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
