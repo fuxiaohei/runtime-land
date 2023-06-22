@@ -9,6 +9,13 @@ documentation = "https://runtime.land"
 categories = ["wasm"]
 keywords = ["webassembly", "wasm", "serverless"]
 repository = "https://github.com/fuxiaohei/runtime.land"
+include = [
+    "../../examples/",
+]
+
+[[bin]]
+name = "land-cli"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = { workspace = true }
