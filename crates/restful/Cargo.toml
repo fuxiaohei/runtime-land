@@ -3,14 +3,19 @@ name = "land-restful"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-publish = false
+description = "Database migration for Runtime Land"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 axum = { workspace = true }
 gravatar = "0.2.0"
-land-core = { path = "../core" }
+land-core = { workspace = true }
 rand = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

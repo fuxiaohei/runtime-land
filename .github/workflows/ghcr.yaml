@@ -72,9 +72,6 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ matrix.image }}
-          tags: |
-            type=raw,value=latest,enable=true
-            type=sha,enable=true,format=short
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx

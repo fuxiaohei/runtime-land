@@ -3,20 +3,21 @@ name = "land-cli"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-documenation = { workspace = true }
-categories = { workspace = true }
-keywords = { workspace = true }
-repository = { workspace = true }
-
+description = "The CLI for the Runtime Land"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
 futures-util = "0.3.28"
-land-core = { path = "../core" }
-land-restful = { path = "../restful" }
-land-runtime = { path = "../runtime" }
+land-core = { workspace = true }
+land-restful = { workspace = true }
+land-runtime = { workspace = true }
 reqwest = { workspace = true }
 rust-embed = "6.7.0"
 tokio = { workspace = true }

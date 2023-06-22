@@ -1,6 +1,6 @@
 use anyhow::Result;
 use envconfig::Envconfig;
-use migration::MigratorTrait;
+use land_migration::MigratorTrait;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use serde::{Deserialize, Serialize};
@@ -72,7 +72,7 @@ pub async fn init() -> Result<()> {
     let db = Database::connect(opt).await?;
 
     // run migrations
-    migration::Migrator::up(&db, None).await?;
+    land_migration::Migrator::up(&db, None).await?;
 
     DB.set(db).unwrap();
     info!("Init success: {}", cfg.url_safe());

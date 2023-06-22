@@ -3,15 +3,17 @@ name = "land-sdk"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-documenation = { workspace = true }
-categories = { workspace = true }
-keywords = { workspace = true }
-repository = { workspace = true }
+description = "Database migration for Runtime Land"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
 http = { workspace = true }
-land-sdk-macro = { path = "./macro" }
+land-sdk-macro = { workspace = true }
 lazy_static = { workspace = true }
 matchit = "0.7.0"
 wit-bindgen = { workspace = true }

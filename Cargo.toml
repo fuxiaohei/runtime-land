@@ -3,27 +3,28 @@ name = "land-server"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-license = { workspace = true }
-documenation = { workspace = true }
-categories = { workspace = true }
-keywords = { workspace = true }
-repository = { workspace = true }
-homepage = { workspace = true }
-publish = false
+description = "A tiny serverless platform for WebAssembly"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
+readme = "README.md"
+homepage = "https://runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
-land-core = { path = "crates/core" }
-land-restful = { path = "crates/restful" }
+land-core = { workspace = true }
+land-restful = { workspace = true }
 serde = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
 tracing = { workspace = true }
 
 [build-dependencies]
-land-runtime = { path = "crates/runtime" }
+land-runtime = { workspace = true }
 
 [workspace]
 members = [
@@ -82,15 +83,14 @@ wit-bindgen-core = "0.7.0"
 wit-bindgen-rust = "0.7.0"
 wit-component = "0.11.0"
 uuid = { version = "1.3.3", features = ["v4"] }
+land-core = { path = "crates/core", version = "0.0.3" }
+land-restful = { path = "crates/restful", version = "0.0.3" }
+land-runtime = { path = "crates/runtime", version = "0.0.3" }
+land-migration = { path = "crates/migration", version = "0.0.3" }
+land-sdk = { path = "crates/sdk", version = "0.0.3" }
+land-sdk-macro = { path = "crates/sdk/macro", version = "0.0.3" }
 
 [workspace.package]
 version = "0.0.3"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
-license = "Apache-2.0"
-documenation = "https://runtime.land"
-categories = ["wasm"]
-keywords = ["webassembly", "wasm", "serverless"]
-repository = "https://github.com/fuxiaohei/runtime.land"
-readme = "README.md"
-homepage = "https://runtime.land"

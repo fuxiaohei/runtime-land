@@ -1,13 +1,14 @@
 [package]
-name = "migration"
+name = "land-migration"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-publish = false
-
-[lib]
-name = "migration"
-path = "src/lib.rs"
+description = "Database migration for Runtime Land"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
 async-std = { version = "1", features = ["attributes", "tokio1"] }

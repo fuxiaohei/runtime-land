@@ -3,7 +3,12 @@ name = "land-runtime"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
-publish = false
+description = "Database migration for Runtime Land"
+license = "Apache-2.0"
+documentation = "https://runtime.land"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm", "serverless"]
+repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
 anyhow = { workspace = true }
@@ -13,7 +18,7 @@ clap = { workspace = true }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 futures-util = "0.3.28"
 hyper = { workspace = true }
-land-core = { path = "../core" }
+land-core = { workspace = true }
 lazy_static = { workspace = true }
 moka = { version = "0.11.2", default-features = false, features = ["sync"] }
 once_cell = { workspace = true }
