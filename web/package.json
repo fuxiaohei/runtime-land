@@ -1,7 +1,7 @@
 {
     "name": "land-web-rspack",
     "private": true,
-    "version": "0.2.0",
+    "version": "0.0.3",
     "scripts": {
         "dev": "rspack serve",
         "build": "rspack build --mode=production"
