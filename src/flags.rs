@@ -148,7 +148,7 @@ impl Build {
 #[derive(Args, Debug)]
 pub struct Serve {
     /// The port to listen on
-    #[clap(long, default_value("127.0.0.1:38668"))]
+    #[clap(long, default_value("127.0.0.1:18080"))]
     pub addr: Option<std::net::SocketAddr>,
 }
 
@@ -177,11 +177,11 @@ pub struct Deploy {
     /// Publish this deployment to production
     #[clap(long, default_value("false"))]
     pub production: bool,
-    /// The project name
+    /// The project name override meta.toml
     #[clap(long)]
     pub project: Option<String>,
     /// The cloud api
-    #[clap(long, default_value("http://grpc.127-0-0-1.nip.io"))]
+    #[clap(long, default_value("https://api.runtime.land"))]
     pub cloud: Option<String>,
 }
 
