@@ -83,7 +83,7 @@ impl Init {
         let template = self.template.as_ref().unwrap();
         let name = self.name.as_str();
 
-        let toml_file = PathBuf::from(template).join("Cargo.toml");
+        let toml_file = PathBuf::from(template).join("Cargo.toml.txt");
         let toml_data = crate::embed::TemplateAssets::get(toml_file.to_str().unwrap());
         if toml_data.is_none() {
             panic!(
@@ -98,10 +98,6 @@ impl Init {
             .unwrap()
             .to_string();
         content = content.replace(template, name);
-        content = content.replace(
-            "path = \"../../crates/sdk\"",
-            "git = \"https://github.com/fuxiaohei/runtime.land\"",
-        );
         std::fs::write(target_file.to_str().unwrap(), content).unwrap();
 
         info!("Created Cargo.toml: {:?}", target_file);

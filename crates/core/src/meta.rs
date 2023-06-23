@@ -102,7 +102,13 @@ impl Meta {
             .take(8)
             .map(char::from)
             .collect();
-        self.project = format!("{}-{}", self.name, rand_string.to_lowercase());
+        // project name is too short, generate a middle name
+        if self.name.len() < 8 {
+            let middle = random_word::gen();
+            self.project = format!("{}-{}-{}", self.name, middle, rand_string.to_lowercase());
+        } else {
+            self.project = format!("{}-{}", self.name, rand_string.to_lowercase());
+        }
         self.project.clone()
     }
 }

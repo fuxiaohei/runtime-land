@@ -38,12 +38,7 @@ members = [
     "crates/sdk",
     "crates/sdk/macro",
     "crates/server",
-    "examples/rust-basic",
-    "examples/rust-fetch",
-    "examples/rust-router",
-    "tests/wit-v2-gen",
-    "tests/wit-v2-guest",
-    "tests/wit-v2-host",
+    "tests/rust-basic",
 ]
 
 [workspace.dependencies]

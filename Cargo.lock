@@ -1959,6 +1959,7 @@ dependencies = [
  "once_cell",
  "opendal",
  "rand",
+ "random_word",
  "sea-orm",
  "serde",
  "time 0.3.22",
@@ -2760,6 +2761,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "random_word"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d0f7171155590e912ab907550240a5764c665388ab0a1e46d783a493e816ff3"
+dependencies = [
+ "once_cell",
+ "rand",
+]
+
+[[package]]
 name = "rayon"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3039,26 +3050,6 @@ checksum = "512b0ab6853f7e14e3c8754acb43d6f748bb9ced66aa5915a6553ac8213f7731"
 dependencies = [
  "sha2",
  "walkdir",
-]
-
-[[package]]
-name = "rust-fetch"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "http",
- "land-sdk",
- "wit-bindgen",
-]
-
-[[package]]
-name = "rust-router"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "http",
- "land-sdk",
- "wit-bindgen",
 ]
 
 [[package]]
@@ -5156,34 +5147,6 @@ dependencies = [
  "semver",
  "unicode-xid",
  "url 2.4.0",
-]
-
-[[package]]
-name = "wit-v2-gen"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "wit-bindgen",
- "wit-bindgen-core",
- "wit-bindgen-rust",
-]
-
-[[package]]
-name = "wit-v2-guest"
-version = "0.1.0"
-dependencies = [
- "wit-bindgen",
-]
-
-[[package]]
-name = "wit-v2-host"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "tokio",
- "wasmtime",
- "wasmtime-wasi",
- "wit-component",
 ]
 
 [[package]]
