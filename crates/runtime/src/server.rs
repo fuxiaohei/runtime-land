@@ -147,6 +147,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     {
         Ok(resp) => resp,
         Err(e) => {
+            warn!(status = 500, "[Response] {}", e.to_string());
             let builder = Response::builder().status(500);
             builder.body(Body::from(e.to_string())).unwrap()
         }

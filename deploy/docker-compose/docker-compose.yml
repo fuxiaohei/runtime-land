@@ -44,10 +44,10 @@ services:
     networks:
       - land_serverless_network
   land-server:
-    image: ghcr.io/fuxiaohei/land-server:latest
+    image: ghcr.io/fuxiaohei/land-server:main
     restart: always
     environment:
-      - GRPC_ADDR=${LAND_SERVER_GRPC_ADDR}
+      - HTTP_ADDR=${LAND_SERVER_HTTP_ADDR}
       - STORAGE_LOCAL_PATH=/data
       - DB_HOST=${MYSQL_HOST}
       - DB_PORT=${MYSQL_PORT}
@@ -70,11 +70,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.land-server.rule=Host(`${LAND_SERVER_DOMAIN}`)
-      - traefik.http.routers.land-server.middlewares=land-server-grpcweb@docker
-      - traefik.http.middlewares.land-server-grpcweb.grpcweb.allowOrigins=* # this feature need traefik 3.0
-      - traefik.http.services.land-server-docker-compose.loadbalancer.server.scheme=h2c
   land-runtime:
-    image: ghcr.io/fuxiaohei/land-runtime:latest
+    image: ghcr.io/fuxiaohei/land-runtime:main
     restart: always
     environment:
       - HTTP_ADDR=${LAND_RUMTIME_HTTP_ADDR}
@@ -89,7 +86,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.land-runtime.rule=Host(`${LAND_RUNTIME_DOMAIN}`)
   land-web:
-    image: ghcr.io/fuxiaohei/land-web:latest
+    image: ghcr.io/fuxiaohei/land-web:main
     restart: always
     environment:
       - API_ADDRESS=${LAND_WEB_API_ADDR}
