@@ -17,6 +17,7 @@ jobs:
         run: |
           rustup update stable
           rustup component add rustfmt
+          rustup target add wasm32-wasi
       - name: Toolchain info
         run: |
           cargo --version --verbose
