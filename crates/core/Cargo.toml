@@ -24,6 +24,7 @@ opendal = { version = "0.37.0", default-features = false, features = [
     "services-redis",
 ] }
 rand = { workspace = true }
+random_word = "0.3.1"
 sea-orm = { version = "0.11.3", features = [
     "sqlx-mysql",
     "runtime-tokio-rustls"
@@ -35,7 +36,6 @@ toml = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
-random_word = "0.3.1"
 
 [build-dependencies]
 vergen = { version = "8.2.1", features = ["build", "cargo"] }

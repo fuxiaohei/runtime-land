@@ -45,7 +45,7 @@ members = [
 anyhow = "1.0.71"
 async-trait = "0.1.68"
 axum = "0.6.18"
-clap = { version = "4.3.2", features = ["derive", "env"] }
+clap = { version = "4.3.8", features = ["derive", "env"] }
 chrono = "0.4.26"
 http = "0.2.9"
 hyper = { version = "0.14.26", features = ["full"] }
@@ -63,21 +63,20 @@ rand = "0.8.5"
 serde = { version = "1.0.164", features = ["derive"] }
 time = "0.3.22"
 tokio = { version = "1.28.2", features = ["full"] }
-toml = "0.7.4"
+toml = "0.7.5"
 tracing = "0.1.37"
 tracing-subscriber = { version = "0.3.17", features = [
     "time",
     "local-time",
     "env-filter"
 ] }
-# wasi-common = { git = "https://github.com/bytecodealliance/preview2-prototyping" }
 wasmtime = { version = "10.0.1", features = ["component-model", "async"] }
 wasmtime-wasi = { version = "10.0.1" }
-wit-bindgen = "0.7.0"
-wit-bindgen-core = "0.7.0"
-wit-bindgen-rust = "0.7.0"
+wit-bindgen = "0.8.0"
+wit-bindgen-core = "0.8.0"
+wit-bindgen-rust = "0.8.0"
 wit-component = "0.11.0"
-uuid = { version = "1.3.3", features = ["v4"] }
+uuid = { version = "1.3.4", features = ["v4"] }
 land-core = { path = "crates/core", version = "0.0.4" }
 land-restful = { path = "crates/restful", version = "0.0.4" }
 land-runtime = { path = "crates/runtime", version = "0.0.4" }
