@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { ButtonLink } from "../components/ButtonLink";
 import ProjectHeader from "../components/ProjectHeader";
@@ -10,9 +10,11 @@ import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
 import ProjectDeploymentsListGroup from "../components/ProjectDeploymentsListGroup";
 import DeployToProductionModal from "../components/DeployToProductionModal";
+import { Helmet } from "react-helmet";
 
 function ProjectPage() {
   const { projectName } = useParams();
+  const [loadingStatus, setLoadingStatus] = React.useState(true);
   const [projectOverview, setProjectOverview] = React.useState(null);
   const [showDeployToProduction, setShowDeployToProduction] =
     React.useState(false);
@@ -27,6 +29,7 @@ function ProjectPage() {
       return;
     }
     setProjectOverview(project);
+    setLoadingStatus(false);
   };
 
   useEffect(() => {
@@ -59,8 +62,29 @@ function ProjectPage() {
     setShowDeployToProduction(false);
   };
 
+  if (loadingStatus) {
+    return (
+      <div>
+        <Helmet>
+          <title>{projectName} | Project | Runtime.land</title>
+        </Helmet>
+        <DashboardNavbar />
+        <Container id="project-container">
+          <ProjectHeader
+            projectName={projectName}
+            project={projectOverview || {}}
+          />
+          <Spinner className="m-4" animation="border" />
+        </Container>
+      </div>
+    );
+  }
+
   return (
     <div>
+      <Helmet>
+        <title>{projectName} | Project | Runtime.land</title>
+      </Helmet>
       <DashboardNavbar />
       <Container id="project-container">
         <ProjectHeader

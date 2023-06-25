@@ -37,7 +37,7 @@ function ProjectTabs({ projectName, activeKey }) {
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="disabled" disabled>
-              Analytics
+              Traffics
             </Nav.Link>
           </Nav.Item>
         </Nav>

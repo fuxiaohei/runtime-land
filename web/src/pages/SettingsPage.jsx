@@ -6,6 +6,7 @@ import AccessTokensListGroup from "../components/AccessTokensListGroup";
 import React, { useEffect } from "react";
 import { listTokens, createToken, removeToken } from "../cloud/token";
 import AccessTokenRemoveModal from "../components/AccessTokenRemoveModal";
+import { Helmet } from "react-helmet";
 
 function SettingsPage() {
   const [tokenModelShow, setTokenModelShow] = React.useState(false);
@@ -69,6 +70,9 @@ function SettingsPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Settings | Runtime.land</title>
+      </Helmet>
       <DashboardNavbar />
       <Container id="account-settings-container">
         <Container>

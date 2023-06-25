@@ -1,5 +1,7 @@
 const RPC_CLIENT_ADDRESS = window.API_ADDRESS || "http://127.0.0.1:38779";
 
+console.log("RPC_CLIENT_ADDRESS:", RPC_CLIENT_ADDRESS);
+
 const axios = require("axios");
 
 function getLocalUser() {
@@ -57,5 +59,5 @@ export {
   getLocalUser,
   removeLocalUser,
   setLocalUser,
-  format_axios_error
+  format_axios_error,
 };

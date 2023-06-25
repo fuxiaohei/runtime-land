@@ -3,6 +3,7 @@ import { Alert, Form, Button, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import LoginNavbar from "../components/LoginNavbar";
 import { userAuthContext } from "../components/AuthContext";
+import { Helmet } from "react-helmet";
 
 function LoginEmailPage() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ function LoginEmailPage() {
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
   const { signin } = userAuthContext();
+  const [loadingSignin, setLoadingSignin] = useState(false);
 
   const handleSubmit = async (event) => {
     const form = event.currentTarget;
@@ -25,7 +27,9 @@ function LoginEmailPage() {
     if (validated) {
       event.preventDefault();
       event.stopPropagation();
+      setLoadingSignin(true);
       let res = await signin({ email, password });
+      setLoadingSignin(false);
       if (res.error) {
         setShowAlert(true);
         setAlertMessage(res.error);
@@ -37,6 +41,9 @@ function LoginEmailPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Login | Runtime.land</title>
+      </Helmet>
       <LoginNavbar />
       <Container className="login-container">
         <h3 className="login-container-header">Login to Runtime.land</h3>
@@ -78,8 +85,13 @@ function LoginEmailPage() {
             {alertMessage}
           </Alert>
           <div className="d-flex mb-4 justify-content-between">
-            <Button variant="primary" type="submit" className="w-100">
-              Sign in
+            <Button
+              variant="primary"
+              type="submit"
+              className="w-100"
+              disabled={loadingSignin}
+            >
+              {loadingSignin ? "Loading..." : "Sign in"}
             </Button>
           </div>
           <div className="d-flex justify-content-between login-email-link">

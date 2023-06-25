@@ -1,7 +1,7 @@
 {
     "name": "land-web-rspack",
     "private": true,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "scripts": {
         "dev": "rspack serve",
         "build": "rspack build --mode=production"
@@ -17,6 +17,7 @@
         "react-bootstrap": "^2.7.2",
         "react-copy-to-clipboard": "^5.1.0",
         "react-dom": "^18.2.0",
+        "react-helmet": "^6.1.0",
         "react-icons": "^4.8.0",
         "react-router-dom": "^6.9.0",
         "unique-names-generator": "^4.7.1"

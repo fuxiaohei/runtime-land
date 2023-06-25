@@ -21,6 +21,7 @@ import {
 } from "unique-names-generator";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 function NewProjectPage() {
   const generateName = () => {
@@ -66,6 +67,9 @@ function NewProjectPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Create a Project | Runtime.land</title>
+      </Helmet>
       <DashboardNavbar />
       <Container id="dashboard-container">
         <Container id="new-project-top">

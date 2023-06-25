@@ -1,11 +1,15 @@
 import LoginNavbar from "../components/LoginNavbar";
 import { Button, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 function NotFoundPage() {
   const navigate = useNavigate();
   return (
     <div>
+      <Helmet>
+        <title>Page Not Found | Runtime.land</title>
+      </Helmet>
       <LoginNavbar />
       <Container id="notfound-container">
         <h1>Page Not Found</h1>

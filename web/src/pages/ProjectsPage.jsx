@@ -1,19 +1,10 @@
-import { Link } from "react-router-dom";
 import { ButtonLink } from "../components/ButtonLink";
 import DashboardNavbar from "../components/DashboardNavbar";
-import {
-  Container,
-  Button,
-  Row,
-  Col,
-  Form,
-  InputGroup,
-  Card,
-  Spinner,
-} from "react-bootstrap";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
 import React, { useEffect } from "react";
 import ProjectsGroup from "../components/ProjectsGroup";
 import { listProjects } from "../cloud/projects";
+import { Helmet } from "react-helmet";
 
 function ProjectsPage() {
   const [loadingStatus, setLoadingStatus] = React.useState({
@@ -44,6 +35,9 @@ function ProjectsPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Projects | Runtime.land</title>
+      </Helmet>
       <DashboardNavbar />
       <Container id="dashboard-container">
         <header id="dashboard-header">
