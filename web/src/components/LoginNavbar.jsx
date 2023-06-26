@@ -7,10 +7,10 @@ function LoginNavbar() {
         <Navbar.Brand href="/">
           <img
             alt=""
-            src="/public/runtime-land-logo-240.svg"
+            src="/public/logo-v2-small.svg"
             width="30"
             height="30"
-            className="d-inline-block align-top"
+            className="d-inline-block align-top me-2"
           />{" "}
           Runtime.land
         </Navbar.Brand>

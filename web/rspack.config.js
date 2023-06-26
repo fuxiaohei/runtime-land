@@ -17,7 +17,7 @@ module.exports = {
       {
         template: "./index.html",
         title: "Runtime.land | a tiny Function as a Service (FaaS) platform ",
-        favicon: "./public/runtime-land-logo-32.ico",
+        favicon: "./public/logo-v2-small.ico",
       },
     ],
     copy: {
@@ -37,6 +37,18 @@ module.exports = {
       {
         test: /\.svg$/,
         type: "asset",
+      },
+      {
+        test: /\.sass|.scss$/,
+        use: [
+          {
+            loader: 'sass-loader',
+            options: {
+              // ...
+            },
+          },
+        ],
+        type: 'css',
       },
       {
         test: /\.png$/,
