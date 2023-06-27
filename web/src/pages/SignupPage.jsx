@@ -3,6 +3,7 @@ import { Alert, Form, Button, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import LoginNavbar from "../components/LoginNavbar";
 import { userAuthContext } from "../components/AuthContext";
+import { Helmet } from "react-helmet-async";
 
 function SignupPage() {
   const [email, setEmail] = useState("");
@@ -38,6 +39,9 @@ function SignupPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Sign up | Runtime.land</title>
+      </Helmet>
       <LoginNavbar />
       <Container className="login-container">
         <h3 className="login-container-header">Sign up Runtime.land</h3>

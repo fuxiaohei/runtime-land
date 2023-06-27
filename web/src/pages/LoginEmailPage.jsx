@@ -3,7 +3,7 @@ import { Alert, Form, Button, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import LoginNavbar from "../components/LoginNavbar";
 import { userAuthContext } from "../components/AuthContext";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 function LoginEmailPage() {
   const [email, setEmail] = useState("");

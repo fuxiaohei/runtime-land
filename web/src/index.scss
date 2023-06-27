@@ -351,3 +351,16 @@ $primary: #2a70b6;
 .deployment-metadata a.name:hover {
   text-decoration: underline;
 }
+
+#project-settings-tabs .danger-zone-nav .nav-link {
+  color: #dc3545;
+}
+
+#project-settings-tabs .danger-zone-nav .nav-link.active {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+#project-settings-tabs .project-danger-zone {
+  background-color: #fcf8f9;
+}

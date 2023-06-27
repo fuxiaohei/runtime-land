@@ -26,16 +26,17 @@ async function createProject(projectName, projectLanguage) {
   }
 }
 
-async function getProjectOverview(projectName) {
+async function getProjectOverview(projectName, with_deployments) {
   let client = createClient();
   try {
     let response = await client.get("/v1/project/overview", {
       params: {
         name: projectName,
         language: "",
+        with_deployments: with_deployments,
       }
     });
-    console.log("getProjectOverview:", projectName);
+    console.log("getProjectOverview:", projectName, "with_deployments:", with_deployments);
     return response.data || {};
   } catch (error) {
     return { error: format_axios_error(error) };

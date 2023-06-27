@@ -73,7 +73,11 @@ impl Client {
     ) -> Result<params::ProjectData, ClientError> {
         let mut url = self.addr_url.clone();
         url.set_path("/v1/project");
-        let payload = params::FetchProjectRequest { name, language };
+        let payload = params::FetchProjectRequest {
+            name,
+            language,
+            with_deployments: false,
+        };
         let resp = self.client.post(url).json(&payload).send().await?;
         if resp.status().is_success() {
             let data = resp.json::<params::ProjectData>().await?;

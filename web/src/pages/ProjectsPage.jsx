@@ -4,7 +4,7 @@ import { Container, Row, Col, Spinner } from "react-bootstrap";
 import React, { useEffect } from "react";
 import ProjectsGroup from "../components/ProjectsGroup";
 import { listProjects } from "../cloud/projects";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 function ProjectsPage() {
   const [loadingStatus, setLoadingStatus] = React.useState({

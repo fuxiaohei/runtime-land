@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Container, Button, Row, Col, Card } from "react-bootstrap";
 import TimeAgo from "javascript-time-ago";
+import { ButtonLink } from "./ButtonLink";
 
 function ProjectsGroup({ projects }) {
   // separate projects array to two-item pairs list
@@ -36,7 +37,9 @@ function ProjectsGroup({ projects }) {
                     View
                   </Button>
                 ) : (
-                  <Button variant="light">Dev</Button>
+                  <ButtonLink variant="light" to={"/projects/" + project.name}>
+                    Dev
+                  </ButtonLink>
                 )}
               </Col>
             </Row>

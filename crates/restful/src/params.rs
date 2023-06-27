@@ -62,6 +62,7 @@ pub struct FetchProjectRequest {
     #[validate(length(min = 3))]
     pub name: String,
     pub language: String,
+    pub with_deployments: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

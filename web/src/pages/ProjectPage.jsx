@@ -24,7 +24,7 @@ function ProjectPage() {
     React.useState(false);
 
   const fetchProjectOverview = async () => {
-    let project = await getProjectOverview(projectName);
+    let project = await getProjectOverview(projectName, true);
     if (project.error) {
       return;
     }

@@ -6,7 +6,7 @@ import AccessTokensListGroup from "../components/AccessTokensListGroup";
 import React, { useEffect } from "react";
 import { listTokens, createToken, removeToken } from "../cloud/token";
 import AccessTokenRemoveModal from "../components/AccessTokenRemoveModal";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 function SettingsPage() {
   const [tokenModelShow, setTokenModelShow] = React.useState(false);

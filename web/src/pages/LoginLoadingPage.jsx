@@ -1,6 +1,6 @@
 import LoginNavbar from "../components/LoginNavbar";
 import { Container, Spinner } from "react-bootstrap";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 function LoginLoadingPage() {
   return (
