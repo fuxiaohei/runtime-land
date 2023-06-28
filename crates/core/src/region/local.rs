@@ -126,3 +126,9 @@ pub async fn deploy(deploy_id: i32, mut deploy_uuid: String, is_production: bool
 
     Ok(())
 }
+
+// TODO: drop is not implemented yet
+pub async fn drop(deploy_uuid: String) -> Result<()> {
+    debug!("drop: {}", deploy_uuid);
+    Ok(())
+}

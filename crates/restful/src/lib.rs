@@ -38,6 +38,7 @@ fn api_router() -> Router {
         .route("/v1/tokens", delete(tokens::remove_handler))
         .route("/v1/project", get(projects::fetch_handler))
         .route("/v1/project", post(projects::create_handler))
+        .route("/v1/project", delete(projects::remove_handler))
         .route("/v1/projects", get(projects::list_handler))
         .route("/v1/project/overview", get(projects::overview_handler))
         .route("/v1/deployment", post(deployments::create_handler))

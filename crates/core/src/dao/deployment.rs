@@ -9,12 +9,17 @@ use sea_orm::{
 
 use super::project;
 
-enum DeploymentStatus {
-    Deploying = 1,
-    Deployed,
+#[derive(strum::Display)]
+#[strum(serialize_all = "lowercase")]
+enum DeployStatus {
+    Waiting,
+    Doing,
+    Success,
+    Failure,
+    Deleted,
 }
 
-enum DeploymentProdStatus {
+pub enum ProdStatus {
     Prod = 1,
     Preview,
 }
@@ -37,8 +42,8 @@ pub async fn create(
         storage_path,
         created_at: now,
         updated_at: now,
-        prod_status: DeploymentProdStatus::Preview as i32,
-        deploy_status: DeploymentStatus::Deploying as i32,
+        prod_status: ProdStatus::Preview as i32,
+        deploy_status: DeployStatus::Waiting.to_string(),
     };
     let active_model: project_deployment::ActiveModel = deployment.into();
     let db = DB.get().unwrap();
@@ -81,10 +86,40 @@ pub async fn update_storage(deploy_id: i32, storage_path: String) -> Result<()> 
 
     let mut deployment_model: project_deployment::ActiveModel = deployment.unwrap().into();
     deployment_model.storage_path = Set(storage_path);
-    deployment_model.deploy_status = Set(DeploymentStatus::Deployed as i32);
+    deployment_model.deploy_status = Set(DeployStatus::Doing.to_string());
     deployment_model.update(db).await?;
 
     Ok(())
+}
+
+async fn update_status(deploy_id: i32, status: DeployStatus) -> Result<()> {
+    let db = DB.get().unwrap();
+    let deployment = project_deployment::Entity::find()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
+        .one(db)
+        .await?;
+
+    if deployment.is_none() {
+        return Err(anyhow::anyhow!("deployment not found"));
+    }
+
+    let mut deployment_model: project_deployment::ActiveModel = deployment.unwrap().into();
+    deployment_model.deploy_status = Set(status.to_string());
+    deployment_model.update(db).await?;
+
+    Ok(())
+}
+
+pub async fn update_success(deploy_id: i32) -> Result<()> {
+    update_status(deploy_id, DeployStatus::Success).await
+}
+
+pub async fn update_failure(deploy_id: i32) -> Result<()> {
+    update_status(deploy_id, DeployStatus::Failure).await
+}
+
+pub async fn remove(deploy_id: i32) -> Result<()> {
+    update_status(deploy_id, DeployStatus::Deleted).await
 }
 
 pub async fn publish(
@@ -118,7 +153,7 @@ pub async fn publish(
     project_deployment::Entity::update_many()
         .col_expr(
             project_deployment::Column::ProdStatus,
-            Expr::value(DeploymentProdStatus::Preview as i32),
+            Expr::value(ProdStatus::Preview as i32),
         )
         .filter(project_deployment::Column::Id.ne(deployment.id))
         .exec(&txn)
@@ -126,7 +161,7 @@ pub async fn publish(
 
     // update current deployment to prod
     let mut deployment_model: project_deployment::ActiveModel = deployment.into();
-    deployment_model.prod_status = Set(DeploymentProdStatus::Prod as i32);
+    deployment_model.prod_status = Set(ProdStatus::Prod as i32);
     deployment_model.prod_domain = Set(prod_domain);
     let deployment = deployment_model.update(&txn).await?;
 
@@ -135,7 +170,7 @@ pub async fn publish(
     Ok(deployment)
 }
 
-pub async fn list(
+pub async fn list_normal(
     owner_id: i32,
     project_id: i32,
     limits: u64,
@@ -144,6 +179,7 @@ pub async fn list(
     let deployments = project_deployment::Entity::find()
         .filter(project_deployment::Column::OwnerId.eq(owner_id))
         .filter(project_deployment::Column::ProjectId.eq(project_id))
+        .filter(project_deployment::Column::DeployStatus.ne(DeployStatus::Deleted.to_string()))
         .order_by_desc(project_deployment::Column::UpdatedAt)
         .limit(limits)
         .all(db)

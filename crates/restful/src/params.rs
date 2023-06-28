@@ -65,6 +65,13 @@ pub struct FetchProjectRequest {
     pub with_deployments: bool,
 }
 
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct RemoveProjectRequest {
+    pub project_id: i32,
+    pub project_uuid: String,
+    pub project_name: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProjectData {
     pub name: String,
@@ -101,7 +108,7 @@ pub struct DeploymentData {
     pub uuid: String,
     pub created_at: i64,
     pub updated_at: i64,
-    pub deploy_status: i32,
+    pub deploy_status: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

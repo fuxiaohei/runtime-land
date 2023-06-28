@@ -74,8 +74,16 @@ pub async fn create_handler(
     tokio::spawn(async move {
         let res = land_core::region::local::deploy(deploy_id, deploy_uuid, false).await;
         if res.is_err() {
-            warn!("deploy failed: {:?}", res.err().unwrap());
+            warn!(
+                "deploy failed, deploy_id:{}, error: {:?}",
+                deploy_id,
+                res.err().unwrap()
+            );
+            dao::deployment::update_failure(deploy_id).await.unwrap();
+            return;
         }
+        dao::deployment::update_success(deploy_id).await.unwrap();
+        info!("deploy success, deploy_id:{}", deploy_id)
     });
 
     Ok((StatusCode::OK, Json(resp)))
@@ -115,8 +123,16 @@ pub async fn publish_handler(
     tokio::spawn(async move {
         let res = land_core::region::local::deploy(deploy_id, deploy_uuid, true).await;
         if res.is_err() {
-            warn!("deploy failed: {:?}", res.err().unwrap());
+            warn!(
+                "deploy failed, deploy_id:{}, error: {:?}",
+                deploy_id,
+                res.err().unwrap()
+            );
+            dao::deployment::update_failure(deploy_id).await.unwrap();
+            return;
         }
+        dao::deployment::update_success(deploy_id).await.unwrap();
+        info!("deploy success, deploy_id:{}", deploy_id)
     });
 
     info!(

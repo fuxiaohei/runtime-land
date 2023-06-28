@@ -1,13 +1,13 @@
 use crate::auth::CurrentUser;
 use crate::{params, AppError};
-use axum::extract::Extension;
+use axum::extract::{Extension, Query};
 use axum::http::StatusCode;
 use axum::{Form, Json};
 use land_core::{dao, PROD_DOMAIN, PROD_PROTOCOL};
 use tracing::{info, warn};
 use validator::Validate;
 
-/// lfetch_handler fetches a project by uuid for current user.
+/// fetch_handler fetches a project by uuid for current user.
 pub async fn fetch_handler(
     Extension(current_user): Extension<CurrentUser>,
     Form(payload): Form<params::FetchProjectRequest>,
@@ -16,7 +16,7 @@ pub async fn fetch_handler(
     let project = dao::project::find(current_user.id, payload.name.clone()).await?;
     if project.is_none() {
         warn!(
-            "project not found, userid:{}, name:{}",
+            "fetching project not found, userid:{}, name:{}",
             current_user.id, payload.name
         );
         return Err(AppError(
@@ -83,7 +83,7 @@ pub async fn create_handler(
 pub async fn list_handler(
     Extension(current_user): Extension<CurrentUser>,
 ) -> Result<(StatusCode, Json<Vec<params::ProjectData>>), AppError> {
-    let projects = dao::project::list(current_user.id).await?;
+    let projects = dao::project::list_normal(current_user.id).await?;
     let values: Vec<params::ProjectData> = projects
         .into_iter()
         .map(|p| {
@@ -175,7 +175,7 @@ pub async fn overview_handler(
     }
 
     // load project deployments
-    let deployments = dao::deployment::list(project.owner_id, project.id, 10).await?;
+    let deployments = dao::deployment::list_normal(project.owner_id, project.id, 10).await?;
     let values: Vec<params::DeploymentData> = deployments
         .into_iter()
         .map(|d| params::DeploymentData {
@@ -201,4 +201,36 @@ pub async fn overview_handler(
         resp.deployments.len(),
     );
     Ok((StatusCode::OK, Json(resp)))
+}
+
+pub async fn remove_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Query(payload): Query<params::RemoveProjectRequest>,
+) -> Result<StatusCode, AppError> {
+    payload.validate()?;
+
+    dao::project::remove(current_user.id, payload.project_id).await?;
+    info!(
+        "remove_project success, userid:{}, project_id:{}",
+        current_user.id, payload.project_id
+    );
+
+    let project_uuid = payload.project_uuid.clone();
+    let project_id = payload.project_id;
+    let owner_id = current_user.id;
+    tokio::spawn(async move {
+        let deployments = dao::deployment::list_normal(owner_id, project_id, 999)
+            .await
+            .unwrap();
+        for d in deployments {
+            let mut deployment_uuid = d.uuid.clone();
+            if d.prod_status == dao::deployment::ProdStatus::Prod as i32 {
+                deployment_uuid = project_uuid.clone();
+            }
+            let _ = land_core::region::local::drop(deployment_uuid).await;
+            dao::deployment::remove(d.id).await.unwrap();
+        }
+    });
+
+    Ok(StatusCode::OK)
 }

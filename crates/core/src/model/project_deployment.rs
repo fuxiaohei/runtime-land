@@ -18,7 +18,7 @@ pub struct Model {
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
     pub prod_status: i32,
-    pub deploy_status: i32,
+    pub deploy_status: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

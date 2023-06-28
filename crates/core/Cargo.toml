@@ -30,6 +30,7 @@ sea-orm = { version = "0.11.3", features = [
     "runtime-tokio-rustls"
 ] }
 serde = { workspace = true }
+strum = { version = "0.25", features = ["derive"] }
 time = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
