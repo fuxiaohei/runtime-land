@@ -11,6 +11,7 @@ keywords = ["webassembly", "wasm", "serverless"]
 repository = "https://github.com/fuxiaohei/runtime.land"
 
 [dependencies]
+async-trait  = { workspace = true }
 anyhow = { workspace = true }
 bcrypt = "0.14.0"
 chrono = { workspace = true }

@@ -1,22 +1,12 @@
+use super::RegionTrait;
 use anyhow::Result;
+use async_trait::async_trait;
 use envconfig::Envconfig;
-use once_cell::sync::OnceCell;
 use opendal::Operator;
 use tracing::{debug, info, warn};
 
-// LOCAL_REGION is the local region operator
-pub static LOCAL_REGION: OnceCell<Operator> = OnceCell::new();
-
-// LOCAL_REGION_RUNTIME is the local region runtime service name
-pub static LOCAL_REGION_RUNTIME: OnceCell<String> = OnceCell::new();
-
-// LOCAL_REGION_ENABLED is the local region enabled
-static LOCAL_REGION_ENABLED: OnceCell<bool> = OnceCell::new();
-
 #[derive(Envconfig, Debug)]
 pub struct LocalConfig {
-    #[envconfig(from = "LOCAL_REGION_ENABLED", default = "false")]
-    pub enable: bool,
     #[envconfig(from = "LOCAL_REGION_REDIS_ADDR", default = "127.0.0.1:6379")]
     pub redis_addr: String,
     #[envconfig(from = "LOCAL_REGION_REDIS_PASSWORD", default = "")]
@@ -28,107 +18,139 @@ pub struct LocalConfig {
     pub runtime: String,
 }
 
-// init initializes the local region
-#[tracing::instrument(name = "[LOCAL_REGION]")]
-pub async fn init() -> Result<()> {
-    let cfg = LocalConfig::init_from_env()?;
-    if !cfg.enable {
-        info!("Disabled");
-        LOCAL_REGION_ENABLED.set(false).unwrap();
-        return Ok(());
-    }
-    LOCAL_REGION_ENABLED.set(true).unwrap();
-
-    let mut builder = opendal::services::Redis::default();
-    builder
-        .endpoint(&cfg.redis_addr)
-        .password(&cfg.redis_password)
-        .db(cfg.redis_db);
-
-    // write once as ping to validate redis connection
-    let op = Operator::new(builder)?.finish();
-    op.write("land-serverless", "setup").await?;
-
-    LOCAL_REGION.set(op).unwrap();
-    LOCAL_REGION_RUNTIME.set(cfg.runtime).unwrap();
-
-    Ok(())
+#[derive(Debug)]
+pub struct LocalRegion {
+    operator: Option<Operator>,
+    service_name: String,
 }
 
-pub async fn deploy(deploy_id: i32, mut deploy_uuid: String, is_production: bool) -> Result<()> {
-    if !LOCAL_REGION_ENABLED.get().unwrap() {
-        warn!("local region disabled");
-        return Ok(());
+impl LocalRegion {
+    pub fn new() -> Self {
+        Self {
+            operator: None,
+            service_name: "".to_string(),
+        }
     }
-    let deployment = crate::dao::deployment::find(deploy_id, deploy_uuid.clone()).await?;
-    if deployment.is_none() {
-        return Err(anyhow::anyhow!("deployment not found"));
-    }
-    let deployment = deployment.unwrap();
-    let mut commands: Vec<(String, String)> = vec![];
+    async fn deploy_inner(&self, uuid: String, domain: String, storage_path: String) -> Result<()> {
+        //  redis rules for traefik proxy, set key=value
+        let mut commands: Vec<(String, String)> = vec![];
 
-    if is_production {
-        // if is production, set deploy_uuid to PROD-project-uuid
+        // generate Host(domain) url
+        let runtime_domain = crate::PROD_DOMAIN.get().unwrap().clone();
+        let deploy_domain = format!("{}.{}", domain, runtime_domain);
+        commands.push((
+            format!("traefik/http/routers/{}/rule", uuid),
+            format!("Host(`{}`)", deploy_domain),
+        ));
+
+        // set routes backend service
+        commands.push((
+            format!("traefik/http/routers/{}/service", uuid),
+            self.service_name.clone(),
+        ));
+
+        // add custom-header for land-wasm
+        commands.push((
+            format!(
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
+                uuid
+            ),
+            storage_path,
+        ));
+        commands.push((
+            format!(
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-uuid",
+                uuid
+            ),
+            uuid.clone(),
+        ));
+
+        // add custom-header to middleware
+        commands.push((
+            format!("traefik/http/routers/{}/middlewares/0", uuid),
+            format!("m-{}", uuid),
+        ));
+
+        let op = self.operator.as_ref().unwrap();
+        for (k, v) in commands {
+            debug!("deploy: {} : {}", k, v);
+            op.write(&k, v.clone()).await?;
+        }
+
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl RegionTrait for LocalRegion {
+    #[tracing::instrument(skip_all, name = "[LOCAL_REGION]")]
+    async fn init(&mut self) -> Result<()> {
+        let cfg = LocalConfig::init_from_env()?;
+        // init redis operator
+        let mut builder = opendal::services::Redis::default();
+        builder
+            .endpoint(&cfg.redis_addr)
+            .password(&cfg.redis_password)
+            .db(cfg.redis_db);
+
+        let op = Operator::new(builder)?.finish();
+        let now = chrono::Utc::now().timestamp();
+        op.write("land-serverless", now.to_string()).await?;
+        self.operator = Some(op);
+        self.service_name = cfg.runtime;
+        Ok(())
+    }
+
+    #[tracing::instrument(name = "[LOCAL_REGION]")]
+    async fn deploy(&self, deploy_id: i32) -> Result<()> {
+        let deployment = crate::dao::deployment::find_by_id(deploy_id).await?;
+        if deployment.is_none() {
+            return Err(anyhow::anyhow!("deployment not found"));
+        }
+        let deployment = deployment.unwrap();
+
+        let res = self
+            .deploy_inner(deployment.uuid, deployment.domain, deployment.storage_path)
+            .await;
+        if res.is_err() {
+            warn!("deploy failed: {:?}", res);
+            crate::dao::deployment::update_failure(deploy_id).await?;
+        } else {
+            info!("deploy success");
+            crate::dao::deployment::update_success(deploy_id).await?;
+        }
+        Ok(())
+    }
+
+    #[tracing::instrument(name = "[LOCAL_REGION]")]
+    async fn publish(&self, deploy_id: i32) -> Result<()> {
+        let deployment = crate::dao::deployment::find_by_id(deploy_id).await?;
+        if deployment.is_none() {
+            return Err(anyhow::anyhow!("deployment not found"));
+        }
+        let deployment = deployment.unwrap();
         let project =
             crate::dao::project::find_by_id(deployment.owner_id, deployment.project_id).await?;
         if project.is_none() {
             return Err(anyhow::anyhow!("project not found"));
         }
         let project = project.unwrap();
-        deploy_uuid = format!("PROD-{}", project.uuid);
+        let deploy_uuid = format!("PROD-{}", project.uuid);
+        let res = self
+            .deploy_inner(deploy_uuid, deployment.prod_domain, deployment.storage_path)
+            .await;
+        if res.is_err() {
+            warn!("deploy failed: {:?}", res);
+            crate::dao::deployment::update_failure(deploy_id).await?;
+        } else {
+            info!("deploy success");
+            crate::dao::deployment::update_success(deploy_id).await?;
+        }
+        Ok(())
     }
 
-    // generate Host(domain) url
-    let prod_domain = crate::PROD_DOMAIN.get().unwrap().clone();
-    let mut domain = format!("{}.{}", deployment.domain, prod_domain);
-    if is_production {
-        domain = format!("{}.{}", deployment.prod_domain, prod_domain);
+    #[tracing::instrument(name = "[LOCAL_REGION]")]
+    async fn offline(&self, _deploy_id: i32) -> Result<()> {
+        todo!()
     }
-    commands.push((
-        format!("traefik/http/routers/{}/rule", deploy_uuid),
-        format!("Host(`{}`)", domain),
-    ));
-
-    // set routes backend service
-    let service_name = LOCAL_REGION_RUNTIME.get().unwrap().clone();
-    commands.push((
-        format!("traefik/http/routers/{}/service", deploy_uuid),
-        service_name,
-    ));
-
-    // add custom-header for land-wasm
-    commands.push((
-        format!(
-            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
-            deploy_uuid
-        ),
-        deployment.storage_path,
-    ));
-    commands.push((
-        format!(
-            "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-uuid",
-            deploy_uuid
-        ),
-        deploy_uuid.clone(),
-    ));
-
-    // add custom-header to middleware
-    commands.push((
-        format!("traefik/http/routers/{}/middlewares/0", &deploy_uuid),
-        format!("m-{}", deploy_uuid),
-    ));
-
-    let operator = LOCAL_REGION.get().unwrap();
-    for (k, v) in commands {
-        debug!("deploy: {} : {}", k, v);
-        operator.write(&k, v.clone()).await?;
-    }
-
-    Ok(())
-}
-
-// TODO: drop is not implemented yet
-pub async fn drop(deploy_uuid: String) -> Result<()> {
-    debug!("drop: {}", deploy_uuid);
-    Ok(())
 }

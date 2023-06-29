@@ -28,3 +28,4 @@ opendal = { version = "0.37.0", default-features = false, features = [
     "services-redis",
 ] }
 once_cell = { workspace = true }
+chrono = { workspace = true }

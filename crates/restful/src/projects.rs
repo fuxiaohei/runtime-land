@@ -3,6 +3,7 @@ use crate::{params, AppError};
 use axum::extract::{Extension, Query};
 use axum::http::StatusCode;
 use axum::{Form, Json};
+use land_core::region::REGION;
 use land_core::{dao, PROD_DOMAIN, PROD_PROTOCOL};
 use tracing::{info, warn};
 use validator::Validate;
@@ -215,7 +216,6 @@ pub async fn remove_handler(
         current_user.id, payload.project_id
     );
 
-    let project_uuid = payload.project_uuid.clone();
     let project_id = payload.project_id;
     let owner_id = current_user.id;
     tokio::spawn(async move {
@@ -223,11 +223,7 @@ pub async fn remove_handler(
             .await
             .unwrap();
         for d in deployments {
-            let mut deployment_uuid = d.uuid.clone();
-            if d.prod_status == dao::deployment::ProdStatus::Prod as i32 {
-                deployment_uuid = project_uuid.clone();
-            }
-            let _ = land_core::region::local::drop(deployment_uuid).await;
+            let _ = REGION.get().unwrap().offline(d.id).await.unwrap();
             dao::deployment::remove(d.id).await.unwrap();
         }
     });

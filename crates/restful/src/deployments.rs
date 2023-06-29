@@ -3,6 +3,7 @@ use crate::{params, AppError};
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::Json;
+use land_core::region::REGION;
 use land_core::storage::STORAGE;
 use land_core::{dao, PROD_DOMAIN, PROD_PROTOCOL};
 use tracing::{info, warn};
@@ -70,20 +71,8 @@ pub async fn create_handler(
     // in future, deploy behavior should be a queue. It provides a better way to control.
     // Api need a method to get deployment status.
     let deploy_id = deployment.id;
-    let deploy_uuid = deployment.uuid;
     tokio::spawn(async move {
-        let res = land_core::region::local::deploy(deploy_id, deploy_uuid, false).await;
-        if res.is_err() {
-            warn!(
-                "deploy failed, deploy_id:{}, error: {:?}",
-                deploy_id,
-                res.err().unwrap()
-            );
-            dao::deployment::update_failure(deploy_id).await.unwrap();
-            return;
-        }
-        dao::deployment::update_success(deploy_id).await.unwrap();
-        info!("deploy success, deploy_id:{}", deploy_id)
+        REGION.get().unwrap().deploy(deploy_id).await.unwrap();
     });
 
     Ok((StatusCode::OK, Json(resp)))
@@ -119,20 +108,11 @@ pub async fn publish_handler(
     };
 
     let deploy_id = deployment.id;
-    let deploy_uuid = deployment.uuid.clone();
     tokio::spawn(async move {
-        let res = land_core::region::local::deploy(deploy_id, deploy_uuid, true).await;
-        if res.is_err() {
-            warn!(
-                "deploy failed, deploy_id:{}, error: {:?}",
-                deploy_id,
-                res.err().unwrap()
-            );
-            dao::deployment::update_failure(deploy_id).await.unwrap();
-            return;
-        }
-        dao::deployment::update_success(deploy_id).await.unwrap();
-        info!("deploy success, deploy_id:{}", deploy_id)
+        // deploy preview mode first
+        REGION.get().unwrap().deploy(deploy_id).await.unwrap();
+        // publish to production
+        REGION.get().unwrap().publish(deploy_id).await.unwrap();
     });
 
     info!(

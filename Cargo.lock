@@ -1987,6 +1987,7 @@ name = "land-core"
 version = "0.0.5-b2"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bcrypt",
  "chrono",
  "envconfig",
@@ -2094,6 +2095,7 @@ version = "0.0.5-b2"
 dependencies = [
  "anyhow",
  "axum",
+ "chrono",
  "clap 4.3.8",
  "envconfig",
  "land-core",

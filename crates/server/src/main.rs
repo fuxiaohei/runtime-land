@@ -1,8 +1,6 @@
 use clap::Parser;
 use tracing::debug;
 
-mod region;
-
 #[derive(Parser, Debug)]
 #[clap(name = "land-server", version = land_core::version::get())]
 struct Cli {
@@ -31,7 +29,7 @@ async fn main() {
         .expect("init prod const failed");
 
     // init local region
-    land_core::region::local::init()
+    land_core::region::init()
         .await
         .expect("init local region failed");
 
