@@ -34,7 +34,7 @@ pub async fn fetch_handler(
         format!(
             "{}://{}.{}",
             PROD_PROTOCOL.get().unwrap(),
-            project.name.clone(),
+            project.name,
             PROD_DOMAIN.get().unwrap()
         )
     } else {
@@ -92,7 +92,7 @@ pub async fn list_handler(
                 format!(
                     "{}://{}.{}",
                     PROD_PROTOCOL.get().unwrap(),
-                    p.name.clone(),
+                    p.name,
                     PROD_DOMAIN.get().unwrap()
                 )
             } else {
@@ -120,7 +120,7 @@ pub async fn list_handler(
 /// overview_handler returns a project overview.
 pub async fn overview_handler(
     Extension(current_user): Extension<CurrentUser>,
-    Form(payload): Form<params::FetchProjectRequest>,
+    Form(payload): Form<params::FetchProjectOverviewRequest>,
 ) -> Result<(StatusCode, Json<params::ProjectOverview>), AppError> {
     payload.validate()?;
     let project = dao::project::find(current_user.id, payload.name.clone()).await?;
@@ -150,55 +150,60 @@ pub async fn overview_handler(
             prod_domain
         ),
     };
-
-    // if prod_deployment is set, load deployment data
-    if resp.prod_deployment_id > 0 {
-        let deployment = dao::deployment::find_by_id(resp.prod_deployment_id).await?;
-        if deployment.is_some() {
-            let deployment = deployment.unwrap();
-            resp.prod_deployment = Some(params::DeploymentData {
-                id: deployment.id,
-                domain: deployment.domain.clone(),
-                domain_url: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
-                prod_domain: deployment.prod_domain.clone(),
-                prod_url: format!(
-                    "{}://{}.{}",
-                    prod_protocol, deployment.prod_domain, prod_domain
-                ),
-                prod_status: deployment.prod_status,
-                deploy_status: deployment.deploy_status,
-                uuid: deployment.uuid,
-                project_id: deployment.project_id,
-                created_at: deployment.created_at.timestamp(),
-                updated_at: deployment.updated_at.timestamp(),
-            });
+    if payload.with_deployments {
+        // if prod_deployment is set, load deployment data
+        if resp.prod_deployment_id > 0 {
+            let deployment = dao::deployment::find_by_id(resp.prod_deployment_id).await?;
+            if deployment.is_some() {
+                let deployment = deployment.unwrap();
+                resp.prod_deployment = Some(params::DeploymentData {
+                    id: deployment.id,
+                    domain: deployment.domain.clone(),
+                    domain_url: format!(
+                        "{}://{}.{}",
+                        prod_protocol, deployment.domain, prod_domain
+                    ),
+                    prod_domain: deployment.prod_domain.clone(),
+                    prod_url: format!(
+                        "{}://{}.{}",
+                        prod_protocol, deployment.prod_domain, prod_domain
+                    ),
+                    prod_status: deployment.prod_status,
+                    deploy_status: deployment.deploy_status,
+                    uuid: deployment.uuid,
+                    project_id: deployment.project_id,
+                    created_at: deployment.created_at.timestamp(),
+                    updated_at: deployment.updated_at.timestamp(),
+                });
+            }
         }
-    }
 
-    // load project deployments
-    let deployments = dao::deployment::list_normal(project.owner_id, project.id, 10).await?;
-    let values: Vec<params::DeploymentData> = deployments
-        .into_iter()
-        .map(|d| params::DeploymentData {
-            id: d.id,
-            domain: d.domain.clone(),
-            domain_url: format!("{}://{}.{}", prod_protocol, d.domain, prod_domain),
-            prod_domain: String::new(),
-            prod_url: String::new(),
-            prod_status: d.prod_status,
-            deploy_status: d.deploy_status,
-            uuid: d.uuid,
-            project_id: d.project_id,
-            created_at: d.created_at.timestamp(),
-            updated_at: d.updated_at.timestamp(),
-        })
-        .collect();
-    resp.deployments = values;
+        // load project deployments
+        let deployments = dao::deployment::list_normal(project.owner_id, project.id, 10).await?;
+        let values: Vec<params::DeploymentData> = deployments
+            .into_iter()
+            .map(|d| params::DeploymentData {
+                id: d.id,
+                domain: d.domain.clone(),
+                domain_url: format!("{}://{}.{}", prod_protocol, d.domain, prod_domain),
+                prod_domain: String::new(),
+                prod_url: String::new(),
+                prod_status: d.prod_status,
+                deploy_status: d.deploy_status,
+                uuid: d.uuid,
+                project_id: d.project_id,
+                created_at: d.created_at.timestamp(),
+                updated_at: d.updated_at.timestamp(),
+            })
+            .collect();
+        resp.deployments = values;
+    }
     info!(
-        "project_overview success, userid:{}, name:{}, prod:{}, deployments:{}",
+        "project_overview success, userid:{}, name:{}, prod:{}, with_deployments:{}, deployments:{}",
         current_user.id,
         payload.name,
         resp.prod_deployment_id,
+        payload.with_deployments,
         resp.deployments.len(),
     );
     Ok((StatusCode::OK, Json(resp)))
@@ -223,7 +228,7 @@ pub async fn remove_handler(
             .await
             .unwrap();
         for d in deployments {
-            let _ = REGION.get().unwrap().offline(d.id).await.unwrap();
+            REGION.get().unwrap().remove(d.id).await.unwrap();
             dao::deployment::remove(d.id).await.unwrap();
         }
     });

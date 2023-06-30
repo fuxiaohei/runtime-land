@@ -21,6 +21,8 @@ pub struct DbConfig {
     pub database: String,
     #[envconfig(from = "DB_POOL_SIZE", default = "10")]
     pub pool_size: u32,
+    #[envconfig(from = "DB_LOG_SQL", default = "false")]
+    pub log_sql: bool,
 }
 
 impl DbConfig {
@@ -47,6 +49,7 @@ impl Default for DbConfig {
             password: "".to_string(),
             database: "moss-serverless".to_string(),
             pool_size: 10,
+            log_sql: false,
         }
     }
 }
@@ -67,7 +70,7 @@ pub async fn init() -> Result<()> {
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(600))
         .max_lifetime(Duration::from_secs(1800))
-        .sqlx_logging(true);
+        .sqlx_logging(cfg.log_sql);
 
     let db = Database::connect(opt).await?;
 

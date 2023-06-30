@@ -12,6 +12,36 @@ function ProjectDeploymentsListGroup({
       onDeployToProduction(deployment);
     };
   };
+  const renderDeployToProductionButton = (deployment) => {
+    if (deployment.prod_status === 1) {
+      return (
+        <Dropdown.Item className="small" disabled>
+          In Production
+        </Dropdown.Item>
+      );
+    }
+    return (
+      <Dropdown.Item
+        className="small"
+        onClick={buildHandleDeployToProduction(deployment)}
+      >
+        Deploy to Production
+      </Dropdown.Item>
+    );
+  };
+
+  const renderRemoveButton = (deployment) => {
+    // if deployment is in production, don't show remove button
+    if (deployment.prod_status === 1) {
+      return null;
+    }
+    return (
+      <Dropdown.Item className="small text-danger-emphasis">
+        Remove
+      </Dropdown.Item>
+    );
+  };
+
   const listItems = deploymentsList.map((deployment) => (
     <ListGroup.Item
       className="lh-lg d-flex justify-content-between ps-0"
@@ -32,14 +62,11 @@ function ProjectDeploymentsListGroup({
             <BsAppIndicator size={12} />
           </Dropdown.Toggle>
           <Dropdown.Menu className="lh-1 text-muted">
-            <Dropdown.Item
-              className="small"
-              onClick={buildHandleDeployToProduction(deployment)}
-            >
-              Deploy to Production
-            </Dropdown.Item>
+            {renderDeployToProductionButton(deployment)}
             <Dropdown.Divider />
             <Dropdown.Item className="small">Logs</Dropdown.Item>
+            {deployment.prod_status !== 1 ? <Dropdown.Divider /> : null}
+            {renderRemoveButton(deployment)}
           </Dropdown.Menu>
         </Dropdown>
       </div>

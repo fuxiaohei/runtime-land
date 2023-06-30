@@ -9,7 +9,7 @@ pub trait RegionTrait {
     async fn init(&mut self) -> Result<()>;
     async fn deploy(&self, deploy_id: i32) -> Result<()>;
     async fn publish(&self, deploy_id: i32) -> Result<()>;
-    async fn offline(&self, deploy_id: i32) -> Result<()>;
+    async fn remove(&self, deploy_id: i32) -> Result<()>;
 }
 
 impl std::fmt::Debug for Box<dyn RegionTrait + Send + Sync> {

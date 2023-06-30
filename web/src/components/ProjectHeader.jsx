@@ -11,7 +11,7 @@ function ProjectHeader({ project, projectName }) {
           size="sm"
           className="ms-2"
           target="_blank"
-          href={project.prod_deployment.prod_url}
+          href={project.prod_url}
         >
           <BsClouds size={16} className="icon" />
           View

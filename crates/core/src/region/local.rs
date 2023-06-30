@@ -79,6 +79,28 @@ impl LocalRegion {
 
         Ok(())
     }
+
+    async fn remove_inner(&self, uuid: String) -> Result<()> {
+        let keys = vec![
+            format!("traefik/http/routers/{}/rule", uuid),
+            format!("traefik/http/routers/{}/service", uuid),
+            format!(
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
+                uuid
+            ),
+            format!(
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-uuid",
+                uuid
+            ),
+            format!("traefik/http/routers/{}/middlewares/0", uuid),
+        ];
+        let op = self.operator.as_ref().unwrap();
+        for k in keys {
+            debug!("remove: {}", k);
+            op.delete(&k).await?;
+        }
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -101,7 +123,7 @@ impl RegionTrait for LocalRegion {
         Ok(())
     }
 
-    #[tracing::instrument(name = "[LOCAL_REGION]")]
+    #[tracing::instrument(skip(self), name = "[LOCAL_REGION]")]
     async fn deploy(&self, deploy_id: i32) -> Result<()> {
         let deployment = crate::dao::deployment::find_by_id(deploy_id).await?;
         if deployment.is_none() {
@@ -122,7 +144,7 @@ impl RegionTrait for LocalRegion {
         Ok(())
     }
 
-    #[tracing::instrument(name = "[LOCAL_REGION]")]
+    #[tracing::instrument(skip(self), name = "[LOCAL_REGION]")]
     async fn publish(&self, deploy_id: i32) -> Result<()> {
         let deployment = crate::dao::deployment::find_by_id(deploy_id).await?;
         if deployment.is_none() {
@@ -149,8 +171,31 @@ impl RegionTrait for LocalRegion {
         Ok(())
     }
 
-    #[tracing::instrument(name = "[LOCAL_REGION]")]
-    async fn offline(&self, _deploy_id: i32) -> Result<()> {
-        todo!()
+    #[tracing::instrument(skip(self), name = "[LOCAL_REGION]")]
+    async fn remove(&self, deploy_id: i32) -> Result<()> {
+        let deployment = crate::dao::deployment::find_by_id(deploy_id).await?;
+        if deployment.is_none() {
+            return Err(anyhow::anyhow!("deployment not found"));
+        }
+        let deployment = deployment.unwrap();
+        let mut uuid = deployment.uuid;
+        if deployment.prod_status == crate::dao::deployment::ProdStatus::Prod as i32 {
+            let project =
+                crate::dao::project::find_by_id(deployment.owner_id, deployment.project_id).await?;
+            if project.is_none() {
+                return Err(anyhow::anyhow!("project not found"));
+            }
+            uuid = format!("PROD-{}", project.unwrap().uuid);
+        }
+        let res = self.remove_inner(uuid).await;
+        if res.is_err() {
+            warn!("remove failed: {:?}", res);
+        } else {
+            info!("remove success");
+            // No need to update status. When remove button click in dashboard, the status is already Deleted.
+            // TODO: If the removing action is failed, we need another background job to check the status and update it.
+            // crate::dao::deployment::remove(deploy_id).await?;
+        }
+        Ok(())
     }
 }

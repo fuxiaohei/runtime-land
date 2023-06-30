@@ -23,7 +23,7 @@ function ProjectRemoveModal(props) {
           and all of its deployments. You will not access:
         </p>
         <p>
-          <strong>www.example.com</strong>
+          <strong>{props.project.prod_url}</strong>
         </p>
         <Alert variant="danger">
           This action is not recoverable. Be careful!
@@ -41,7 +41,10 @@ function ProjectRemoveModal(props) {
         <Button variant="outline-secondary" onClick={props.onHide}>
           Cancel
         </Button>
-        <Button variant="outline-danger" disabled={buttonDisabled}>
+        <Button
+          variant={buttonDisabled ? "outline-danger" : "danger"}
+          disabled={buttonDisabled}
+        >
           Delete
         </Button>
       </Modal.Footer>
