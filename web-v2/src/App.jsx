@@ -2,6 +2,7 @@ import { AuthProvider } from "./contexts/Auth";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import ProjectsPage from "./pages/Projects";
 import NotFoundPage from "./pages/NotFound";
+import ProjectOverviewPage from "./pages/ProjectOverview";
 
 function App() {
   return (
@@ -10,6 +11,10 @@ function App() {
         <Route element={<Outlet />}>
           <Route path="/" element={<Navigate to="/projects" replace />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route
+            path="/projects/:projectName/overview"
+            element={<ProjectOverviewPage />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
