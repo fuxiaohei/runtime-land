@@ -136,3 +136,10 @@ pub struct PublishDeployRequest {
     #[validate(length(min = 3))]
     pub deploy_uuid: String,
 }
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct RemoveDeployRequest {
+    pub deploy_id: i32,
+    #[validate(length(min = 3))]
+    pub deploy_uuid: String,
+}

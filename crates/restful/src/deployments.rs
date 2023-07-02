@@ -1,8 +1,9 @@
 use crate::auth::CurrentUser;
 use crate::{params, AppError};
-use axum::extract::Extension;
+use axum::extract::{Extension, Query};
 use axum::http::StatusCode;
 use axum::Json;
+use land_core::dao::deployment::ProdStatus;
 use land_core::region::REGION;
 use land_core::storage::STORAGE;
 use land_core::{dao, PROD_DOMAIN, PROD_PROTOCOL};
@@ -121,4 +122,58 @@ pub async fn publish_handler(
     );
 
     Ok((StatusCode::OK, Json(resp)))
+}
+
+/// remove_handler removes a deployment from project.
+pub async fn remove_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Query(payload): Query<params::RemoveDeployRequest>,
+) -> Result<StatusCode, AppError> {
+    payload.validate()?;
+    let deployment = dao::deployment::find_by_id(payload.deploy_id).await?;
+    if deployment.is_none() {
+        warn!(
+            "remove deployment but deployment not found, deploy_id:{}",
+            payload.deploy_id
+        );
+        return Err(anyhow::anyhow!("deployment not found").into());
+    }
+    let deployment = deployment.unwrap();
+    if deployment.uuid != payload.deploy_uuid {
+        warn!(
+            "remove deployment but deployment uuid not match, deploy_id:{}, deploy_uuid:{}, payload.uuid:{}",
+            payload.deploy_id, deployment.uuid, payload.deploy_uuid
+        );
+        return Err(anyhow::anyhow!("deployment uuid not match").into());
+    }
+    if deployment.owner_id != current_user.id {
+        warn!(
+            "remove deployment but deployment owner not match, deploy_id:{}, deploy_uuid:{}, owner_id:{}, current_user.id:{}",
+            payload.deploy_id, deployment.uuid, deployment.owner_id, current_user.id
+        );
+        return Err(anyhow::anyhow!("deployment owner not match").into());
+    }
+
+    // if deployment is in production, publish a new deployment to production then remove it.
+    if deployment.prod_status == ProdStatus::Prod as i32 {
+        warn!(
+            "remove deployment but deployment is in production, deploy_name:{}, deploy_uuid:{}",
+            deployment.domain, deployment.uuid
+        );
+        return Err(anyhow::anyhow!("deployment is in production").into());
+    }
+    // update deployment status to remove
+    dao::deployment::remove(deployment.id).await?;
+    // use async task to remove deployment gateway route and storage
+    let deploy_id = deployment.id;
+    let storage_path = deployment.storage_path;
+    tokio::spawn(async move {
+        REGION.get().unwrap().remove(deploy_id).await.unwrap();
+        STORAGE.get().unwrap().delete(&storage_path).await.unwrap();
+    });
+    info!(
+        "remove deployment success, deploy_name:{}, deploy_uuid:{}",
+        deployment.domain, deployment.uuid
+    );
+    Ok(StatusCode::OK)
 }

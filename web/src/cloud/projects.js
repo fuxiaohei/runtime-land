@@ -56,4 +56,20 @@ async function publishDeployment(deploy_id, deploy_uuid) {
   }
 }
 
-export { listProjects, createProject, publishDeployment, getProjectOverview };
+async function removeDeployment(deploy_id, deploy_uuid) {
+  let client = createClient();
+  try {
+    let response = await client.delete("/v1/deployment", {
+      params: {
+        deploy_id: deploy_id,
+        deploy_uuid: deploy_uuid,
+      }
+    });
+    return response;
+  } catch (error) {
+    return { error: format_axios_error(error) };
+  }
+}
+
+
+export { listProjects, createProject, publishDeployment, getProjectOverview, removeDeployment };

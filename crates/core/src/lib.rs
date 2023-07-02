@@ -17,7 +17,7 @@ pub static PROD_PROTOCOL: OnceCell<String> = OnceCell::new();
 // init_prod_const initializes the PROD_DOMAIN const
 #[tracing::instrument(name = "[PROD_DOMAIN]")]
 pub async fn init_prod_const() -> Result<()> {
-    let domain = std::env::var("PROD_DOMAIN").unwrap_or("127-0-0-1.nip.io".to_string());
+    let domain = std::env::var("PROD_DOMAIN").unwrap_or("runtime.127-0-0-1.nip.io".to_string());
     let protocol = std::env::var("PROD_PROTOCOL").unwrap_or("http".to_string());
     info!("Set {}://{}", protocol, domain);
     PROD_DOMAIN.set(domain).unwrap();

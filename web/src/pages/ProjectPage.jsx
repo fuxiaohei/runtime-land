@@ -4,13 +4,17 @@ import { ButtonLink } from "../components/ButtonLink";
 import ProjectHeader from "../components/ProjectHeader";
 import ProjectTabs from "../components/ProjectTabs";
 import { useParams } from "react-router-dom";
-import { getProjectOverview, publishDeployment } from "../cloud/projects";
+import {
+  getProjectOverview,
+  publishDeployment,
+  removeDeployment,
+} from "../cloud/projects";
 import React, { useEffect } from "react";
 import ProjectNoDeploymentCard from "../components/ProjectNoDeploymentCard";
 import ProjectProdDeploymentCard from "../components/ProjectProdDeploymentCard";
 import ProjectDeploymentsListGroup from "../components/ProjectDeploymentsListGroup";
 import DeployToProductionModal from "../components/DeployToProductionModal";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 function ProjectPage() {
   const { projectName } = useParams();
@@ -60,6 +64,15 @@ function ProjectPage() {
     await fetchProjectOverview(); // refresh project overview
     setLoadingDeployToProduction(false);
     setShowDeployToProduction(false);
+  };
+
+  const handleRemoveDeployment = async (deployment) => {
+    let response = await removeDeployment(deployment.id, deployment.uuid);
+    if (response.error) {
+      // FIXME: show error message
+      return;
+    }
+    await fetchProjectOverview(); // refresh project overview
   };
 
   if (loadingStatus) {
@@ -121,6 +134,7 @@ function ProjectPage() {
                     <ProjectDeploymentsListGroup
                       deploymentsList={projectOverview?.deployments || []}
                       onDeployToProduction={handleDeployToProduction}
+                      onRemoveDeployment={handleRemoveDeployment}
                     />
                   </Card.Body>
                 </Card>
