@@ -43,6 +43,50 @@ function ProjectsTable() {
               <VscKebabVertical />
             </td>
           </tr>
+          <tr role="button">
+            <td className="project-name fw-bold">
+              <span className="me-2">
+                <Link
+                  className="text-dark"
+                  to="/projects/polite-pike-746/overview"
+                >
+                  dry-toad-chip-33
+                </Link>
+              </span>
+              <Badge className="me-2" bg="success">
+                Prod
+              </Badge>
+              <a className="text-success" href="#">
+                <VscLink />
+              </a>
+            </td>
+            <td>Mark</td>
+            <td>US West (Oregon)</td>
+            <td className="deploy-count">4</td>
+            <td>Jul 2, 2023 18:29</td>
+            <td>
+              <VscKebabVertical />
+            </td>
+          </tr>
+          <tr role="button">
+            <td className="project-name fw-bold">
+              <span className="me-2">
+                <Link
+                  className="text-dark"
+                  to="/projects/polite-pike-746/overview"
+                >
+                  proud-happy-39
+                </Link>
+              </span>
+            </td>
+            <td>Mark</td>
+            <td>US West (Oregon)</td>
+            <td className="deploy-count">4</td>
+            <td>Jul 2, 2023 18:29</td>
+            <td>
+              <VscKebabVertical />
+            </td>
+          </tr>
         </tbody>
       </Table>
     </div>

@@ -90,3 +90,35 @@ main,
     }
   }
 }
+
+.overview-production-card {
+  .card-header {
+    background-color: #e5fae8;
+  }
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.overview-no-production-card {
+  .card-header {
+    background-color: #faf9e5;
+  }
+}
+
+#deployments-table {
+  th,
+  td {
+    color: #63707d;
+    padding: 0.8rem;
+  }
+  .deployment-name a {
+    text-decoration: none;
+  }
+  .deployment-name a:hover {
+    text-decoration: underline;
+  }
+}
