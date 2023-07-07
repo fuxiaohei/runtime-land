@@ -1,0 +1,28 @@
+[package]
+name = "land-cli"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[build-dependencies]
+land-worker = { workspace = true }
+
+[workspace]
+members = [
+    "binary/center",
+    "binary/edge",
+    "binary/runtime",
+    "crates/worker",
+    "crates/sdk-macro",
+    "crates/sdk"
+]
+
+[workspace.package]
+version = "0.1.0-b1"
+edition = "2021"
+authors = ["fuxiaohei <fudong0797@gmail.com>"]
+
+[workspace.dependencies]
+land-worker = { path = "crates/worker", version = "0.1.0-b1" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b1" }
+

@@ -1,0 +1,21 @@
+[package]
+name = "land-worker"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = "1.0.71"
+async-trait = "0.1.71"
+futures-util = "0.3.28"
+hyper = { version = "0.14.27", features = ["full"] }
+reqwest = { version = "0.11.18", features = ["stream"] }
+tracing = "0.1.37"
+uuid = { version = "1.4.0", features = ["v4"] }
+wasmtime = { version = "10.0.1", features = ["component-model", "async"] }
+wasmtime-wasi = "10.0.1"
+wit-bindgen-core = "0.8.0"
+wit-bindgen-rust = "0.8.0"
+
+[lib]
+doctest = false

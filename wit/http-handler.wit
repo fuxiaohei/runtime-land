@@ -1,0 +1,5 @@
+package land:serverless
+
+world http-handler {
+    export land:http/http-incoming
+}

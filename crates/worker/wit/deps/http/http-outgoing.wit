@@ -1,0 +1,8 @@
+package land:http
+
+interface http-outgoing {
+    use http-types.{request,response,request-error,request-options}
+
+    // send request function
+    fetch-request: func(req: request, options: request-options) -> result<response,request-error>
+}

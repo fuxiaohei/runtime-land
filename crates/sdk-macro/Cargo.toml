@@ -1,0 +1,16 @@
+[package]
+name = "land-sdk-macro"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = "1.0.71"
+http = "0.2.9"
+quote = "1.0.28"
+syn = { version = "2.0.22", features = ["full"] }
+
+[lib]
+proc-macro = true
+test = false
+doctest = false
