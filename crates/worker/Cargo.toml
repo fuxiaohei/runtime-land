@@ -19,3 +19,6 @@ wit-bindgen-rust = "0.8.0"
 
 [lib]
 doctest = false
+
+[dev-dependencies]
+tokio = { version = "1.29.1", features = ["macros"] }

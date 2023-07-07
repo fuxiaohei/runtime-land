@@ -1,0 +1,13 @@
+[package]
+name = "rust-fetch"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.70"
+http = "0.2.9"
+land-sdk = "0.0.4"
+wit-bindgen = "0.8.0"
+
+[lib]
+crate-type = ["cdylib"]

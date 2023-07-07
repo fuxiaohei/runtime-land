@@ -1,0 +1,9 @@
+manifest = "v1"
+name = "rust-fetch"
+project = "rust-fetch-example"
+description = "example rust project with fetch api"
+authors = []
+language = "rust"
+
+[build]
+rust_target_dir = "../../target"

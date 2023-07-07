@@ -148,3 +148,49 @@ impl Worker {
         Ok((resp, body))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        hostcall::Request,
+        worker::{Context, Worker},
+    };
+    use hyper::Body;
+
+    #[tokio::test]
+    async fn run_wasm() {
+        let wasm_file = "../../tests/rust_test.component.wasm";
+        let mut worker = Worker::new(wasm_file).await.unwrap();
+
+        for _ in 1..10 {
+            let headers: Vec<(String, String)> = vec![];
+
+            let mut context = Context::default();
+            let body = Body::from("test request body");
+            let body_handle = context.set_body(body);
+
+            let req = Request {
+                method: "GET",
+                uri: "/abc",
+                headers: &headers,
+                body: Some(body_handle),
+            };
+
+            let (resp, _body) = worker.handle_request(req, context).await.unwrap();
+            assert_eq!(resp.status, 200);
+            // this wasm return request's body
+            // so the body handler u32 is 2, same as request's body
+            assert_eq!(resp.body, Some(2));
+
+            let headers = resp.headers;
+            for (key, value) in headers {
+                if key == "X-Request-Method" {
+                    assert_eq!(value, "GET");
+                }
+                if key == "X-Request-Url" {
+                    assert_eq!(value, "/abc");
+                }
+            }
+        }
+    }
+}
