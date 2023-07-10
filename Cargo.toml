@@ -15,6 +15,8 @@ members = [
     "crates/worker",
     "crates/sdk-macro",
     "crates/sdk",
+    "crates/core",
+    "crates/dao",
     "tests/rust-test"
 ]
 
@@ -27,3 +29,5 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 land-worker = { path = "crates/worker", version = "0.1.0-b1" }
 land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b1" }
 land-sdk = { path = "crates/sdk", version = "0.1.0-b1" }
+land-core = { path = "crates/core", version = "0.1.0-b1" }
+land-dao = { path = "crates/dao", version = "0.1.0-b1" }

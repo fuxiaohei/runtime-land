@@ -1,0 +1,18 @@
+[package]
+name = "land-core"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+lazy_static = "1.4.0"
+time = "0.3.23"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = [
+    "time",
+    "local-time",
+    "env-filter"
+] }
+
+[build-dependencies]
+vergen = { version = "8.2.1", features = ["build", "cargo"] }
