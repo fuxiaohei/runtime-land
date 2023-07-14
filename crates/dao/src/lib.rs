@@ -2,8 +2,15 @@ use anyhow::Result;
 use clap::Args;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm_migration::MigratorTrait;
 use std::time::Duration;
 use tracing::{debug, info};
+
+mod migration;
+mod model;
+
+pub mod user_token;
+pub mod user;
 
 #[derive(Args)]
 pub struct DbConfig {
@@ -15,7 +22,11 @@ pub struct DbConfig {
     pub user: String,
     #[clap(long("db-password"), env("DB_PASSWORD"), default_value(""))]
     pub password: String,
-    #[clap(long("db-database"), env("DB_DATABASE"), default_value("runtime-land-db"))]
+    #[clap(
+        long("db-database"),
+        env("DB_DATABASE"),
+        default_value("runtime-land-db")
+    )]
     pub database: String,
     #[clap(long("db-pool-size"), env("DB_POOL_SIZE"), default_value("10"))]
     pub pool_size: u32,
@@ -84,6 +95,9 @@ pub async fn connect(cfg: DbConfig) -> Result<()> {
         .sqlx_logging(cfg.log_sql);
 
     let db = Database::connect(opt).await?;
+
+    // run migrations
+    migration::Migrator::up(&db, None).await?;
 
     DB.set(db).unwrap();
     info!("Init success: {}", cfg.url_safe());

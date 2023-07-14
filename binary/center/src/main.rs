@@ -1,5 +1,6 @@
+use anyhow::Result;
 use clap::Parser;
-use tracing::debug;
+use tracing::{debug, info};
 
 mod server;
 
@@ -13,15 +14,17 @@ struct Cli {
 }
 
 #[tokio::main]
-async fn main() {
+#[tracing::instrument(name = "[MAIN]")]
+async fn main() -> Result<()> {
     land_core::trace::init();
 
     let args = Cli::parse();
-    debug!("load args: {:?}", args);
+    debug!("Load args: {:?}", args);
 
-    land_dao::connect(args.db_config).await.unwrap();
+    land_dao::connect(args.db_config).await?;
+    info!("Connect to database success");
 
-    crate::server::start(args.http_addr.parse().unwrap())
-        .await
-        .unwrap();
+    crate::server::start(args.http_addr.parse().unwrap()).await?;
+
+    Ok(())
 }
