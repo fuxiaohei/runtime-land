@@ -54,3 +54,4 @@ wasmtime = { version = "10.0.1", features = ["component-model", "async"] }
 wasmtime-wasi = "10.0.1"
 wit-bindgen-core = "0.9.0"
 wit-bindgen-rust = "0.9.0"
+serde = { version = "1.0.171", features = ["derive"] }

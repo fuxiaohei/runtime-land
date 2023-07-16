@@ -3,6 +3,7 @@ use clap::Parser;
 use tracing::{debug, info};
 
 mod server;
+mod restapi;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]
