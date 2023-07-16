@@ -5,12 +5,12 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-anyhow = "1.0.71"
-http = "0.2.9"
+anyhow = { workspace = true }
+http = { workspace = true }
 land-sdk-macro = { workspace = true }
-lazy_static = "1.4.0"
+lazy_static = { workspace = true }
 matchit = "0.7.0"
-wit-bindgen = "0.8.0"
+wit-bindgen = { workspace = true }
 
 [lib]
 doctest = false

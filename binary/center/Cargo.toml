@@ -5,10 +5,10 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
-anyhow = "1.0.71"
-axum = "0.6.18"
-clap = { version = "4.3.8", features = ["derive", "env"] }
+anyhow = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
 land-core = { workspace = true }
 land-dao = { workspace = true }
-tokio = { version = "1.29.1", features = ["full"] }
-tracing = "0.1.37"
+tokio = { workspace = true }
+tracing = { workspace = true }
