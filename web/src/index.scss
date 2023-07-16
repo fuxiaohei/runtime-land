@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap");
+
+$font-family-base: "Open Sans", sans-serif;
+$primary: #2a70b6;
+$nav-pills-link-active-color: #1965b1;
+$nav-pills-link-active-bg: #daeafa;
+$nav-link-color: #4a6075;
+$nav-link-hover-color: #0d1b27;
+$nav-link-disabled-color: #9da1a6;
+$table-hover-bg: #e4edf7;
+
+@import "bootstrap/scss/bootstrap";
+
+:root {
+  --sidebar-bg: #f3f7fa;
+  --sidebar-divider-bg: #b8bcc2;
+  --sidebar-nav-link-hover-bg: #e5eaee;
+}
+
+body {
+  min-height: 100vh;
+}
+
+main,
+#root {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#login-container {
+  max-width: 660px;
+  margin-top: 5rem;
+}
+
+.sidebar-container {
+  background-color: var(--sidebar-bg);
+  width: 220px;
+  .divider {
+    border-top-color: var(--sidebar-divider-bg);
+  }
+  .nav {
+    gap: 4px;
+  }
+  .nav-link:hover {
+    background-color: var(--sidebar-nav-link-hover-bg);
+  }
+  .account-avatar.dropdown-toggle::after {
+    display: none;
+  }
+}
+
+.main-breadcrumb {
+  .breadcrumb {
+    margin-bottom: 0;
+  }
+  nav {
+    line-height: 40px;
+  }
+  .breadcrumb-item a {
+    color: #4a6075;
+    text-decoration: none;
+  }
+  .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
+}
+
+#projects-table {
+  table-layout: fixed;
+  tbody tr:last-child {
+    border-bottom: 0;
+    td {
+      border-bottom: 0;
+    }
+  }
+  th,
+  td {
+    color: #63707d;
+    padding: 0.8rem;
+  }
+  td.project-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #0d1b27;
+    a {
+      text-decoration: none;
+    }
+  }
+  tr:hover {
+    td.project-name a {
+      text-decoration: underline;
+    }
+  }
+}
+
+.overview-production-card {
+  .card-header {
+    background-color: #e5fae8;
+  }
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.overview-no-production-card {
+  .card-header {
+    background-color: #faf9e5;
+  }
+}
+
+#deployments-table {
+  th,
+  td {
+    color: #63707d;
+    padding: 0.8rem;
+  }
+  .deployment-name a {
+    text-decoration: none;
+  }
+  .deployment-name a:hover {
+    text-decoration: underline;
+  }
+}
