@@ -1,0 +1,15 @@
+[package]
+name = "land-storage"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+envconfig = "0.10.0"
+once_cell = { workspace = true }
+opendal = { version = "0.38.1", default-features = false, features = [
+    "services-fs",
+    "services-redis",
+] }
+tracing = { workspace = true }

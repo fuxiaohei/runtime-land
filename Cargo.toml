@@ -17,20 +17,22 @@ members = [
     "crates/sdk",
     "crates/core",
     "crates/dao",
+    "crates/storage",
     "tests/rust-test"
 ]
 
 [workspace.package]
-version = "0.1.0-b2"
+version = "0.1.0-b3"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.0-b2" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b2" }
-land-sdk = { path = "crates/sdk", version = "0.1.0-b2" }
-land-core = { path = "crates/core", version = "0.1.0-b2" }
-land-dao = { path = "crates/dao", version = "0.1.0-b2" }
+land-worker = { path = "crates/worker", version = "0.1.0-b3" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b3" }
+land-sdk = { path = "crates/sdk", version = "0.1.0-b3" }
+land-core = { path = "crates/core", version = "0.1.0-b3" }
+land-dao = { path = "crates/dao", version = "0.1.0-b3" }
+land-storage = { path = "crates/storage", version = "0.1.0-b3" }
 anyhow = "1.0.72"
 axum = "0.6.18"
 clap = { version = "4.3.12", features = ["derive", "env"] }

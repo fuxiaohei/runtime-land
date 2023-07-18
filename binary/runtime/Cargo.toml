@@ -5,3 +5,20 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
+land-core = { workspace = true }
+land-storage = { workspace = true }
+land-worker = { workspace = true }
+lazy_static = { workspace = true }
+moka = { version = "0.11.2", default-features = false, features = ["sync"] }
+once_cell = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+hyper = { workspace = true }
