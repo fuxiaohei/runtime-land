@@ -5,3 +5,9 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+axum = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+land-core = { workspace = true }

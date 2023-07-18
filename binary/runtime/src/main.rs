@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, debug_span, Instrument};
+use tracing::{debug, debug_span, info, Instrument};
 
 mod pool;
 mod server;
@@ -16,6 +16,9 @@ async fn main() {
     land_core::trace::init();
 
     let args = Cli::parse();
+    debug!("Load args: {:?}", args);
+
+    info!("Hostname: {:?}", gethostname::gethostname());
 
     // init storage
     land_storage::init().await.expect("init storage failed");
@@ -24,6 +27,4 @@ async fn main() {
         .instrument(debug_span!("[SERVER]"))
         .await
         .unwrap();
-
-    debug!("Load args: {:?}", args);
 }

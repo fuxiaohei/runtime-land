@@ -74,7 +74,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     // get header x-land-wasm
     let headers = req.headers().clone();
     let empty_wasm_path = String::new();
-    let moni_wasm = headers
+    let land_wasm = headers
         .get("x-land-wasm")
         .and_then(|v| v.to_str().ok())
         .unwrap_or(
@@ -87,21 +87,23 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let uri = req.uri().to_string();
     let span = info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri,);
 
-    if moni_wasm.is_empty() {
+    if land_wasm.is_empty() {
         let _enter = span.enter();
-        let builder = Response::builder().status(404);
+        let mut builder = Response::builder().status(404);
+        builder = builder.header("x-request-id", req_id);
         warn!(status = 404, "[Response] x-land-wasm not found");
         return builder.body(Body::from("x-land-wasm not found")).unwrap();
     }
 
-    match wasm_caller_handler(req, moni_wasm, req_id)
+    match wasm_caller_handler(req, land_wasm, req_id.clone())
         .instrument(span)
         .await
     {
         Ok(resp) => resp,
         Err(e) => {
             warn!(status = 500, "[Response] {}", e.to_string());
-            let builder = Response::builder().status(500);
+            let mut builder = Response::builder().status(500);
+            builder = builder.header("x-request-id", req_id);
             builder.body(Body::from(e.to_string())).unwrap()
         }
     }

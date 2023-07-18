@@ -10,6 +10,7 @@ async-trait = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
+gethostname = "0.4.3"
 land-core = { workspace = true }
 land-storage = { workspace = true }
 land-worker = { workspace = true }
