@@ -1,24 +1,29 @@
+import { useUser } from "@clerk/clerk-react";
 import React from "react";
-import { selector, useRecoilValue } from "recoil";
+import {
+  SignedIn,
+  SignedOut,
+  RedirectToSignIn,
+  useUser,
+} from "@clerk/clerk-react";
 
 const AuthContext = React.createContext(null);
-
-const userInfo = selector({
-  key: "userInfo",
-  get: () => {
-    console.log("get user info");
-    return { logged: true, user: { name: "testing-user", token: "ttt" } };
-  },
-});
 
 function userAuthContext() {
   return React.useContext(AuthContext);
 }
 
 function AuthProvider({ children }) {
-  let user = useRecoilValue(userInfo);
-  let value = { user };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const value = useUser();
+  console.log("---user",value)
+  return (
+    <AuthContext.Provider value={value}>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </AuthContext.Provider>
+  );
 }
 
 export { AuthProvider, userAuthContext };
