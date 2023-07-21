@@ -22,6 +22,7 @@ wasmtime = { workspace = true }
 wasmtime-wasi = { workspace = true }
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
+wit-component = "0.13.0"
 
 [lib]
 doctest = false

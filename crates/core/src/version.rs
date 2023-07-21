@@ -13,7 +13,12 @@ lazy_static! {
     pub static ref VERSION: String = build_info();
 }
 
-// get returns the version of the current build.
+/// get returns the version of the current build.
 pub fn get() -> &'static str {
     &VERSION
+}
+
+/// get_about returns the version of the current build.
+pub fn get_about() -> String {
+    format!("{}\nThe Runtime.land command line tool", get())
 }

@@ -4,6 +4,18 @@ version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
 
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+land-core = { workspace = true }
+land-worker = { workspace = true }
+once_cell = { workspace = true }
+rust-embed = "6.8.1"
+tokio = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+
 [build-dependencies]
 land-worker = { workspace = true }
 
@@ -12,12 +24,12 @@ members = [
     "binary/center",
     "binary/edge",
     "binary/runtime",
-    "crates/worker",
-    "crates/sdk-macro",
-    "crates/sdk",
     "crates/core",
     "crates/dao",
+    "crates/sdk",
+    "crates/sdk-macro",
     "crates/storage",
+    "crates/worker",
     "tests/rust-test"
 ]
 
