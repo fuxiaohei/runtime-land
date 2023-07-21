@@ -35,9 +35,9 @@ pub async fn wasm_caller_handler(
     let body = req.into_body();
     let body_handle = context.set_body(body);
     let wasm_req = WasmRequest {
-        method: method.as_str(),
-        uri: uri.as_str(),
-        headers: &headers,
+        method: method.to_string(),
+        uri,
+        headers,
         body: Some(body_handle),
     };
 

@@ -122,9 +122,9 @@ mod tests {
 
             let headers: Vec<(String, String)> = vec![];
             let req = Request {
-                method: "GET",
-                uri: "/abc",
-                headers: &headers,
+                method: "GET".to_string(),
+                uri: "/abc".to_string(),
+                headers,
                 body: Some(body_handle),
             };
 

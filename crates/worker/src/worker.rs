@@ -131,7 +131,7 @@ impl Worker {
     /// handle_request is used to handle http request
     pub async fn handle_request(
         &mut self,
-        req: Request<'_>,
+        req: Request,
         context: Context,
     ) -> Result<(Response, Body)> {
         // create store
@@ -142,7 +142,7 @@ impl Worker {
             HttpHandler::instantiate_pre(&mut store, &self.instance_pre).await?;
         let resp = exports
             .land_http_http_incoming()
-            .call_handle_request(&mut store, req)
+            .call_handle_request(&mut store, &req)
             .await?;
         let body = store.data_mut().take_body(resp.body.unwrap()).unwrap();
         Ok((resp, body))
@@ -170,9 +170,9 @@ mod tests {
             let body_handle = context.set_body(body);
 
             let req = Request {
-                method: "GET",
-                uri: "/abc",
-                headers: &headers,
+                method: "GET".to_string(),
+                uri: "/abc".to_string(),
+                headers,
                 body: Some(body_handle),
             };
 
