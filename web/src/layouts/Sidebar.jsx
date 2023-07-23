@@ -9,6 +9,8 @@ import {
   VscDebugLineByLine,
 } from "react-icons/vsc";
 import { useLocation } from "react-router-dom";
+import { userAuthContext } from "../contexts/Auth";
+import { useClerk } from "@clerk/clerk-react";
 
 function SidebarLogo() {
   return (
@@ -45,6 +47,14 @@ function SidebarBottonNav({ activeKey }) {
 }
 
 function SidebarAccount() {
+  const { user } = userAuthContext();
+  const { signOut } = useClerk();
+
+  const handleSignOut = (event) => {
+    event.preventDefault();
+    signOut();
+  };
+
   return (
     <div className="account d-flex flex-column">
       <hr className="divider mx-3" />
@@ -56,19 +66,21 @@ function SidebarAccount() {
         >
           <span className="me-2">
             <Image
-              src="https://avatars.githubusercontent.com/u/2142787?v=4"
+              src={user.avatar_url}
               rounded
               width={30}
               height={30}
               className="mx-2"
             />
-            <span className="fw-bold">FuXiaohei</span>
+            <span className="fw-bold">{user.name}</span>
           </span>
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item href="/account">Account</Dropdown.Item>
           <Dropdown.Divider />
-          <Dropdown.Item href="/sign-out">Sign Out</Dropdown.Item>
+          <Dropdown.Item href="/#sign-out" onClick={handleSignOut}>
+            Sign Out
+          </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
       <div className="footer text-center fs-6 text-body-tertiary">

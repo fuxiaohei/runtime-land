@@ -13,11 +13,13 @@ pub struct SignupEmailRequest {
 
 #[derive(Serialize, Debug)]
 pub struct LoginResponse {
-    pub access_token: String,
-    pub access_token_uuid: String,
+    pub token_value: String,
+    pub token_uuid: String,
+    pub token_expired_at: i64,
     pub nick_name: String,
     pub email: String,
     pub avatar_url: String,
+    pub oauth_id: String,
 }
 
 #[derive(Deserialize, Debug, Validate)]
@@ -32,4 +34,15 @@ pub struct LoginEmailRequest {
 pub struct LoginTokenRequest {
     #[validate(length(min = 12))]
     pub token: String,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct CreateTokenRequest {
+    pub name: String,
+    pub display_name: String,
+    pub email: String,
+    pub image_url: String,
+    pub oauth_id: String,
+    pub oauth_provider: String,
+    pub oauth_social: String,
 }

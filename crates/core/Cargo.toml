@@ -14,4 +14,4 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [build-dependencies]
-vergen = { version = "8.2.4", features = ["build", "cargo"] }
+vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitcl"] }

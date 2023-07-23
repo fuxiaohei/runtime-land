@@ -6,7 +6,6 @@ use crate::{
     DB,
 };
 use anyhow::Result;
-use gravatar::{Gravatar, Rating};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
@@ -29,6 +28,16 @@ async fn find_by_email(email: String) -> Result<Option<user_info::Model>> {
     let db = DB.get().unwrap();
     let user = user_info::Entity::find()
         .filter(user_info::Column::Email.eq(email))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(user)
+}
+
+pub async fn find_by_oauth_id(oauth_id: String) -> Result<Option<user_info::Model>> {
+    let db = DB.get().unwrap();
+    let user = user_info::Entity::find()
+        .filter(user_info::Column::OauthId.eq(oauth_id))
         .one(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
@@ -78,13 +87,16 @@ pub async fn login_by_token(token_value: String) -> Result<(Model, user_token::M
     Ok((user_info.unwrap(), token_info))
 }
 
-pub async fn signup_by_email(
+pub async fn signup_by_oauth(
+    name: String,
+    display_name: String,
     email: String,
-    password: String,
-    nick_name: String,
+    avatar: String,
+    oauth_id: String,
+    oauth_provider: String,
+    oauth_social: String,
 ) -> Result<(Model, user_token::Model)> {
-    // if user is exist, return error
-    let user = find_by_email(email.clone()).await?;
+    let user = find_by_oauth_id(oauth_id.clone()).await?;
     if user.is_some() {
         return Err(anyhow::anyhow!("user is exist"));
     }
@@ -95,13 +107,8 @@ pub async fn signup_by_email(
         .take(10)
         .map(char::from)
         .collect();
-    let full_password = format!("{}{}", password, password_salt);
+    let full_password = format!("{}{}", oauth_id, password_salt);
     let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
-    let avatar = Gravatar::new(&email)
-        .set_size(Some(400))
-        .set_rating(Some(Rating::Pg))
-        .image_url()
-        .to_string();
 
     let now = chrono::Utc::now();
     let user_model = user_info::Model {
@@ -110,23 +117,25 @@ pub async fn signup_by_email(
         password,
         password_salt,
         avatar,
-        nick_name,
-        bio: String::from(""),
+        nick_name: display_name,
+        bio: name,
         status: Status::Active.to_string(),
         role: Role::Normal.to_string(),
         created_at: now,
         updated_at: now,
         deleted_at: None,
+        oauth_id,
+        oauth_provider,
+        oauth_social,
     };
     let user_active_model: user_info::ActiveModel = user_model.into();
     let db = DB.get().unwrap();
     let user_model = user_active_model.insert(db).await?;
-
-    // create token from webpage, expire in 3 days
+    // create token from webpage, expire in 10 days
     let token = super::user_token::create(
         user_model.id,
-        String::from("login-by-email"),
-        60 * 60 * 24 * 3, // 3 days
+        String::from("signup_by_oauth"),
+        60 * 60 * 24 * 10, // 10 days
         super::user_token::CreatedByCases::EmailLogin,
     )
     .await?;

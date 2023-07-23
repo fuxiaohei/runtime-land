@@ -14,9 +14,8 @@ mod params;
 
 fn auth_router() -> Router {
     Router::new()
-        .route("/v1/user/login", post(auth::login_by_email))
-        .route("/v1/user/sign-up", post(auth::signup_email))
-        .route("/v1/user/verify", post(auth::verify_token))
+        .route("/v1/token", post(auth::create_token))
+        .route("/v1/token/verify", post(auth::verify_token))
 }
 
 fn api_router() -> Router {

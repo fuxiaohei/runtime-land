@@ -19,7 +19,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(UserInfo::Email).string_len(128).not_null())
-                    .col(ColumnDef::new(UserInfo::Avatar).string_len(128).not_null())
+                    .col(ColumnDef::new(UserInfo::Avatar).string_len(256).not_null())
                     .col(ColumnDef::new(UserInfo::Bio).string_len(2048).not_null())
                     .col(
                         ColumnDef::new(UserInfo::Password)
@@ -38,6 +38,17 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(UserInfo::Role).string_len(24).not_null())
                     .col(ColumnDef::new(UserInfo::Status).string_len(24).not_null())
+                    .col(ColumnDef::new(UserInfo::OauthId).string_len(128).not_null())
+                    .col(
+                        ColumnDef::new(UserInfo::OauthProvider)
+                            .string_len(32)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(UserInfo::OauthSocial)
+                            .string_len(32)
+                            .not_null(),
+                    )
                     .col(
                         ColumnDef::new(UserInfo::CreatedAt)
                             .timestamp()
@@ -88,6 +99,17 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-user-info-oauth-id")
+                    .table(UserInfo::Table)
+                    .col(UserInfo::OauthId)
+                    .to_owned(),
+            )
+            .await?;
+
         Ok(())
     }
 
@@ -108,6 +130,9 @@ enum UserInfo {
     PasswordSalt,
     Role,
     Status,
+    OauthId,
+    OauthProvider,
+    OauthSocial,
     CreatedAt,
     UpdatedAt,
     DeletedAt,
