@@ -62,7 +62,10 @@ function DeploymentsTable() {
 
 function ProjectOverviewPage() {
   return (
-    <ProjectLayout projectName="polite-pike-746">
+    <ProjectLayout
+      title="polite-pike-746 | Projects | Runtime.land"
+      projectName="polite-pike-746"
+    >
       <div id="overview-header" className="mb-5 mt-3">
         <h3 className="d-inline">polite-pike-746</h3>
         <span className="prod-link text-secondary ps-3">
@@ -79,7 +82,7 @@ function ProjectOverviewPage() {
       </div>
       <Container fluid className="p-0">
         <Row>
-          <Col md={3}>
+          <Col lg={6} xl={4}>
             <Card className="overview-production-card mb-4">
               <Card.Header>In Production</Card.Header>
               <Card.Body>
@@ -123,7 +126,7 @@ function ProjectOverviewPage() {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={8}>
+          <Col lg={6} xl={8}>
             <Card>
               <Card.Header>Deployments</Card.Header>
               <Card.Body>

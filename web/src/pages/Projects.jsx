@@ -95,7 +95,7 @@ function ProjectsTable() {
 
 function ProjectsPage() {
   return (
-    <DefaultLayout>
+    <DefaultLayout title="Projects | Runtime.land">
       <div id="projects-header" className="mb-5 mt-3">
         <h3 className="d-inline">Projects</h3>
         <span className="count text-secondary ps-2">(2)</span>

@@ -9,8 +9,9 @@ import {
   VscDebugLineByLine,
 } from "react-icons/vsc";
 import { useLocation } from "react-router-dom";
-import { userAuthContext } from "../contexts/Auth";
+import { useAuthContext } from "../contexts/Auth";
 import { useClerk } from "@clerk/clerk-react";
+import { DropdownItemLink, NavbarLink } from "../contexts/Link";
 
 function SidebarLogo() {
   return (
@@ -47,7 +48,7 @@ function SidebarBottonNav({ activeKey }) {
 }
 
 function SidebarAccount() {
-  const { user } = userAuthContext();
+  const { user } = useAuthContext();
   const { signOut } = useClerk();
 
   const handleSignOut = (event) => {
@@ -76,7 +77,7 @@ function SidebarAccount() {
           </span>
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <Dropdown.Item href="/account">Account</Dropdown.Item>
+          <DropdownItemLink to="/account">Account</DropdownItemLink>
           <Dropdown.Divider />
           <Dropdown.Item href="/#sign-out" onClick={handleSignOut}>
             Sign Out
@@ -112,14 +113,14 @@ function DefaultSidebar() {
         defaultActiveKey={activeKey}
         className="flex-column sidebar-nav mb-auto px-3"
       >
-        <Nav.Link href="/projects">
+        <NavbarLink to="/projects">
           <VscProject className="me-2" />
           Projects
-        </Nav.Link>
-        <Nav.Link href="/settings">
+        </NavbarLink>
+        <NavbarLink to="/settings">
           <VscSettingsGear className="me-2" />
           Settings
-        </Nav.Link>
+        </NavbarLink>
       </Nav>
       <hr className="divider mx-3" />
       <SidebarBottonNav activeKey={activeKey} />

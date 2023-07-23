@@ -1,10 +1,10 @@
-import { DefaultLayout } from "../layouts/Layout";
+import { LoginLayout } from "../layouts/Login";
 
 function NotFoundPage() {
   return (
-    <DefaultLayout>
+    <LoginLayout>
       <h1>NotFound</h1>
-    </DefaultLayout>
+    </LoginLayout>
   );
 }
 

@@ -15,10 +15,10 @@ function setLocalInfo(info) {
 }
 
 function createClient() {
-    let user = getLocalInfo();
+    let info = getLocalInfo();
     let headers = {};
-    if (user && user.token) {
-        headers["Authorization"] = "Bearer " + user.token.value;
+    if (info && info.token) {
+        headers["Authorization"] = "Bearer " + info.token.value;
     }
     const instance = axios.create({
         baseURL: SERVER_URL,

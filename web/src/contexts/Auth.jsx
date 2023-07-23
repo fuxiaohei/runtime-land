@@ -10,7 +10,7 @@ import { createToken } from "../api/token";
 
 const AuthContext = React.createContext(null);
 
-function userAuthContext() {
+function useAuthContext() {
   return React.useContext(AuthContext);
 }
 
@@ -94,4 +94,4 @@ function AuthProvider({ children }) {
   );
 }
 
-export { AuthProvider, userAuthContext };
+export { AuthProvider, useAuthContext };

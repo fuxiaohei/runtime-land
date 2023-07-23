@@ -172,17 +172,15 @@ pub struct Deploy {
     /// The token
     #[clap(long)]
     pub token: String,
-    /// The project name override meta.toml
-    #[clap(long)]
-    pub project: String,
-
     /// Publish this deployment to production
     #[clap(long, default_value("false"))]
     pub production: bool,
-
-    /// The cloud api
-    #[clap(long, default_value("https://api.runtime.land"))]
-    pub cloud: Option<String>,
+    /// The api address
+    #[clap(long, default_value(""))]
+    pub api_addr: Option<String>,
+    /// The project name override meta.toml
+    #[clap(long)]
+    pub project: Option<String>,
 }
 
 impl Deploy {
