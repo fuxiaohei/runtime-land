@@ -4,7 +4,7 @@ use axum::{
     body::Body,
     http::{Request, Response, StatusCode},
     middleware,
-    routing::{any, get, post},
+    routing::{any, delete, get, post},
     Router,
 };
 use tower_http::cors::{Any, CorsLayer};
@@ -24,6 +24,7 @@ fn api_router() -> Router {
         .route("/v1/home", get(default_handler))
         .route("/v1/token/deployment", post(auth::create_for_deployment))
         .route("/v1/token/deployment", get(auth::list_for_deployment))
+        .route("/v1/token/deployment/:uuid", delete(auth::remove_token))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

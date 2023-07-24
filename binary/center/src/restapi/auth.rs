@@ -1,4 +1,5 @@
 use super::{params, AppError};
+use axum::extract::Path;
 use axum::Extension;
 use axum::{http::Request, http::StatusCode, middleware::Next, response::Response, Json};
 use land_dao::user_token;
@@ -194,4 +195,16 @@ pub async fn list_for_deployment(
         current_user.id
     );
     Ok((StatusCode::OK, Json(values)))
+}
+
+pub async fn remove_token(
+    Extension(current_user): Extension<CurrentUser>,
+    Path(uuid): Path<String>,
+) -> Result<(), AppError> {
+    land_dao::user_token::remove(current_user.id, uuid.clone()).await?;
+    info!(
+        "remove_token success, userid:{}, uuid:{}",
+        current_user.id, uuid
+    );
+    Ok(())
 }

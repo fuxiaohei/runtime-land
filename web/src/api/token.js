@@ -33,4 +33,20 @@ async function listDeploymentTokens() {
     }
 }
 
-export { createOauthToken, createDeploymentToken, listDeploymentTokens };
+async function removeToken(uuid) {
+    let client = createClient();
+    try {
+        let response = await client.delete("/v1/token/deployment/" + uuid);
+        console.log("removeToken:", uuid);
+        return response.data || {};
+    } catch (error) {
+        return { error: format_axios_error(error) };
+    }
+}
+
+export {
+    createOauthToken,
+    createDeploymentToken,
+    listDeploymentTokens,
+    removeToken,
+};
