@@ -1,4 +1,5 @@
 use super::{params, AppError};
+use axum::Extension;
 use axum::{http::Request, http::StatusCode, middleware::Next, response::Response, Json};
 use land_dao::user_token;
 use tracing::info;
@@ -61,9 +62,9 @@ pub async fn verify_token(
     ))
 }
 
-#[tracing::instrument(name = "[create_token]", skip(payload))]
-pub async fn create_token(
-    Json(payload): Json<params::CreateTokenRequest>,
+#[tracing::instrument(name = "[create_oauth_token]", skip(payload))]
+pub async fn create_oauth_token(
+    Json(payload): Json<params::CreateOauthTokenRequest>,
 ) -> Result<(StatusCode, Json<params::LoginResponse>), AppError> {
     payload.validate()?;
     info!("begin, email:{}", payload.email);
@@ -74,9 +75,9 @@ pub async fn create_token(
         let user = user.unwrap();
         let token = land_dao::user_token::create(
             user.id,
-            String::from("createToken"),
+            String::from("create_oauth_token"),
             60 * 60 * 24 * 10, // 10 days
-            land_dao::user_token::CreatedByCases::EmailLogin,
+            land_dao::user_token::CreatedByCases::OauthLogin,
         )
         .await?;
         info!("success, email:{}, nickname:{}", user.email, user.nick_name,);
@@ -121,4 +122,76 @@ pub async fn create_token(
             oauth_id: user.oauth_id,
         }),
     ))
+}
+
+/// create_for_deployment creates a new token for current user for deployment
+pub async fn create_for_deployment(
+    Extension(current_user): Extension<CurrentUser>,
+    Json(payload): Json<params::CreateTokenRequest>,
+) -> Result<(StatusCode, Json<params::TokenResponse>), AppError> {
+    payload.validate()?;
+
+    let token = land_dao::user_token::find_by_name(
+        current_user.id,
+        payload.name.clone(),
+        land_dao::user_token::CreatedByCases::Deployment,
+    )
+    .await?;
+    if token.is_some() {
+        return Err(anyhow::anyhow!("token name is exist").into());
+    }
+
+    let token = land_dao::user_token::create(
+        current_user.id,
+        payload.name.clone(),
+        365 * 24 * 60 * 60, // 1 year
+        land_dao::user_token::CreatedByCases::Deployment,
+    )
+    .await?;
+
+    info!(
+        "create_for_deployment success, userid:{}, name:{}",
+        current_user.id, payload.name
+    );
+    Ok((
+        StatusCode::OK,
+        Json(params::TokenResponse {
+            name: token.name,
+            created_at: token.created_at.timestamp(),
+            updated_at: token.updated_at.timestamp(),
+            expired_at: token.expired_at.unwrap().timestamp(),
+            origin: token.created_by.to_string(),
+            uuid: token.uuid,
+            value: token.value,
+        }),
+    ))
+}
+
+/// list_for_deployment lists all tokens of current user.
+pub async fn list_for_deployment(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<Vec<params::TokenResponse>>), AppError> {
+    let tokens = land_dao::user_token::list_by_created(
+        current_user.id,
+        land_dao::user_token::CreatedByCases::Deployment,
+    )
+    .await?;
+    let values: Vec<params::TokenResponse> = tokens
+        .into_iter()
+        .map(|t| params::TokenResponse {
+            name: t.name,
+            created_at: t.created_at.timestamp(),
+            updated_at: t.updated_at.timestamp(),
+            expired_at: t.expired_at.unwrap().timestamp(),
+            origin: t.created_by.to_string(),
+            uuid: t.uuid,
+            value: String::new(),
+        })
+        .collect();
+    info!(
+        "list_for_deployment success, count:{}, userid: {}",
+        values.len(),
+        current_user.id
+    );
+    Ok((StatusCode::OK, Json(values)))
 }

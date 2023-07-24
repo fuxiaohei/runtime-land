@@ -10,7 +10,9 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrde
 #[strum(serialize_all = "lowercase")]
 pub enum CreatedByCases {
     EmailLogin,
+    OauthLogin,
     Dashboard,
+    Deployment,
 }
 
 #[derive(strum::Display)]
@@ -35,6 +37,22 @@ pub async fn list_by_created(
         .all(db)
         .await?;
     Ok(tokens)
+}
+
+// find_by_name finds a token by name
+pub async fn find_by_name(
+    owner_id: i32,
+    name: String,
+    created_by: CreatedByCases,
+) -> Result<Option<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::OwnerId.eq(owner_id))
+        .filter(user_token::Column::Name.eq(name))
+        .filter(user_token::Column::CreatedBy.eq(created_by.to_string()))
+        .one(db)
+        .await?;
+    Ok(token)
 }
 
 pub async fn find(value: String) -> Result<Option<user_token::Model>> {

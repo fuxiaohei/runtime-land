@@ -15,6 +15,7 @@ $table-hover-bg: #e4edf7;
   --sidebar-bg: #f3f7fa;
   --sidebar-divider-bg: #b8bcc2;
   --sidebar-nav-link-hover-bg: #e5eaee;
+  --success-light-bg: #e5fae8;
 }
 
 body {
@@ -131,5 +132,8 @@ main,
 #account-container {
   .account-info-title {
     line-height: 37px;
+  }
+  .new-token {
+    background-color: var(--success-light-bg);
   }
 }

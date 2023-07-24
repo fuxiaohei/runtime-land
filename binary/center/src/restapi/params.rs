@@ -37,7 +37,7 @@ pub struct LoginTokenRequest {
 }
 
 #[derive(Deserialize, Debug, Validate)]
-pub struct CreateTokenRequest {
+pub struct CreateOauthTokenRequest {
     pub name: String,
     pub display_name: String,
     pub email: String,
@@ -45,4 +45,21 @@ pub struct CreateTokenRequest {
     pub oauth_id: String,
     pub oauth_provider: String,
     pub oauth_social: String,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct CreateTokenRequest {
+    #[validate(length(min = 3))]
+    pub name: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct TokenResponse {
+    pub name: String,
+    pub value: String,
+    pub origin: String,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub expired_at: i64,
 }

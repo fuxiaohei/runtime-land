@@ -8,19 +8,22 @@ use axum::{
     Router,
 };
 use tower_http::cors::{Any, CorsLayer};
+use tracing::warn;
 
 mod auth;
 mod params;
 
 fn auth_router() -> Router {
     Router::new()
-        .route("/v1/token", post(auth::create_token))
+        .route("/v1/token/oauth", post(auth::create_oauth_token))
         .route("/v1/token/verify", post(auth::verify_token))
 }
 
 fn api_router() -> Router {
     Router::new()
         .route("/v1/home", get(default_handler))
+        .route("/v1/token/deployment", post(auth::create_for_deployment))
+        .route("/v1/token/deployment", get(auth::list_for_deployment))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 
@@ -56,6 +59,7 @@ struct AppErrorJson {
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
+        warn!("app error: {:?}", self.0);
         (
             self.1,
             axum::Json::from(AppErrorJson {

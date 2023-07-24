@@ -6,7 +6,7 @@ import {
   useUser,
 } from "@clerk/clerk-react";
 import { getLocalInfo, setLocalInfo } from "../api/client";
-import { createToken } from "../api/token";
+import { createOauthToken } from "../api/token";
 
 const AuthContext = React.createContext(null);
 
@@ -20,7 +20,7 @@ function AuthProvider({ children }) {
   const [getTokenError, setGetTokenError] = React.useState(null);
 
   const fetchToken = async (req) => {
-    let response = await createToken(req);
+    let response = await createOauthToken(req);
     if (response.error) {
       setGetTokenError(response.error);
       setGetTokenSuccess(false);

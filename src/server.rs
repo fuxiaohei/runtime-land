@@ -9,16 +9,23 @@ use land_core::metadata::Metadata;
 use land_worker::hostcall::Request as WasmRequest;
 use once_cell::sync::OnceCell;
 use std::net::SocketAddr;
-use tracing::{info, warn};
+use tracing::{info, info_span, warn};
 
 /// WASM_PATH is a global worker path
 static WASM_PATH: OnceCell<String> = OnceCell::new();
 
 async fn default_handler(req: Request<Body>) -> Response<Body> {
     let wasm_path = WASM_PATH.get().unwrap();
-    let mut worker = land_worker::Worker::new(&wasm_path).await.unwrap();
-
     let req_id = uuid::Uuid::new_v4().to_string();
+
+    let span = info_span!("[WASM]", req_id = %req_id, wasm_path = %wasm_path);
+    let _enter = span.enter();
+    let now = tokio::time::Instant::now();
+
+    let mut worker = land_worker::Worker::new(&wasm_path).await.unwrap();
+    let elapsed = now.elapsed();
+    info!(elapsed = ?elapsed, "[WASM] worker init success");
+
     let mut headers: Vec<(String, String)> = vec![];
     let req_headers = req.headers().clone();
     req_headers.iter().for_each(|(k, v)| {

@@ -3,6 +3,7 @@ import { DefaultSidebar, ProjectSidebar } from "./Sidebar";
 import { VscBell } from "react-icons/vsc";
 import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { ToastProvider } from "../contexts/Toast";
 
 function MainBreadcrumb() {
   let location = useLocation();
@@ -35,16 +36,18 @@ function MainBreadcrumb() {
 
 function DefaultLayout({ title, children }) {
   return (
-    <main className="d-flex flex-nowrap">
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
-      <DefaultSidebar />
-      <Container fluid className="main-container">
-        <MainBreadcrumb />
-        <div className="main-section p-3">{children}</div>
-      </Container>
-    </main>
+    <ToastProvider>
+      <main className="d-flex flex-nowrap">
+        <Helmet>
+          <title>{title}</title>
+        </Helmet>
+        <DefaultSidebar />
+        <Container fluid className="main-container">
+          <MainBreadcrumb />
+          <div className="main-section p-3">{children}</div>
+        </Container>
+      </main>
+    </ToastProvider>
   );
 }
 
