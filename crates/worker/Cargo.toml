@@ -9,13 +9,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 futures-util = "0.3.28"
 hyper = { workspace = true }
-reqwest = { version = "0.11.18", default-features = false, features = [
-    "stream",
-    "rustls-tls",
-    "blocking",
-    "json",
-    "multipart",
-] }
+reqwest = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 wasmtime = { workspace = true }

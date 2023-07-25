@@ -64,3 +64,21 @@ pub struct TokenResponse {
     pub updated_at: i64,
     pub expired_at: i64,
 }
+
+#[derive(Deserialize, Debug)]
+pub struct IpInfo {
+    pub ip: String,
+    pub city: String,
+    pub region: String,
+    pub country: String,
+    pub loc: String,
+    pub org: String,
+    pub timezone: String,
+    pub readme: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SyncData {
+    pub localip: IpInfo,
+    pub region: String,
+}

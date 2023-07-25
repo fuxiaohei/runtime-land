@@ -12,6 +12,7 @@ use tracing::warn;
 
 mod auth;
 mod params;
+mod region;
 
 fn auth_router() -> Router {
     Router::new()
@@ -28,10 +29,16 @@ fn api_router() -> Router {
         .route_layer(middleware::from_fn(auth::middleware))
 }
 
+fn region_router() -> Router {
+    Router::new()
+        .route("/v1/region/sync", post(region::sync_handler))
+        .route_layer(middleware::from_fn(region::middleware))
+}
+
 /// default_handler is the default handler for all requests.
 async fn default_handler(_req: Request<Body>) -> Response<Body> {
-    let builder = Response::builder().status(200);
-    builder.body(Body::from("Hello, land-center")).unwrap()
+    let builder = Response::builder().status(404);
+    builder.body(Body::from("Route Not Matched")).unwrap()
 }
 
 pub fn router() -> Router {
@@ -43,6 +50,7 @@ pub fn router() -> Router {
     Router::new()
         .merge(auth_router())
         .merge(api_router())
+        .merge(region_router())
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))

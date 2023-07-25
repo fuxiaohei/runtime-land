@@ -13,6 +13,7 @@ pub enum CreatedByCases {
     OauthLogin,
     Dashboard,
     Deployment,
+    Edgehub,
 }
 
 #[derive(strum::Display)]
