@@ -1,7 +1,7 @@
 import { Breadcrumb, Container, Nav } from "react-bootstrap";
 import { DefaultSidebar, ProjectSidebar } from "./Sidebar";
 import { VscBell } from "react-icons/vsc";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ToastProvider } from "../contexts/Toast";
 
@@ -22,7 +22,9 @@ function MainBreadcrumb() {
   return (
     <div className="main-breadcrumb d-flex flex-row justify-content-between p-3 border-bottom">
       <Breadcrumb>
-        <Breadcrumb.Item href="/projects">Home</Breadcrumb.Item>
+        <Breadcrumb.Item linkAs="span">
+          <Link to="/projects">Home</Link>
+        </Breadcrumb.Item>
         {renderBreadcrumb()}
       </Breadcrumb>
       <Nav>

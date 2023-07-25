@@ -33,6 +33,7 @@ function AuthProvider({ children }) {
         email: response.email,
         avatar_url: response.avatar_url,
         oauth_id: response.oauth_id,
+        role: response.role,
       },
       token: {
         value: response.token_value,

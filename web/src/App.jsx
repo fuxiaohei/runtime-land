@@ -5,6 +5,7 @@ import NotFoundPage from "./pages/NotFound";
 import ProjectOverviewPage from "./pages/ProjectOverview";
 import { ClerkProvider, SignIn, SignUp } from "@clerk/clerk-react";
 import AccountPage from "./pages/Account";
+import AdminPage from "./pages/admin/Admin";
 
 const clerkPubKey = "pk_test_cGV0LW1vb3NlLTc1LmNsZXJrLmFjY291bnRzLmRldiQ";
 
@@ -44,6 +45,14 @@ function App() {
             element={
               <AuthProvider>
                 <AccountPage />
+              </AuthProvider>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AuthProvider>
+                <AdminPage />
               </AuthProvider>
             }
           />

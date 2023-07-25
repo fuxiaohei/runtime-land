@@ -20,6 +20,7 @@ pub struct LoginResponse {
     pub email: String,
     pub avatar_url: String,
     pub oauth_id: String,
+    pub role: String,
 }
 
 #[derive(Deserialize, Debug, Validate)]

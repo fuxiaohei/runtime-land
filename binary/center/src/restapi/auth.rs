@@ -59,6 +59,7 @@ pub async fn verify_token(
             email: user.email,
             avatar_url: user.avatar,
             oauth_id: user.oauth_id,
+            role: user.role,
         }),
     ))
 }
@@ -92,6 +93,7 @@ pub async fn create_oauth_token(
                 email: user.email,
                 avatar_url: user.avatar,
                 oauth_id: user.oauth_id,
+                role: user.role,
             }),
         ));
     }
@@ -121,6 +123,7 @@ pub async fn create_oauth_token(
             email: user.email,
             avatar_url: user.avatar,
             oauth_id: user.oauth_id,
+            role: user.role,
         }),
     ))
 }

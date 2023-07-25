@@ -7,6 +7,7 @@ import {
   VscPreview,
   VscGraphLine,
   VscDebugLineByLine,
+  VscLock,
 } from "react-icons/vsc";
 import { useLocation } from "react-router-dom";
 import { useAuthContext } from "../contexts/Auth";
@@ -29,6 +30,7 @@ function SidebarLogo() {
 }
 
 function SidebarBottonNav({ activeKey }) {
+  const { user } = useAuthContext();
   return (
     <Nav
       variant="pills"
@@ -43,6 +45,16 @@ function SidebarBottonNav({ activeKey }) {
         <VscFeedback className="me-2" />
         Feedback
       </Nav.Link>
+
+      {user.role == "admin" ? (
+        <>
+          <hr className="divider mx-3" />
+          <NavbarLink to="/admin">
+            <VscLock className="me-2" />
+            Admin
+          </NavbarLink>
+        </>
+      ) : null}
     </Nav>
   );
 }
