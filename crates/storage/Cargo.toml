@@ -6,7 +6,7 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
-envconfig = "0.10.0"
+envconfig = { workspace = true }
 once_cell = { workspace = true }
 opendal = { version = "0.38.1", default-features = false, features = [
     "services-fs",

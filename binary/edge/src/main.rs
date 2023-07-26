@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use clap::Parser;
+use server::RuntimeData;
 use tracing::{debug, debug_span, warn, Instrument};
 
 mod localip;
@@ -13,12 +16,15 @@ struct Cli {
     pub center_addr: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,
+    #[clap(long, env("CENTER_SYNC_ENABLED"), default_value("true"))]
+    pub center_sync_enabled: Option<bool>,
 }
 
 #[derive(Debug, serde::Serialize)]
 struct SyncData {
     pub localip: localip::IpInfo,
     pub region: String,
+    pub runtimes: HashMap<String, RuntimeData>,
 }
 
 async fn sync_interval(center_addr: String, center_token: String) {
@@ -30,7 +36,12 @@ async fn sync_interval(center_addr: String, center_token: String) {
 
         let localip = localip::IPINFO.get().unwrap().clone();
         let region = localip.region();
-        let sync_data = SyncData { localip, region };
+        let runtimes = server::RUNTIMES.lock().unwrap().clone();
+        let sync_data = SyncData {
+            localip,
+            region,
+            runtimes,
+        };
 
         let client = reqwest::Client::new();
         let res = match client
@@ -75,9 +86,13 @@ async fn main() {
     localip::init().await.expect("init localip failed");
 
     // spawn sync internal task
-    tokio::spawn(
-        sync_interval(args.center_addr, args.center_token).instrument(debug_span!("[SYNC]")),
-    );
+    if args.center_sync_enabled.unwrap() {
+        tokio::spawn(
+            sync_interval(args.center_addr, args.center_token).instrument(debug_span!("[SYNC]")),
+        );
+    } else {
+        warn!("sync interval disabled")
+    }
 
     server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[SERVER]"))

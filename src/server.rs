@@ -22,7 +22,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let _enter = span.enter();
     let now = tokio::time::Instant::now();
 
-    let mut worker = land_worker::Worker::new(&wasm_path).await.unwrap();
+    let mut worker = land_worker::Worker::new(wasm_path).await.unwrap();
     let elapsed = now.elapsed();
     info!(elapsed = ?elapsed, "[WASM] worker init success");
 

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -78,7 +80,18 @@ pub struct IpInfo {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct RuntimeData {
+    pub hostname: String,
+    pub cpu_count: usize,
+    pub cpu_usage: f32,
+    pub total_memory: u64,
+    pub used_memory: u64,
+    pub updated_at: u64,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct SyncData {
     pub localip: IpInfo,
     pub region: String,
+    pub runtimes: HashMap<String, RuntimeData>,
 }
