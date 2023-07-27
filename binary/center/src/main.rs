@@ -4,6 +4,7 @@ use tracing::{debug, info};
 
 mod server;
 mod restapi;
+mod region;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]

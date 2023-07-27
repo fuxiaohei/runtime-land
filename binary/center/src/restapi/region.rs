@@ -44,14 +44,13 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
 /// sync_handler syncs the region info from edge to center.
 pub async fn sync_handler(
     Extension(current_user): Extension<CurrentUser>,
-    Json(payload): Json<params::SyncData>,
+    Json(payload): Json<crate::region::RegionData>,
 ) -> Result<(), AppError> {
-    debug!(
-        "sync_handler begin, payload:{:?}, user:{:?}",
-        payload, current_user
-    );
-    Err(AppError(
-        anyhow::anyhow!("not implemented"),
-        StatusCode::NOT_IMPLEMENTED,
-    ))
+    debug!("sync_region, region:{:?}, user:{:?}", payload, current_user);
+
+    let mut regions = crate::region::REGIONS.lock().await;
+    regions.insert(payload.region.clone(), payload);
+    debug!("sync_region, regions:{:?}", regions.len());
+
+    Ok(())
 }

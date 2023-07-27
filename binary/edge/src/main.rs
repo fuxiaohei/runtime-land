@@ -1,9 +1,7 @@
-use std::collections::HashMap;
-
 use clap::Parser;
-use server::RuntimeData;
 use tracing::{debug, debug_span, warn, Instrument};
 
+mod center;
 mod localip;
 mod server;
 
@@ -12,68 +10,12 @@ mod server;
 struct Cli {
     #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7899"))]
     pub http_addr: String,
-    #[clap(long, env("CENTER_ADDR"), default_value("http://127.0.0.1:7777"))]
+    #[clap(long, env("CENTER_ADDR"), default_value("127.0.0.1:7777"))]
     pub center_addr: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,
     #[clap(long, env("CENTER_SYNC_ENABLED"), default_value("true"))]
     pub center_sync_enabled: Option<bool>,
-}
-
-#[derive(Debug, serde::Serialize)]
-struct SyncData {
-    pub localip: localip::IpInfo,
-    pub region: String,
-    pub runtimes: HashMap<String, RuntimeData>,
-}
-
-async fn sync_interval(center_addr: String, center_token: String) {
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    let url = format!("{}/v1/region/sync", center_addr);
-    let auth = format!("Bearer {}", center_token);
-    loop {
-        interval.tick().await;
-
-        let localip = localip::IPINFO.get().unwrap().clone();
-        let region = localip.region();
-        let runtimes = server::RUNTIMES.lock().unwrap().clone();
-        let sync_data = SyncData {
-            localip,
-            region,
-            runtimes,
-        };
-
-        let client = reqwest::Client::new();
-        let res = match client
-            .post(&url)
-            .json(&sync_data)
-            .header(reqwest::header::AUTHORIZATION, auth.clone())
-            .send()
-            .await
-        {
-            Ok(res) => res,
-            Err(e) => {
-                warn!("request error: {}", e.to_string());
-                continue;
-            }
-        };
-
-        // if no auth
-        if res.status() == reqwest::StatusCode::UNAUTHORIZED {
-            warn!("no auth");
-            continue;
-        }
-
-        // if not ok
-        if !res.status().is_success() {
-            warn!("request error: {}", res.status());
-            continue;
-        }
-
-        // TODO: handle response
-
-        debug!("sync interval response: {:?}", res);
-    }
 }
 
 #[tokio::main]
@@ -87,9 +29,11 @@ async fn main() {
 
     // spawn sync internal task
     if args.center_sync_enabled.unwrap() {
-        tokio::spawn(
-            sync_interval(args.center_addr, args.center_token).instrument(debug_span!("[SYNC]")),
-        );
+        /*tokio::spawn(
+            sync_interval(args.center_addr.clone(), args.center_token.clone())
+                .instrument(debug_span!("[SYNC]")),
+        );*/
+        tokio::spawn(center::init(args.center_addr, args.center_token));
     } else {
         warn!("sync interval disabled")
     }

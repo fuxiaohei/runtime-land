@@ -36,6 +36,9 @@ impl IpInfo {
     pub fn region(&self) -> String {
         format!("{}-{}-{}", self.country, self.region, self.city)
     }
+    pub fn region_ip(&self) -> String {
+        format!("{}-{}-{}-{}", self.country, self.region, self.city, self.ip)
+    }
 }
 
 #[instrument(name = "[LocalIP]")]

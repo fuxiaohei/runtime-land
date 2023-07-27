@@ -66,32 +66,3 @@ pub struct TokenResponse {
     pub updated_at: i64,
     pub expired_at: i64,
 }
-
-#[derive(Deserialize, Debug)]
-pub struct IpInfo {
-    pub ip: String,
-    pub city: String,
-    pub region: String,
-    pub country: String,
-    pub loc: String,
-    pub org: String,
-    pub timezone: String,
-    pub readme: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RuntimeData {
-    pub hostname: String,
-    pub cpu_count: usize,
-    pub cpu_usage: f32,
-    pub total_memory: u64,
-    pub used_memory: u64,
-    pub updated_at: u64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SyncData {
-    pub localip: IpInfo,
-    pub region: String,
-    pub runtimes: HashMap<String, RuntimeData>,
-}

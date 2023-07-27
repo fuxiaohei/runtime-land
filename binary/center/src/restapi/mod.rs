@@ -13,6 +13,7 @@ use tracing::warn;
 mod auth;
 mod params;
 mod region;
+mod ws;
 
 fn auth_router() -> Router {
     Router::new()
@@ -51,6 +52,7 @@ pub fn router() -> Router {
         .merge(auth_router())
         .merge(api_router())
         .merge(region_router())
+        .route("/v1/region/ws", get(ws::ws_handler))
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
