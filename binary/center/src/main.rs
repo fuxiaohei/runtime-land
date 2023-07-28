@@ -26,6 +26,8 @@ async fn main() -> Result<()> {
     land_dao::connect(args.db_config).await?;
     info!("Connect to database success");
 
+    region::init().await;
+
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
     Ok(())

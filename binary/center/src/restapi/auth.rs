@@ -20,7 +20,7 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
     let auth_token = auth_header.unwrap().to_str().unwrap();
     let auth_token = auth_token.replace("Bearer ", "");
     let auth_token = auth_token.trim();
-    let token = user_token::find(auth_token.to_string())
+    let token = user_token::find_by_value(auth_token.to_string())
         .await
         .map_err(|e| {
             info!("find token error: {:?}", e);

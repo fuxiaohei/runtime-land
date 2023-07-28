@@ -44,7 +44,7 @@ pub async fn find_by_oauth_id(oauth_id: String) -> Result<Option<user_info::Mode
     Ok(user)
 }
 
-async fn find_by_id(id: i32) -> Result<Option<user_info::Model>> {
+pub async fn find_by_id(id: i32) -> Result<Option<user_info::Model>> {
     let db = DB.get().unwrap();
     let user = user_info::Entity::find()
         .filter(user_info::Column::Id.eq(id))
@@ -74,7 +74,7 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, user_t
 }
 
 pub async fn login_by_token(token_value: String) -> Result<(Model, user_token::Model)> {
-    let token_info = super::user_token::find(token_value).await?;
+    let token_info = super::user_token::find_by_value(token_value).await?;
     if token_info.is_none() {
         return Err(anyhow::anyhow!("token not found"));
     }

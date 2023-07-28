@@ -1,19 +1,18 @@
-use crate::server::RuntimeData;
+use crate::localip;
+use crate::server;
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
+use std::collections::HashMap;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
 use tracing::{debug, warn};
 use tracing::{info, instrument};
-use crate::localip;
-use std::collections::HashMap;
-
 
 #[derive(Debug, serde::Serialize)]
 struct SyncData {
     pub localip: localip::IpInfo,
     pub region: String,
-    pub runtimes: HashMap<String, RuntimeData>,
+    pub runtimes: HashMap<String, server::RuntimeData>,
 }
 
 #[instrument(name = "[WS]", skip_all)]
@@ -55,7 +54,7 @@ pub async fn init(addr: String, token: String) {
 
                 let localip = localip::IPINFO.get().unwrap().clone();
                 let region = localip.region();
-                let runtimes = server::RUNTIMES.lock().unwrap().clone();
+                let runtimes = server::get_living_runtimes().await;
                 let sync_data = SyncData {
                     localip,
                     region,
@@ -63,7 +62,7 @@ pub async fn init(addr: String, token: String) {
                 };
                 let data = serde_json::to_vec(&sync_data).unwrap();
 
-                if !sender.send(Message::Binary(data)).await.is_ok() {
+                if sender.send(Message::Binary(data)).await.is_err() {
                     warn!("Ping failed");
                     return;
                 }

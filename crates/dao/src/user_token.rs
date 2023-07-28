@@ -1,10 +1,9 @@
-use std::ops::Add;
-
-use crate::{model::user_token, DB};
+use crate::{model::user_info, model::user_token, DB};
 use anyhow::{Ok, Result};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
+use std::ops::Add;
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -56,13 +55,32 @@ pub async fn find_by_name(
     Ok(token)
 }
 
-pub async fn find(value: String) -> Result<Option<user_token::Model>> {
+pub async fn find_by_value(value: String) -> Result<Option<user_token::Model>> {
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()
         .filter(user_token::Column::Value.eq(value))
         .one(db)
         .await?;
     Ok(token)
+}
+
+pub async fn find_by_value_with_active_user(
+    value: String,
+) -> Result<(user_token::Model, user_info::Model)> {
+    let token = find_by_value(value).await?;
+    if token.is_none() {
+        return Err(anyhow::anyhow!("token not found"));
+    }
+    let token = token.unwrap();
+    let user = super::user::find_by_id(token.owner_id).await?;
+    if user.is_none() {
+        return Err(anyhow::anyhow!("user not found"));
+    }
+    let user = user.unwrap();
+    if user.status != super::user::Status::Active.to_string() {
+        return Err(anyhow::anyhow!("user status not active"));
+    }
+    Ok((token, user))
 }
 
 pub async fn create(

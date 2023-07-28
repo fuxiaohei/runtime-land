@@ -18,6 +18,31 @@ lazy_static! {
     };
 }
 
+/// RUMTIME_LIVE_EXPIRE is the expire time of runtime data.
+const RUMTIME_LIVE_EXPIRE: u64 = 30;
+
+pub async fn get_living_runtimes() -> HashMap<String, RuntimeData> {
+    let mut runtimes = RUNTIMES.lock().unwrap();
+    let mut living_runtimes = HashMap::new();
+
+    let mut keys: Vec<String> = vec![];
+    for (region, runtime) in runtimes.iter() {
+        if runtime.updated_at + RUMTIME_LIVE_EXPIRE > chrono::Utc::now().timestamp() as u64 {
+            living_runtimes.insert(region.clone(), runtime.clone());
+        } else {
+            keys.push(region.clone());
+        }
+    }
+
+    // clean dead runtimes
+    for key in keys {
+        runtimes.remove(&key);
+        info!("remove dead runtime: {}", key);
+    }
+
+    living_runtimes
+}
+
 async fn default_handler(_req: Request<Body>) -> Response<Body> {
     let builder = Response::builder().status(200);
     builder.body(Body::from("Hello, land-edge")).unwrap()

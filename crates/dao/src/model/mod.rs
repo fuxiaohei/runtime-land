@@ -2,5 +2,6 @@
 
 pub mod prelude;
 
+pub mod region;
 pub mod user_info;
 pub mod user_token;

@@ -9,8 +9,12 @@ use tracing::{debug, info};
 mod migration;
 mod model;
 
-pub mod user_token;
+// re-export
+pub use model::region::Model as Region;
+
+pub mod region;
 pub mod user;
+pub mod user_token;
 
 #[derive(Args)]
 pub struct DbConfig {

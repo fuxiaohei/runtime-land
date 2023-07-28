@@ -12,8 +12,6 @@ use tracing::warn;
 
 mod auth;
 mod params;
-mod region;
-mod ws;
 
 fn auth_router() -> Router {
     Router::new()
@@ -28,12 +26,6 @@ fn api_router() -> Router {
         .route("/v1/token/deployment", get(auth::list_for_deployment))
         .route("/v1/token/deployment/:uuid", delete(auth::remove_token))
         .route_layer(middleware::from_fn(auth::middleware))
-}
-
-fn region_router() -> Router {
-    Router::new()
-        .route("/v1/region/sync", post(region::sync_handler))
-        .route_layer(middleware::from_fn(region::middleware))
 }
 
 /// default_handler is the default handler for all requests.
@@ -51,8 +43,7 @@ pub fn router() -> Router {
     Router::new()
         .merge(auth_router())
         .merge(api_router())
-        .merge(region_router())
-        .route("/v1/region/ws", get(ws::ws_handler))
+        .route("/v1/region/ws", get(crate::region::ws_handler))
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))

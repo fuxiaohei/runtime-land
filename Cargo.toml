@@ -34,17 +34,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-b5"
+version = "0.1.0-b6"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.0-b5" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b5" }
-land-sdk = { path = "crates/sdk", version = "0.1.0-b5" }
-land-core = { path = "crates/core", version = "0.1.0-b5" }
-land-dao = { path = "crates/dao", version = "0.1.0-b5" }
-land-storage = { path = "crates/storage", version = "0.1.0-b5" }
+land-worker = { path = "crates/worker", version = "0.1.0-b6" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b6" }
+land-sdk = { path = "crates/sdk", version = "0.1.0-b6" }
+land-core = { path = "crates/core", version = "0.1.0-b6" }
+land-dao = { path = "crates/dao", version = "0.1.0-b6" }
+land-storage = { path = "crates/storage", version = "0.1.0-b6" }
 anyhow = "1.0.72"
 axum = { version = "0.6.19", features = ["headers", "ws"] }
 clap = { version = "4.3.19", features = ["derive", "env"] }
@@ -68,7 +68,7 @@ wasmtime = { version = "11.0.1", features = ["component-model", "async"] }
 wasmtime-wasi = "11.0.1"
 wit-bindgen-core = "0.9.0"
 wit-bindgen-rust = "0.9.0"
-serde = { version = "1.0.175", features = ["derive"] }
+serde = { version = "1.0.177", features = ["derive"] }
 serde_json = "1.0.103"
 reqwest = { version = "0.11.18", default-features = false, features = [
     "stream",
