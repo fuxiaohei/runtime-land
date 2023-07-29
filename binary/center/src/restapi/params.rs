@@ -64,3 +64,46 @@ pub struct TokenResponse {
     pub updated_at: i64,
     pub expired_at: i64,
 }
+
+#[derive(Serialize, Deserialize, Validate, Debug)]
+pub struct CreateProjectRequest {
+    pub name: Option<String>,
+    pub prefix: Option<String>,
+    pub language: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectResponse {
+    pub name: String,
+    pub language: String,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub prod_deployment: i32,
+    pub prod_url: String,
+    pub status: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct CreateDeployRequest {
+    #[validate(length(min = 3))]
+    pub project_name: String,
+    pub project_uuid: String,
+    pub deploy_chunk: Vec<u8>,
+    pub deploy_content_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DeploymentResponse {
+    pub id: i32,
+    pub project_id: i32,
+    pub domain: String,
+    pub domain_url: String,
+    pub prod_domain: String,
+    pub prod_url: String,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub deploy_status: String,
+    pub status: String,
+}

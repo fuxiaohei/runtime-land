@@ -1,3 +1,4 @@
+use crate::deploy;
 use clap::Args;
 use land_core::metadata::{Metadata, DEFAULT_FILE as DEFAULT_METADATA_FILE};
 use std::path::{Path, PathBuf};
@@ -170,13 +171,13 @@ impl Serve {
 #[derive(Args, Debug)]
 pub struct Deploy {
     /// The token
-    #[clap(long)]
+    #[clap(long, env("TOKEN"))]
     pub token: String,
     /// Publish this deployment to production
     #[clap(long, default_value("false"))]
     pub production: bool,
     /// The api address
-    #[clap(long, default_value(""))]
+    #[clap(long, default_value("http://127.0.0.1:7777"))]
     pub api_addr: Option<String>,
     /// The project name override meta.toml
     #[clap(long)]
@@ -186,5 +187,29 @@ pub struct Deploy {
 impl Deploy {
     pub async fn run(&self) {
         debug!("Deploy: {self:?}");
+        let addr = self.api_addr.as_ref().unwrap();
+
+        let meta = Metadata::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
+        debug!("Meta: {meta:?}");
+
+        let project = deploy::load_project(self.project.clone(), &meta, addr, &self.token)
+            .await
+            .expect("Load project failed");
+        info!("Project name: {}", project.name);
+
+        let output = meta.get_output();
+        let content = std::fs::read(output).expect("Read compiled target failed");
+
+        let deployment = deploy::create_deployment(
+            project,
+            content,
+            String::from("application/wasm"),
+            addr,
+            &self.token,
+        )
+        .await
+        .expect("Create deployment failed");
+
+        info!("Deployment url: {}", deployment.domain_url);
     }
 }

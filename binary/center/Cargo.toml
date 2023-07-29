@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
+chrono = { workspace = true }
 clap = { workspace = true }
 futures-util = { workspace = true }
 headers = "0.3.8"
@@ -19,4 +20,3 @@ tokio = { workspace = true }
 tower-http = { version = "0.4.3", features = ["cors"] }
 tracing = { workspace = true }
 validator = { version = "0.16.1", features = ["derive"] }
-chrono = { workspace = true }

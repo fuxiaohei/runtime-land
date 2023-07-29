@@ -12,12 +12,13 @@ chrono = { workspace = true }
 clap = { workspace = true }
 gravatar = "0.2.0"
 once_cell = { workspace = true }
-rand = "0.8.5"
-sea-orm = { version = "0.11.3", features = [
+rand = { workspace = true }
+random_word = { version = "0.4.1", features = ["en"] }
+sea-orm = { version = "0.12.1", features = [
     "sqlx-mysql",
-    "runtime-tokio-rustls"
+    "runtime-tokio-rustls",
 ] }
-sea-orm-migration = { version = "0.11.3" }
+sea-orm-migration = { version = "0.12.1" }
 strum = { version = "0.25.0", features = ["derive"] }
 tracing = { workspace = true }
 uuid = { workspace = true }

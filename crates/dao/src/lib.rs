@@ -10,8 +10,11 @@ mod migration;
 mod model;
 
 // re-export
+pub use model::project::Model as Project;
 pub use model::region::Model as Region;
 
+pub mod deployment;
+pub mod project;
 pub mod region;
 pub mod user;
 pub mod user_token;

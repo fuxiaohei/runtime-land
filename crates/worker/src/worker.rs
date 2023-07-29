@@ -117,7 +117,7 @@ impl Worker {
         // create linker
         let mut linker: Linker<Context> = Linker::new(&engine);
         // init wasi context
-        wasmtime_wasi::preview2::wasi::command::add_to_linker(&mut linker)
+        wasmtime_wasi::preview2::command::add_to_linker(&mut linker)
             .expect("add wasmtime_wasi::preview2 failed");
         HttpService::add_to_linker(&mut linker, Context::http_ctx)?;
 

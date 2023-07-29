@@ -11,7 +11,9 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing::warn;
 
 mod auth;
+mod deployment;
 mod params;
+mod project;
 
 fn auth_router() -> Router {
     Router::new()
@@ -25,6 +27,9 @@ fn api_router() -> Router {
         .route("/v1/token/deployment", post(auth::create_for_deployment))
         .route("/v1/token/deployment", get(auth::list_for_deployment))
         .route("/v1/token/deployment/:uuid", delete(auth::remove_token))
+        .route("/v1/project", post(project::create_handler))
+        .route("/v1/project/:name", get(project::query_handler))
+        .route("/v1/deployment", post(deployment::create_handler))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 
