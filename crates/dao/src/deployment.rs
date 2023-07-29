@@ -2,7 +2,7 @@ use crate::{model::deployment, DB};
 use anyhow::Result;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use sea_orm::ActiveModelTrait;
+use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -31,10 +31,10 @@ pub async fn create(
     let uuid = uuid::Uuid::new_v4().to_string();
     let rand_string: String = thread_rng()
         .sample_iter(&Alphanumeric)
-        .take(10)
+        .take(8)
         .map(char::from)
         .collect();
-    let deployment_name = format!("{}-{}", project_name, rand_string);
+    let deployment_name = format!("{}-{}", project_name, rand_string.to_lowercase());
     let deployment = deployment::Model {
         id: 0,
         owner_id,
@@ -53,5 +53,20 @@ pub async fn create(
     let db = DB.get().unwrap();
     let deployment = active_model.insert(db).await?;
 
+    Ok(deployment)
+}
+
+pub async fn set_storage_success(id: i32, storage_path: String) -> Result<deployment::Model> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find_by_id(id)
+        .one(db)
+        .await?
+        .ok_or(anyhow::anyhow!("deployment not found"))?;
+
+    let mut active_model: deployment::ActiveModel = deployment.into();
+    active_model.deploy_status = Set(DeployStatus::Success.to_string());
+    active_model.storage_path = Set(storage_path);
+    active_model.updated_at = Set(chrono::Utc::now());
+    let deployment = active_model.update(db).await?;
     Ok(deployment)
 }

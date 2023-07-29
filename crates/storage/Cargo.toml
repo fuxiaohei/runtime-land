@@ -11,5 +11,7 @@ once_cell = { workspace = true }
 opendal = { version = "0.38.1", default-features = false, features = [
     "services-fs",
     "services-redis",
+    "services-s3",
+    "rustls",
 ] }
 tracing = { workspace = true }

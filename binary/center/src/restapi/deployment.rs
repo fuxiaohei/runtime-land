@@ -1,6 +1,7 @@
 use super::{auth::CurrentUser, params, AppError};
+use crate::settings;
 use axum::{http::StatusCode, Extension, Json};
-use tracing::info;
+use tracing::{info, warn};
 use validator::Validate;
 
 #[tracing::instrument(name = "[create_deployment]", skip_all)]
@@ -21,7 +22,7 @@ pub async fn create_handler(
         current_user.id,
         project.id,
         project.name,
-        String::from("todo-storagepath"),
+        String::from("todo"),
     )
     .await?;
 
@@ -35,6 +36,40 @@ pub async fn create_handler(
         info!("success to activate project from pending, project_name:{}, project_uuid:{}, project_status:{}", project.name, project.uuid, project.status);
     }
 
+    let prod_domain = settings::DOMAIN.get().unwrap();
+    let prod_protocol = settings::PROTOCOL.get().unwrap();
+
+    // upload deploy chunk to storage
+    let storage_path = format!("deployments/{}/{}.wasm", deployment.uuid, deployment.domain);
+    let deployment_id = deployment.id;
+    tokio::task::spawn(async move {
+        match land_storage::write(&storage_path, payload.deploy_chunk).await {
+            Ok(_) => {
+                info!(
+                    "success to upload deploy wasm to storage, storage_path:{}",
+                    storage_path,
+                );
+            }
+            Err(err) => {
+                info!(
+                    "failed to upload deploy wasm to storage, storage_path:{}, err:{}",
+                    storage_path, err
+                );
+            }
+        }
+
+        // then update storage_path and deploy status
+        match land_dao::deployment::set_storage_success(deployment_id, storage_path.clone()).await {
+            Ok(_) => {}
+            Err(err) => {
+                warn!(
+                    "failed to update deployment storage_path, id:{}, storage_path:{}, err:{}",
+                    deployment_id, storage_path, err
+                );
+            }
+        }
+    });
+
     Ok((
         StatusCode::OK,
         Json(params::DeploymentResponse {
@@ -42,8 +77,8 @@ pub async fn create_handler(
             project_id: deployment.project_id,
             uuid: deployment.uuid,
             domain: deployment.domain.clone(),
-            domain_url: format!("http://{}.{}", deployment.domain, "local.dev"),
-            prod_domain: deployment.prod_domain.clone(),
+            domain_url: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
+            prod_domain: String::new(),
             prod_url: String::new(),
             created_at: deployment.created_at.timestamp(),
             updated_at: deployment.updated_at.timestamp(),

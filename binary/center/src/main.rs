@@ -1,10 +1,11 @@
 use anyhow::Result;
 use clap::Parser;
-use tracing::{debug, info};
+use tracing::debug;
 
-mod server;
-mod restapi;
 mod region;
+mod restapi;
+mod server;
+mod settings;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]
@@ -24,10 +25,13 @@ async fn main() -> Result<()> {
     debug!("Load args: {:?}", args);
 
     land_dao::connect(args.db_config).await?;
-    info!("Connect to database success");
+
+    settings::init().await?;
 
     region::init().await;
 
+    land_storage::init().await?;
+    
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
     Ok(())

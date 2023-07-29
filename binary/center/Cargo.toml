@@ -13,7 +13,9 @@ futures-util = { workspace = true }
 headers = "0.3.8"
 land-core = { workspace = true }
 land-dao = { workspace = true }
+land-storage = { workspace = true }
 lazy_static = { workspace = true }
+once_cell = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }

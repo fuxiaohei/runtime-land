@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use tracing::info;
 
 /// start starts the server.
+#[tracing::instrument(name = "[SERVER]", skip_all)]
 pub async fn start(addr: SocketAddr) -> Result<()> {
     let app = restapi::router();
 

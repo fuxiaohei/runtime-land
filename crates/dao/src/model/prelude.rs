@@ -3,5 +3,6 @@
 pub use super::deployment::Entity as Deployment;
 pub use super::project::Entity as Project;
 pub use super::region::Entity as Region;
+pub use super::settings::Entity as Settings;
 pub use super::user_info::Entity as UserInfo;
 pub use super::user_token::Entity as UserToken;
