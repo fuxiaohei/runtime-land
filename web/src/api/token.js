@@ -11,6 +11,17 @@ async function createOauthToken(req) {
     }
 }
 
+async function verifyToken(token) {
+    let client = createClient();
+    try {
+        let response = await client.post("/v1/token/verify/" + encodeURIComponent(token));
+        console.log("verifyToken:", token);
+        return response.data || {};
+    } catch (error) {
+        return { error: format_axios_error(error) };
+    }
+}
+
 async function createDeploymentToken(name) {
     let client = createClient();
     try {
@@ -46,6 +57,7 @@ async function removeToken(uuid) {
 
 export {
     createOauthToken,
+    verifyToken,
     createDeploymentToken,
     listDeploymentTokens,
     removeToken,

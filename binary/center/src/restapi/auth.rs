@@ -38,16 +38,12 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
     Ok(response)
 }
 
+#[tracing::instrument(name = "[create_token]", skip_all)]
 pub async fn verify_token(
-    Json(payload): Json<params::LoginTokenRequest>,
+    Path(token): Path<String>,
 ) -> Result<(StatusCode, Json<params::LoginResponse>), AppError> {
-    payload.validate()?;
-    info!("login_by_token begin, token:{}", payload.token);
-    let (user, token) = land_dao::user::login_by_token(payload.token).await?;
-    info!(
-        "login_by_token success, email:{}, nickname:{}",
-        user.email, user.nick_name,
-    );
+    let (user, token) = land_dao::user::login_by_token(token).await?;
+    info!("success, email:{}, nickname:{}", user.email, user.nick_name,);
 
     Ok((
         StatusCode::OK,

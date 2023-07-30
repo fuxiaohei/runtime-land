@@ -1,8 +1,13 @@
+use crate::model::project;
 use crate::{model::deployment, DB};
 use anyhow::Result;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
+    Set, Statement,
+};
+use std::collections::HashMap;
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -68,5 +73,62 @@ pub async fn set_storage_success(id: i32, storage_path: String) -> Result<deploy
     active_model.storage_path = Set(storage_path);
     active_model.updated_at = Set(chrono::Utc::now());
     let deployment = active_model.update(db).await?;
+    Ok(deployment)
+}
+
+/// find_by_uuid finds a deployment by uuid
+pub async fn publish(owner_id: i32, uuid: String) -> Result<deployment::Model> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find()
+        .filter(deployment::Column::Uuid.eq(uuid))
+        .filter(deployment::Column::OwnerId.eq(owner_id))
+        .one(db)
+        .await?
+        .ok_or(anyhow::anyhow!("deployment not found"))?;
+
+    let project = crate::project::find_by_id(deployment.project_id)
+        .await?
+        .ok_or(anyhow::anyhow!("project not found"))?;
+
+    let mut active_model: deployment::ActiveModel = deployment.into();
+    active_model.updated_at = Set(chrono::Utc::now());
+    active_model.prod_domain = Set(project.name.clone());
+    let deployment = active_model.update(db).await?;
+
+    // update project project.prod_deploy_id
+    let mut project_active_model: project::ActiveModel = project.into();
+    project_active_model.prod_deploy_id = Set(deployment.id);
+    project_active_model.updated_at = Set(chrono::Utc::now());
+    project_active_model.update(db).await?;
+
+    Ok(deployment)
+}
+
+/// list_counter lists the counter of deployments
+pub async fn list_counter(owner_id: i32) -> Result<HashMap<i32, usize>> {
+    let db = DB.get().unwrap();
+    let values: Vec<JsonValue> = JsonValue::find_by_statement(Statement::from_sql_and_values(
+        DbBackend::MySql,
+        r#"select count(id) as counter, project_id from deployment where owner_id = ? and status != 'deleted' group by project_id"#,
+        [owner_id.into()],
+    ))
+    .all(db)
+    .await?;
+    let mut map = HashMap::new();
+    for value in values {
+        let counter = value["counter"].as_i64().unwrap() as usize;
+        let project_id = value["project_id"].as_i64().unwrap() as i32;
+        map.insert(project_id, counter);
+    }
+    Ok(map)
+}
+
+/// find_by_id finds a deployment by id
+pub async fn find_by_id(owner_id: i32, id: i32) -> Result<Option<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find_by_id(id)
+        .filter(deployment::Column::OwnerId.eq(owner_id))
+        .one(db)
+        .await?;
     Ok(deployment)
 }

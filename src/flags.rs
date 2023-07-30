@@ -210,6 +210,14 @@ impl Deploy {
         .await
         .expect("Create deployment failed");
 
-        info!("Deployment url: {}", deployment.domain_url);
+        if self.production {
+            let deployment = deploy::publish_deployment(deployment.uuid, addr, &self.token)
+                .await
+                .expect("Publish deployment failed");
+            info!("Deployment url: \t\n{}", deployment.prod_url);
+            return;
+        }
+
+        info!("Deployment url: \t\n{}", deployment.domain_url);
     }
 }

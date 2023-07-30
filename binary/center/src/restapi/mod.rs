@@ -18,7 +18,7 @@ mod project;
 fn auth_router() -> Router {
     Router::new()
         .route("/v1/token/oauth", post(auth::create_oauth_token))
-        .route("/v1/token/verify", post(auth::verify_token))
+        .route("/v1/token/verify/:token", post(auth::verify_token))
 }
 
 fn api_router() -> Router {
@@ -29,7 +29,10 @@ fn api_router() -> Router {
         .route("/v1/token/deployment/:uuid", delete(auth::remove_token))
         .route("/v1/project", post(project::create_handler))
         .route("/v1/project/:name", get(project::query_handler))
+        .route("/v1/project/:name", delete(project::remove_handler))
+        .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))
+        .route("/v1/deployment/:uuid", post(deployment::publish_handler))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

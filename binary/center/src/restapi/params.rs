@@ -32,12 +32,6 @@ pub struct LoginEmailRequest {
 }
 
 #[derive(Deserialize, Debug, Validate)]
-pub struct LoginTokenRequest {
-    #[validate(length(min = 12))]
-    pub token: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
 pub struct CreateOauthTokenRequest {
     pub name: String,
     pub display_name: String,
@@ -106,4 +100,12 @@ pub struct DeploymentResponse {
     pub updated_at: i64,
     pub deploy_status: String,
     pub status: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectOverview {
+    pub project: ProjectResponse,
+    pub deployments: Option<Vec<DeploymentResponse>>,
+    pub deployments_count: usize,
+    pub prod_deployment: Option<DeploymentResponse>,
 }

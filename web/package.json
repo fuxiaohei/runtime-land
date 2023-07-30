@@ -1,6 +1,6 @@
 {
   "name": "runtime-land-web",
-  "version": "0.0.5-b3",
+  "version": "0.1.0-b9",
   "description": "runtime.land platform web dashboard",
   "main": "index.js",
   "directories": {
@@ -25,7 +25,8 @@
     "react-helmet": "^6.1.0",
     "react-helmet-async": "^1.3.0",
     "react-icons": "^4.10.1",
-    "react-router-dom": "^6.14.1"
+    "react-router-dom": "^6.14.1",
+    "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {
     "@rspack/cli": "^0.2.4",

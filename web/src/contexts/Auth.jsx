@@ -6,7 +6,7 @@ import {
   useUser,
 } from "@clerk/clerk-react";
 import { getLocalInfo, setLocalInfo } from "../api/client";
-import { createOauthToken } from "../api/token";
+import { createOauthToken, verifyToken } from "../api/token";
 
 const AuthContext = React.createContext(null);
 
@@ -19,8 +19,7 @@ function AuthProvider({ children }) {
   const [getTokenSuccess, setGetTokenSuccess] = React.useState(false);
   const [getTokenError, setGetTokenError] = React.useState(null);
 
-  const fetchToken = async (req) => {
-    let response = await createOauthToken(req);
+  const handleTokenResponse = (response) => {
     if (response.error) {
       setGetTokenError(response.error);
       setGetTokenSuccess(false);
@@ -44,21 +43,25 @@ function AuthProvider({ children }) {
     setLocalInfo(value);
   };
 
+  const fetchToken = async (req) => {
+    let response = await createOauthToken(req);
+    handleTokenResponse(response);
+  };
+
+  const verifyLocalToken = async (token) => {
+    let response = await verifyToken(token);
+    handleTokenResponse(response);
+    console.log("verify local token");
+  };
+
   useEffect(() => {
     if (!isLoaded || !isSignedIn) {
       return;
     }
     let localInfo = getLocalInfo();
     if (localInfo && localInfo.token) {
-      const current_timestamp = new Date().getTime();
-      if (
-        current_timestamp / 1000 < localInfo.token.expired_at &&
-        localInfo.user.oauth_id == user.id
-      ) {
-        console.log("local token is valid");
-        setGetTokenSuccess(true);
-        return;
-      }
+      verifyLocalToken(localInfo.token.value);
+      return;
     }
     console.log("local token is invalid, fetch new token", user);
     let req = {

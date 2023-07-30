@@ -1,4 +1,9 @@
-use super::{auth::CurrentUser, params, AppError};
+use super::{
+    auth::CurrentUser,
+    params::{self, ProjectResponse},
+    AppError,
+};
+use crate::settings;
 use anyhow::Result;
 use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::info;
@@ -85,4 +90,89 @@ pub async fn get_active_project(
         return Ok(project);
     }
     Err(anyhow::anyhow!("project is not active"))
+}
+
+#[tracing::instrument(name = "[project_list_handler]", skip_all)]
+pub async fn list_handler(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<Vec<params::ProjectOverview>>), AppError> {
+    let projects = land_dao::project::list_available(current_user.id).await?;
+    let counters = land_dao::deployment::list_counter(current_user.id).await?;
+
+    let prod_domain = settings::DOMAIN.get().unwrap();
+    let prod_protocol = settings::PROTOCOL.get().unwrap();
+
+    let mut project_overviews = Vec::new();
+    for project in projects {
+        let counter = counters.get(&project.id).unwrap_or(&0);
+
+        let project_response = ProjectResponse {
+            language: project.language,
+            uuid: project.uuid,
+            prod_deployment: project.prod_deploy_id,
+            prod_url: "".to_string(),
+            status: project.status,
+            name: project.name,
+            created_at: project.created_at.timestamp(),
+            updated_at: project.updated_at.timestamp(),
+        };
+
+        let mut overview = params::ProjectOverview {
+            deployments_count: *counter,
+            deployments: None,
+            prod_deployment: None,
+            project: project_response,
+        };
+
+        // load prod deployment
+        if project.prod_deploy_id > 0 {
+            let deployment =
+                land_dao::deployment::find_by_id(current_user.id, project.prod_deploy_id).await?;
+            if deployment.is_some() {
+                let deployment = deployment.unwrap();
+                overview.project.prod_url =
+                    format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain);
+                overview.prod_deployment = Some(params::DeploymentResponse {
+                    id: deployment.id,
+                    project_id: deployment.project_id,
+                    uuid: deployment.uuid,
+                    domain: deployment.domain.clone(),
+                    domain_url: format!(
+                        "{}://{}.{}",
+                        prod_protocol, deployment.domain, prod_domain
+                    ),
+                    prod_domain: deployment.prod_domain.clone(),
+                    prod_url: format!(
+                        "{}://{}.{}",
+                        prod_protocol, deployment.prod_domain, prod_domain
+                    ),
+                    created_at: deployment.created_at.timestamp(),
+                    updated_at: deployment.updated_at.timestamp(),
+                    status: deployment.status,
+                    deploy_status: deployment.deploy_status,
+                });
+            }
+        }
+
+        project_overviews.push(overview);
+    }
+
+    info!(
+        "success, owner_id:{}, count:{}",
+        current_user.id,
+        project_overviews.len()
+    );
+
+    Ok((StatusCode::OK, Json(project_overviews)))
+}
+
+#[tracing::instrument(name = "[project_remove_handler]", skip_all)]
+pub async fn remove_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Path(name): Path<String>,
+) -> Result<StatusCode, AppError> {
+    // name is uuid in this api
+    land_dao::project::remove_project(current_user.id, name.clone()).await?;
+    info!("success, owner_id:{}, uuid:{}", current_user.id, name);
+    Ok(StatusCode::OK)
 }

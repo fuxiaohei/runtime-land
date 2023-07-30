@@ -133,6 +133,7 @@ pub struct DeploymentResponse {
     pub domain_url: String,
     pub prod_domain: String,
     pub prod_url: String,
+    pub uuid: String,
 }
 
 /// create_deployment creates a new deployment
@@ -157,6 +158,35 @@ pub async fn create_deployment(
         .json(&data)
         .send()
         .await?;
+    if !resp.status().is_success() {
+        return Err(anyhow::anyhow!(
+            "create deployment failed, status: {}",
+            resp.status()
+        ));
+    }
+    let deployment = resp.json::<DeploymentResponse>().await?;
+    Ok(deployment)
+}
+
+/// publish_deployment publishes the deployment
+pub async fn publish_deployment(
+    uuid: String,
+    addr: &str,
+    token: &str,
+) -> Result<DeploymentResponse> {
+    let url = format!("{}/v1/deployment/{}", addr, uuid);
+    let client = reqwest::Client::new();
+    let resp = client
+        .post(&url)
+        .header("Authorization", format!("Bearer {}", token))
+        .send()
+        .await?;
+    if !resp.status().is_success() {
+        return Err(anyhow::anyhow!(
+            "publish deployment failed, status: {}",
+            resp.status()
+        ));
+    }
     let deployment = resp.json::<DeploymentResponse>().await?;
     Ok(deployment)
 }

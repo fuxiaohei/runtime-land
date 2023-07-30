@@ -95,6 +95,9 @@ main,
       text-decoration: underline;
     }
   }
+  .ops .dropdown-toggle::after {
+    display: none;
+  }
 }
 
 .overview-production-card {
