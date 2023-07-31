@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   SignedIn,
   SignedOut,
@@ -7,6 +7,7 @@ import {
 } from "@clerk/clerk-react";
 import { getLocalInfo, setLocalInfo } from "../api/client";
 import { createOauthToken, verifyToken } from "../api/token";
+import { useQuery } from "@tanstack/react-query";
 
 const AuthContext = React.createContext(null);
 
@@ -16,16 +17,8 @@ function useAuthContext() {
 
 function AuthProvider({ children }) {
   const { isLoaded, isSignedIn, user } = useUser();
-  const [getTokenSuccess, setGetTokenSuccess] = React.useState(false);
-  const [getTokenError, setGetTokenError] = React.useState(null);
 
   const handleTokenResponse = (response) => {
-    if (response.error) {
-      setGetTokenError(response.error);
-      setGetTokenSuccess(false);
-      return;
-    }
-    setGetTokenSuccess(true);
     let value = {
       user: {
         name: response.nick_name,
@@ -43,38 +36,33 @@ function AuthProvider({ children }) {
     setLocalInfo(value);
   };
 
-  const fetchToken = async (req) => {
-    let response = await createOauthToken(req);
-    handleTokenResponse(response);
-  };
-
-  const verifyLocalToken = async (token) => {
-    let response = await verifyToken(token);
-    handleTokenResponse(response);
-    console.log("verify local token");
-  };
-
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) {
-      return;
-    }
-    let localInfo = getLocalInfo();
-    if (localInfo && localInfo.token) {
-      verifyLocalToken(localInfo.token.value);
-      return;
-    }
-    console.log("local token is invalid, fetch new token", user);
-    let req = {
-      name: user.username || user.firstName,
-      display_name: user.fullName,
-      email: user.primaryEmailAddress.emailAddress,
-      image_url: user.imageUrl,
-      oauth_id: user.id,
-      oauth_provider: "clerk",
-      oauth_social: user.primaryEmailAddress.linkedTo[0].type,
-    };
-    fetchToken(req);
-  }, [isSignedIn]);
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ["auth-context"],
+    queryFn: async () => {
+      let localInfo = getLocalInfo();
+      if (localInfo && localInfo.token) {
+        let response = await verifyToken(localInfo.token.value);
+        handleTokenResponse(response);
+        console.log("verify local token");
+        return true;
+      }
+      console.log("local token is invalid, fetch new token", user);
+      let req = {
+        name: user.username || user.firstName,
+        display_name: user.fullName,
+        email: user.primaryEmailAddress.emailAddress,
+        image_url: user.imageUrl,
+        oauth_id: user.id,
+        oauth_provider: "clerk",
+        oauth_social: user.primaryEmailAddress.linkedTo[0].type,
+      };
+      let response = await createOauthToken(req);
+      handleTokenResponse(response);
+      return true;
+    },
+    retry: false,
+    enabled: isLoaded && isSignedIn,
+  });
 
   if (!isLoaded || !isSignedIn) {
     return (
@@ -84,8 +72,12 @@ function AuthProvider({ children }) {
     );
   }
 
-  if (!getTokenSuccess) {
-    return <h1>Error...</h1>;
+  if (isLoading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (isError) {
+    return <h1>Error:{error.toString()}</h1>;
   }
 
   return (

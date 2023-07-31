@@ -1,12 +1,20 @@
 import { DefaultLayout } from "../layouts/Layout";
-import { Button, Table, Badge, Dropdown } from "react-bootstrap";
+import {
+  Button,
+  Table,
+  Badge,
+  Dropdown,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
 import { VscLink, VscKebabVertical } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 import { create_project, list_projects, remove_project } from "../api/projects";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DateTime } from "luxon";
 import ProjectRemoveModal from "../components/ProjectRemoveModal";
 import ProjectCreateModal from "../components/ProjectCreateModal";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function ProjectsTable({ projects, onRemove }) {
   const renderProjectRow = (project) => {
@@ -102,25 +110,22 @@ function ProjectsTable({ projects, onRemove }) {
 }
 
 function ProjectsPage() {
-  const [projects, setProjects] = useState([]);
+  const queryClient = useQueryClient();
+
   const [removeProject, setRemoveProject] = useState({});
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeAlert, setRemoveAlert] = useState("");
 
-  const fetchProjects = async () => {
-    let response = await list_projects();
-    if (response.error) {
-      console.log(response.error);
-      return;
-    }
-    setProjects(response);
-  };
-
-  useEffect(() => {
-    if (projects.length === 0) {
-      fetchProjects();
-    }
-  }, []);
+  const {
+    isLoading,
+    isError,
+    error,
+    data: projects,
+  } = useQuery({
+    queryKey: ["projects-list"],
+    queryFn: list_projects,
+    retry: false,
+  });
 
   const triggerRemove = (data) => {
     console.log("trigger remove", data);
@@ -128,38 +133,42 @@ function ProjectsPage() {
     setRemoveProject(data);
   };
 
-  const handleRemove = async (data) => {
-    console.log("handle remove", data);
-    let response = await remove_project(data.uuid);
-    if (response.error) {
-      setRemoveAlert(response.error);
-      return;
-    }
-    setShowRemoveModal(false);
-    setRemoveProject({});
-    fetchProjects();
-  };
+  const removeMutation = useMutation({
+    mutationFn: (data) => remove_project(data.uuid),
+    onSuccess: () => {
+      setShowRemoveModal(false);
+      setRemoveProject({});
+      queryClient.invalidateQueries({ queryKey: ["projects-list"] });
+    },
+    onError: (error) => {
+      setRemoveAlert(error.toString());
+    },
+  });
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createAlert, setCreateAlert] = useState("");
 
-  const handleCreate = async (data) => {
-    console.log("handle create", data);
-    let response = await create_project(data);
-    if (response.error) {
-      setCreateAlert(response.error);
-      return;
-    }
-    setShowCreateModal(false);
-    setCreateAlert("");
-    fetchProjects();
-  };
+  const createMutation = useMutation({
+    mutationFn: async (data) => {
+      return await create_project(data);
+    },
+    onSuccess: () => {
+      setShowCreateModal(false);
+      setCreateAlert("");
+      queryClient.invalidateQueries({ queryKey: ["projects-list"] });
+    },
+    onError: (error) => {
+      setCreateAlert(error.toString());
+    },
+  });
 
   return (
     <DefaultLayout title="Projects | Runtime.land">
       <div id="projects-header" className="mb-5 mt-3">
         <h3 className="d-inline">Projects</h3>
-        <span className="count text-secondary ps-2">({projects.length})</span>
+        <span className="count text-secondary ps-2">
+          ({projects?.length || 0})
+        </span>
         <Button
           size="sm"
           variant="primary"
@@ -169,12 +178,18 @@ function ProjectsPage() {
           + New Project
         </Button>
       </div>
-      <ProjectsTable projects={projects || []} onRemove={triggerRemove} />
+      {isLoading ? (
+        <Spinner animation="border" />
+      ) : (
+        <ProjectsTable projects={projects || []} onRemove={triggerRemove} />
+      )}
+      {isError ? <Alert variant="danger">{error.toString()}</Alert> : null}
+
       <ProjectCreateModal
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         alert={createAlert}
-        onCreate={handleCreate}
+        onCreate={(data) => createMutation.mutate(data)}
       />
       <ProjectRemoveModal
         show={showRemoveModal}
@@ -183,7 +198,7 @@ function ProjectsPage() {
           setShowRemoveModal(false);
           setRemoveProject({});
         }}
-        onRemove={handleRemove}
+        onRemove={(data) => removeMutation.mutate(data)}
         alert={removeAlert}
       />
     </DefaultLayout>

@@ -7,7 +7,7 @@ async function list_projects() {
         console.log("list_projects");
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
@@ -18,7 +18,7 @@ async function remove_project(uuid) {
         console.log("remove_project:", uuid);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
@@ -29,7 +29,7 @@ async function create_project(req) {
         console.log("create_project:", req);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 

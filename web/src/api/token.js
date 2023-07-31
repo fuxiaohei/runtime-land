@@ -7,7 +7,7 @@ async function createOauthToken(req) {
         console.log("createOauthToken:", req.name);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
@@ -18,7 +18,7 @@ async function verifyToken(token) {
         console.log("verifyToken:", token);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
