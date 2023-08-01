@@ -1,5 +1,5 @@
 use super::{auth::CurrentUser, params, AppError};
-use crate::settings;
+use crate::{conf, settings};
 use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::{debug_span, info, warn, Instrument};
 use validator::Validate;
@@ -71,6 +71,9 @@ pub async fn create_handler(
                     );
                 }
             }
+
+            // trigger build conf
+            conf::trigger().await;
         }
         .instrument(debug_span!("[upload_deploy_chunk]")),
     );

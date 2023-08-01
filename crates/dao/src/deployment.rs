@@ -32,6 +32,9 @@ pub async fn create(
     project_name: String,
     storage_path: String,
 ) -> Result<deployment::Model> {
+    let project = crate::project::find_by_id(project_id)
+        .await?
+        .ok_or(anyhow::anyhow!("project not found"))?;
     let now = chrono::Utc::now();
     let uuid = uuid::Uuid::new_v4().to_string();
     let rand_string: String = thread_rng()
@@ -44,6 +47,7 @@ pub async fn create(
         id: 0,
         owner_id,
         project_id,
+        project_uuid: project.uuid,
         domain: deployment_name,
         prod_domain: String::new(),
         uuid,
@@ -131,4 +135,15 @@ pub async fn find_by_id(owner_id: i32, id: i32) -> Result<Option<deployment::Mod
         .one(db)
         .await?;
     Ok(deployment)
+}
+
+/// list_active lists the success deployments
+pub async fn list_success() -> Result<Vec<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployments = deployment::Entity::find()
+        .filter(deployment::Column::Status.eq(Status::Active.to_string()))
+        .filter(deployment::Column::DeployStatus.eq(DeployStatus::Success.to_string()))
+        .all(db)
+        .await?;
+    Ok(deployments)
 }

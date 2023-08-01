@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use tracing::debug;
 
+mod conf;
 mod region;
 mod restapi;
 mod server;
@@ -30,8 +31,10 @@ async fn main() -> Result<()> {
 
     region::init().await;
 
+    conf::init().await;
+
     land_storage::init().await?;
-    
+
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
     Ok(())

@@ -11,6 +11,7 @@ pub struct Model {
     #[sea_orm(unique)]
     pub domain: String,
     pub prod_domain: String,
+    pub project_uuid: String,
     #[sea_orm(unique)]
     pub uuid: String,
     pub storage_path: String,

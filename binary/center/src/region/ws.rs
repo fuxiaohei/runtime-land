@@ -1,8 +1,14 @@
+use crate::conf::CONF_VALUES;
 use anyhow::Result;
-use axum::extract::ws::{Message, WebSocket};
-use axum::extract::{connect_info::ConnectInfo, Query, WebSocketUpgrade};
-use axum::http::StatusCode;
-use axum::response::Response;
+use axum::{
+    extract::{
+        connect_info::ConnectInfo,
+        ws::{Message, WebSocket},
+        Query, WebSocketUpgrade,
+    },
+    http::StatusCode,
+    response::Response,
+};
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use land_dao::{user, user_token};
@@ -112,12 +118,20 @@ async fn process_message(
                     anyhow::anyhow!("parse region data error: {:?}", e)
                 })
                 .unwrap();
+
+            let conf_time_version = region_data.conf_value_time_version;
+
             region_data.owner_id = owner_id;
             region_data.time_at = chrono::Utc::now().timestamp() as u64;
             super::REGIONS
                 .lock()
                 .await
                 .insert(region.clone(), region_data);
+
+            let conf_value = CONF_VALUES.lock().await;
+            if conf_value.created_at > conf_time_version {
+                
+            }
         }
         Message::Close(c) => {
             if let Some(cf) = c {

@@ -45,6 +45,7 @@ pub struct RegionData {
     pub owner_id: i32,
     #[serde(skip)]
     pub time_at: u64,
+    pub conf_value_time_version: u64,
 }
 
 impl RegionData {

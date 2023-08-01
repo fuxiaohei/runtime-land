@@ -20,6 +20,11 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(Deployment::ProjectId).integer().not_null())
                     .col(
+                        ColumnDef::new(Deployment::ProjectUuid)
+                            .string_len(64)
+                            .not_null(),
+                    )
+                    .col(
                         ColumnDef::new(Deployment::Domain)
                             .string_len(128)
                             .not_null()
@@ -111,6 +116,7 @@ enum Deployment {
     Id,
     OwnerId,
     ProjectId,
+    ProjectUuid,
     Domain,
     ProdDomain,
     Uuid,
