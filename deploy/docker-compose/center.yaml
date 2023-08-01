@@ -1,0 +1,31 @@
+version: "3"
+
+networks:
+  runtime_land_center_network:
+    external: true
+
+services:
+  proxy:
+    image: traefik:3.0
+    command: --api.insecure=true --providers.docker=true --providers.docker.exposedByDefault=false
+    ports:
+      - "80:80"
+    networks:
+      - runtime_land_center_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  runtimeland-center:
+    image: docker.io/library/land-center:v0.1.0-b9
+    restart: always
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=runtime_land_dev
+      - HTTP_ADDR=0.0.0.0:7899
+    networks:
+      - runtime_land_center_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land-runtime.rule=Host(`api-dev.127-0-0-1.nip.io`)

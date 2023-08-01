@@ -1,31 +1,69 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use async_trait::async_trait;
 use axum::{
     body::Body,
     http::{Request, Response},
     routing::any,
     Router,
 };
+use deadpool::managed;
 use land_core::metadata::Metadata;
 use land_worker::hostcall::Request as WasmRequest;
+use land_worker::Worker;
 use once_cell::sync::OnceCell;
 use std::net::SocketAddr;
-use tracing::{info, info_span, warn};
+use tokio::time::Instant;
+use tracing::{debug, debug_span, info, warn};
 
-/// WASM_PATH is a global worker path
-static WASM_PATH: OnceCell<String> = OnceCell::new();
+/// WASM_POOLER is a global worker pooler
+static WASM_POOLER: OnceCell<WorkerPooler> = OnceCell::new();
+
+#[derive(Debug)]
+struct Pooler {
+    path: String,
+}
+
+impl Pooler {
+    pub fn new(path: &str) -> Self {
+        Self {
+            path: String::from(path),
+        }
+    }
+}
+
+#[async_trait]
+impl managed::Manager for Pooler {
+    type Type = Worker;
+    type Error = anyhow::Error;
+
+    async fn create(&self) -> Result<Self::Type, Self::Error> {
+        let start_time = Instant::now();
+        let worker = Worker::new(&self.path).await?;
+        debug_span!("[Worker]", path = &self.path).in_scope(|| {
+            debug!(eplased = ?start_time.elapsed(), "create, ok");
+        });
+        Ok(worker)
+    }
+
+    async fn recycle(&self, _obj: &mut Self::Type) -> managed::RecycleResult<Self::Error> {
+        Ok(())
+    }
+}
+
+/// WorkerPooler is a worker pooler
+type WorkerPooler = managed::Pool<Pooler>;
 
 async fn default_handler(req: Request<Body>) -> Response<Body> {
-    let wasm_path = WASM_PATH.get().unwrap();
-    let req_id = uuid::Uuid::new_v4().to_string();
-
-    let span = info_span!("[WASM]", req_id = %req_id, wasm_path = %wasm_path);
-    let _enter = span.enter();
     let now = tokio::time::Instant::now();
 
-    let mut worker = land_worker::Worker::new(wasm_path).await.unwrap();
-    let elapsed = now.elapsed();
-    info!(elapsed = ?elapsed, "[WASM] worker init success");
+    let pooler = WASM_POOLER.get().unwrap();
+    let mut worker = pooler
+        .get()
+        .await
+        .map_err(|e| anyhow!(e.to_string()))
+        .unwrap();
 
+    let req_id = uuid::Uuid::new_v4().to_string();
     let mut headers: Vec<(String, String)> = vec![];
     let req_headers = req.headers().clone();
     req_headers.iter().for_each(|(k, v)| {
@@ -61,18 +99,22 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     if builder.headers_ref().unwrap().get("x-request-id").is_none() {
         builder = builder.header("x-request-id", req_id.clone());
     }
+    let elapsed = now.elapsed();
     if wasm_resp.status >= 400 {
-        warn!( status=%wasm_resp.status, "[Response]");
+        warn!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, "[Response]");
     } else {
-        info!( status=%wasm_resp.status, "[Response]");
+        info!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, "[Response]");
     }
     builder.body(wasm_resp_body).unwrap()
 }
 
 pub async fn start(addr: SocketAddr, meta: &Metadata) -> Result<()> {
     let output = meta.get_output();
-    WASM_PATH.set(output.clone()).unwrap();
     info!("WASM_PATH: {}", output);
+
+    let pooler = Pooler::new(&output);
+    let worker_pooler = managed::Pool::builder(pooler).build().unwrap();
+    WASM_POOLER.set(worker_pooler).unwrap();
 
     let app = Router::new()
         .route("/", any(default_handler))

@@ -9,7 +9,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
-deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
+deadpool = { workspace = true }
 envconfig = { workspace = true }
 gethostname = "0.4.3"
 land-core = { workspace = true }

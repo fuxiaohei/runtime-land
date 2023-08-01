@@ -130,5 +130,5 @@ pub async fn remove_project(owner_id: i32, uuid: String) -> Result<()> {
     }
 
     // TODO: remove active project
-    return Err(anyhow::anyhow!("project is not pending"));
+    Err(anyhow::anyhow!("project is not pending"))
 }
