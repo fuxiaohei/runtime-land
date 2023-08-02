@@ -1,75 +1,30 @@
 use anyhow::Result;
+use land_core::confdata::RegionReportData;
 use lazy_static::lazy_static;
-use serde::Deserialize;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 use tracing::{info, warn, Instrument};
 
-mod ws;
-pub use ws::ws_handler;
-
-#[derive(Deserialize, Debug)]
-pub struct IpInfo {
-    pub ip: String,
-    pub city: String,
-    pub region: String,
-    pub country: String,
-    pub loc: String,
-    pub org: String,
-    pub timezone: String,
-    pub readme: String,
-}
-
-impl IpInfo {
-    pub fn region(&self) -> String {
-        format!("{}-{}-{}", self.country, self.region, self.city)
-    }
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct RuntimeData {
-    pub hostname: String,
-    pub cpu_count: usize,
-    pub cpu_usage: f32,
-    pub total_memory: u64,
-    pub used_memory: u64,
-    pub updated_at: u64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RegionData {
-    pub localip: IpInfo,
-    pub region: String,
-    pub runtimes: HashMap<String, RuntimeData>,
-    #[serde(skip)]
-    pub owner_id: i32,
-    #[serde(skip)]
-    pub time_at: u64,
-    pub conf_value_time_version: u64,
-}
-
-impl RegionData {
-    pub fn to_model(&self, key: String) -> land_dao::Region {
-        let now = chrono::Utc::now();
-        land_dao::Region {
-            id: 0,
-            name: self.localip.region(),
-            key,
-            ip: self.localip.ip.clone(),
-            city: self.localip.city.clone(),
-            country: self.localip.country.clone(),
-            runtimes: self.runtimes.len() as i32,
-            owner_id: self.owner_id,
-            status: land_dao::region::Status::Active.to_string(),
-            created_at: now,
-            updated_at: now,
-            deleted_at: None,
-        }
+pub fn region_data_to_model(rg: &RegionReportData, key: String) -> land_dao::Region {
+    let now = chrono::Utc::now();
+    land_dao::Region {
+        id: 0,
+        name: rg.localip.region(),
+        key,
+        ip: rg.localip.ip.clone(),
+        city: rg.localip.city.clone(),
+        country: rg.localip.country.clone(),
+        runtimes: rg.runtimes.len() as i32,
+        owner_id: rg.owner_id,
+        status: land_dao::region::Status::Active.to_string(),
+        created_at: now,
+        updated_at: now,
+        deleted_at: None,
     }
 }
 
 lazy_static! {
-    pub static ref REGIONS: Mutex<HashMap<String, RegionData>> = {
+    pub static ref REGIONS: Mutex<HashMap<String, RegionReportData>> = {
         let map = HashMap::new();
         Mutex::new(map)
     };
@@ -129,15 +84,21 @@ async fn refresh_regions() -> Result<()> {
             continue;
         }
         info!("create {:?}: {:?}", key, region_data);
-        let model = region_data.to_model(key.clone());
+        let model = region_data_to_model(region_data, key.clone());
         land_dao::region::create(model).await?;
     }
 
     // iterate saved_regions. if region not in regions, set it inactive
     for (key, region) in saved_regions.iter() {
+        // region record is handled by REGIONS
         if regions.contains_key(key) {
             continue;
         }
+        // region record is not expired
+        if region.updated_at.timestamp() as u64 + REGION_INACTIVE_EXPIRE > now_ts {
+            continue;
+        }
+        // region record is already inactive
         if region.status == land_dao::region::Status::InActive.to_string() {
             continue;
         }

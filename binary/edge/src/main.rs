@@ -4,6 +4,7 @@ use tracing::{debug, debug_span, warn, Instrument};
 mod center;
 mod localip;
 mod server;
+mod conf;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-edge", version = land_core::version::get())]

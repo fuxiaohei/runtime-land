@@ -5,8 +5,8 @@ use axum::{
     routing::{any, post},
     Json, Router,
 };
+use land_core::confdata::RuntimeData;
 use lazy_static::lazy_static;
-use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, net::SocketAddr, sync::Mutex};
 use tokio::signal;
 use tracing::{debug, info};
@@ -58,17 +58,6 @@ async fn sync_handler(Json(mut payload): Json<RuntimeData>) -> Response<Body> {
 
     let builder = Response::builder().status(200);
     builder.body(Body::from("Hello, sync")).unwrap()
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RuntimeData {
-    hostname: String,
-    cpu_count: usize,
-    cpu_usage: f32,
-    total_memory: u64,
-    used_memory: u64,
-    #[serde(skip_deserializing)]
-    updated_at: u64,
 }
 
 pub async fn start(addr: SocketAddr) -> Result<()> {

@@ -1,4 +1,5 @@
 use anyhow::Result;
+use land_core::confdata::{RouteConfItem, RoutesConf};
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 use tracing::{debug, info, warn, Instrument};
@@ -21,7 +22,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    pub static ref CONF_VALUES: Mutex<ConfValues> = Mutex::new(ConfValues {
+    pub static ref CONF_VALUES: Mutex<RoutesConf> = Mutex::new(RoutesConf {
         items: vec![],
         created_at: 0,
     });
@@ -62,20 +63,6 @@ pub async fn init() {
     );
 }
 
-#[derive(Debug, Clone)]
-pub struct ConfItem {
-    pub domain: String,
-    pub module: String,
-    pub key: String,
-    pub time_at: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConfValues {
-    pub items: Vec<ConfItem>,
-    pub created_at: u64,
-}
-
 async fn build_conf() -> Result<()> {
     let deployments = land_dao::deployment::list_success().await.unwrap();
 
@@ -86,7 +73,7 @@ async fn build_conf() -> Result<()> {
 
     let mut conf_items = Vec::new();
     for deployment in deployments {
-        let conf_item = ConfItem {
+        let conf_item = RouteConfItem {
             domain: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
             module: deployment.storage_path.clone(),
             key: deployment.uuid,
@@ -94,8 +81,8 @@ async fn build_conf() -> Result<()> {
         };
         conf_items.push(conf_item);
 
-        if deployment.prod_domain != "" {
-            let conf_item = ConfItem {
+        if !deployment.prod_domain.is_empty() {
+            let conf_item = RouteConfItem {
                 domain: format!(
                     "{}://{}.{}",
                     prod_protocol, deployment.prod_domain, prod_domain

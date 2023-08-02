@@ -15,6 +15,7 @@ mod deployment;
 mod params;
 mod project;
 mod region;
+mod ws;
 
 fn auth_router() -> Router {
     Router::new()
@@ -53,7 +54,7 @@ pub fn router() -> Router {
     Router::new()
         .merge(auth_router())
         .merge(api_router())
-        .route("/v1/region/ws", get(crate::region::ws_handler))
+        .route("/v1/region/ws", get(ws::ws_handler))
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))

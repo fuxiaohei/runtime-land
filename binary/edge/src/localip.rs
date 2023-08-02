@@ -1,11 +1,11 @@
-use std::sync::OnceLock;
-
 use anyhow::Result;
+use land_core::confdata::RegionIPInfo;
+use std::sync::OnceLock;
 use tracing::{debug, info, instrument};
 
 const IPINFO_LINK: &str = "https://ipinfo.io/json";
 const IPINFO_LOCAL_FILE: &str = "ipinfo.json";
-pub static IPINFO: OnceLock<IpInfo> = OnceLock::new();
+pub static IPINFO: OnceLock<RegionIPInfo> = OnceLock::new();
 
 /*
 {
@@ -20,33 +20,15 @@ pub static IPINFO: OnceLock<IpInfo> = OnceLock::new();
 }
  */
 
-#[derive(serde::Deserialize, Clone, serde::Serialize, Debug)]
-pub struct IpInfo {
-    ip: String,
-    city: String,
-    region: String,
-    country: String,
-    loc: String,
-    org: String,
-    timezone: String,
-    readme: String,
-}
-
-impl IpInfo {
-    pub fn region(&self) -> String {
-        format!("{}-{}-{}", self.country, self.region, self.city)
-    }
-    pub fn region_ip(&self) -> String {
-        format!("{}-{}-{}-{}", self.country, self.region, self.city, self.ip)
-    }
-}
-
 #[instrument(name = "[LocalIP]")]
 pub async fn init() -> Result<()> {
     let ip = match read_file() {
         Ok(ip) => ip,
         Err(_) => {
-            let ip = reqwest::get(IPINFO_LINK).await?.json::<IpInfo>().await?;
+            let ip = reqwest::get(IPINFO_LINK)
+                .await?
+                .json::<RegionIPInfo>()
+                .await?;
             debug!("remoteip: {:?}", ip);
             std::fs::write(IPINFO_LOCAL_FILE, serde_json::to_string(&ip)?)?;
             ip
@@ -57,7 +39,7 @@ pub async fn init() -> Result<()> {
     Ok(())
 }
 
-fn read_file() -> Result<IpInfo> {
+fn read_file() -> Result<RegionIPInfo> {
     let file = std::fs::File::open(IPINFO_LOCAL_FILE)?;
     let reader = std::io::BufReader::new(file);
     let ip = serde_json::from_reader(reader)?;

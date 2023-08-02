@@ -1,19 +1,14 @@
+use crate::conf::{process_conf, CURRENT_CONF_VERSION};
 use crate::localip;
 use crate::server;
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
-use std::collections::HashMap;
+use land_core::confdata::{RegionRecvData, RegionReportData};
+use std::ops::ControlFlow;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
 use tracing::{debug, warn};
 use tracing::{info, instrument};
-
-#[derive(Debug, serde::Serialize)]
-struct SyncData {
-    pub localip: localip::IpInfo,
-    pub region: String,
-    pub runtimes: HashMap<String, server::RuntimeData>,
-}
 
 #[instrument(name = "[WS]", skip_all)]
 pub async fn init(addr: String, token: String) {
@@ -55,15 +50,20 @@ pub async fn init(addr: String, token: String) {
                 let localip = localip::IPINFO.get().unwrap().clone();
                 let region = localip.region();
                 let runtimes = server::get_living_runtimes().await;
-                let sync_data = SyncData {
+                let conf_version = CURRENT_CONF_VERSION.lock().await;
+                let sync_data = RegionReportData {
                     localip,
                     region,
                     runtimes,
+                    conf_value_time_version: *conf_version,
+                    time_at: chrono::Utc::now().timestamp() as u64,
+                    owner_id: 0,
                 };
                 let data = serde_json::to_vec(&sync_data).unwrap();
+                debug!("send report data, {}", data.len());
 
                 if sender.send(Message::Binary(data)).await.is_err() {
-                    warn!("Ping failed");
+                    warn!("send report data failed");
                     return;
                 }
             }
@@ -73,7 +73,9 @@ pub async fn init(addr: String, token: String) {
             let mut cnt = 0;
             while let Some(Ok(msg)) = receiver.next().await {
                 cnt += 1;
-                debug!("recv: {:?}", msg);
+                if process_message(msg).await.is_break() {
+                    break;
+                }
             }
             cnt
         });
@@ -93,4 +95,34 @@ pub async fn init(addr: String, token: String) {
 
         tokio::time::sleep(std::time::Duration::from_secs(3)).await;
     }
+}
+
+async fn process_message(msg: Message) -> ControlFlow<(), ()> {
+    match msg {
+        Message::Text(t) => {
+            debug!("recv text: {:?}", t);
+        }
+        Message::Binary(d) => {
+            let recv_data: RegionRecvData = serde_json::from_slice(&d).unwrap();
+            process_conf(&recv_data.conf_values).await;
+        }
+        Message::Close(c) => {
+            if let Some(cf) = c {
+                info!("recv close: {:?}", cf);
+            } else {
+                info!("recv close");
+            }
+            return ControlFlow::Break(());
+        }
+        Message::Pong(v) => {
+            debug!("recv pong: {:?}", v)
+        }
+        Message::Ping(v) => {
+            debug!("recv ping: {:?}", v)
+        }
+        Message::Frame(_) => {
+            unreachable!("This is never supposed to happen")
+        }
+    }
+    ControlFlow::Continue(())
 }

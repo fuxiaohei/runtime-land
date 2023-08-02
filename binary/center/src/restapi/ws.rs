@@ -1,4 +1,5 @@
 use crate::conf::CONF_VALUES;
+use crate::region::REGIONS;
 use anyhow::Result;
 use axum::{
     extract::{
@@ -11,10 +12,12 @@ use axum::{
 };
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
+use land_core::confdata::{RegionRecvData, RegionReportData};
 use land_dao::{user, user_token};
 use serde::Deserialize;
 use std::net::SocketAddr;
 use std::ops::ControlFlow;
+use tokio::sync::watch;
 use tracing::{debug, info, warn};
 
 #[derive(Debug, Deserialize)]
@@ -52,17 +55,20 @@ async fn handle_socket(mut socket: WebSocket, region: String, addr: SocketAddr, 
         return;
     }
 
+    let (tx, mut rx) = watch::channel(0);
+
     let (mut sender, mut receiver) = socket.split();
 
     let mut send_task = tokio::spawn(async move {
-        let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-        loop {
-            interval.tick().await;
-            if sender.send(Message::Ping(vec![1, 2, 3])).await.is_ok() {
-                debug!("Ping ok");
+        while rx.changed().await.is_ok() {
+            let conf_values = CONF_VALUES.lock().await.clone();
+            let send_data = RegionRecvData { conf_values };
+            let bytes = serde_json::to_vec(&send_data).unwrap();
+            if sender.send(Message::Binary(bytes)).await.is_ok() {
+                debug!("Send values ok");
             } else {
-                warn!("Ping failed");
-                return;
+                warn!("Send failed");
+                break;
             }
         }
     });
@@ -71,11 +77,18 @@ async fn handle_socket(mut socket: WebSocket, region: String, addr: SocketAddr, 
         let mut cnt = 0;
         while let Some(Ok(msg)) = receiver.next().await {
             cnt += 1;
-            if process_message(msg, region.clone(), addr, owner_id)
+            let (trigger_send, ops) = process_message(msg, region.clone(), addr, owner_id)
                 .await
-                .is_break()
-            {
+                .unwrap();
+            if ops.is_break() {
                 break;
+            }
+            if trigger_send {
+                let ts = chrono::Utc::now().timestamp() as u64;
+                if tx.send(ts).is_err() {
+                    warn!("send error");
+                    break;
+                }
             }
         }
         cnt
@@ -91,8 +104,8 @@ async fn handle_socket(mut socket: WebSocket, region: String, addr: SocketAddr, 
         },
         rv_b = (&mut recv_task) => {
             match rv_b {
-                Ok(b) => println!("Received {} messages", b),
-                Err(b) => println!("Error receiving messages {:?}", b)
+                Ok(b) => debug!("Received {} messages", b),
+                Err(b) => warn!("Error receiving messages {:?}", b)
             }
             send_task.abort();
         }
@@ -106,13 +119,14 @@ async fn process_message(
     region: String,
     addr: SocketAddr,
     owner_id: i32,
-) -> ControlFlow<(), ()> {
+) -> Result<(bool, ControlFlow<(), ()>)> {
+    let mut trigger_send = false;
     match msg {
         Message::Text(t) => {
             debug!("recv text: {:?}", t);
         }
         Message::Binary(d) => {
-            let mut region_data: super::RegionData = serde_json::from_slice(&d)
+            let mut region_data: RegionReportData = serde_json::from_slice(&d)
                 .map_err(|e| {
                     info!("parse region data error: {:?}", e);
                     anyhow::anyhow!("parse region data error: {:?}", e)
@@ -123,14 +137,11 @@ async fn process_message(
 
             region_data.owner_id = owner_id;
             region_data.time_at = chrono::Utc::now().timestamp() as u64;
-            super::REGIONS
-                .lock()
-                .await
-                .insert(region.clone(), region_data);
+            REGIONS.lock().await.insert(region.clone(), region_data);
 
             let conf_value = CONF_VALUES.lock().await;
             if conf_value.created_at > conf_time_version {
-                
+                trigger_send = true;
             }
         }
         Message::Close(c) => {
@@ -139,7 +150,7 @@ async fn process_message(
             } else {
                 info!("recv close, addr: {:?}", addr);
             }
-            return ControlFlow::Break(());
+            return Ok((false, ControlFlow::Break(())));
         }
         Message::Pong(v) => {
             debug!("recv pong: {:?}", v)
@@ -148,7 +159,7 @@ async fn process_message(
             debug!("recv ping: {:?}", v)
         }
     }
-    ControlFlow::Continue(())
+    Ok((trigger_send, ControlFlow::Continue(())))
 }
 
 // set specific value to show global ownership for token
