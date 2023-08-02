@@ -2,13 +2,14 @@ use super::{params, AppError};
 use axum::extract::Path;
 use axum::Extension;
 use axum::{http::Request, http::StatusCode, middleware::Next, response::Response, Json};
-use land_dao::user_token;
+use land_dao::{user, user_token};
 use tracing::info;
 use validator::Validate;
 
 #[derive(Clone, Debug)]
 pub struct CurrentUser {
     pub id: i32,
+    pub role: String,
 }
 
 pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
@@ -30,10 +31,16 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
         info!("token not found");
         return Err(StatusCode::UNAUTHORIZED);
     }
+    let user = user::find_by_id(token.clone().unwrap().owner_id)
+        .await
+        .map_err(|e| {
+            info!("find user error: {:?}", e);
+            StatusCode::UNAUTHORIZED
+        })?;
     request.extensions_mut().insert(CurrentUser {
         id: token.unwrap().owner_id,
+        role: user.unwrap().role,
     });
-
     let response = next.run(request).await;
     Ok(response)
 }

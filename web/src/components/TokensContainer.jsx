@@ -1,5 +1,5 @@
 import { Col, Button, ListGroup, Spinner, Alert } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createDeploymentToken,
   listDeploymentTokens,
@@ -10,8 +10,11 @@ import { DateTime } from "luxon";
 import TokenCreateModal from "../components/TokenCreateModal";
 import TokenRemoveModal from "../components/TokenRemoveModal";
 import TokenNewCard from "../components/TokenNewCard";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function TokensContainer() {
+  const queryClient = useQueryClient();
+
   const [createModalShow, setCreateModalShow] = useState(false);
   const [createModalAlert, setCreateModalAlert] = useState("");
   const [removeModalShow, setRemoveModalShow] = useState(false);
@@ -21,29 +24,34 @@ function TokensContainer() {
   const [newToken, setNewToken] = useState(null);
   const handleNewTokenDone = () => {
     setNewToken(null);
-    fetchTokens();
+    queryClient.invalidateQueries({ queryKey: ["tokens"] });
   };
 
-  const handleCreate = async (tokenDesc) => {
-    let response = await createDeploymentToken(tokenDesc);
-    if (!response.error) {
-      setNewToken(response);
+  const createMutation = useMutation({
+    mutationFn: async (tokenDesc) => {
+      return await createDeploymentToken(tokenDesc);
+    },
+    onSuccess: async (data) => {
+      setNewToken(data);
       setCreateModalShow(false);
-    } else {
-      setCreateModalAlert(response.error);
-    }
-    return response;
-  };
+    },
+    onError: (error) => {
+      setCreateModalAlert(error.toString());
+    },
+  });
 
-  const handleRemove = async () => {
-    let response = await removeToken(rmToken.uuid);
-    if (response.error) {
-      setRemoveModalAlert(response.error);
-    } else {
-      await fetchTokens();
+  const removeMutation = useMutation({
+    mutationFn: async () => {
+      await removeToken(rmToken.uuid);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["tokens"] });
       setRemoveModalShow(false);
-    }
-  };
+    },
+    onError: (error) => {
+      setRemoveModalAlert(error.toString());
+    },
+  });
 
   const renderNewToken = () => {
     if (!newToken) {
@@ -52,25 +60,16 @@ function TokensContainer() {
     return <TokenNewCard token={newToken} onDone={handleNewTokenDone} />;
   };
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [tokens, setTokens] = useState([]);
-  const [tokensListAlert, setTokensListAlert] = useState("");
-
-  const fetchTokens = async () => {
-    setIsLoading(true);
-    let response = await listDeploymentTokens();
-    if (response.error) {
-      setIsLoading(false);
-      setTokensListAlert(response.error);
-      return;
-    }
-    setTokens(response);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTokens();
-  }, []);
+  const {
+    isLoading,
+    isError,
+    error,
+    data: tokens,
+  } = useQuery({
+    queryKey: ["tokens"],
+    queryFn: listDeploymentTokens,
+    retry: false,
+  });
 
   const renderTokens = () => {
     if (isLoading) {
@@ -86,8 +85,10 @@ function TokensContainer() {
       );
     }
 
-    if (tokensListAlert) {
-      return <Alert variant="danger">Loading failure, {tokensListAlert}</Alert>;
+    if (isError) {
+      return (
+        <Alert variant="danger">Loading failure, {error.toString()}</Alert>
+      );
     }
 
     return tokens.map((token) => {
@@ -148,7 +149,7 @@ function TokensContainer() {
           setCreateModalShow(false);
           setCreateModalAlert("");
         }}
-        onCreate={handleCreate}
+        onCreate={(tokenDesc) => createMutation.mutate(tokenDesc)}
         alert={createModalAlert}
       />
       <TokenRemoveModal
@@ -158,7 +159,7 @@ function TokensContainer() {
           setRemoveModalAlert("");
         }}
         name={removeToken?.name || ""}
-        onRemove={handleRemove}
+        onRemove={() => removeMutation.mutate()}
         alert={removeModalAlert}
       />
     </Col>

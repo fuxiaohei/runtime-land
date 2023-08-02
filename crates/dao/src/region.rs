@@ -12,6 +12,17 @@ pub enum Status {
     Deleted,
 }
 
+/// list lists all regions
+pub async fn list() -> Result<Vec<region::Model>> {
+    let db = DB.get().unwrap();
+    let regions = region::Entity::find()
+        .filter(region::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_asc(region::Column::Key)
+        .all(db)
+        .await?;
+    Ok(regions)
+}
+
 /// list_maps lists all regions as hashmap with key field and by owner id
 pub async fn list_maps() -> Result<HashMap<String, region::Model>> {
     let db = DB.get().unwrap();

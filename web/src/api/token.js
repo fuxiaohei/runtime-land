@@ -29,7 +29,7 @@ async function createDeploymentToken(name) {
         console.log("createDeploymentToken:", name);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
@@ -40,7 +40,7 @@ async function listDeploymentTokens() {
         console.log("listDeploymentTokens");
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 
@@ -51,7 +51,7 @@ async function removeToken(uuid) {
         console.log("removeToken:", uuid);
         return response.data || {};
     } catch (error) {
-        return { error: format_axios_error(error) };
+        throw new Error(format_axios_error(error));
     }
 }
 

@@ -109,3 +109,11 @@ pub struct ProjectOverview {
     pub deployments_count: usize,
     pub prod_deployment: Option<DeploymentResponse>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RegionResponse {
+    pub id: i32,
+    pub key: String,
+    pub runtimes: i32,
+    pub status: String,
+}

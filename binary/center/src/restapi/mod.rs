@@ -14,6 +14,7 @@ mod auth;
 mod deployment;
 mod params;
 mod project;
+mod region;
 
 fn auth_router() -> Router {
     Router::new()
@@ -33,6 +34,7 @@ fn api_router() -> Router {
         .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))
         .route("/v1/deployment/:uuid", post(deployment::publish_handler))
+        .route("/v1/regions", get(region::list_handler))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

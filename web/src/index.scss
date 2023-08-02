@@ -140,3 +140,13 @@ main,
     background-color: var(--success-light-bg);
   }
 }
+
+#regions-table {
+  table-layout: fixed;
+  tbody tr:last-child {
+    border-bottom: 0;
+    td {
+      border-bottom: 0;
+    }
+  }
+}
