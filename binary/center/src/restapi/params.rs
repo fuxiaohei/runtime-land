@@ -77,6 +77,7 @@ pub struct ProjectResponse {
     pub prod_url: String,
     pub deployment_url: String,
     pub status: String,
+    pub subdomain: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

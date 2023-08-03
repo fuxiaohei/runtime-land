@@ -1,6 +1,5 @@
 use crate::{model::project, DB};
 use anyhow::Result;
-use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
 
@@ -26,22 +25,13 @@ pub async fn create(
     let project_name = if let Some(name) = name {
         name
     } else {
-        let rand_string: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(3)
-            .map(char::from)
-            .collect();
-        let prefix = prefix.unwrap();
-        if prefix.len() >= 8 {
-            format!("{}-{}", prefix, rand_string.to_lowercase())
-        } else {
-            format!(
-                "{}-{}-{}",
-                prefix,
-                random_word::gen(random_word::Lang::En),
-                rand_string.to_lowercase(),
-            )
-        }
+        let rand_int = thread_rng().gen_range(100..=999);
+        format!(
+            "{}-{}-{}",
+            random_word::gen(random_word::Lang::En),
+            random_word::gen(random_word::Lang::En),
+            rand_int,
+        )
     };
     let now = chrono::Utc::now();
     let uuid = uuid::Uuid::new_v4().to_string();

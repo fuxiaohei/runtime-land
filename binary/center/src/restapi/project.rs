@@ -27,6 +27,9 @@ pub async fn create_handler(
         "success, project_name:{}, project_uuid:{}",
         project.name, project.uuid,
     );
+
+    let prod_domain = settings::DOMAIN.get().unwrap();
+
     Ok((
         StatusCode::OK,
         Json(params::ProjectResponse {
@@ -39,6 +42,7 @@ pub async fn create_handler(
             name: project.name,
             created_at: project.created_at.timestamp(),
             updated_at: project.updated_at.timestamp(),
+            subdomain: prod_domain.to_string(),
         }),
     ))
 }
@@ -56,6 +60,7 @@ pub async fn query_handler(
         ));
     }
     let project = project.unwrap();
+    let prod_domain = settings::DOMAIN.get().unwrap();
     Ok((
         StatusCode::OK,
         Json(params::ProjectResponse {
@@ -68,6 +73,7 @@ pub async fn query_handler(
             name: project.name,
             created_at: project.created_at.timestamp(),
             updated_at: project.updated_at.timestamp(),
+            subdomain: prod_domain.to_string(),
         }),
     ))
 }
@@ -118,6 +124,7 @@ pub async fn list_handler(
             name: project.name,
             created_at: project.created_at.timestamp(),
             updated_at: project.updated_at.timestamp(),
+            subdomain: prod_domain.to_string(),
         };
 
         let mut overview = params::ProjectOverview {
@@ -193,6 +200,10 @@ pub async fn overview_handler(
         ));
     }
     let project = project.unwrap();
+
+    let prod_domain = settings::DOMAIN.get().unwrap();
+    let prod_protocol = settings::PROTOCOL.get().unwrap();
+
     let project_response = ProjectResponse {
         language: project.language,
         uuid: project.uuid,
@@ -203,6 +214,7 @@ pub async fn overview_handler(
         name: project.name,
         created_at: project.created_at.timestamp(),
         updated_at: project.updated_at.timestamp(),
+        subdomain: prod_domain.to_string(),
     };
 
     let mut overview = params::ProjectOverview {
@@ -214,9 +226,6 @@ pub async fn overview_handler(
 
     let deployments = land_dao::deployment::list_by_project_id(project.id).await?;
     overview.deployments_count = deployments.len();
-
-    let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
 
     let mut deployments_response = vec![];
     for deployment in deployments {
