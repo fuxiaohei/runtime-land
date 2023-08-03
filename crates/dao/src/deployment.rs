@@ -5,7 +5,7 @@ use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
-    Set, Statement,
+    QueryOrder, Set, Statement,
 };
 use std::collections::HashMap;
 
@@ -143,6 +143,18 @@ pub async fn list_success() -> Result<Vec<deployment::Model>> {
     let deployments = deployment::Entity::find()
         .filter(deployment::Column::Status.eq(Status::Active.to_string()))
         .filter(deployment::Column::DeployStatus.eq(DeployStatus::Success.to_string()))
+        .all(db)
+        .await?;
+    Ok(deployments)
+}
+
+/// list_by_project_id lists the deployments by project without deleted
+pub async fn list_by_project_id(project_id: i32) -> Result<Vec<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployments = deployment::Entity::find()
+        .filter(deployment::Column::ProjectId.eq(project_id))
+        .filter(deployment::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(deployment::Column::CreatedAt)
         .all(db)
         .await?;
     Ok(deployments)

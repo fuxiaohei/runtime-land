@@ -31,6 +31,7 @@ fn api_router() -> Router {
         .route("/v1/token/deployment/:uuid", delete(auth::remove_token))
         .route("/v1/project", post(project::create_handler))
         .route("/v1/project/:name", get(project::query_handler))
+        .route("/v1/project/:name/overview", get(project::overview_handler))
         .route("/v1/project/:name", delete(project::remove_handler))
         .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))

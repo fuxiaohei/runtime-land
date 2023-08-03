@@ -9,7 +9,7 @@ use land_core::confdata::RuntimeData;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, net::SocketAddr, sync::Mutex};
 use tokio::signal;
-use tracing::{debug, info};
+use tracing::info;
 
 lazy_static! {
     pub static ref RUNTIMES: Mutex<HashMap<String, RuntimeData>> = {
@@ -50,14 +50,11 @@ async fn default_handler(_req: Request<Body>) -> Response<Body> {
 
 async fn sync_handler(Json(mut payload): Json<RuntimeData>) -> Response<Body> {
     payload.updated_at = chrono::Utc::now().timestamp() as u64;
-
-    debug!("sync_handler begin, payload:{:?}", payload);
-
     let mut runtimes = RUNTIMES.lock().unwrap();
     runtimes.insert(payload.hostname.clone(), payload);
 
-    let builder = Response::builder().status(200);
-    builder.body(Body::from("Hello, sync")).unwrap()
+    let builder = Response::builder().status(204);
+    builder.body(Body::empty()).unwrap()
 }
 
 pub async fn start(addr: SocketAddr) -> Result<()> {

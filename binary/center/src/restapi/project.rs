@@ -34,6 +34,7 @@ pub async fn create_handler(
             uuid: project.uuid,
             prod_deployment: project.prod_deploy_id,
             prod_url: "".to_string(),
+            deployment_url: "".to_string(),
             status: project.status,
             name: project.name,
             created_at: project.created_at.timestamp(),
@@ -62,6 +63,7 @@ pub async fn query_handler(
             uuid: project.uuid,
             prod_deployment: project.prod_deploy_id,
             prod_url: "".to_string(),
+            deployment_url: "".to_string(),
             status: project.status,
             name: project.name,
             created_at: project.created_at.timestamp(),
@@ -111,6 +113,7 @@ pub async fn list_handler(
             uuid: project.uuid,
             prod_deployment: project.prod_deploy_id,
             prod_url: "".to_string(),
+            deployment_url: "".to_string(),
             status: project.status,
             name: project.name,
             created_at: project.created_at.timestamp(),
@@ -175,4 +178,72 @@ pub async fn remove_handler(
     land_dao::project::remove_project(current_user.id, name.clone()).await?;
     info!("success, owner_id:{}, uuid:{}", current_user.id, name);
     Ok(StatusCode::OK)
+}
+
+#[tracing::instrument(name = "[project_overview_handler]", skip_all)]
+pub async fn overview_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Path(name): Path<String>,
+) -> Result<(StatusCode, Json<params::ProjectOverview>), AppError> {
+    let project = land_dao::project::find_by_name(name, current_user.id).await?;
+    if project.is_none() {
+        return Err(AppError(
+            anyhow::anyhow!("project not found"),
+            StatusCode::NOT_FOUND,
+        ));
+    }
+    let project = project.unwrap();
+    let project_response = ProjectResponse {
+        language: project.language,
+        uuid: project.uuid,
+        prod_deployment: project.prod_deploy_id,
+        prod_url: "".to_string(),
+        deployment_url: "".to_string(),
+        status: project.status,
+        name: project.name,
+        created_at: project.created_at.timestamp(),
+        updated_at: project.updated_at.timestamp(),
+    };
+
+    let mut overview = params::ProjectOverview {
+        deployments_count: 0,
+        deployments: None,
+        prod_deployment: None,
+        project: project_response,
+    };
+
+    let deployments = land_dao::deployment::list_by_project_id(project.id).await?;
+    overview.deployments_count = deployments.len();
+
+    let prod_domain = settings::DOMAIN.get().unwrap();
+    let prod_protocol = settings::PROTOCOL.get().unwrap();
+
+    let mut deployments_response = vec![];
+    for deployment in deployments {
+        let deployment_response = params::DeploymentResponse {
+            id: deployment.id,
+            project_id: deployment.project_id,
+            uuid: deployment.uuid,
+            domain: deployment.domain.clone(),
+            domain_url: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
+            prod_domain: deployment.prod_domain.clone(),
+            prod_url: format!(
+                "{}://{}.{}",
+                prod_protocol, deployment.prod_domain, prod_domain
+            ),
+            created_at: deployment.created_at.timestamp(),
+            updated_at: deployment.updated_at.timestamp(),
+            status: deployment.status,
+            deploy_status: deployment.deploy_status,
+        };
+        if deployment.id == project.prod_deploy_id {
+            overview.project.prod_url = deployment_response.prod_url.clone();
+            overview.project.deployment_url = deployment_response.domain_url.clone();
+            overview.prod_deployment = Some(deployment_response.clone());
+        }
+        deployments_response.push(deployment_response);
+    }
+    overview.deployments = Some(deployments_response);
+
+    Ok((StatusCode::OK, Json(overview)))
 }

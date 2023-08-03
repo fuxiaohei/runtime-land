@@ -18,6 +18,7 @@ function RegionsTable({ regions, loading, error }) {
   if (error) {
     return <Alert variant="danger">{error.toString()}</Alert>;
   }
+
   return (
     <div className="regions-table-container">
       <Table id="regions-table" className="mb-0" hover>
@@ -34,7 +35,9 @@ function RegionsTable({ regions, loading, error }) {
               <td>{region.key}</td>
               <td>{region.runtimes}</td>
               <td>
-                <Badge bg="warning" text="dark">
+                <Badge
+                  bg={region.status == "active" ? "success" : "warning"}
+                >
                   {region.status}
                 </Badge>
               </td>

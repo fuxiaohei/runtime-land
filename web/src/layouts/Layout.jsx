@@ -1,19 +1,27 @@
 import { Breadcrumb, Container, Nav } from "react-bootstrap";
 import { DefaultSidebar, ProjectSidebar } from "./Sidebar";
 import { VscBell } from "react-icons/vsc";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { ToastProvider } from "../contexts/Toast";
 
 function MainBreadcrumb() {
   let location = useLocation();
+  let { projectName } = useParams();
 
   const renderBreadcrumb = () => {
-    console.log("location", location, location.pathname.startsWith("/account"));
     if (location.pathname.startsWith("/account")) {
       return <Breadcrumb.Item active>Account</Breadcrumb.Item>;
     }
     if (location.pathname.startsWith("/projects")) {
+      if (projectName) {
+        return (
+          <>
+            <Breadcrumb.Item linkAs="span">Projects</Breadcrumb.Item>
+            <Breadcrumb.Item active>{projectName}</Breadcrumb.Item>
+          </>
+        );
+      }
       return <Breadcrumb.Item active>Projects</Breadcrumb.Item>;
     }
     return null;

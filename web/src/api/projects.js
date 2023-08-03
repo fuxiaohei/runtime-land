@@ -11,6 +11,17 @@ async function list_projects() {
     }
 }
 
+async function get_overview(name) {
+    let client = createClient();
+    try {
+        let response = await client.get("/v1/project/" + name + "/overview");
+        console.log("get_overview:", name);
+        return response.data || {};
+    } catch (error) {
+        throw new Error(format_axios_error(error));
+    }
+}
+
 async function remove_project(uuid) {
     let client = createClient();
     try {
@@ -38,4 +49,5 @@ export {
     list_projects,
     remove_project,
     create_project,
+    get_overview,
 }

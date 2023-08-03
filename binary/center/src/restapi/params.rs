@@ -75,6 +75,7 @@ pub struct ProjectResponse {
     pub updated_at: i64,
     pub prod_deployment: i32,
     pub prod_url: String,
+    pub deployment_url: String,
     pub status: String,
 }
 
@@ -87,7 +88,7 @@ pub struct CreateDeployRequest {
     pub deploy_content_type: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DeploymentResponse {
     pub id: i32,
     pub project_id: i32,

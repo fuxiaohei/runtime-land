@@ -1,5 +1,5 @@
 use envconfig::Envconfig;
-use serde::Serialize;
+use land_core::confdata::RuntimeData;
 use sysinfo::{CpuExt, System, SystemExt};
 use tracing::{debug, info, instrument, warn};
 
@@ -11,15 +11,6 @@ pub struct Config {
     sync_enabled: bool,
     #[envconfig(from = "EDGE_SYNC_INTERVAL", default = "1")]
     sync_interval: u64,
-}
-
-#[derive(Debug, Serialize)]
-struct SyncData {
-    hostname: String,
-    cpu_count: usize,
-    cpu_usage: f32,
-    total_memory: u64,
-    used_memory: u64,
 }
 
 #[instrument(skip_all, name = "[EDGE]")]
@@ -40,25 +31,27 @@ async fn sync_interval(cfg: Config) {
         let total_memory = sys.total_memory() / 1024 / 1024;
         let used_memory = sys.used_memory() / 1024 / 1024;
 
-        let data = SyncData {
+        let now_ts = chrono::Utc::now().timestamp() as u64;
+        let data = RuntimeData {
             hostname: hostname.into_string().unwrap(),
             cpu_count,
             cpu_usage,
             total_memory,
             used_memory,
+            updated_at: now_ts,
         };
         let client = reqwest::Client::new();
         let resp = match client.post(&url).json(&data).send().await {
             Ok(resp) => resp,
             Err(e) => {
-                warn!("sync failed: {}", e);
+                warn!("sync request failed: {}", e);
                 continue;
             }
         };
         if resp.status().is_success() {
             debug!("sync success");
         } else {
-            warn!("sync failed: {}", resp.status());
+            warn!("sync responst status failed: {}", resp.status());
         }
     }
 }
