@@ -1,48 +1,48 @@
 import { Table, Badge } from "react-bootstrap";
 import { VscKebabVertical } from "react-icons/vsc";
+import { DateTime } from "luxon";
 
 function ProjectDeploymentsTable({ deployments }) {
+  const renderLink = (deployment) => {
+    let url = deployment.prod_domain
+      ? deployment.prod_url
+      : deployment.domain_url;
+    return (
+      <a className="deployment-link text-black" href={url} target="_blank">
+        {new URL(url).host}
+      </a>
+    );
+  };
+
   return (
-    <div className="deployments-table-container mb-4">
+    <div className="deployments-table-container overflow-y-auto mb-4">
       <Table id="deployments-table" className="mb-0" hover>
         <thead>
           <tr>
             <th>Deployment</th>
             <th style={{ width: "180px" }}>Created At</th>
-            <th style={{ width: "200px" }}>Op</th>
+            <th style={{ width: "5px" }}>Op</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="deployment-name fw-bold">
-              <span className="me-2">
-                <a href="https://quick-trout-91-m9t91f4cbqh0.deno.dev">
-                  quick-trout-91-m9t91f4cbqh0.deno.dev
-                </a>
-              </span>
-            </td>
-            <td>Jul 2, 2023 18:29</td>
-            <td>op</td>
-          </tr>
-          <tr>
-            <td className="deployment-name fw-bold">
-              <span className="me-2">
-                <a
-                  className="text-dark"
-                  href="/projects/polite-pike-746/overview"
-                >
-                  quick-dog-91.deno.dev
-                </a>
-              </span>
-              <Badge className="me-2" bg="success">
-                Prod
-              </Badge>
-            </td>
-            <td>Jul 2, 2023 18:29</td>
-            <td>
-              <VscKebabVertical />
-            </td>
-          </tr>
+          {deployments.map((deployment) => (
+            <tr key={deployment.id}>
+              <td className="deployment-name">
+                <span className="me-2">{renderLink(deployment)}</span>
+                {deployment.prod_domain ? (
+                  <Badge className="me-2" bg="success">
+                    Prod
+                  </Badge>
+                ) : null}
+              </td>
+              <td>
+                {DateTime.fromSeconds(deployment.updated_at)
+                  .setLocale("en-US")
+                  .toFormat("LLL dd, yyyy HH:mm")}
+              </td>
+              <td></td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>

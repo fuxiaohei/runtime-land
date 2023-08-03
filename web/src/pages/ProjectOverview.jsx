@@ -84,14 +84,18 @@ function ProjectOverviewPage() {
           </Col>
           <Col lg={6} xl={8}>
             <Card>
-              <Card.Header>Deployments</Card.Header>
+              <Card.Header>
+                Deployments ({overview?.deployments.length || 0})
+              </Card.Header>
               <Card.Body>
                 <Card.Text as="div">
                   <p className="text-secondary">
                     All deployments of this project.
                   </p>
                 </Card.Text>
-                <ProjectDeploymentsTable />
+                <ProjectDeploymentsTable
+                  deployments={overview?.deployments || []}
+                />
               </Card.Body>
             </Card>
           </Col>

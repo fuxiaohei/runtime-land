@@ -118,17 +118,20 @@ main,
   }
 }
 
-#deployments-table {
-  th,
-  td {
-    color: #63707d;
-    padding: 0.8rem;
-  }
-  .deployment-name a {
-    text-decoration: none;
-  }
-  .deployment-name a:hover {
-    text-decoration: underline;
+.deployments-table-container {
+  height: 400px;
+  #deployments-table {
+    th,
+    td {
+      color: #63707d;
+      padding: 0.8rem;
+    }
+    .deployment-name a {
+      text-decoration: none;
+    }
+    .deployment-name a:hover {
+      text-decoration: underline;
+    }
   }
 }
 

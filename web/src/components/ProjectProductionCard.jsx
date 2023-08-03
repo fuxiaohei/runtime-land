@@ -15,7 +15,7 @@ function ProjectProdutionCard({ deployment }) {
                 target="_blank"
                 className="text-dark fw-bold"
               >
-                {deployment.prod_url}
+                {new URL(deployment.prod_url).host}
               </a>
             </p>
             <p>
@@ -24,7 +24,7 @@ function ProjectProdutionCard({ deployment }) {
                 target="_blank"
                 className="text-secondary"
               >
-                {deployment.domain_url}
+                {new URL(deployment.domain_url).host}
               </a>
             </p>
           </div>
