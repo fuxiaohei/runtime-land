@@ -3,12 +3,18 @@ import ProjectHeader from "../components/ProjectHeader";
 import { AuthProvider } from "../layouts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { get_project } from "../api/projects";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getProject, removeProject } from "../api/projects";
 import LoadingPage from "./Loading";
+import { useState } from "react";
+import ProjectRemoveModal from "../components/ProjectRemoveModal";
+import { useNavigate } from "react-router-dom";
 
 function ProjectSettingPage() {
-  let { name: projectName } = useParams();
+  const { name: projectName } = useParams();
+  const navigate = useNavigate();
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [removeAlert, setRemoveAlert] = useState("");
 
   const {
     isLoading,
@@ -19,16 +25,30 @@ function ProjectSettingPage() {
     queryKey: ["project-simple", { projectName }],
     queryFn: async ({ queryKey }) => {
       const { projectName } = queryKey[1];
-      const data = await get_project(projectName);
+      const data = await getProject(projectName);
       return data;
     },
     retry: false,
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: async () => {
+      return await removeProject(project.uuid);
+    },
+    onSuccess: () => {
+      setShowRemoveModal(false);
+      navigate("/projects");
+    },
+    onError: (error) => {
+      setRemoveAlert(error.toString());
+    },
   });
 
   const renderContainer = () => {
     if (isLoading) {
       return <LoadingPage />;
     }
+
     return (
       <Container className="mx-auto" id="project-overview-container">
         <ProjectHeader project={project} activeKey="setting" />
@@ -52,7 +72,11 @@ function ProjectSettingPage() {
               Delete <strong>{project.name}</strong> and all of its deployments.
               Be careful, this action cannot be undone.
             </p>
-            <Button className="mb-3" variant="outline-danger">
+            <Button
+              className="mb-3"
+              variant="outline-danger"
+              onClick={() => setShowRemoveModal(true)}
+            >
               Delete
             </Button>
           </div>
@@ -63,7 +87,15 @@ function ProjectSettingPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>{renderContainer()}</MainLayout>
+      <MainLayout>
+        {renderContainer()}
+        <ProjectRemoveModal
+          show={showRemoveModal}
+          handleClose={() => setShowRemoveModal(false)}
+          alert={removeAlert}
+          handleRemove={() => removeMutation.mutate()}
+        />
+      </MainLayout>
     </AuthProvider>
   );
 }

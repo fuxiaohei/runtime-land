@@ -1,53 +1,29 @@
-import { createClient, format_axios_error } from "./client";
+import { clientDelete, clientPost, clientGet } from "./client";
 
-async function list_projects() {
-    let client = createClient();
-    try {
-        let response = await client.get("/v1/projects");
-        console.log("list_projects");
-        return response.data || {};
-    } catch (error) {
-        throw new Error(format_axios_error(error));
-    }
+async function listProjects() {
+    return await clientGet("/v1/projects");
 }
 
-async function get_overview(name) {
-    let client = createClient();
-    try {
-        let response = await client.get("/v1/project/" + name + "/overview");
-        console.log("get_overview:", name);
-        return response.data || {};
-    } catch (error) {
-        throw new Error(format_axios_error(error));
-    }
+async function getProjectOverview(name) {
+    return await clientGet("/v1/project/" + name + "/overview");
 }
 
-async function remove_project(uuid) {
-    let client = createClient();
-    try {
-        let response = await client.delete("/v1/project/" + uuid);
-        console.log("remove_project:", uuid);
-        return response.data || {};
-    } catch (error) {
-        throw new Error(format_axios_error(error));
-    }
+async function getProject(name) {
+    return await clientGet("/v1/project/" + name);
 }
 
-async function create_project(req) {
-    let client = createClient();
-    try {
-        let response = await client.post("/v1/project", req);
-        console.log("create_project:", req);
-        return response.data || {};
-    } catch (error) {
-        throw new Error(format_axios_error(error));
-    }
+async function removeProject(uuid) {
+    return await clientDelete("/v1/project/" + uuid);
 }
 
+async function createProject(req) {
+    return await clientPost("/v1/project", req);
+}
 
 export {
-    list_projects,
-    remove_project,
-    create_project,
-    get_overview,
+    listProjects,
+    removeProject,
+    createProject,
+    getProjectOverview,
+    getProject,
 }

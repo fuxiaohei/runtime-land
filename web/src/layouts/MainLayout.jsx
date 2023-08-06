@@ -2,9 +2,11 @@ import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { NavbarLink, NavDropdownLink } from "./Links";
 import { useClerk } from "@clerk/clerk-react";
+import { useAuthContext } from "./AuthContext";
 
 function MainLayout({ children }) {
   const { signOut } = useClerk();
+  const { user } = useAuthContext();
 
   const handleSignOut = (event) => {
     console.log("sign out");
@@ -40,17 +42,15 @@ function MainLayout({ children }) {
               <Navbar.Text>
                 <img
                   className="rounded ms-3 me-3"
-                  src="https://avatars.githubusercontent.com/u/2142787?v=4"
+                  src={user.avatar_url}
                   width={36}
                 />
                 <NavDropdown
                   as="span"
                   id="nav-account-dropdown"
-                  title="FuXiaohei"
+                  title={user.name}
                 >
-                  <NavDropdownLink to="/account">
-                    Account Settings
-                  </NavDropdownLink>
+                  <NavDropdownLink to="/account">Account</NavDropdownLink>
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={handleSignOut}>
                     Log out

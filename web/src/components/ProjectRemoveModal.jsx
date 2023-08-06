@@ -1,30 +1,21 @@
-import { Alert, Button, Modal } from "react-bootstrap";
+import { Modal, Button, Alert } from "react-bootstrap";
 
-function ProjectRemoveModal(props) {
-  let data = props.data;
-  const handleRemove = async (event) => {
-    event.preventDefault();
-    await props.onRemove(data);
-  };
+function ProjectRemoveModal({ show, handleClose, handleRemove, alert }) {
   return (
-    <Modal show={props.show}>
-      <Modal.Header>
-        <Modal.Title>Remove Token</Modal.Title>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Remove project</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want to remove this project '
-        <strong>{data.name}</strong>' ?
-        {props.alert ? (
-          <Alert className="mt-4" variant="danger">
-            {props.alert}
-          </Alert>
-        ) : null}
+        <p>Are you sure you want to remove this project?</p>
+        <p>Be careful, this action cannot be undone.</p>
+        {alert ? <Alert variant="danger">{alert}</Alert> : null}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" size="sm" onClick={props.onClose}>
+        <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
-        <Button type="submit" variant="danger" size="sm" onClick={handleRemove}>
+        <Button variant="danger" onClick={handleRemove}>
           Remove
         </Button>
       </Modal.Footer>

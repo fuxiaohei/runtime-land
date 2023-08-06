@@ -3,7 +3,7 @@ use super::{
     params::{self, ProjectResponse},
     AppError,
 };
-use crate::settings;
+use crate::{conf, settings};
 use anyhow::Result;
 use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::info;
@@ -182,8 +182,12 @@ pub async fn remove_handler(
     Path(name): Path<String>,
 ) -> Result<StatusCode, AppError> {
     // name is uuid in this api
-    land_dao::project::remove_project(current_user.id, name.clone()).await?;
+    let project_id = land_dao::project::remove_project(current_user.id, name.clone()).await?;
     info!("success, owner_id:{}, uuid:{}", current_user.id, name);
+    // set related deployments to deleted
+    land_dao::deployment::set_deleted_by_project(project_id).await?;
+    // update deployment conf
+    conf::trigger().await;
     Ok(StatusCode::OK)
 }
 
@@ -255,4 +259,23 @@ pub async fn overview_handler(
     overview.deployments = Some(deployments_response);
 
     Ok((StatusCode::OK, Json(overview)))
+}
+
+#[tracing::instrument(name = "[project_rename]", skip_all)]
+pub async fn rename_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Json(payload): Json<params::ProjectRenameRequest>,
+) -> Result<StatusCode, AppError> {
+    land_dao::project::rename(
+        current_user.id,
+        payload.old_name.clone(),
+        payload.new_name.clone(),
+    )
+    .await?;
+    info!(
+        "success, owner_id:{}, old_name:{}, new_name:{}",
+        current_user.id, payload.old_name, payload.new_name
+    );
+
+    Ok(StatusCode::OK)
 }

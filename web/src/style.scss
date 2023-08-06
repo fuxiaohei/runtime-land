@@ -38,15 +38,6 @@ $table-hover-bg: #e4edf7;
   }
 }
 
-.access-token {
-  .trash-btn {
-    color: #0d1b27;
-  }
-  .trash-btn:hover {
-    color: rgb(195, 46, 46);
-  }
-}
-
 #projects-list-container {
   width: 64rem;
   .project-link {
@@ -58,6 +49,19 @@ $table-hover-bg: #e4edf7;
   }
 }
 
-#project-overview-container {
+#project-overview-container,
+#account-container {
   width: 64rem;
+}
+
+#deployment-tokens-list {
+  .token-name {
+    min-width: 6rem;
+  }
+  .trash-btn {
+    color: #0d1b27;
+  }
+  .trash-btn:hover {
+    color: rgb(195, 46, 46);
+  }
 }

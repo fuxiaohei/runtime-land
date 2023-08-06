@@ -1,5 +1,5 @@
 import { Badge, Dropdown, ListGroup } from "react-bootstrap";
-import { BiDotsVerticalRounded, BiCheckCircle } from "react-icons/bi";
+import { BiDotsVerticalRounded, BiCheckCircle, BiDisc } from "react-icons/bi";
 import ReactTimeAgo from "react-time-ago";
 
 function DeploymentsList({ deployments }) {
@@ -40,12 +40,22 @@ function DeploymentsList({ deployments }) {
       );
     };
 
+    const renderStatus = () => {
+      if (deployment.deploy_status === "success") {
+        return <BiCheckCircle className="me-2 text-success" />;
+      } else if (deployment.deploy_status === "deploying") {
+        return <BiDisc className="me-2 text-info" />;
+      } else {
+        return null;
+      }
+    };
+
     return (
       <ListGroup.Item key={deployment.uuid} className="py-3">
         <div className="d-flex justify-content-between">
           <div>
             <span className="text-truncate">
-              <BiCheckCircle className="me-2 text-success" />
+              {renderStatus()}
               <a
                 className="text-dark deployment-link"
                 href={url}

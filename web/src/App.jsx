@@ -1,21 +1,11 @@
-import { AuthProvider } from "./contexts/Auth";
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router";
+import { SignIn, SignUp } from "@clerk/clerk-react";
 import ProjectsPage from "./pages/Projects";
-import NotFoundPage from "./pages/NotFound";
 import ProjectOverviewPage from "./pages/ProjectOverview";
-import {
-  ClerkProvider,
-  ClerkLoading,
-  ClerkLoaded,
-  SignIn,
-  SignUp,
-} from "@clerk/clerk-react";
+import ProjectSettingPage from "./pages/ProjectSetting";
 import AccountPage from "./pages/Account";
-import AdminPage from "./pages/admin/Admin";
 
-const clerkPubKey = "pk_test_cGV0LW1vb3NlLTc1LmNsZXJrLmFjY291bnRzLmRldiQ";
-
-function AppRoutes() {
+function App() {
   return (
     <Routes>
       <Route element={<Outlet />}>
@@ -27,56 +17,19 @@ function AppRoutes() {
           path="/sign-up/*"
           element={<SignUp routing="path" path="/sign-up" />}
         />
-
         <Route path="/" element={<Navigate to="/projects" replace />} />
+        <Route path="/projects" element={<ProjectsPage />} />
         <Route
-          path="/projects"
-          element={
-            <AuthProvider>
-              <ProjectsPage />
-            </AuthProvider>
-          }
+          path="/projects/:name/overview"
+          element={<ProjectOverviewPage />}
         />
         <Route
-          path="/projects/:projectName/overview"
-          element={
-            <AuthProvider>
-              <ProjectOverviewPage />
-            </AuthProvider>
-          }
+          path="/projects/:name/setting"
+          element={<ProjectSettingPage />}
         />
-        <Route
-          path="/account"
-          element={
-            <AuthProvider>
-              <AccountPage />
-            </AuthProvider>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <AuthProvider>
-              <AdminPage />
-            </AuthProvider>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="/account" element={<AccountPage />} />
       </Route>
     </Routes>
-  );
-}
-
-function App() {
-  return (
-    <ClerkProvider publishableKey={clerkPubKey}>
-      <ClerkLoading>
-        <div>Clerk is loading...</div>
-      </ClerkLoading>
-      <ClerkLoaded>
-        <AppRoutes />
-      </ClerkLoaded>
-    </ClerkProvider>
   );
 }
 

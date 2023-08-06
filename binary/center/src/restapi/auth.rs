@@ -2,7 +2,7 @@ use super::{params, AppError};
 use axum::extract::Path;
 use axum::Extension;
 use axum::{http::Request, http::StatusCode, middleware::Next, response::Response, Json};
-use land_dao::{user, user_token};
+use land_dao::user_token;
 use tracing::info;
 use validator::Validate;
 
@@ -21,25 +21,19 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
     let auth_token = auth_header.unwrap().to_str().unwrap();
     let auth_token = auth_token.replace("Bearer ", "");
     let auth_token = auth_token.trim();
-    let token = user_token::find_by_value(auth_token.to_string())
+    let (token, user) = user_token::find_by_value_with_active_user(auth_token.to_string())
         .await
         .map_err(|e| {
-            info!("find token error: {:?}", e);
+            info!("auth, find token error: {:?}", e);
             StatusCode::UNAUTHORIZED
         })?;
-    if token.is_none() {
-        info!("token not found");
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-    let user = user::find_by_id(token.clone().unwrap().owner_id)
-        .await
-        .map_err(|e| {
-            info!("find user error: {:?}", e);
-            StatusCode::UNAUTHORIZED
-        })?;
+    user_token::refresh(token.id).await.map_err(|e| {
+        info!("auth, refresh token error: {:?}", e);
+        StatusCode::UNAUTHORIZED
+    })?;
     request.extensions_mut().insert(CurrentUser {
-        id: token.unwrap().owner_id,
-        role: user.unwrap().role,
+        id: token.owner_id,
+        role: user.role,
     });
     let response = next.run(request).await;
     Ok(response)

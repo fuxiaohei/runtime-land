@@ -5,7 +5,7 @@
 module.exports = {
   context: __dirname,
   entry: {
-    main: "./src/index.jsx",
+    app: "./src/index.jsx",
   },
   output: {
     filename: "[name].[contenthash].bundle.js",

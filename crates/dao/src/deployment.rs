@@ -3,6 +3,7 @@ use crate::{model::deployment, DB};
 use anyhow::Result;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
+use sea_orm::sea_query::Expr;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
     QueryOrder, Set, Statement,
@@ -94,6 +95,13 @@ pub async fn publish(owner_id: i32, uuid: String) -> Result<deployment::Model> {
         .await?
         .ok_or(anyhow::anyhow!("project not found"))?;
 
+    // update old deployment domain
+    deployment::Entity::update_many()
+        .col_expr(deployment::Column::ProdDomain, Expr::value(String::new()))
+        .filter(deployment::Column::ProjectId.eq(project.id))
+        .exec(db)
+        .await?;
+
     let mut active_model: deployment::ActiveModel = deployment.into();
     active_model.updated_at = Set(chrono::Utc::now());
     active_model.prod_domain = Set(project.name.clone());
@@ -158,4 +166,23 @@ pub async fn list_by_project_id(project_id: i32) -> Result<Vec<deployment::Model
         .all(db)
         .await?;
     Ok(deployments)
+}
+
+/// set_deleted_by_project sets the deployments deleted by project
+pub async fn set_deleted_by_project(project_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    deployment::Entity::update_many()
+        .col_expr(
+            deployment::Column::Status,
+            Expr::value(Status::Deleted.to_string()),
+        )
+        .col_expr(
+            deployment::Column::DeletedAt,
+            Expr::value(chrono::Utc::now()),
+        )
+        .filter(deployment::Column::ProjectId.eq(project_id))
+        .filter(deployment::Column::Status.ne(Status::Deleted.to_string()))
+        .exec(db)
+        .await?;
+    Ok(())
 }

@@ -74,17 +74,8 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, user_t
 }
 
 pub async fn login_by_token(token_value: String) -> Result<(Model, user_token::Model)> {
-    let token_info = super::user_token::find_by_value(token_value).await?;
-    if token_info.is_none() {
-        return Err(anyhow::anyhow!("token not found"));
-    }
-    let token_info = token_info.unwrap();
-    let user_info = find_by_id(token_info.owner_id).await?;
-    if user_info.is_none() {
-        return Err(anyhow::anyhow!("user not found"));
-    }
-    // super::user_token::update_login(token_info.id).await?;
-    Ok((user_info.unwrap(), token_info))
+    let (token, user) = super::user_token::find_by_value_with_active_user(token_value).await?;
+    Ok((user, token))
 }
 
 pub async fn signup_by_oauth(

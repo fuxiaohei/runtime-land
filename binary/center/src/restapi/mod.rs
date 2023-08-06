@@ -33,6 +33,7 @@ fn api_router() -> Router {
         .route("/v1/project/:name", get(project::query_handler))
         .route("/v1/project/:name/overview", get(project::overview_handler))
         .route("/v1/project/:name", delete(project::remove_handler))
+        .route("/v1/project/:name/rename", post(project::rename_handler))
         .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))
         .route("/v1/deployment/:uuid", post(deployment::publish_handler))

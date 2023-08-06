@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, Button, Modal, Alert, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, InputGroup, Alert } from "react-bootstrap";
 import { BiRefresh } from "react-icons/bi";
 import {
   uniqueNamesGenerator,
@@ -18,85 +18,75 @@ const generateName = () => {
   return shortName;
 };
 
-function ProjectCreateModal(props) {
+function ProjectCreateModal({ show, handleClose, handleCreate, alert }) {
   const [validated, setValidated] = useState(false);
-  const [projectName, setProjectName] = useState(generateName());
-  const [projectLanguage, setProjectLanguage] = useState("rust");
+  const [autoName, setAutoName] = useState(generateName());
+  const [language, setLanguage] = useState("rust");
 
   const handleSubmit = async (event) => {
     const form = event.currentTarget;
-    const validated = form.checkValidity();
-    if (validated === false) {
+    if (form.checkValidity() === false) {
       event.preventDefault();
-      setValidated(true);
-      return;
+      event.stopPropagation();
     }
+
     setValidated(true);
     event.preventDefault();
-
-    await props.onCreate({ name: projectName, language: projectLanguage });
+    await handleCreate({ name: autoName, language: language });
     refreshName();
   };
 
   const refreshName = () => {
-    setProjectName(generateName());
+    setAutoName(generateName());
   };
 
   return (
-    <Modal show={props.show}>
-      <Modal.Header>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
         <Modal.Title>Create new project</Modal.Title>
       </Modal.Header>
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Modal.Body>
-          <Form.Group className="mb-3">
-            <div className="mb-3">
-              <Form.Text className="text-muted">
-                Enter your project name.
-              </Form.Text>
-            </div>
-            <InputGroup>
+          <Form.Group className="mb-3" controlId="project-name-input">
+            <Form.Label>Project name</Form.Label>
+            <InputGroup className="mb-3">
               <Form.Control
-                name="tokenvalue"
+                placeholder="project name"
                 required
-                type="text"
-                placeholder="What's the project name"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
+                value={autoName}
+                onChange={(e) => setAutoName(e.target.value)}
               />
-              <Button size="sm" variant="outline-success" onClick={refreshName}>
-                <BiRefresh size={20} />
+              <Button
+                className="rounded-end"
+                variant="outline-secondary"
+                onClick={refreshName}
+              >
+                <BiRefresh />
               </Button>
+              <Form.Control.Feedback type="invalid">
+                Please provide a valid project name.
+              </Form.Control.Feedback>
             </InputGroup>
-            <Form.Control.Feedback type="invalid">
-              Please enter a valid project name.
-            </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group className="mb-3">
-            <div className="mb-3">
-              <Form.Text className="text-muted">
-                Select the language of your project.
-              </Form.Text>
-            </div>
+          <Form.Group className="mb-3" controlId="project-name-language">
+            <Form.Label>Project language</Form.Label>
             <Form.Select
               onChange={(e) => {
-                setProjectLanguage(e.target.value);
+                setLanguage(e.target.value);
               }}
             >
               <option value="rust">Rust</option>
+              <option value="java">Java</option>
+              <option value="golang">Go</option>
             </Form.Select>
           </Form.Group>
-          {props.alert ? (
-            <Alert dismissible variant="danger">
-              {props.alert}
-            </Alert>
-          ) : null}
+          {alert ? <Alert variant="danger">{alert}</Alert> : null}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" size="sm" onClick={props.onClose}>
+          <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="sm">
+          <Button variant="primary" type="submit">
             Create
           </Button>
         </Modal.Footer>

@@ -2,6 +2,7 @@ use crate::{model::user_info, model::user_token, DB};
 use anyhow::{Ok, Result};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
+use sea_orm::prelude::Expr;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
 use std::ops::Add;
 
@@ -55,13 +56,26 @@ pub async fn find_by_name(
     Ok(token)
 }
 
-pub async fn find_by_value(value: String) -> Result<Option<user_token::Model>> {
+async fn find_by_value(value: String) -> Result<Option<user_token::Model>> {
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()
         .filter(user_token::Column::Value.eq(value))
         .one(db)
         .await?;
     Ok(token)
+}
+
+pub async fn refresh(id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    user_token::Entity::update_many()
+        .filter(user_token::Column::Id.eq(id))
+        .col_expr(
+            user_token::Column::UpdatedAt,
+            Expr::value(chrono::Utc::now()),
+        )
+        .exec(db)
+        .await?;
+    Ok(())
 }
 
 pub async fn find_by_value_with_active_user(
@@ -72,6 +86,9 @@ pub async fn find_by_value_with_active_user(
         return Err(anyhow::anyhow!("token not found"));
     }
     let token = token.unwrap();
+    if token.status == Status::Deleted.to_string() {
+        return Err(anyhow::anyhow!("token is deleted"));
+    }
     let user = super::user::find_by_id(token.owner_id).await?;
     if user.is_none() {
         return Err(anyhow::anyhow!("user not found"));

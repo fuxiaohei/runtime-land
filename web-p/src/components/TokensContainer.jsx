@@ -7,9 +7,9 @@ import {
 } from "../api/token";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { DateTime } from "luxon";
-import TokenCreateModal from "../components/TokenCreateModal";
-import TokenRemoveModal from "../components/TokenRemoveModal";
-import TokenNewCard from "../components/TokenNewCard";
+import TokenCreateModal from "./TokenCreateModal";
+import TokenRemoveModal from "./TokenRemoveModal";
+import TokenNewCard from "../../../web/src/components/TokenNewCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function TokensContainer() {

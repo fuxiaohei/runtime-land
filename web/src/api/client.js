@@ -45,8 +45,40 @@ function format_axios_error(error) {
     return message;
 }
 
+async function clientGet(url) {
+    let client = createClient();
+    try {
+        let response = await client.get(url);
+        return response.data || {};
+    } catch (error) {
+        throw new Error(format_axios_error(error));
+    }
+}
+
+async function clientDelete(url) {
+    let client = createClient();
+    try {
+        let response = await client.delete(url);
+        return response.data || {};
+    } catch (error) {
+        throw new Error(format_axios_error(error));
+    }
+}
+
+async function clientPost(url, req) {
+    let client = createClient();
+    try {
+        let response = await client.post(url, req);
+        return response.data || {};
+    } catch (error) {
+        throw new Error(format_axios_error(error));
+    }
+}
 
 export {
+    clientGet,
+    clientDelete,
+    clientPost,
     createClient,
     getLocalInfo,
     setLocalInfo,

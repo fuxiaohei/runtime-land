@@ -98,7 +98,7 @@ pub async fn list_available(owner_id: i32) -> Result<Vec<project::Model>> {
 }
 
 /// remove_project removes a project
-pub async fn remove_project(owner_id: i32, uuid: String) -> Result<()> {
+pub async fn remove_project(owner_id: i32, uuid: String) -> Result<i32> {
     let db = DB.get().unwrap();
     let project = project::Entity::find()
         .filter(project::Column::OwnerId.eq(owner_id))
@@ -109,6 +109,7 @@ pub async fn remove_project(owner_id: i32, uuid: String) -> Result<()> {
         return Err(anyhow::anyhow!("project not found"));
     }
     let project = project.unwrap();
+    let project_id = project.id;
 
     // if project status is pending, it can remove directly
     if project.status == Status::Pending.to_string() {
@@ -116,9 +117,22 @@ pub async fn remove_project(owner_id: i32, uuid: String) -> Result<()> {
         active_model.status = Set(Status::Deleted.to_string());
         active_model.deleted_at = Set(Some(chrono::Utc::now()));
         active_model.update(db).await?;
-        return Ok(());
+        return Ok(project_id);
     }
 
     // TODO: remove active project
     Err(anyhow::anyhow!("project is not pending"))
+}
+
+/// rename renames a project
+pub async fn rename(owner_id: i32, old_name: String, new_name: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    let project = find_by_name(old_name, owner_id)
+        .await?
+        .ok_or(anyhow::anyhow!("project not found"))?;
+    let mut active_model: project::ActiveModel = project.into();
+    active_model.name = Set(new_name);
+    active_model.updated_at = Set(chrono::Utc::now());
+    active_model.update(db).await?;
+    Ok(())
 }

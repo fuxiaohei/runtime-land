@@ -113,6 +113,12 @@ pub struct ProjectOverview {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectRenameRequest {
+    pub old_name: String,
+    pub new_name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RegionResponse {
     pub id: i32,
     pub key: String,
