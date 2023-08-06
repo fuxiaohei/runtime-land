@@ -2,9 +2,9 @@ use clap::Parser;
 use tracing::{debug, debug_span, warn, Instrument};
 
 mod center;
+mod conf;
 mod localip;
 mod server;
-mod conf;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-edge", version = land_core::version::get())]
@@ -28,12 +28,9 @@ async fn main() {
 
     localip::init().await.expect("init localip failed");
 
-    // spawn sync internal task
+    conf::init().await.expect("init conf failed");
+
     if args.center_sync_enabled.unwrap() {
-        /*tokio::spawn(
-            sync_interval(args.center_addr.clone(), args.center_token.clone())
-                .instrument(debug_span!("[SYNC]")),
-        );*/
         tokio::spawn(center::init(args.center_addr, args.center_token));
     } else {
         warn!("sync interval disabled")

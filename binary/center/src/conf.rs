@@ -69,28 +69,23 @@ async fn build_conf() -> Result<()> {
     debug!("deployments: {:?}", deployments.len());
 
     let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
 
     let mut conf_items = Vec::new();
     for deployment in deployments {
-        let conf_item = RouteConfItem {
-            domain: format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain),
-            module: deployment.storage_path.clone(),
-            key: deployment.uuid,
-            time_at: deployment.updated_at.timestamp() as u64,
-        };
+        let conf_item = RouteConfItem::new(
+            format!("{}.{}", deployment.domain, prod_domain),
+            deployment.storage_path.clone(),
+            deployment.uuid,
+            deployment.updated_at.timestamp() as u64,
+        );
         conf_items.push(conf_item);
-
         if !deployment.prod_domain.is_empty() {
-            let conf_item = RouteConfItem {
-                domain: format!(
-                    "{}://{}.{}",
-                    prod_protocol, deployment.prod_domain, prod_domain
-                ),
-                module: deployment.storage_path,
-                key: format!("{}-prod", deployment.project_uuid),
-                time_at: deployment.updated_at.timestamp() as u64,
-            };
+            let conf_item = RouteConfItem::new(
+                format!("{}.{}", deployment.prod_domain, prod_domain),
+                deployment.storage_path,
+                format!("{}-prod", deployment.project_uuid),
+                deployment.updated_at.timestamp() as u64,
+            );
             conf_items.push(conf_item);
         }
     }

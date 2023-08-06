@@ -6,6 +6,7 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+async-trait = { workspace = true }
 axum = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
@@ -13,6 +14,8 @@ envconfig = { workspace = true }
 futures-util = { workspace = true }
 land-core = { workspace = true }
 lazy_static = { workspace = true }
+once_cell = { workspace = true }
+opendal = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -21,3 +24,4 @@ tokio-tungstenite = { version = "0.20.0", features = [
     "rustls-tls-native-roots",
 ] }
 tracing = { workspace = true }
+

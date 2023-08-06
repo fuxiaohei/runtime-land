@@ -89,3 +89,9 @@ envconfig = "0.10.0"
 futures-util = "0.3.28"
 rand = "0.8.5"
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
+opendal = { version = "0.38.1", default-features = false, features = [
+    "services-fs",
+    "services-redis",
+    "services-s3",
+    "rustls",
+] }

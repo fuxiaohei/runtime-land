@@ -1,3 +1,4 @@
+use md5::{Digest, Md5};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -8,6 +9,23 @@ pub struct RouteConfItem {
     pub module: String,
     pub key: String,
     pub time_at: u64,
+    pub md5: String,
+}
+
+impl RouteConfItem {
+    pub fn new(domain: String, module: String, key: String, time_at: u64) -> Self {
+        let mut hasher = Md5::new();
+        hasher.update(format!("{}-{}-{}", domain, module, key));
+        let result = hasher.finalize();
+        let md5 = format!("{:x}", result);
+        Self {
+            domain,
+            module,
+            key,
+            time_at,
+            md5,
+        }
+    }
 }
 
 // RoutesConf is config for all project deployment routes
@@ -15,6 +33,16 @@ pub struct RouteConfItem {
 pub struct RoutesConf {
     pub items: Vec<RouteConfItem>,
     pub created_at: u64,
+}
+
+impl RoutesConf {
+    pub fn to_map(&self) -> HashMap<String, RouteConfItem> {
+        let mut map = HashMap::new();
+        for item in &self.items {
+            map.insert(item.key.clone(), item.clone());
+        }
+        map
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

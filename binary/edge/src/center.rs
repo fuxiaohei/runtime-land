@@ -1,4 +1,5 @@
-use crate::conf::{process_conf, CURRENT_CONF_VERSION};
+use crate::conf::process_conf;
+use crate::conf::CONF_VALUES;
 use crate::localip;
 use crate::server;
 use futures_util::stream::StreamExt;
@@ -50,12 +51,12 @@ pub async fn init(addr: String, token: String) {
                 let localip = localip::IPINFO.get().unwrap().clone();
                 let region = localip.region();
                 let runtimes = server::get_living_runtimes().await;
-                let conf_version = CURRENT_CONF_VERSION.lock().await;
+                let local_conf = CONF_VALUES.lock().await;
                 let sync_data = RegionReportData {
                     localip,
                     region,
                     runtimes,
-                    conf_value_time_version: *conf_version,
+                    conf_value_time_version: local_conf.created_at,
                     time_at: chrono::Utc::now().timestamp() as u64,
                     owner_id: 0,
                 };
@@ -104,7 +105,7 @@ async fn process_message(msg: Message) -> ControlFlow<(), ()> {
         }
         Message::Binary(d) => {
             let recv_data: RegionRecvData = serde_json::from_slice(&d).unwrap();
-            process_conf(&recv_data.conf_values).await;
+            process_conf(recv_data.conf_values).await;
         }
         Message::Close(c) => {
             if let Some(cf) = c {

@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 lazy_static = { workspace = true }
+md-5 = "0.10.5"
 serde = { workspace = true }
 time = { workspace = true }
 toml = "0.7.6"
