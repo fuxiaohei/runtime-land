@@ -72,11 +72,11 @@ pub async fn wasm_caller_handler(
 // basic handler that responds with a static string
 async fn default_handler(req: Request<Body>) -> Response<Body> {
     let req_id = uuid::Uuid::new_v4().to_string();
-    // get header x-land-wasm
+    // get header x-land-module
     let headers = req.headers().clone();
     let empty_wasm_path = String::new();
     let land_wasm = headers
-        .get("x-land-wasm")
+        .get("x-land-module")
         .and_then(|v| v.to_str().ok())
         .unwrap_or(
             crate::pool::DEFAULT_WASM_PATH
@@ -92,8 +92,8 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
         let _enter = span.enter();
         let mut builder = Response::builder().status(404);
         builder = builder.header("x-request-id", req_id);
-        warn!(status = 404, "[Response] x-land-wasm not found");
-        return builder.body(Body::from("x-land-wasm not found")).unwrap();
+        warn!(status = 404, "[Response] x-land-module not found");
+        return builder.body(Body::from("x-land-module not found")).unwrap();
     }
 
     match wasm_caller_handler(req, land_wasm, req_id.clone())

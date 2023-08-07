@@ -14,12 +14,14 @@ pub struct Config {
     access_key_id: String,
     #[envconfig(from = "S3_SECRET_ACCESS_KEY")]
     secret_access_key: String,
+    #[envconfig(from = "S3_ROOT_PATH", default = "/wasm-bin")]
+    root_path: String,
 }
 
 pub async fn init() -> Result<Operator> {
     let cfg = Config::init_from_env()?;
     let mut builder = S3::default();
-    builder.root("/wasm-bin");
+    builder.root(&cfg.root_path);
     builder.bucket(&cfg.bucket);
     builder.endpoint(&cfg.endpoint);
     builder.region(&cfg.region);

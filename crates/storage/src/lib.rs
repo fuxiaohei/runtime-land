@@ -4,8 +4,8 @@ use once_cell::sync::OnceCell;
 use opendal::Operator;
 use tracing::debug;
 
-mod local;
-mod s3;
+pub mod local;
+pub mod s3;
 
 #[derive(Envconfig, Debug)]
 pub struct Config {

@@ -33,6 +33,9 @@ impl TraefikOperator {
         }
     }
     async fn deploy_inner(&self, item: &RouteConfItem) -> Result<()> {
+        // download file
+        super::store::save_remote_to_local(&item.module).await?;
+
         let mut commands: Vec<(String, String)> = vec![];
         commands.push((
             format!("traefik/http/routers/{}/rule", item.key),
@@ -44,7 +47,7 @@ impl TraefikOperator {
         ));
         commands.push((
             format!(
-                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-module",
                 item.key
             ),
             item.module.clone(),
@@ -75,7 +78,7 @@ impl TraefikOperator {
             format!("traefik/http/routers/{}/rule", item.key),
             format!("traefik/http/routers/{}/service", item.key),
             format!(
-                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-wasm",
+                "traefik/http/middlewares/m-{}/headers/customrequestheaders/x-land-module",
                 item.key
             ),
             format!(
@@ -89,6 +92,15 @@ impl TraefikOperator {
             debug!("traefik remove: {}", k);
             op.delete(&k).await?;
         }
+
+        // try remote local file, but no matter success or not, remove local file
+        match super::store::remove_local(&item.module).await {
+            Ok(_) => {}
+            Err(e) => {
+                debug!("remove local file error: {}", e);
+            }
+        }
+
         Ok(())
     }
 }

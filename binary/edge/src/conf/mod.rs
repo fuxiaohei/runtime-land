@@ -5,6 +5,7 @@ use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 use tracing::{info, instrument, warn};
 
+mod store;
 mod traefik;
 
 lazy_static! {
@@ -53,6 +54,10 @@ pub async fn init() -> Result<()> {
             return Err(anyhow::anyhow!("operator unknown"));
         }
     }
+
+    // init store
+    store::init().await?;
+
     Ok(())
 }
 
