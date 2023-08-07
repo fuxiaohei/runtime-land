@@ -1,4 +1,4 @@
-const SERVER_URL = 'http://localhost:7777';
+console.log("API_URL", API_URL);
 
 const axios = require("axios");
 
@@ -21,7 +21,7 @@ function createClient() {
         headers["Authorization"] = "Bearer " + info.token.value;
     }
     const instance = axios.create({
-        baseURL: SERVER_URL,
+        baseURL: API_URL,
         timeout: 20000,
         headers: headers,
     });

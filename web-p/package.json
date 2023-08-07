@@ -1,6 +1,6 @@
 {
   "name": "runtime-land-web",
-  "version": "0.1.0-b11",
+  "version": "0.1.0-b12",
   "description": "runtime.land platform web dashboard",
   "main": "index.js",
   "directories": {

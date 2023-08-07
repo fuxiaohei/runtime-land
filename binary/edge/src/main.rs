@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing::{debug, debug_span, warn, Instrument};
+use tracing::{debug, debug_span, Instrument};
 
 mod center;
 mod conf;
@@ -15,8 +15,6 @@ struct Cli {
     pub center_addr: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,
-    #[clap(long, env("CENTER_SYNC_ENABLED"), default_value("true"))]
-    pub center_sync_enabled: Option<bool>,
 }
 
 #[tokio::main]
@@ -30,11 +28,7 @@ async fn main() {
 
     conf::init().await.expect("init conf failed");
 
-    if args.center_sync_enabled.unwrap() {
-        tokio::spawn(center::init(args.center_addr, args.center_token));
-    } else {
-        warn!("sync interval disabled")
-    }
+    tokio::spawn(center::init(args.center_addr, args.center_token));
 
     server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[SERVER]"))

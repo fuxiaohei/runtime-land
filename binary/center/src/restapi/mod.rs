@@ -10,11 +10,11 @@ use axum::{
 use tower_http::cors::{Any, CorsLayer};
 use tracing::warn;
 
+mod admin;
 mod auth;
 mod deployment;
 mod params;
 mod project;
-mod region;
 mod ws;
 
 fn auth_router() -> Router {
@@ -37,7 +37,8 @@ fn api_router() -> Router {
         .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))
         .route("/v1/deployment/:uuid", post(deployment::publish_handler))
-        .route("/v1/regions", get(region::list_handler))
+        .route("/v1/regions", get(admin::list_regions))
+        .route("/v1/settings/domains", get(admin::list_production_domains))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

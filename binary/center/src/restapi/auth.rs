@@ -3,13 +3,19 @@ use axum::extract::Path;
 use axum::Extension;
 use axum::{http::Request, http::StatusCode, middleware::Next, response::Response, Json};
 use land_dao::user_token;
-use tracing::info;
+use tracing::{info, warn};
 use validator::Validate;
 
 #[derive(Clone, Debug)]
 pub struct CurrentUser {
     pub id: i32,
     pub role: String,
+}
+
+impl CurrentUser {
+    pub fn is_admin(&self) -> bool {
+        self.role == land_dao::user::Role::Admin.to_string()
+    }
 }
 
 pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
@@ -24,11 +30,11 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
     let (token, user) = user_token::find_by_value_with_active_user(auth_token.to_string())
         .await
         .map_err(|e| {
-            info!("auth, find token error: {:?}", e);
+            warn!("auth, find token error: {:?}", e);
             StatusCode::UNAUTHORIZED
         })?;
     user_token::refresh(token.id).await.map_err(|e| {
-        info!("auth, refresh token error: {:?}", e);
+        warn!("auth, refresh token error: {:?}", e);
         StatusCode::UNAUTHORIZED
     })?;
     request.extensions_mut().insert(CurrentUser {
@@ -39,12 +45,31 @@ pub async fn middleware<B>(mut request: Request<B>, next: Next<B>) -> Result<Res
     Ok(response)
 }
 
-#[tracing::instrument(name = "[create_token]", skip_all)]
+#[tracing::instrument(name = "[verify_token]", skip_all)]
 pub async fn verify_token(
     Path(token): Path<String>,
 ) -> Result<(StatusCode, Json<params::LoginResponse>), AppError> {
     let (user, token) = land_dao::user::login_by_token(token).await?;
     info!("success, email:{}, nickname:{}", user.email, user.nick_name,);
+
+    let expire_at = token.expired_at.unwrap().timestamp();
+
+    // if expired ,set unauthorized
+    if expire_at < chrono::Utc::now().timestamp() {
+        warn!("token expired");
+        return Err(AppError(
+            anyhow::anyhow!("token expired"),
+            StatusCode::UNAUTHORIZED,
+        ));
+    }
+
+    user_token::refresh(token.id).await.map_err(|e| {
+        warn!("refresh token error: {:?}", e);
+        AppError(
+            anyhow::anyhow!("refresh token error"),
+            StatusCode::UNAUTHORIZED,
+        )
+    })?;
 
     Ok((
         StatusCode::OK,
@@ -52,6 +77,8 @@ pub async fn verify_token(
             token_value: token.value,
             token_uuid: token.uuid,
             token_expired_at: token.expired_at.unwrap().timestamp(),
+            token_active_at: token.updated_at.timestamp(),
+            token_active_interval: 60,
             nick_name: user.nick_name,
             email: user.email,
             avatar_url: user.avatar,
@@ -86,6 +113,8 @@ pub async fn create_oauth_token(
                 token_value: token.value,
                 token_uuid: token.uuid,
                 token_expired_at: token.expired_at.unwrap().timestamp(),
+                token_active_at: token.updated_at.timestamp(),
+                token_active_interval: 60,
                 nick_name: user.nick_name,
                 email: user.email,
                 avatar_url: user.avatar,
@@ -116,6 +145,8 @@ pub async fn create_oauth_token(
             token_value: token.value,
             token_uuid: token.uuid,
             token_expired_at: token.expired_at.unwrap().timestamp(),
+            token_active_at: token.updated_at.timestamp(),
+            token_active_interval: 60,
             nick_name: user.nick_name,
             email: user.email,
             avatar_url: user.avatar,

@@ -16,6 +16,8 @@ pub struct LoginResponse {
     pub token_value: String,
     pub token_uuid: String,
     pub token_expired_at: i64,
+    pub token_active_at: i64,
+    pub token_active_interval: i64,
     pub nick_name: String,
     pub email: String,
     pub avatar_url: String,
@@ -121,6 +123,7 @@ pub struct ProjectRenameRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegionResponse {
     pub id: i32,
+    pub name: String,
     pub key: String,
     pub runtimes: i32,
     pub status: String,

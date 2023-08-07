@@ -14,11 +14,11 @@ gravatar = "0.2.0"
 once_cell = { workspace = true }
 rand = { workspace = true }
 random_word = { version = "0.4.1", features = ["en"] }
-sea-orm = { version = "0.12.1", features = [
+sea-orm = { version = "0.12.2", features = [
     "sqlx-mysql",
     "runtime-tokio-rustls",
 ] }
-sea-orm-migration = { version = "0.12.1" }
+sea-orm-migration = { version = "0.12.2" }
 strum = { version = "0.25.0", features = ["derive"] }
 tracing = { workspace = true }
 uuid = { workspace = true }

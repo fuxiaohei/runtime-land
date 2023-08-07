@@ -14,18 +14,44 @@ services:
       - runtime_land_center_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik-center.127-0-0-1.nip.io`)"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
   runtimeland-center:
-    image: docker.io/library/land-center:v0.1.0-b9
+    image: docker.io/library/land-center:v0.1.0-b12
     restart: always
     environment:
-      - DB_HOST=localhost
+      - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=root
-      - DB_PASSWORD=password
+      - DB_PASSWORD=f19&6IbfVvlT
       - DB_DATABASE=runtime_land_dev
       - HTTP_ADDR=0.0.0.0:7899
     networks:
       - runtime_land_center_network
+    depends_on:
+      - mysql
     labels:
       - traefik.enable=true
       - traefik.http.routers.land-runtime.rule=Host(`api-dev.127-0-0-1.nip.io`)
+  runtimeland-dashboard:
+    image: docker.io/library/land-dashboard:v0.1.0-b12
+    restart: always
+    networks:
+      - runtime_land_center_network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land-web.rule=Host(`dashboard-dev.127-0-0-1.nip.io`)
+  mysql:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=runtime_land_dev
+      - MYSQL_ROOT_PASSWORD=f19&6IbfVvlT
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - runtime_land_center_network

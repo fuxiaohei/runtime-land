@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { NavbarLink, NavDropdownLink } from "./Links";
 import { useClerk } from "@clerk/clerk-react";
 import { useAuthContext } from "./AuthContext";
+import { Helmet } from "react-helmet-async";
 
-function MainLayout({ children }) {
+function MainLayout({ title, children }) {
   const { signOut } = useClerk();
   const { user } = useAuthContext();
 
@@ -15,8 +16,23 @@ function MainLayout({ children }) {
     console.log("call sign out");
   };
 
+  const renderAdminNav = () => {
+    if (user.role === "admin") {
+      return (
+        <>
+          <NavDropdownLink to="/admin">Admin</NavDropdownLink>
+          <NavDropdown.Divider />
+        </>
+      );
+    }
+    return null;
+  };
+
   return (
     <main>
+      <Helmet>
+        <title>{title}</title>
+      </Helmet>
       <header>
         <Navbar expand="lg" className="bg-body-tertiary py-2 border-bottom">
           <Container className="d-flex justify-content-between">
@@ -52,6 +68,7 @@ function MainLayout({ children }) {
                 >
                   <NavDropdownLink to="/account">Account</NavDropdownLink>
                   <NavDropdown.Divider />
+                  {renderAdminNav()}
                   <NavDropdown.Item onClick={handleSignOut}>
                     Log out
                   </NavDropdown.Item>

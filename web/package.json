@@ -1,6 +1,6 @@
 {
-  "name": "runtime-land-webpages",
-  "version": "0.1.0-b11",
+  "name": "runtime-land-dashboard",
+  "version": "0.1.0-b12",
   "description": "web dashboard for runtime.land",
   "main": "index.js",
   "scripts": {

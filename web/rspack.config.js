@@ -2,6 +2,13 @@
  * @type {import('@rspack/cli').Configuration}
  */
 
+let api_url = (process.env.NODE_ENV === 'development') ? "http://api-dev.127-0-0-1.nip.io" : "https://center.runtime.land";
+if (process.env.API_URL) {
+  api_url = process.env.API_URL;
+}
+
+console.log("API_URL:", api_url);
+
 module.exports = {
   context: __dirname,
   entry: {
@@ -22,14 +29,13 @@ module.exports = {
     ],
     copy: {
       patterns: [
-        /*{
-          from: "src/config.js",
-          to: "config.js",
-        },*/
         {
           from: "public/**/*",
         },
       ],
+    },
+    define: {
+      API_URL: "'" + api_url + "'",
     },
   },
   module: {

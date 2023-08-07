@@ -32,6 +32,8 @@ function AuthProvider({ children }) {
         value: response.token_value,
         uuid: response.token_uuid,
         expired_at: response.token_expired_at,
+        active_at: response.token_active_at,
+        active_interval: response.token_active_interval,
       },
     };
     setLocalInfo(value);
@@ -42,12 +44,27 @@ function AuthProvider({ children }) {
     queryFn: async () => {
       let localInfo = getLocalInfo();
       if (localInfo && localInfo.token) {
-        let response = await verifyToken(localInfo.token.value);
-        handleTokenResponse(response);
-        console.log("verify local token");
-        return true;
+        let now_ts = Date.now() / 1000;
+
+        // if token is in active interval, use local token
+        let active_at = localInfo.token.active_at;
+        if (now_ts - active_at < localInfo.token.active_interval) {
+          console.log("local token is in active interval");
+          return true;
+        }
+
+        // if token is not expired, use local token
+        let expired_at = localInfo.token.expired_at;
+        if (expired_at && expired_at > now_ts) {
+          console.log("local token is valid");
+          let response = await verifyToken(localInfo.token.value);
+          handleTokenResponse(response);
+          console.log("verify local token");
+          return true;
+        }
       }
-      console.log("local token is invalid, fetch new token", user);
+
+      console.log("local token is invalid, fetch new token");
       let req = {
         name: user.username || user.firstName,
         display_name: user.fullName,

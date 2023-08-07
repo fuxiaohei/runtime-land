@@ -39,24 +39,24 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-b11"
+version = "0.1.0-b12"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.0-b11" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b11" }
-land-sdk = { path = "crates/sdk", version = "0.1.0-b11" }
-land-core = { path = "crates/core", version = "0.1.0-b11" }
-land-dao = { path = "crates/dao", version = "0.1.0-b11" }
-land-storage = { path = "crates/storage", version = "0.1.0-b11" }
+land-worker = { path = "crates/worker", version = "0.1.0-b12" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b12" }
+land-sdk = { path = "crates/sdk", version = "0.1.0-b12" }
+land-core = { path = "crates/core", version = "0.1.0-b12" }
+land-dao = { path = "crates/dao", version = "0.1.0-b12" }
+land-storage = { path = "crates/storage", version = "0.1.0-b12" }
 anyhow = "1.0.72"
-axum = { version = "0.6.19", features = ["headers", "ws"] }
+axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.3.19", features = ["derive", "env"] }
 tokio = { version = "1.29.1", features = ["full"] }
 tracing = "0.1.37"
 lazy_static = "1.4.0"
-time = "0.3.24"
+time = "0.3.25"
 tracing-subscriber = { version = "0.3.17", features = [
     "time",
     "local-time",
@@ -76,7 +76,7 @@ wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", tag = "dev", 
 wasmtime-wasi = { git = "https://github.com/bytecodealliance/wasmtime", tag = "dev" }
 wit-bindgen-core = "0.9.0"
 wit-bindgen-rust = "0.9.0"
-serde = { version = "1.0.179", features = ["derive"] }
+serde = { version = "1.0.183", features = ["derive"] }
 serde_json = "1.0.104"
 reqwest = { version = "0.11.18", default-features = false, features = [
     "stream",
@@ -89,7 +89,7 @@ envconfig = "0.10.0"
 futures-util = "0.3.28"
 rand = "0.8.5"
 deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
-opendal = { version = "0.38.1", default-features = false, features = [
+opendal = { version = "0.39.0", default-features = false, features = [
     "services-fs",
     "services-redis",
     "services-s3",

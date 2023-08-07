@@ -4,6 +4,8 @@ import ProjectsPage from "./pages/Projects";
 import ProjectOverviewPage from "./pages/ProjectOverview";
 import ProjectSettingPage from "./pages/ProjectSetting";
 import AccountPage from "./pages/Account";
+import NotFoundPage from "./pages/NotFound";
+import AdminPage from "./pages/admin/Admin";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
           element={<ProjectSettingPage />}
         />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
