@@ -174,7 +174,7 @@ pub async fn publish_deployment(
     addr: &str,
     token: &str,
 ) -> Result<DeploymentResponse> {
-    let url = format!("{}/v1/deployment/{}", addr, uuid);
+    let url = format!("{}/v1/deployment/{}/publish", addr, uuid);
     let client = reqwest::Client::new();
     let resp = client
         .post(&url)

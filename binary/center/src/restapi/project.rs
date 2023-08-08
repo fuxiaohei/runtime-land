@@ -264,14 +264,26 @@ pub async fn overview_handler(
 #[tracing::instrument(name = "[project_rename]", skip_all)]
 pub async fn rename_handler(
     Extension(current_user): Extension<CurrentUser>,
+    Path(name): Path<String>,
     Json(payload): Json<params::ProjectRenameRequest>,
 ) -> Result<StatusCode, AppError> {
-    land_dao::project::rename(
+    if name != payload.old_name {
+        return Err(AppError(
+            anyhow::anyhow!("project name not matched"),
+            StatusCode::BAD_REQUEST,
+        ));
+    }
+
+    let project = land_dao::project::rename(
         current_user.id,
         payload.old_name.clone(),
         payload.new_name.clone(),
     )
     .await?;
+
+    if project.prod_deploy_id > 0 {
+        land_dao::deployment::update_prod_domain(project.prod_deploy_id, project.name).await?;
+    }
     info!(
         "success, owner_id:{}, old_name:{}, new_name:{}",
         current_user.id, payload.old_name, payload.new_name

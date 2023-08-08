@@ -3,8 +3,8 @@ import ProjectHeader from "../components/ProjectHeader";
 import { AuthProvider } from "../layouts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
 import { useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProject, removeProject } from "../api/projects";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProject, removeProject, renameProject } from "../api/projects";
 import LoadingPage from "./Loading";
 import { useState } from "react";
 import ProjectRemoveModal from "../components/ProjectRemoveModal";
@@ -15,6 +15,8 @@ function ProjectSettingPage() {
   const navigate = useNavigate();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeAlert, setRemoveAlert] = useState("");
+  const [inputProjectName, setInputProjectName] = useState(projectName);
+  const queryClient = useQueryClient();
 
   const {
     isLoading,
@@ -44,6 +46,27 @@ function ProjectSettingPage() {
     },
   });
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (projectName === inputProjectName) {
+      return;
+    }
+    renameMutation.mutate({
+      old_name: projectName,
+      new_name: inputProjectName,
+    });
+  };
+
+  const renameMutation = useMutation({
+    mutationFn: async ({ old_name, new_name }) => {
+      return await renameProject(old_name, new_name);
+    },
+    onSuccess: async () => {
+      navigate("/projects/" + inputProjectName + "/setting");
+    },
+    onError: (error) => {},
+  });
+
   const renderContainer = () => {
     if (isLoading) {
       return <LoadingPage />;
@@ -56,9 +79,14 @@ function ProjectSettingPage() {
           <div className="project-name-updater border-bottom">
             <h5 className="fw-bold">Project Name</h5>
             <p className="text-secondary">The name of your project.</p>
-            <Form>
+            <Form onSubmit={handleSubmit}>
               <InputGroup className="mb-3 project-name-input">
-                <Form.Control placeholder="the name of your project" />
+                <Form.Control
+                  defaultValue={inputProjectName}
+                  required
+                  placeholder="the name of your project"
+                  onChange={(event) => setInputProjectName(event.target.value)}
+                />
                 <InputGroup.Text>.{project.subdomain}</InputGroup.Text>
               </InputGroup>
               <Button className="mb-3" variant="primary" type="submit">

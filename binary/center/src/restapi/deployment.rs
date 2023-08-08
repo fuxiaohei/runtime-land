@@ -4,7 +4,7 @@ use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::{debug_span, info, warn, Instrument};
 use validator::Validate;
 
-#[tracing::instrument(name = "[create_deployment]", skip_all)]
+#[tracing::instrument(name = "[create_dp]", skip_all)]
 pub async fn create_handler(
     Extension(current_user): Extension<CurrentUser>,
     Json(payload): Json<params::CreateDeployRequest>,
@@ -97,7 +97,7 @@ pub async fn create_handler(
 }
 
 /// publish_handler publishes the deployment
-#[tracing::instrument(name = "[publish_deployment]", skip_all)]
+#[tracing::instrument(name = "[publish_dp]", skip_all)]
 pub async fn publish_handler(
     Extension(current_user): Extension<CurrentUser>,
     Path(uuid): Path<String>,
@@ -107,6 +107,8 @@ pub async fn publish_handler(
         "success, deployment_name:{}, deployment_uuid:{}",
         deployment.domain, deployment.uuid,
     );
+
+    conf::trigger().await;
 
     let prod_domain = settings::DOMAIN.get().unwrap();
     let prod_protocol = settings::PROTOCOL.get().unwrap();
@@ -129,4 +131,34 @@ pub async fn publish_handler(
             deploy_status: deployment.deploy_status,
         }),
     ))
+}
+
+/// disable_handler disables a deployment
+#[tracing::instrument(name = "[disable_dp]", skip_all)]
+pub async fn disable_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Path(uuid): Path<String>,
+) -> Result<StatusCode, AppError> {
+    let deployment = land_dao::deployment::disable(current_user.id, uuid).await?;
+    info!(
+        "success, deployment_name:{}, deployment_uuid:{}",
+        deployment.domain, deployment.uuid,
+    );
+    conf::trigger().await;
+    Ok(StatusCode::OK)
+}
+
+/// enable_handler enables a deployment
+#[tracing::instrument(name = "[enable_ep]", skip_all)]
+pub async fn enable_handler(
+    Extension(current_user): Extension<CurrentUser>,
+    Path(uuid): Path<String>,
+) -> Result<StatusCode, AppError> {
+    let deployment = land_dao::deployment::enable(current_user.id, uuid).await?;
+    info!(
+        "success, deployment_name:{}, deployment_uuid:{}",
+        deployment.domain, deployment.uuid,
+    );
+    conf::trigger().await;
+    Ok(StatusCode::OK)
 }

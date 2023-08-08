@@ -8,7 +8,7 @@ import { createProject, listProjects } from "../api/projects";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "./Loading";
 
-function ProjectsHeader({ count, onShow }) {
+function ProjectsHeader({ count, onShow, onSearch }) {
   return (
     <div className="projects-header mt-4 d-flex justify-content-between">
       <h2>
@@ -22,6 +22,7 @@ function ProjectsHeader({ count, onShow }) {
             placeholder="Search"
             className="me-2"
             aria-label="Search"
+            onChange={(e) => onSearch(e.target.value)}
           />
         </Form>
         <Button variant="primary" onClick={onShow}>
@@ -62,20 +63,42 @@ function ProjectsPage() {
     },
   });
 
-  const renderContainer = () => {
+  const [searchFilter, setSearchFilter] = useState("all");
+
+  const handleSearch = (search) => {
+    setSearchFilter(search);
+  };
+
+  const filterProjects = (projects) => {
+    projects = projects || [];
+    if (searchFilter === "all") {
+      return projects;
+    }
+    return projects.filter((project) => {
+      return project.project.name.includes(searchFilter);
+    });
+  };
+
+  const renderContainer = (projects) => {
     if (isLoading) {
       return <LoadingPage />;
     }
     if (isError) {
       return <div>Error: {error.toString()}</div>;
     }
+    projects = filterProjects(projects);
     return (
       <Container className="mx-auto" id="projects-list-container">
         <ProjectsHeader
           count={projects?.length || 0}
           onShow={() => setShowCreateModal(true)}
+          onSearch={handleSearch}
         />
-        <ProjectsList projects={projects || []} />
+        {projects.length ? (
+          <ProjectsList projects={projects || []} />
+        ) : (
+          <div className="fs-4 mt-4 text-secondary">No searching projects found.</div>
+        )}
         <ProjectCreateModal
           show={showCreateModal}
           handleClose={() => setShowCreateModal(false)}
@@ -88,7 +111,7 @@ function ProjectsPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>{renderContainer()}</MainLayout>
+      <MainLayout>{renderContainer(projects)}</MainLayout>
     </AuthProvider>
   );
 }

@@ -6,11 +6,17 @@ import MainLayout from "../layouts/MainLayout";
 import DeploymentProd from "../components/DeploymentProd";
 import { useParams } from "react-router-dom";
 import { getProjectOverview } from "../api/projects";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "./Loading";
+import {
+  disableDeployment,
+  enableDeployment,
+  publishDeployment,
+} from "../api/deployments";
 
 function ProjectOverviewPage() {
   let { name: projectName } = useParams();
+  const queryClient = useQueryClient();
 
   const {
     isLoading,
@@ -27,6 +33,39 @@ function ProjectOverviewPage() {
     retry: false,
   });
 
+  const publishMutation = useMutation({
+    mutationFn: publishDeployment,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([
+        "project-overview",
+        { projectName },
+      ]);
+    },
+    onError: (error) => {},
+  });
+
+  const disableMutation = useMutation({
+    mutationFn: disableDeployment,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([
+        "project-overview",
+        { projectName },
+      ]);
+    },
+    onError: (error) => {},
+  });
+
+  const enableMutation = useMutation({
+    mutationFn: enableDeployment,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries([
+        "project-overview",
+        { projectName },
+      ]);
+    },
+    onError: (error) => {},
+  });
+
   const renderContainer = () => {
     if (isLoading) {
       return <LoadingPage />;
@@ -35,7 +74,18 @@ function ProjectOverviewPage() {
       <Container className="mx-auto" id="project-overview-container">
         <ProjectHeader project={overview?.project} activeKey="overview" />
         <DeploymentProd project={overview?.project} />
-        <DeploymentsList deployments={overview?.deployments || []} />
+        <DeploymentsList
+          deployments={overview?.deployments || []}
+          onPublish={(uuid) => {
+            publishMutation.mutate(uuid);
+          }}
+          onDisable={(uuid) => {
+            disableMutation.mutate(uuid);
+          }}
+          onEnable={(uuid) => {
+            enableMutation.mutate(uuid);
+          }}
+        />
       </Container>
     );
   };

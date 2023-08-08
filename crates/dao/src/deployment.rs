@@ -105,6 +105,7 @@ pub async fn publish(owner_id: i32, uuid: String) -> Result<deployment::Model> {
     let mut active_model: deployment::ActiveModel = deployment.into();
     active_model.updated_at = Set(chrono::Utc::now());
     active_model.prod_domain = Set(project.name.clone());
+    active_model.status = Set(Status::Active.to_string()); // force set status to active when publish
     let deployment = active_model.update(db).await?;
 
     // update project project.prod_deploy_id
@@ -114,6 +115,32 @@ pub async fn publish(owner_id: i32, uuid: String) -> Result<deployment::Model> {
     project_active_model.update(db).await?;
 
     Ok(deployment)
+}
+
+async fn set_status(owner_id: i32, uuid: String, status: Status) -> Result<deployment::Model> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find()
+        .filter(deployment::Column::Uuid.eq(uuid))
+        .filter(deployment::Column::OwnerId.eq(owner_id))
+        .one(db)
+        .await?
+        .ok_or(anyhow::anyhow!("deployment not found"))?;
+
+    let mut active_model: deployment::ActiveModel = deployment.into();
+    active_model.status = Set(status.to_string());
+    active_model.updated_at = Set(chrono::Utc::now());
+    let deployment = active_model.update(db).await?;
+    Ok(deployment)
+}
+
+/// disable disables a deployment, set status to inactive
+pub async fn disable(owner_id: i32, uuid: String) -> Result<deployment::Model> {
+    set_status(owner_id, uuid, Status::InActive).await
+}
+
+/// enable enables a deployment, set status to active
+pub async fn enable(owner_id: i32, uuid: String) -> Result<deployment::Model> {
+    set_status(owner_id, uuid, Status::Active).await
 }
 
 /// list_counter lists the counter of deployments
@@ -145,7 +172,7 @@ pub async fn find_by_id(owner_id: i32, id: i32) -> Result<Option<deployment::Mod
     Ok(deployment)
 }
 
-/// list_active lists the success deployments
+/// list_active lists the success deployments, deploy status is success, status is active
 pub async fn list_success() -> Result<Vec<deployment::Model>> {
     let db = DB.get().unwrap();
     let deployments = deployment::Entity::find()
@@ -182,6 +209,21 @@ pub async fn set_deleted_by_project(project_id: i32) -> Result<()> {
         )
         .filter(deployment::Column::ProjectId.eq(project_id))
         .filter(deployment::Column::Status.ne(Status::Deleted.to_string()))
+        .exec(db)
+        .await?;
+    Ok(())
+}
+
+/// update_prod_domain updates the prod domain of deployment
+pub async fn update_prod_domain(id: i32, domain: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    deployment::Entity::update_many()
+        .col_expr(deployment::Column::ProdDomain, Expr::value(domain))
+        .col_expr(
+            deployment::Column::UpdatedAt,
+            Expr::value(chrono::Utc::now()),
+        )
+        .filter(deployment::Column::Id.eq(id))
         .exec(db)
         .await?;
     Ok(())

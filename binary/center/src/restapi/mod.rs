@@ -36,7 +36,18 @@ fn api_router() -> Router {
         .route("/v1/project/:name/rename", post(project::rename_handler))
         .route("/v1/projects", get(project::list_handler))
         .route("/v1/deployment", post(deployment::create_handler))
-        .route("/v1/deployment/:uuid", post(deployment::publish_handler))
+        .route(
+            "/v1/deployment/:uuid/publish",
+            post(deployment::publish_handler),
+        )
+        .route(
+            "/v1/deployment/:uuid/disable",
+            post(deployment::disable_handler),
+        )
+        .route(
+            "/v1/deployment/:uuid/enable",
+            post(deployment::enable_handler),
+        )
         .route("/v1/regions", get(admin::list_regions))
         .route("/v1/settings/domains", get(admin::list_production_domains))
         .route_layer(middleware::from_fn(auth::middleware))

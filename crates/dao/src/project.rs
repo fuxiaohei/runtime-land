@@ -125,7 +125,7 @@ pub async fn remove_project(owner_id: i32, uuid: String) -> Result<i32> {
 }
 
 /// rename renames a project
-pub async fn rename(owner_id: i32, old_name: String, new_name: String) -> Result<()> {
+pub async fn rename(owner_id: i32, old_name: String, new_name: String) -> Result<project::Model> {
     let db = DB.get().unwrap();
     let project = find_by_name(old_name, owner_id)
         .await?
@@ -133,6 +133,6 @@ pub async fn rename(owner_id: i32, old_name: String, new_name: String) -> Result
     let mut active_model: project::ActiveModel = project.into();
     active_model.name = Set(new_name);
     active_model.updated_at = Set(chrono::Utc::now());
-    active_model.update(db).await?;
-    Ok(())
+    let project = active_model.update(db).await?;
+    Ok(project)
 }
