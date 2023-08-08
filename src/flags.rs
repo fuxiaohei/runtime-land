@@ -1,6 +1,7 @@
 use crate::deploy;
 use clap::Args;
 use land_core::metadata::{Metadata, DEFAULT_FILE as DEFAULT_METADATA_FILE};
+use path_slash::PathBufExt as _;
 use std::path::{Path, PathBuf};
 use tracing::{debug, debug_span, info, Instrument};
 
@@ -62,12 +63,13 @@ impl Init {
         std::fs::create_dir_all(src_dir.parent().unwrap()).unwrap();
 
         // copy src files
-        let tpl_dir = Path::new(&self.template.as_ref().unwrap()).join("src");
+        let tpl_dir = Path::new(&self.template.as_ref().unwrap())
+            .join("src")
+            .to_slash_lossy()
+            .to_string();
         crate::embed::TemplateAssets::iter().for_each(|t| {
-            if t.starts_with(tpl_dir.to_str().unwrap()) {
-                let src_path = Path::new(t.as_ref())
-                    .strip_prefix(tpl_dir.to_str().unwrap())
-                    .unwrap();
+            if t.starts_with(tpl_dir.clone().as_str()) {
+                let src_path = Path::new(t.as_ref()).strip_prefix(tpl_dir.clone()).unwrap();
                 let file = crate::embed::TemplateAssets::get(t.as_ref()).unwrap();
                 let content = std::str::from_utf8(&file.data).unwrap().to_string();
                 let target_path = src_dir.join(src_path);

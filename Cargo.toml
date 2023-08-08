@@ -13,6 +13,7 @@ deadpool = { workspace = true }
 land-core = { workspace = true }
 land-worker = { workspace = true }
 once_cell = { workspace = true }
+path-slash = "0.2.1"
 reqwest = { workspace = true }
 rust-embed = "6.8.1"
 serde = { workspace = true }
