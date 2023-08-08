@@ -84,7 +84,7 @@ function ProjectsPage() {
       return <LoadingPage />;
     }
     if (isError) {
-      return <div>Error: {error.toString()}</div>;
+      return <div>{error.toString()}</div>;
     }
     projects = filterProjects(projects);
     return (

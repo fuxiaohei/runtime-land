@@ -95,7 +95,8 @@ function AuthProvider({ children }) {
   }
 
   if (isError) {
-    return <h1>Error:{error.toString()}</h1>;
+    console.log("----",error)
+    return <h1>{error.toString()}</h1>;
   }
 
   return (

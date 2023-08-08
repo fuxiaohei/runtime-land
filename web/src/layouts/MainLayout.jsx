@@ -37,7 +37,7 @@ function MainLayout({ title, children }) {
         <Navbar expand="lg" className="bg-body-tertiary py-2 border-bottom">
           <Container className="d-flex justify-content-between">
             <Navbar.Brand as="span">
-              <img src="/public/logo-v2-small.svg" width={40} />
+              <img src="/public/logo-v2.svg" width={40} />
               <Link
                 className="ms-3 fs-4 align-middle text-dark text-decoration-none"
                 to="/"
