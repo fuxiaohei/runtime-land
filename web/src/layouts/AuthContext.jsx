@@ -9,6 +9,7 @@ import { getLocalInfo, setLocalInfo } from "../api/client";
 import { createOauthToken, verifyToken } from "../api/token";
 import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../pages/Loading";
+import ErrorPage from "../pages/Error";
 
 const AuthContext = React.createContext(null);
 
@@ -95,8 +96,7 @@ function AuthProvider({ children }) {
   }
 
   if (isError) {
-    console.log("----",error)
-    return <h1>{error.toString()}</h1>;
+    return <ErrorPage message={error.toString()} />;
   }
 
   return (
