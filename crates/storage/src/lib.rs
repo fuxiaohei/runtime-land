@@ -19,21 +19,26 @@ pub static STORAGE: OnceCell<Operator> = OnceCell::new();
 pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
     debug!("Init storage cfg: {:?}", cfg);
-    match cfg.type_name.as_str() {
+    let op = get_operator(cfg.type_name).await?;
+    STORAGE.set(op).map_err(|_| anyhow!("set storage error"))?;
+    Ok(())
+}
+
+/// get_operator returns the storage operator
+pub async fn get_operator(type_name: String) -> Result<Operator> {
+    match type_name.as_str() {
         "local" => {
             let op = local::init().await?;
-            STORAGE.set(op).unwrap();
+            Ok(op)
         }
         "cloudflare-r2" => {
             let op = s3::init().await?;
-            STORAGE.set(op).unwrap();
+            Ok(op)
         }
         _ => {
-            return Err(anyhow!("unknown storage type: {}", cfg.type_name));
+            return Err(anyhow!("unknown storage type: {}", type_name));
         }
     }
-
-    Ok(())
 }
 
 /// write writes the content to the storage

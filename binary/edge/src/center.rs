@@ -21,6 +21,8 @@ pub async fn init(addr: String, token: String) {
         ipinfo.region_ip()
     );
 
+    let reconnect_interval = std::time::Duration::from_secs(5);
+
     loop {
         debug!("connect to {}", url);
 
@@ -28,8 +30,8 @@ pub async fn init(addr: String, token: String) {
             Ok((stream, _response)) => stream,
             Err(e) => {
                 warn!("Error during handshake {:?}", e);
-                info!("reconnect after 3s");
-                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                info!("reconnect after {:?}", reconnect_interval);
+                tokio::time::sleep(reconnect_interval).await;
                 continue;
             }
         };
@@ -92,9 +94,8 @@ pub async fn init(addr: String, token: String) {
             }
         }
 
-        info!("reconnect after 3s");
-
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        info!("reconnect after {:?}", reconnect_interval);
+        tokio::time::sleep(reconnect_interval).await;
     }
 }
 

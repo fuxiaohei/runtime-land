@@ -1,30 +1,51 @@
 use anyhow::Result;
+use envconfig::Envconfig;
 use futures_util::StreamExt;
-use land_storage::local;
-use land_storage::s3;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
 use tracing::debug;
 
 static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
 static REMOTE_STORE: OnceCell<Operator> = OnceCell::new();
+pub static REMOTE_STORE_ENABLED: OnceCell<bool> = OnceCell::new();
+
+#[derive(Envconfig, Debug)]
+pub struct Config {
+    #[envconfig(from = "LOCAL_STORE_TYPE", default = "local")]
+    pub local_store_type: String,
+    #[envconfig(from = "REMOTE_STORE_TYPE", default = "cloudflare-r2")]
+    pub remote_store_type: String,
+    #[envconfig(from = "REMOTE_STORE_ENABLED", default = "true")]
+    pub remote_store_enabled: bool,
+}
 
 pub async fn init() -> Result<()> {
-    let local_op = local::init().await?;
+    let cfg = Config::init_from_env().unwrap();
+    debug!("Init storage cfg: {:?}", cfg);
+
+    let local_op = land_storage::get_operator(cfg.local_store_type).await?;
     LOCAL_STORE
         .set(local_op)
         .map_err(|_| anyhow::anyhow!("set local store error"))?;
 
-    let remote_op = s3::init().await?;
-    REMOTE_STORE
-        .set(remote_op)
-        .map_err(|_| anyhow::anyhow!("set remote store error"))?;
+    if cfg.remote_store_enabled {
+        let remote_op = land_storage::get_operator(cfg.remote_store_type).await?;
+        REMOTE_STORE
+            .set(remote_op)
+            .map_err(|_| anyhow::anyhow!("set remote store error"))?;
+        REMOTE_STORE_ENABLED.set(true).unwrap();
+    } else {
+        REMOTE_STORE_ENABLED.set(false).unwrap();
+    }
 
     Ok(())
 }
 
 /// save_remote_to_local saves the remote file to local
 pub async fn save_remote_to_local(path: &str) -> Result<()> {
+    if REMOTE_STORE_ENABLED.get().unwrap() == &false {
+        return Ok(());
+    }
     let remote_op = REMOTE_STORE.get().unwrap();
     let local_op = LOCAL_STORE.get().unwrap();
 
