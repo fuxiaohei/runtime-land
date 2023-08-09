@@ -1,0 +1,5 @@
+manifest = "v1"
+name = "js-basic"
+description = "example js project with hello world"
+authors = []
+language = "javascript"

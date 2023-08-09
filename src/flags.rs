@@ -130,7 +130,7 @@ impl Build {
             "rust" => {
                 land_worker::compiler::compile_rust(&arch, &target).expect("Build failed");
             }
-            "js" => {
+            "js" | "javascript" => {
                 land_worker::compiler::compile_js(&target, "src/index.js", self.js_engine.clone())
                     .expect("Build failed");
             }

@@ -11,3 +11,5 @@ wit-bindgen = "0.9.0"
 
 [lib]
 crate-type = ["cdylib"]
+test = false
+doctest = false
