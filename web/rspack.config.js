@@ -2,7 +2,7 @@
  * @type {import('@rspack/cli').Configuration}
  */
 
-let api_url = (process.env.NODE_ENV === 'development') ? "http://api-dev.127-0-0-1.nip.io" : "https://center.runtime.land";
+let api_url = (process.env.NODE_ENV === 'development') ? "http://api-dev.127-0-0-1.nip.io" : "https://center-api.runtime.land";
 if (process.env.API_URL) {
   api_url = process.env.API_URL;
 }
