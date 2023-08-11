@@ -15,7 +15,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   runtimeland-center:
-    image: ghcr.io/fuxiaohei/runtime-land-center:v0.1.0-b14
+    image: ghcr.io/fuxiaohei/runtime-land-center:v0.1.0-b16
     restart: always
     environment:
       - DB_HOST=${MYSQL_HOST}
@@ -36,7 +36,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.land-runtime.rule=Host(`${CENTER_HOST}`)
   runtimeland-dashboard:
-    image: ghcr.io/fuxiaohei/runtime-land-dashboard:v0.1.0-b14
+    image: ghcr.io/fuxiaohei/runtime-land-dashboard:v0.1.0-b16
     restart: always
     networks:
       - runtime_land_center_network

@@ -1,7 +1,4 @@
-use crate::conf::process_conf;
-use crate::conf::CONF_VALUES;
-use crate::localip;
-use crate::server;
+use crate::{conf::process_conf, conf::CONF_VALUES, localip, server};
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use land_core::confdata::{RegionRecvData, RegionReportData};
@@ -12,19 +9,21 @@ use tracing::{debug, warn};
 use tracing::{info, instrument};
 
 #[instrument(name = "[WS]", skip_all)]
-pub async fn init(addr: String, token: String) {
+pub async fn init(addr: String, protocol: String, token: String) {
     let ipinfo = crate::localip::IPINFO.get().unwrap();
     let url = format!(
-        "ws://{}/v1/region/ws?token={}&region={}",
+        "{}://{}/v1/region/ws?token={}&region={}",
+        protocol,
         addr,
         token,
         ipinfo.region_ip()
     );
+    info!("connect to {}", url);
 
     let reconnect_interval = std::time::Duration::from_secs(5);
 
     loop {
-        debug!("connect to {}", url);
+        debug!("connect to {} in loop", url);
 
         let ws_stream = match connect_async(&url).await {
             Ok((stream, _response)) => stream,
@@ -46,7 +45,7 @@ pub async fn init(addr: String, token: String) {
             .expect("Can not send!");
 
         let mut send_task = tokio::spawn(async move {
-            let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(2));
             loop {
                 interval.tick().await;
 

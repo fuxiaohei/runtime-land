@@ -77,6 +77,7 @@ function AuthProvider({ children }) {
       };
       let response = await createOauthToken(req);
       handleTokenResponse(response);
+      window.location.reload();
       return true;
     },
     retry: false,

@@ -92,7 +92,9 @@ function ProjectOverviewPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>{renderContainer()}</MainLayout>
+      <MainLayout title={projectName + " | Runtime.land"}>
+        {renderContainer()}
+      </MainLayout>
     </AuthProvider>
   );
 }

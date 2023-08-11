@@ -97,7 +97,7 @@ function ProjectsPage() {
         {projects.length ? (
           <ProjectsList projects={projects || []} />
         ) : (
-          <div className="fs-4 mt-4 text-secondary">No searching projects found.</div>
+          <div className="fs-4 mt-4 text-secondary">No projects found.</div>
         )}
         <ProjectCreateModal
           show={showCreateModal}
@@ -111,7 +111,9 @@ function ProjectsPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>{renderContainer(projects)}</MainLayout>
+      <MainLayout title="Projects | Runtime.land">
+        {renderContainer(projects)}
+      </MainLayout>
     </AuthProvider>
   );
 }

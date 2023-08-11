@@ -115,7 +115,7 @@ function ProjectSettingPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>
+      <MainLayout title="Project Settings | Runtime.land">
         {renderContainer()}
         <ProjectRemoveModal
           show={showRemoveModal}
