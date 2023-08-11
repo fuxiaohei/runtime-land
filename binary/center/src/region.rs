@@ -31,9 +31,9 @@ lazy_static! {
 }
 
 /// REGION_REFRESH_INTERVAL is the interval to refresh REGIONS to database
-const REGION_REFRESH_INTERVAL: u64 = 10;
+const REGION_REFRESH_INTERVAL: u64 = 30;
 /// REGION_INACTIVE_EXPIRE is the expiry to check if region is inactive
-const REGION_INACTIVE_EXPIRE: u64 = 60;
+const REGION_INACTIVE_EXPIRE: u64 = 120;
 
 pub async fn init() {
     // start 10s interval to update REGIONS to database

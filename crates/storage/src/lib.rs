@@ -35,9 +35,7 @@ pub async fn get_operator(type_name: String) -> Result<Operator> {
             let op = s3::init().await?;
             Ok(op)
         }
-        _ => {
-            return Err(anyhow!("unknown storage type: {}", type_name));
-        }
+        _ => Err(anyhow!("unknown storage type: {}", type_name)),
     }
 }
 
