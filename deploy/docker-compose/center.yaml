@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`traefik-center.127-0-0-1.nip.io`)"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
   runtimeland-center:
-    image: docker.io/library/land-center:v0.1.0-b14
+    image: docker.io/library/land-center:v0.1.0-b16
     restart: always
     environment:
       - DB_HOST=mysql
@@ -36,7 +36,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.land-runtime.rule=Host(`api-dev.127-0-0-1.nip.io`)
   runtimeland-dashboard:
-    image: docker.io/library/land-dashboard:v0.1.0-b14
+    image: docker.io/library/land-dashboard:v0.1.0-b16
     restart: always
     networks:
       - runtime_land_center_network

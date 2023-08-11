@@ -2,7 +2,7 @@ name: Build Github Packages
 on:
   push:
     branches:
-      - v0.1
+      - main
     tags: ["v*"]
 env:
   CARGO_TERM_COLOR: always

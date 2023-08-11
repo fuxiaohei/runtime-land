@@ -95,7 +95,9 @@ function AccountPage() {
 
   return (
     <AuthProvider>
-      <MainLayout>{renderContainer()}</MainLayout>
+      <MainLayout title="Account | Runtime.land">
+        {renderContainer()}
+      </MainLayout>
     </AuthProvider>
   );
 }
