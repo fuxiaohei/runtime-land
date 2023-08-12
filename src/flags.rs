@@ -179,7 +179,11 @@ pub struct Deploy {
     #[clap(long, default_value("false"))]
     pub production: bool,
     /// The api address
-    #[clap(long, default_value("http://127.0.0.1:7777"))]
+    #[clap(
+        long,
+        env("API_ADDR"),
+        default_value("https://center-api.runtime.land")
+    )]
     pub api_addr: Option<String>,
     /// The project name override meta.toml
     #[clap(long)]
