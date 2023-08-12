@@ -94,5 +94,5 @@ opendal = { version = "0.39.0", default-features = false, features = [
     "services-fs",
     "services-redis",
     "services-s3",
-    "rustls",
+    "native-tls-vendored",
 ] }
