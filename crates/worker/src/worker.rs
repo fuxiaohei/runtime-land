@@ -37,7 +37,8 @@ impl Context {
         let mut table = Table::new();
         Context {
             wasi_ctx: WasiCtxBuilder::new()
-                .inherit_stdio()
+                .inherit_stderr()
+                .inherit_stdout()
                 .build(&mut table)
                 .unwrap(),
             http_ctx: HttpContext::new(req_id),

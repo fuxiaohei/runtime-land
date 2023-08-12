@@ -67,7 +67,7 @@ chrono = "0.4.26"
 once_cell = "1.18.0"
 http = "0.2.9"
 wit-bindgen = "0.9.0"
-async-trait = "0.1.72"
+async-trait = "0.1.73"
 hyper = { version = "0.14.27", features = ["full"] }
 uuid = { version = "1.4.1", features = ["v4"] }
 wasmtime = { git = "https://github.com/bytecodealliance/wasmtime", tag = "dev", features = [
