@@ -22,3 +22,6 @@ sea-orm-migration = { version = "0.12.2" }
 strum = { version = "0.25.0", features = ["derive"] }
 tracing = { workspace = true }
 uuid = { workspace = true }
+
+[lib]
+doctest = false

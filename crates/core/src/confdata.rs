@@ -57,12 +57,20 @@ pub struct RegionIPInfo {
     pub readme: String,
 }
 
+fn remove_whitespace(s: &mut String) {
+    s.retain(|c| !c.is_whitespace());
+}
+
 impl RegionIPInfo {
     pub fn region(&self) -> String {
-        format!("{}-{}-{}", self.country, self.region, self.city)
+        let mut s = format!("{}-{}-{}", self.country, self.region, self.city);
+        remove_whitespace(&mut s);
+        s
     }
     pub fn region_ip(&self) -> String {
-        format!("{}-{}-{}-{}", self.country, self.region, self.city, self.ip)
+        let mut s = format!("{}-{}-{}-{}", self.country, self.region, self.city, self.ip);
+        remove_whitespace(&mut s);
+        s
     }
 }
 
@@ -91,4 +99,27 @@ pub struct RegionReportData {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RegionRecvData {
     pub conf_values: RoutesConf,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::RegionIPInfo;
+
+    #[test]
+    fn region_ipinfo() {
+        let r = RegionIPInfo {
+            ip: "1.1.1.1".to_string(),
+            city: "Los Angeles".to_string(),
+            region: "California".to_string(),
+            country: "US".to_string(),
+            loc: "34.0544,-118.2440".to_string(),
+            org: "AS13335 Cloudflare, Inc.".to_string(),
+            timezone: "America/Los_Angeles".to_string(),
+            readme: "https://ipinfo.io/missingauth".to_string(),
+        };
+        let region_str = r.region();
+        let region_ip_str = r.region_ip();
+        assert_eq!(region_str, "US-California-LosAngeles");
+        assert_eq!(region_ip_str, "US-California-LosAngeles-1.1.1.1");
+    }
 }
