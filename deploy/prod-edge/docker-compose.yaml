@@ -38,7 +38,7 @@ services:
       - HTTP_ADDR=${LAND_EDGE_HTTP_HOST}:${LAND_EDGE_HTTP_PORT}
       - CENTER_ADDR=${LAND_EDGE_CENTER_ADDR}
       - CENTER_TOKEN=${LAND_EDGE_CENTER_TOKEN}
-      - STORAGE_LOCAL_PATH=${LAND_EDGE_STORAGE_LOCAL_PATH}
+      - STORAGE_LOCAL_PATH=/data
       - LOCAL_STORE_TYPE=local
       - REMOTE_STORE_TYPE=cloudflare-r2
       - S3_ENDPOINT=${S3_ENDPOINT}
@@ -51,6 +51,8 @@ services:
       - TRAEFIK_RUNTIME_NAME=${LAND_EDGE_RUNTIME_NAME}
     networks:
       - runtime_land_edge_network
+    volumes:
+      - ${LAND_EDGE_STORAGE_LOCAL_PATH}:/data
   land-runtime:
     image: ghcr.io/fuxiaohei/runtime-land-runtime:v0.1.0-b15
     restart: always
