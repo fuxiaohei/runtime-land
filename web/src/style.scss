@@ -18,6 +18,10 @@ $table-hover-bg: #e4edf7;
   --success-light-bg: #e5fae8;
 }
 
+.main-container {
+  min-height: 20rem;
+}
+
 #nav-account-dropdown.nav-link {
   display: inline-block;
 }
@@ -69,4 +73,10 @@ $table-hover-bg: #e4edf7;
 
 #error-alert {
   width: 32rem;
+}
+
+#footer {
+  margin-top: 3rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }

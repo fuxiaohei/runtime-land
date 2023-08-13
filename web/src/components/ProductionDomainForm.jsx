@@ -29,7 +29,7 @@ function ProductionDomainForm() {
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault();  
+    e.preventDefault();
   };
 
   return (

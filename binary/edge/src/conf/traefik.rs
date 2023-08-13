@@ -33,9 +33,6 @@ impl TraefikOperator {
         }
     }
     async fn deploy_inner(&self, item: &RouteConfItem) -> Result<()> {
-        // download file
-        super::store::save_remote_to_local(&item.module).await?;
-
         let mut commands: Vec<(String, String)> = vec![];
         commands.push((
             format!("traefik/http/routers/{}/rule", item.key),
@@ -69,6 +66,9 @@ impl TraefikOperator {
             debug!("traefik deploy: {} : {}", k, v);
             op.write(&k, v.clone()).await?;
         }
+
+        // download file
+        super::store::save_remote_to_local(&item.module).await?;
 
         Ok(())
     }

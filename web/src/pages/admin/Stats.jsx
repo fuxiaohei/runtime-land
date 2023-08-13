@@ -1,0 +1,20 @@
+import { Container } from "react-bootstrap";
+import { AuthProvider } from "../../layouts/AuthContext";
+import MainLayout from "../../layouts/MainLayout";
+import AdminNavHeader from "../../components/AdminNavHeader";
+
+function AdminStatsPage() {
+  return (
+    <AuthProvider>
+      <MainLayout title="Stats | Admin Panel | Runtime.land">
+        <Container id="admin-page" className="mt-4">
+          <h3 className="mb-3">Admin Panel</h3>
+          <AdminNavHeader activeKey="stats" />
+          <p>Stats</p>
+        </Container>
+      </MainLayout>
+    </AuthProvider>
+  );
+}
+
+export default AdminStatsPage;

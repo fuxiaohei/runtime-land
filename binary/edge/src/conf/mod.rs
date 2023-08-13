@@ -25,14 +25,17 @@ pub static OPERATOR: once_cell::sync::OnceCell<Box<dyn ConfOperatorTrait + Send 
 /// init conf
 #[instrument(name = "[Conf]")]
 pub async fn init() -> Result<()> {
+    // init store
+    store::init().await?;
+
     // check local conf file exist
-    if std::path::Path::new(CONF_LOCAL_FILE).exists() {
+    if exist_conf().await? {
         // read local conf file to global conf
-        let conf = read_conf()?;
+        let conf = read_conf().await?;
         let mut local_conf = CONF_VALUES.lock().await;
         local_conf.items = conf.items;
         local_conf.created_at = conf.created_at;
-        info!("init conf version: {}", local_conf.created_at);
+        info!("init local conf version: {}", local_conf.created_at);
     } else {
         info!("conf file not exist");
     }
@@ -54,9 +57,6 @@ pub async fn init() -> Result<()> {
             return Err(anyhow::anyhow!("operator unknown"));
         }
     }
-
-    // init store
-    store::init().await?;
 
     Ok(())
 }
@@ -133,7 +133,7 @@ pub async fn process_conf(remote_conf: RoutesConf) {
 
     local_conf.items = remote_conf.items;
     local_conf.created_at = remote_conf.created_at;
-    match write_conf(&local_conf) {
+    match write_conf(&local_conf).await {
         Ok(_) => {}
         Err(e) => {
             warn!("write conf error: {:?}", e);
@@ -141,16 +141,24 @@ pub async fn process_conf(remote_conf: RoutesConf) {
     }
 }
 
-fn write_conf(conf: &RoutesConf) -> Result<()> {
-    let json = serde_json::to_string(conf)?;
-    std::fs::write(CONF_LOCAL_FILE, json)?;
+async fn write_conf(conf: &RoutesConf) -> Result<()> {
+    let s = store::LOCAL_STORE.get().unwrap();
+    let data = serde_json::to_vec(conf)?;
+    s.write(CONF_LOCAL_FILE, data).await?;
     Ok(())
 }
 
-fn read_conf() -> Result<RoutesConf> {
-    let json = std::fs::read_to_string(CONF_LOCAL_FILE)?;
-    let conf: RoutesConf = serde_json::from_str(&json)?;
+async fn read_conf() -> Result<RoutesConf> {
+    let s = store::LOCAL_STORE.get().unwrap();
+    let data = s.read(CONF_LOCAL_FILE).await?;
+    let conf: RoutesConf = serde_json::from_slice(&data)?;
     Ok(conf)
+}
+
+async fn exist_conf() -> Result<bool> {
+    let s = store::LOCAL_STORE.get().unwrap();
+    let exist = s.is_exist(CONF_LOCAL_FILE).await?;
+    Ok(exist)
 }
 
 #[async_trait]

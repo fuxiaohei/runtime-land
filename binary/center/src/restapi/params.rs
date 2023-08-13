@@ -128,3 +128,9 @@ pub struct RegionResponse {
     pub runtimes: i32,
     pub status: String,
 }
+
+#[derive(Serialize, Deserialize,Validate, Debug)]
+pub struct SettingsDomainRequest {
+    pub domain: String,
+    pub protocol: String,
+}

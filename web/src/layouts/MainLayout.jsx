@@ -4,6 +4,7 @@ import { NavbarLink, NavDropdownLink } from "./Links";
 import { useClerk } from "@clerk/clerk-react";
 import { useAuthContext } from "./AuthContext";
 import { Helmet } from "react-helmet-async";
+import { version, commitHash, buildDate } from "./verison";
 
 function MainLayout({ title, children }) {
   const { signOut } = useClerk();
@@ -20,7 +21,7 @@ function MainLayout({ title, children }) {
     if (user.role === "admin") {
       return (
         <>
-          <NavDropdownLink to="/admin">Admin</NavDropdownLink>
+          <NavDropdownLink to="/admin/stats">Admin</NavDropdownLink>
           <NavDropdown.Divider />
         </>
       );
@@ -78,9 +79,9 @@ function MainLayout({ title, children }) {
           </Container>
         </Navbar>
       </header>
-      {children}
-      <footer className="text-center text-secondary border-top mt-5 py-4">
-        @2023 Runtime.land
+      <div className="main-container">{children}</div>
+      <footer id="footer" className="text-center text-secondary border-top">
+        @2023 Runtime.land | v{version} | {commitHash} | {buildDate}
       </footer>
     </main>
   );

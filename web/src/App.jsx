@@ -6,6 +6,10 @@ import ProjectSettingPage from "./pages/ProjectSetting";
 import AccountPage from "./pages/Account";
 import NotFoundPage from "./pages/NotFound";
 import AdminPage from "./pages/admin/Admin";
+import AdminStatsPage from "./pages/admin/Stats";
+import AdminRegionsPage from "./pages/admin/Regions";
+import AdminDomainsPage from "./pages/admin/Domains";
+import AdminStoragePage from "./pages/admin/Storage";
 
 function App() {
   return (
@@ -31,6 +35,10 @@ function App() {
         />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/stats" element={<AdminStatsPage />} />
+        <Route path="/admin/regions" element={<AdminRegionsPage />} />
+        <Route path="/admin/domains" element={<AdminDomainsPage />} />
+        <Route path="/admin/storage" element={<AdminStoragePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

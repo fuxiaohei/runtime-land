@@ -5,14 +5,13 @@ use once_cell::sync::OnceCell;
 use opendal::Operator;
 use tracing::debug;
 
-static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
+pub static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
+
 static REMOTE_STORE: OnceCell<Operator> = OnceCell::new();
-pub static REMOTE_STORE_ENABLED: OnceCell<bool> = OnceCell::new();
+static REMOTE_STORE_ENABLED: OnceCell<bool> = OnceCell::new();
 
 #[derive(Envconfig, Debug)]
 pub struct Config {
-    #[envconfig(from = "LOCAL_STORE_TYPE", default = "local")]
-    pub local_store_type: String,
     #[envconfig(from = "REMOTE_STORE_TYPE", default = "cloudflare-r2")]
     pub remote_store_type: String,
     #[envconfig(from = "REMOTE_STORE_ENABLED", default = "true")]
@@ -23,7 +22,7 @@ pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
     debug!("Init storage cfg: {:?}", cfg);
 
-    let local_op = land_storage::get_operator(cfg.local_store_type).await?;
+    let local_op = land_storage::get_operator("local".to_string()).await?;
     LOCAL_STORE
         .set(local_op)
         .map_err(|_| anyhow::anyhow!("set local store error"))?;

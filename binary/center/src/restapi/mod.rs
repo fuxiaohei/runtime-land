@@ -49,7 +49,8 @@ fn api_router() -> Router {
             post(deployment::enable_handler),
         )
         .route("/v1/regions", get(admin::list_regions))
-        .route("/v1/settings/domains", get(admin::list_production_domains))
+        .route("/v1/settings/domains", get(admin::list_settings_domains))
+        .route("/v1/settings/domains", post(admin::update_settings_domain))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

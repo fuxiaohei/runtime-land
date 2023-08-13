@@ -24,8 +24,24 @@ pub async fn list_maps(keys: Vec<String>) -> Result<HashMap<String, String>> {
     Ok(settings_map)
 }
 
-/// update updates settings
-pub async fn update(values: Vec<settings::Model>) -> Result<()> {
+/// update_maps updates settings with key field as hashmap
+pub async fn update_maps(map: HashMap<String, String>) -> Result<()> {
+    let now = chrono::Utc::now();
+    let values: Vec<settings::Model> = map
+        .into_iter()
+        .map(|(key, value)| settings::Model {
+            id: 0,
+            name: key.clone(),
+            key,
+            value,
+            created_at: now,
+            updated_at: now,
+        })
+        .collect();
+    update(values).await
+}
+
+async fn update(values: Vec<settings::Model>) -> Result<()> {
     let db = DB.get().unwrap();
 
     // delete old keys

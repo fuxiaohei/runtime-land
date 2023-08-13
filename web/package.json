@@ -4,8 +4,8 @@
   "description": "web dashboard for runtime.land",
   "main": "index.js",
   "scripts": {
-    "start": "rspack serve",
-    "build": "rspack build --mode=production"
+    "start": "node updateVersion.js && rspack serve",
+    "build": "node updateVersion.js && rspack build --mode=production"
   },
   "author": "",
   "license": "MIT",
