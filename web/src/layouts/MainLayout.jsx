@@ -4,7 +4,7 @@ import { NavbarLink, NavDropdownLink } from "./Links";
 import { useClerk } from "@clerk/clerk-react";
 import { useAuthContext } from "./AuthContext";
 import { Helmet } from "react-helmet-async";
-import { version, commitHash, buildDate } from "./verison";
+import { version, buildDate } from "../version";
 
 function MainLayout({ title, children }) {
   const { signOut } = useClerk();
@@ -81,7 +81,7 @@ function MainLayout({ title, children }) {
       </header>
       <div className="main-container">{children}</div>
       <footer id="footer" className="text-center text-secondary border-top">
-        @2023 Runtime.land | v{version} | {commitHash} | {buildDate}
+        @2023 Runtime.land | v{version} | {buildDate}
       </footer>
     </main>
   );
