@@ -40,17 +40,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-b16"
+version = "0.1.0-b17"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.0-b16" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b16" }
-land-sdk = { path = "crates/sdk", version = "0.1.0-b16" }
-land-core = { path = "crates/core", version = "0.1.0-b16" }
-land-dao = { path = "crates/dao", version = "0.1.0-b16" }
-land-storage = { path = "crates/storage", version = "0.1.0-b16" }
+land-worker = { path = "crates/worker", version = "0.1.0-b17" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-b17" }
+land-sdk = { path = "crates/sdk", version = "0.1.0-b17" }
+land-core = { path = "crates/core", version = "0.1.0-b17" }
+land-dao = { path = "crates/dao", version = "0.1.0-b17" }
+land-storage = { path = "crates/storage", version = "0.1.0-b17" }
 anyhow = "1.0.72"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.3.21", features = ["derive", "env"] }
@@ -94,5 +94,6 @@ opendal = { version = "0.39.0", default-features = false, features = [
     "services-fs",
     "services-redis",
     "services-s3",
+    "services-memory",
     "rustls",
 ] }

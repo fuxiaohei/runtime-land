@@ -1,7 +1,9 @@
 use anyhow::{anyhow, Result};
 use envconfig::Envconfig;
-use once_cell::sync::OnceCell;
+use once_cell::sync::{Lazy, OnceCell};
+use opendal::services::Memory;
 use opendal::Operator;
+use tokio::sync::Mutex;
 use tracing::debug;
 
 pub mod local;
@@ -14,6 +16,13 @@ pub struct Config {
 }
 
 pub static STORAGE: OnceCell<Operator> = OnceCell::new();
+
+pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
+    let mut builder = Memory::default();
+    builder.root("/tmp");
+    let op = Operator::new(builder).unwrap().finish();
+    Mutex::new(op)
+});
 
 #[tracing::instrument(name = "[STORAGE]")]
 pub async fn init() -> Result<()> {

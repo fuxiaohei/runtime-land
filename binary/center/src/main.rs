@@ -28,13 +28,12 @@ async fn main() -> Result<()> {
     land_dao::connect(args.db_config).await?;
 
     settings::init().await?;
+    settings::init_storage().await?;
 
     region::init().await;
 
     conf::init().await;
-
-    land_storage::init().await?;
-
+    
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
     Ok(())

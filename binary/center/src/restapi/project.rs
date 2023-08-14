@@ -28,7 +28,7 @@ pub async fn create_handler(
         project.name, project.uuid,
     );
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
+    let (prod_domain, _) = settings::get_domains().await;
 
     Ok((
         StatusCode::OK,
@@ -60,7 +60,7 @@ pub async fn query_handler(
         ));
     }
     let project = project.unwrap();
-    let prod_domain = settings::DOMAIN.get().unwrap();
+    let (prod_domain, _) = settings::get_domains().await;
     Ok((
         StatusCode::OK,
         Json(params::ProjectResponse {
@@ -107,9 +107,7 @@ pub async fn list_handler(
     let projects = land_dao::project::list_available(current_user.id).await?;
     let counters = land_dao::deployment::list_counter(current_user.id).await?;
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
-
+    let (prod_domain, prod_protocol) = settings::get_domains().await;
     let mut project_overviews = Vec::new();
     for project in projects {
         let counter = counters.get(&project.id).unwrap_or(&0);
@@ -205,9 +203,7 @@ pub async fn overview_handler(
     }
     let project = project.unwrap();
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
-
+    let (prod_domain, prod_protocol) = settings::get_domains().await;
     let project_response = ProjectResponse {
         language: project.language,
         uuid: project.uuid,

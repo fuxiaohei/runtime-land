@@ -101,6 +101,13 @@ pub struct RegionRecvData {
     pub conf_values: RoutesConf,
 }
 
+#[derive(Debug)]
+/// DomainSetting is the domain settings
+pub struct DomainSetting {
+    pub domain: String,
+    pub protocol: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::RegionIPInfo;

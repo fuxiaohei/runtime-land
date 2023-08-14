@@ -8,6 +8,9 @@ use std::collections::HashMap;
 pub enum Key {
     ProductionDomain,
     ProductionProtocol,
+    StorageType,
+    S3Storage,
+    LocalStorage,
 }
 
 /// list_maps lists settings with key field as hashmap

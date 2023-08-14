@@ -68,7 +68,8 @@ async fn build_conf() -> Result<()> {
 
     debug!("deployments: {:?}", deployments.len());
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
+    let d = settings::DOMAIN.lock().await;
+    let prod_domain = d.domain.clone();
 
     let mut conf_items = Vec::new();
     for deployment in deployments {

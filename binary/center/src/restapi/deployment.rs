@@ -36,8 +36,7 @@ pub async fn create_handler(
         info!("success to activate project from pending, project_name:{}, project_uuid:{}, project_status:{}", project.name, project.uuid, project.status);
     }
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
+    let (prod_domain, prod_protocol) = settings::get_domains().await;
 
     // upload deploy chunk to storage
     let storage_path = format!("deployments/{}/{}.wasm", project.uuid, deployment.domain);
@@ -110,8 +109,8 @@ pub async fn publish_handler(
 
     conf::trigger().await;
 
-    let prod_domain = settings::DOMAIN.get().unwrap();
-    let prod_protocol = settings::PROTOCOL.get().unwrap();
+    let (prod_domain, prod_protocol) = settings::get_domains().await;
+
     Ok((
         StatusCode::OK,
         Json(params::DeploymentResponse {
