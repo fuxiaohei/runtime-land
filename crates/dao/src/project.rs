@@ -1,7 +1,10 @@
 use crate::{model::project, DB};
 use anyhow::Result;
 use rand::{thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
+    QueryOrder, Set, Statement,
+};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -135,4 +138,18 @@ pub async fn rename(owner_id: i32, old_name: String, new_name: String) -> Result
     active_model.updated_at = Set(chrono::Utc::now());
     let project = active_model.update(db).await?;
     Ok(project)
+}
+
+/// get_stats gets the stats of deployments
+pub async fn get_stats() -> Result<i32> {
+    let db = DB.get().unwrap();
+    let values: Vec<JsonValue> = JsonValue::find_by_statement(Statement::from_sql_and_values(
+        DbBackend::MySql,
+        r#"select count(id) as counter from project where status != 'deleted'"#,
+        [],
+    ))
+    .all(db)
+    .await?;
+    let counter = values[0]["counter"].as_i64().unwrap() as i32;
+    Ok(counter)
 }

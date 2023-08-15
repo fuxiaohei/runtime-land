@@ -81,6 +81,21 @@ pub async fn set_storage_success(id: i32, storage_path: String) -> Result<deploy
     Ok(deployment)
 }
 
+/// set_deploy_status sets deploy status
+pub async fn set_deploy_status(id: i32, status: DeployStatus) -> Result<()> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find_by_id(id)
+        .one(db)
+        .await?
+        .ok_or(anyhow::anyhow!("deployment not found"))?;
+
+    let mut active_model: deployment::ActiveModel = deployment.into();
+    active_model.deploy_status = Set(status.to_string());
+    active_model.updated_at = Set(chrono::Utc::now());
+    active_model.update(db).await?;
+    Ok(())
+}
+
 /// find_by_uuid finds a deployment by uuid
 pub async fn publish(owner_id: i32, uuid: String) -> Result<deployment::Model> {
     let db = DB.get().unwrap();
@@ -227,4 +242,18 @@ pub async fn update_prod_domain(id: i32, domain: String) -> Result<()> {
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// get_stats gets the stats of deployments
+pub async fn get_stats() -> Result<i32> {
+    let db = DB.get().unwrap();
+    let values: Vec<JsonValue> = JsonValue::find_by_statement(Statement::from_sql_and_values(
+        DbBackend::MySql,
+        r#"select count(id) as counter from deployment where status != 'deleted'"#,
+        [],
+    ))
+    .all(db)
+    .await?;
+    let counter = values[0]["counter"].as_i64().unwrap() as i32;
+    Ok(counter)
 }

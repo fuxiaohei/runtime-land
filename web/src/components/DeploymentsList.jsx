@@ -1,13 +1,13 @@
 import { Badge, Dropdown, ListGroup } from "react-bootstrap";
-import { BiDotsVerticalRounded, BiCheckCircle, BiDisc } from "react-icons/bi";
+import {
+  BiDotsVerticalRounded,
+  BiCheckCircle,
+  BiDisc,
+  BiErrorCircle,
+} from "react-icons/bi";
 import ReactTimeAgo from "react-time-ago";
 
-function DeploymentsList({
-  deployments,
-  onPublish,
-  onDisable,
-  onEnable,
-}) {
+function DeploymentsList({ deployments, onPublish, onDisable, onEnable }) {
   const renderRow = (deployment) => {
     let url = deployment.prod_domain
       ? deployment.prod_url
@@ -53,11 +53,13 @@ function DeploymentsList({
 
     const renderStatus = (deployment) => {
       if (deployment.deploy_status === "deploying") {
-        return <BiDisc className="me-2 text-info" />;
+        return <BiDisc size={20} className="me-2 text-info" />;
       } else if (deployment.status === "inactive") {
-        return <BiDisc className="me-2 text-secondary" />;
+        return <BiDisc size={20} className="me-2 text-secondary" />;
       } else if (deployment.deploy_status === "success") {
-        return <BiCheckCircle className="me-2 text-success" />;
+        return <BiCheckCircle size={20} className="me-2 text-success" />;
+      } else if (deployment.deploy_status === "failed") {
+        return <BiErrorCircle size={20} className="me-2 text-danger" />;
       } else {
         return null;
       }

@@ -51,10 +51,10 @@ land-sdk = { path = "crates/sdk", version = "0.1.0-b17" }
 land-core = { path = "crates/core", version = "0.1.0-b17" }
 land-dao = { path = "crates/dao", version = "0.1.0-b17" }
 land-storage = { path = "crates/storage", version = "0.1.0-b17" }
-anyhow = "1.0.72"
+anyhow = "1.0.73"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.3.21", features = ["derive", "env"] }
-tokio = { version = "1.30.0", features = ["full"] }
+tokio = { version = "1.31.0", features = ["full"] }
 tracing = "0.1.37"
 lazy_static = "1.4.0"
 time = "0.3.25"

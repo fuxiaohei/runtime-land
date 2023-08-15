@@ -80,3 +80,9 @@ $table-hover-bg: #e4edf7;
   padding-top: 3rem;
   padding-bottom: 3rem;
 }
+
+#admin-page {
+  .stats-card {
+    min-width: 180px;
+  }
+}

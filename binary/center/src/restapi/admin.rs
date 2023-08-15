@@ -65,3 +65,44 @@ pub async fn update_settings_domain(
     );
     Ok(StatusCode::OK)
 }
+
+#[tracing::instrument(name = "[list_settings_storage]", skip_all)]
+pub async fn list_settings_storage(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<params::SettingsStorageResponse>), AppError> {
+    is_admin(&current_user)?;
+    let (key, local_config, s3_config) = crate::settings::load_storage_settings().await?;
+    let response = params::SettingsStorageResponse {
+        storage_type: key.clone(),
+        local: local_config,
+        s3: s3_config,
+    };
+    info!("success, key:{}", key);
+    Ok((StatusCode::OK, Json(response)))
+}
+
+#[tracing::instrument(name = "[update_settings_storage]", skip_all)]
+pub async fn update_settings_storage(
+    Extension(current_user): Extension<CurrentUser>,
+    body: axum::body::Bytes,
+) -> Result<StatusCode, AppError> {
+    is_admin(&current_user)?;
+    let config = serde_json::from_slice::<land_storage::s3::Config>(&body)?;
+    crate::settings::reload_s3(&config).await?;
+    info!("success, config:{:?}", config);
+    Ok(StatusCode::OK)
+}
+
+#[tracing::instrument(name = "[stats_handler]", skip_all)]
+pub async fn stats_handler(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<params::StatsResponse>), AppError> {
+    is_admin(&current_user)?;
+    let response = params::StatsResponse {
+        deployments: land_dao::deployment::get_stats().await?,
+        projects: land_dao::project::get_stats().await?,
+        users: land_dao::user::get_stats().await?,
+        regions: land_dao::region::get_stats().await?,
+    };
+    Ok((StatusCode::OK, Json(response)))
+}

@@ -1,6 +1,9 @@
 use crate::{model::region, DB};
 use anyhow::Result;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
+    QueryOrder, Set, Statement,
+};
 use std::collections::HashMap;
 
 #[derive(strum::Display)]
@@ -81,4 +84,18 @@ pub async fn set_inactive(key: String) -> Result<()> {
     let db = DB.get().unwrap();
     active_model.update(db).await?;
     Ok(())
+}
+
+/// get_stats gets the stats of deployments
+pub async fn get_stats() -> Result<i32> {
+    let db = DB.get().unwrap();
+    let values: Vec<JsonValue> = JsonValue::find_by_statement(Statement::from_sql_and_values(
+        DbBackend::MySql,
+        r#"select count(id) as counter from region where status != 'deleted'"#,
+        [],
+    ))
+    .all(db)
+    .await?;
+    let counter = values[0]["counter"].as_i64().unwrap() as i32;
+    Ok(counter)
 }

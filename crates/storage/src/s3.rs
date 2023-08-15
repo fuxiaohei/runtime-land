@@ -22,22 +22,49 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            endpoint: "".to_string(),
-            bucket: "".to_string(),
+            // this is the default value, not available in reality
+            endpoint: "https://s3.us-east-2.amazonaws.com".to_string(),
+            bucket: "demo-bucket".to_string(),
             region: "auto".to_string(),
-            access_key_id: "".to_string(),
-            secret_access_key: "".to_string(),
+            access_key_id: "access_key_id".to_string(),
+            secret_access_key: "secret_access_key".to_string(),
             root_path: "/wasm-bin".to_string(),
         }
     }
 }
 
+impl Config {
+    pub fn new() -> Result<Self> {
+        let cfg = Config::init_from_env()?;
+        Ok(cfg)
+    }
+    pub fn validate(&self) -> Result<()> {
+        if self.endpoint.is_empty() {
+            return Err(anyhow::anyhow!("S3_ENDPOINT is empty"));
+        }
+        if self.bucket.is_empty() {
+            return Err(anyhow::anyhow!("S3_BUCKET is empty"));
+        }
+        if self.region.is_empty() {
+            return Err(anyhow::anyhow!("S3_REGION is empty"));
+        }
+        if self.access_key_id.is_empty() {
+            return Err(anyhow::anyhow!("S3_ACCESS_KEY_ID is empty"));
+        }
+        if self.secret_access_key.is_empty() {
+            return Err(anyhow::anyhow!("S3_SECRET_ACCESS_KEY is empty"));
+        }
+        Ok(())
+    }
+}
+
 pub async fn init() -> Result<Operator> {
-    let cfg = Config::init_from_env()?;
+    let cfg = Config::new()?;
     create(&cfg).await
 }
 
 pub async fn create(cfg: &Config) -> Result<Operator> {
+    cfg.validate()?;
     let mut builder = S3::default();
     builder.root(&cfg.root_path);
     builder.bucket(&cfg.bucket);
@@ -53,6 +80,7 @@ pub async fn create(cfg: &Config) -> Result<Operator> {
 
 /// reload_global reloads the global storage with the new config
 pub async fn reload_global(cfg: &Config) -> Result<()> {
+    cfg.validate()?;
     let op = create(cfg).await?;
     let mut global = crate::GLOBAL.lock().await;
     *global = op;

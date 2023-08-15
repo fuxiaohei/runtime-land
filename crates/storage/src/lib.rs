@@ -48,9 +48,17 @@ pub async fn get_operator(type_name: String) -> Result<Operator> {
     }
 }
 
+/*
 /// write writes the content to the storage
 pub async fn write(name: &str, content: Vec<u8>) -> Result<()> {
     let op = STORAGE.get().unwrap();
+    op.write(name, content).await?;
+    Ok(())
+}*/
+
+/// write_global writes the content to the global storage
+pub async fn write_global(name: &str, content: Vec<u8>) -> Result<()> {
+    let op = GLOBAL.lock().await;
     op.write(name, content).await?;
     Ok(())
 }

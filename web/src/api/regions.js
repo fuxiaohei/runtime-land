@@ -15,8 +15,26 @@ async function updateDomainSettings({ domain, protocol }) {
     return await clientPost("/v1/settings/domains", { domain, protocol })
 }
 
+// listStorageSettings returns storage settings.
+async function listStorageSettings() {
+    return await clientGet("/v1/settings/storage")
+}
+
+// updateStorageSettings updates storage setting.
+async function updateStorageSettings({ typename, storage }) {
+    return await clientPost("/v1/settings/storage?typename=" + typename, storage)
+}
+
+// getStats returns stats.
+async function getStats() {
+    return clientGet("/v1/settings/stats")
+}
+
 export {
     listRegions,
     listDomainSettings,
     updateDomainSettings,
+    listStorageSettings,
+    updateStorageSettings,
+    getStats,
 }

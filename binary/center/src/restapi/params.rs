@@ -129,8 +129,23 @@ pub struct RegionResponse {
     pub status: String,
 }
 
-#[derive(Serialize, Deserialize,Validate, Debug)]
+#[derive(Serialize, Deserialize, Validate, Debug)]
 pub struct SettingsDomainRequest {
     pub domain: String,
     pub protocol: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SettingsStorageResponse {
+    pub storage_type: String,
+    pub local: land_storage::local::Config,
+    pub s3: land_storage::s3::Config,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StatsResponse {
+    pub deployments: i32,
+    pub projects: i32,
+    pub users: i32,
+    pub regions: i32,
 }

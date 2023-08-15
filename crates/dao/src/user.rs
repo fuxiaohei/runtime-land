@@ -8,7 +8,10 @@ use crate::{
 use anyhow::Result;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
+    Statement,
+};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -131,4 +134,18 @@ pub async fn signup_by_oauth(
     )
     .await?;
     Ok((user_model, token))
+}
+
+/// get_stats gets the stats of deployments
+pub async fn get_stats() -> Result<i32> {
+    let db = DB.get().unwrap();
+    let values: Vec<JsonValue> = JsonValue::find_by_statement(Statement::from_sql_and_values(
+        DbBackend::MySql,
+        r#"select count(id) as counter from user_info where status != 'deleted'"#,
+        [],
+    ))
+    .all(db)
+    .await?;
+    let counter = values[0]["counter"].as_i64().unwrap() as i32;
+    Ok(counter)
 }

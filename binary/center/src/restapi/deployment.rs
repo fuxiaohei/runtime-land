@@ -4,6 +4,20 @@ use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::{debug_span, info, warn, Instrument};
 use validator::Validate;
 
+/// upload_chunks uploads deploy chunks to storage
+async fn upload_chunks(id: i32, storage_path: &str, deploy_chunk: Vec<u8>) -> anyhow::Result<()> {
+    let upload_res = land_storage::write_global(storage_path, deploy_chunk).await;
+    if upload_res.is_err() {
+        land_dao::deployment::set_deploy_status(id, land_dao::deployment::DeployStatus::Failed)
+            .await?;
+        return Err(upload_res.err().unwrap());
+    }
+    let _ = land_dao::deployment::set_storage_success(id, storage_path.to_string()).await?;
+    // trigger build conf
+    conf::trigger().await;
+    Ok(())
+}
+
 #[tracing::instrument(name = "[create_dp]", skip_all)]
 pub async fn create_handler(
     Extension(current_user): Extension<CurrentUser>,
@@ -43,36 +57,10 @@ pub async fn create_handler(
     let deployment_id = deployment.id;
     tokio::task::spawn(
         async move {
-            match land_storage::write(&storage_path, payload.deploy_chunk).await {
-                Ok(_) => {
-                    info!(
-                        "success to upload deploy wasm to storage, storage_path:{}",
-                        storage_path,
-                    );
-                }
-                Err(err) => {
-                    info!(
-                        "failed to upload deploy wasm to storage, storage_path:{}, err:{}",
-                        storage_path, err
-                    );
-                }
+            match upload_chunks(deployment_id, &storage_path, payload.deploy_chunk).await{
+                Ok(_) => info!("success to upload deploy chunk to storage, deployment_id:{}, storage_path:{}", deployment_id, storage_path),
+                Err(e) => warn!("failed to upload deploy chunk to storage, deployment_id:{}, storage_path:{}, err:{}", deployment_id, storage_path, e),
             }
-
-            // then update storage_path and deploy status
-            match land_dao::deployment::set_storage_success(deployment_id, storage_path.clone())
-                .await
-            {
-                Ok(_) => {}
-                Err(err) => {
-                    warn!(
-                        "failed to update deployment storage_path, id:{}, storage_path:{}, err:{}",
-                        deployment_id, storage_path, err
-                    );
-                }
-            }
-
-            // trigger build conf
-            conf::trigger().await;
         }
         .instrument(debug_span!("[upload_deploy_chunk]")),
     );
