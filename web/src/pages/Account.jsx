@@ -26,7 +26,7 @@ function AccountCard() {
           </div>
         </div>
         <div>
-          <Button variant="outline-success">Hobby Plan</Button>
+          <Button variant="outline-success">Free Plan</Button>
         </div>
       </div>
     </div>
