@@ -21,7 +21,7 @@ moka = { version = "0.11.3", default-features = false, features = ["sync"] }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
-sysinfo = "0.29.7"
+sysinfo = "0.29.8"
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }

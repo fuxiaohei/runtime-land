@@ -4,9 +4,16 @@ use super::host::land::http::http_outgoing::{
 use super::host::land::http::http_types::RedirectPolicy;
 use super::HttpContext;
 use hyper::Body;
+use once_cell::sync::Lazy;
 use reqwest::redirect;
+use std::collections::HashMap;
 use std::str::FromStr;
+use tokio::sync::Mutex;
 use tracing::{debug, instrument, warn};
+
+/// CLIENTS_POOL is a global pool of HTTP clients with options key
+static CLIENTS_POOL: Lazy<Mutex<HashMap<String, reqwest::Client>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
 impl Default for RequestOptions {
     fn default() -> Self {
@@ -45,9 +52,19 @@ impl Host for HttpContext {
             None => Body::empty(),
         };
 
-        let client = reqwest::Client::builder()
-            .redirect(options.redirect.try_into()?)
-            .build()?;
+        // use client pool to reuse client
+        let client_key = options.key();
+        let mut pool = CLIENTS_POOL.lock().await;
+        let client = match pool.get(&client_key) {
+            Some(client) => client,
+            None => {
+                let client = reqwest::Client::builder()
+                    .redirect(options.redirect.try_into()?)
+                    .build()?;
+                pool.insert(client_key.clone(), client);
+                pool.get(&client_key).unwrap()
+            }
+        };
 
         let fetch_response = match client
             .request(
@@ -67,13 +84,23 @@ impl Host for HttpContext {
         };
 
         let mut resp_headers = vec![];
+        let mut is_stream = true;
         for (key, value) in fetch_response.headers() {
+            if key == "content-length" {
+                is_stream = false;
+            }
             resp_headers.push((key.to_string(), value.to_str().unwrap().to_string()));
         }
         let status = fetch_response.status().as_u16();
-        let body_stream = fetch_response.bytes_stream();
-        let body = Body::wrap_stream(body_stream);
-        let body_handle = self.set_body(body);
+        let body_handle = if is_stream {
+            let body_stream = fetch_response.bytes_stream();
+            let body = Body::wrap_stream(body_stream);
+            self.set_body(body)
+        } else {
+            let body = fetch_response.bytes().await.unwrap();
+            let body = Body::from(body);
+            self.set_body(body)
+        };
         let resp = Response {
             status,
             headers: resp_headers,

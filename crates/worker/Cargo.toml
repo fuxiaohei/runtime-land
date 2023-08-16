@@ -9,7 +9,9 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 futures-util = "0.3.28"
 hyper = { workspace = true }
+once_cell = { workspace = true }
 reqwest = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 wasmtime = { workspace = true }
