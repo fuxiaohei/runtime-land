@@ -87,7 +87,7 @@ pub async fn update_settings_storage(
     body: axum::body::Bytes,
 ) -> Result<StatusCode, AppError> {
     is_admin(&current_user)?;
-    let config = serde_json::from_slice::<land_storage::s3::Config>(&body)?;
+    let config = serde_json::from_slice::<land_storage::S3Config>(&body)?;
     crate::settings::reload_s3(&config).await?;
     info!("success, config:{:?}", config);
     Ok(StatusCode::OK)

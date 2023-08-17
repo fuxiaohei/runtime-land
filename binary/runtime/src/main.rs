@@ -8,7 +8,7 @@ mod server;
 #[derive(Parser, Debug)]
 #[clap(name = "land-runtime", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7888"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7909"))]
     pub http_addr: String,
 }
 
@@ -20,7 +20,9 @@ async fn main() {
     debug!("Load args: {:?}", args);
 
     // init storage
-    land_storage::init().await.expect("init storage failed");
+    land_storage::init_from_type("fs")
+        .await
+        .expect("init storage failed");
 
     // init edge sync
     edge::init().await;

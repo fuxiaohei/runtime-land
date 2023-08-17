@@ -1,3 +1,4 @@
+use land_storage::{FsConfig, S3Config};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -138,8 +139,8 @@ pub struct SettingsDomainRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SettingsStorageResponse {
     pub storage_type: String,
-    pub local: land_storage::local::Config,
-    pub s3: land_storage::s3::Config,
+    pub local: FsConfig,
+    pub s3: S3Config,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

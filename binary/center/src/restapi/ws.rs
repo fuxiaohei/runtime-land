@@ -14,6 +14,7 @@ use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use land_core::confdata::{RegionRecvData, RegionReportData};
 use land_dao::{user, user_token};
+use once_cell::sync::OnceCell;
 use serde::Deserialize;
 use std::net::SocketAddr;
 use std::ops::ControlFlow;
@@ -162,10 +163,25 @@ async fn process_message(
     Ok((trigger_send, ControlFlow::Continue(())))
 }
 
-// set specific value to show global ownership for token
+/// REGION_TOKEN is token for region
+static REGION_TOKEN: OnceCell<String> = OnceCell::new();
+
+// REGION_GLOBAL_TOKEN_OWNER_ID is owner id of admin user token
 const REGION_GLOBAL_TOKEN_OWNER_ID: i32 = -1;
 
+// REGION_GLOBAL_TOKEN_ENV_ID is global token owner id for env token
+const REGION_GLOBAL_TOKEN_ENV_ID: i32 = -2;
+
 async fn validate_token(token: String) -> Result<i32> {
+    let region_token = REGION_TOKEN.get_or_init(|| {
+        std::env::var("REGION_TOKEN")
+            .unwrap_or_else(|_| "".to_string())
+            .to_string()
+    });
+    if region_token.eq(&token) {
+        info!("token use env region token");
+        return Ok(REGION_GLOBAL_TOKEN_ENV_ID);
+    }
     let (token, user) = user_token::find_by_value_with_active_user(token).await?;
     if token.created_by != user_token::CreatedByCases::Edgehub.to_string() {
         info!("token created by not edgehub");

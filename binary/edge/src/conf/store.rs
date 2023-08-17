@@ -22,13 +22,13 @@ pub async fn init() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
     debug!("Init storage cfg: {:?}", cfg);
 
-    let local_op = land_storage::get_operator("local".to_string()).await?;
+    let local_op = land_storage::build_operator("fs").await?;
     LOCAL_STORE
         .set(local_op)
         .map_err(|_| anyhow::anyhow!("set local store error"))?;
 
     if cfg.remote_store_enabled {
-        let remote_op = land_storage::get_operator(cfg.remote_store_type).await?;
+        let remote_op = land_storage::build_operator(&cfg.remote_store_type).await?;
         REMOTE_STORE
             .set(remote_op)
             .map_err(|_| anyhow::anyhow!("set remote store error"))?;

@@ -1,22 +1,26 @@
 use anyhow::{anyhow, Result};
 use envconfig::Envconfig;
-use once_cell::sync::{Lazy, OnceCell};
+use once_cell::sync::Lazy;
 use opendal::services::Memory;
 use opendal::Operator;
 use tokio::sync::Mutex;
 use tracing::debug;
 
-pub mod local;
-pub mod s3;
+mod fs;
+pub use fs::reload_global as reload_fs_global;
+pub use fs::Config as FsConfig;
+
+mod s3;
+pub use s3::reload_global as reload_s3_global;
+pub use s3::Config as S3Config;
 
 #[derive(Envconfig, Debug)]
 pub struct Config {
-    #[envconfig(from = "STORAGE_TYPE", default = "local")]
+    #[envconfig(from = "STORAGE_TYPE", default = "fs")]
     pub type_name: String,
 }
 
-pub static STORAGE: OnceCell<Operator> = OnceCell::new();
-
+/// GLOBAL is the global storage operator
 pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
     let mut builder = Memory::default();
     builder.root("/tmp");
@@ -25,19 +29,28 @@ pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
 });
 
 #[tracing::instrument(name = "[STORAGE]")]
-pub async fn init() -> Result<()> {
+pub async fn init_from_env() -> Result<()> {
     let cfg = Config::init_from_env().unwrap();
     debug!("Init storage cfg: {:?}", cfg);
-    let op = get_operator(cfg.type_name).await?;
-    STORAGE.set(op).map_err(|_| anyhow!("set storage error"))?;
+    let op = build_operator(&cfg.type_name).await?;
+    let mut global = crate::GLOBAL.lock().await;
+    *global = op;
     Ok(())
 }
 
-/// get_operator returns the storage operator
-pub async fn get_operator(type_name: String) -> Result<Operator> {
-    match type_name.as_str() {
-        "local" => {
-            let op = local::init().await?;
+/// init_from_type init storage from type
+pub async fn init_from_type(typename: &str) -> Result<()> {
+    let op = build_operator(typename).await?;
+    let mut global = crate::GLOBAL.lock().await;
+    *global = op;
+    Ok(())
+}
+
+/// build_operator returns the storage operator
+pub async fn build_operator(type_name: &str) -> Result<Operator> {
+    match type_name {
+        "fs" => {
+            let op = fs::build_from_env().await?;
             Ok(op)
         }
         "cloudflare-r2" => {
@@ -57,8 +70,20 @@ pub async fn write(name: &str, content: Vec<u8>) -> Result<()> {
 }*/
 
 /// write_global writes the content to the global storage
-pub async fn write_global(name: &str, content: Vec<u8>) -> Result<()> {
+pub async fn write(name: &str, content: Vec<u8>) -> Result<()> {
     let op = GLOBAL.lock().await;
     op.write(name, content).await?;
     Ok(())
+}
+
+/// is_exist checks if the file exists
+pub async fn is_exist(name: &str) -> Result<bool> {
+    let op = GLOBAL.lock().await;
+    Ok(op.is_exist(name).await?)
+}
+
+/// read reads the content from the storage
+pub async fn read(name: &str) -> Result<Vec<u8>> {
+    let op = GLOBAL.lock().await;
+    Ok(op.read(name).await?)
 }

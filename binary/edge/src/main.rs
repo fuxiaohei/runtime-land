@@ -9,9 +9,9 @@ mod server;
 #[derive(Parser, Debug)]
 #[clap(name = "land-edge", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7899"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7902"))]
     pub http_addr: String,
-    #[clap(long, env("CENTER_ADDR"), default_value("127.0.0.1:7777"))]
+    #[clap(long, env("CENTER_ADDR"), default_value("127.0.0.1:7901"))]
     pub center_addr: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,

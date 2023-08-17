@@ -6,7 +6,7 @@ use validator::Validate;
 
 /// upload_chunks uploads deploy chunks to storage
 async fn upload_chunks(id: i32, storage_path: &str, deploy_chunk: Vec<u8>) -> anyhow::Result<()> {
-    let upload_res = land_storage::write_global(storage_path, deploy_chunk).await;
+    let upload_res = land_storage::write(storage_path, deploy_chunk).await;
     if upload_res.is_err() {
         land_dao::deployment::set_deploy_status(id, land_dao::deployment::DeployStatus::Failed)
             .await?;

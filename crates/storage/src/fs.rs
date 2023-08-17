@@ -7,7 +7,7 @@ use tracing::info;
 
 #[derive(Envconfig, Serialize, Deserialize, Debug)]
 pub struct Config {
-    #[envconfig(from = "STORAGE_LOCAL_PATH", default = "/tmp/runtime-land-data")]
+    #[envconfig(from = "FS_PATH", default = "/tmp/runtime-land-data")]
     pub path: String,
 }
 
@@ -19,13 +19,13 @@ impl Default for Config {
     }
 }
 
-pub async fn init() -> Result<Operator> {
+pub async fn build_from_env() -> Result<Operator> {
     let cfg = Config::init_from_env()?;
-    create(&cfg).await
+    build(&cfg).await
 }
 
 /// create creates the local storage
-pub async fn create(cfg: &Config) -> Result<Operator> {
+pub async fn build(cfg: &Config) -> Result<Operator> {
     let mut builder = Fs::default();
     builder.root(&cfg.path);
     let op: Operator = Operator::new(builder)?.finish();
@@ -35,7 +35,7 @@ pub async fn create(cfg: &Config) -> Result<Operator> {
 
 /// reload_global reloads the global storage with the new config
 pub async fn reload_global(cfg: &Config) -> Result<()> {
-    let op = create(cfg).await?;
+    let op = build(cfg).await?;
     let mut global = crate::GLOBAL.lock().await;
     *global = op;
     Ok(())

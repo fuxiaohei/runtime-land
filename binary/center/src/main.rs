@@ -11,7 +11,7 @@ mod settings;
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7777"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7901"))]
     pub http_addr: String,
     #[command(flatten)]
     pub db_config: land_dao::DbConfig,
@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
     region::init().await;
 
     conf::init().await;
-    
+
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
     Ok(())

@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use anyhow::Result;
 use async_trait::async_trait;
 use deadpool::managed;
-use land_storage::STORAGE;
 use land_worker::Worker;
 use lazy_static::lazy_static;
 use moka::sync::Cache;
@@ -72,11 +71,10 @@ pub async fn prepare_worker_pool(key: &str) -> Result<Arc<WorkerPool>> {
         return Ok(instances_pool.unwrap());
     }
 
-    let storage = STORAGE.get().expect("storage is not initialized");
-    if !storage.is_exist(key).await? {
+    if !land_storage::is_exist(key).await? {
         return Err(anyhow!("key not found: {}", key));
     }
-    let binary = storage.read(key).await?;
+    let binary = land_storage::read(key).await?;
 
     // write binary to local file
     let mut path = std::env::temp_dir();

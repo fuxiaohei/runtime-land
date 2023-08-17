@@ -5,7 +5,7 @@ use land_dao::settings;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use tracing::{debug, info};
+use tracing::info;
 
 mod storage;
 pub use storage::init as init_storage;
@@ -25,14 +25,14 @@ pub static DOMAIN: Lazy<Mutex<DomainSetting>> = Lazy::new(|| {
 pub async fn init() -> Result<()> {
     let domain_key = settings::Key::ProductionDomain.to_string();
     let protocol_key = settings::Key::ProductionProtocol.to_string();
-    let s3_key = settings::Key::S3Storage.to_string();
-    let local_storage_key = settings::Key::LocalStorage.to_string();
+    // let s3_key = settings::Key::S3Storage.to_string();
+    // let local_storage_key = settings::Key::LocalStorage.to_string();
 
     let keys = vec![
         domain_key.clone(),
         protocol_key.clone(),
-        s3_key.clone(),
-        local_storage_key.clone(),
+        // s3_key.clone(),
+        // local_storage_key.clone(),
     ];
     let settings_map = settings::list_maps(keys).await?;
 
@@ -57,6 +57,7 @@ pub async fn init() -> Result<()> {
         return Ok(());
     }
 
+    /*
     // init s3 storage settings to db
     if !settings_map.contains_key(&s3_key) {
         storage::first_init_s3().await?;
@@ -67,7 +68,7 @@ pub async fn init() -> Result<()> {
     if !settings_map.contains_key(&local_storage_key) {
         storage::first_init_local().await?;
         debug!("Init, Local:default");
-    }
+    }*/
 
     let domain_value = settings_map.get(&domain_key).unwrap();
     let protocol_value = settings_map.get(&protocol_key).unwrap();
