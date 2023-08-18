@@ -1,6 +1,5 @@
 import { clientPost } from "./client";
 
-
 async function publishDeployment(uuid) {
     return await clientPost("/v1/deployment/" + uuid + "/publish");
 }
@@ -14,7 +13,6 @@ async function enableDeployment(uuid) {
 }
 
 export {
-    publishDeployment,
     disableDeployment,
-    enableDeployment,
-}
+    enableDeployment, publishDeployment
+};

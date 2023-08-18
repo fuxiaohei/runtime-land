@@ -1,8 +1,8 @@
-import { Col, Row, Container, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Col, Container, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { BiLinkExternal } from "react-icons/bi";
 import { Link } from "react-router-dom";
-import { ButtonLink } from "../layouts/Links";
 import ReactTimeAgo from "react-time-ago";
+import { ButtonLink } from "../layouts/Links";
 
 function ProjectPendingButton({ name }) {
   return (

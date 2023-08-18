@@ -14,6 +14,30 @@ function setLocalInfo(info) {
     localStorage.setItem("runtime-land-user-info", JSON.stringify(info));
 }
 
+function removeLocalInfo() {
+    localStorage.removeItem("runtime-land-user-info");
+}
+
+function handleTokenResponse(response) {
+    let value = {
+        user: {
+            name: response.nick_name,
+            email: response.email,
+            avatar_url: response.avatar_url,
+            oauth_id: response.oauth_id,
+            role: response.role,
+        },
+        token: {
+            value: response.token_value,
+            uuid: response.token_uuid,
+            expired_at: response.token_expired_at,
+            active_at: response.token_active_at,
+            active_interval: response.token_active_interval,
+        },
+    };
+    setLocalInfo(value);
+}
+
 function createClient() {
     let info = getLocalInfo();
     let headers = {};
@@ -76,11 +100,6 @@ async function clientPost(url, req) {
 }
 
 export {
-    clientGet,
-    clientDelete,
-    clientPost,
-    createClient,
-    getLocalInfo,
-    setLocalInfo,
-    format_axios_error,
-}
+    clientDelete, clientGet, clientPost,
+    createClient, format_axios_error, getLocalInfo, handleTokenResponse, removeLocalInfo, setLocalInfo
+};

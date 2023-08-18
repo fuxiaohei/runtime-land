@@ -1,11 +1,11 @@
-import { Container, Form, Button, Toast, Alert } from "react-bootstrap";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Alert, Button, Container, Form } from "react-bootstrap";
+import { listDomainSettings, updateDomainSettings } from "../../api/regions";
+import AdminNavHeader from "../../components/AdminNavHeader";
 import { AuthProvider } from "../../layouts/AuthContext";
 import MainLayout from "../../layouts/MainLayout";
-import AdminNavHeader from "../../components/AdminNavHeader";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { listDomainSettings, updateDomainSettings } from "../../api/regions";
 import QueryWrapper from "../../layouts/QueryWrapper";
-import { useState } from "react";
 
 function AdminDomainsForm({ settings, onSubmit, isSuccess }) {
   const [domainSuffix, setDomainSuffix] = useState("");

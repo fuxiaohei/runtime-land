@@ -6,6 +6,7 @@ use crate::{
     DB,
 };
 use anyhow::Result;
+use gravatar::{Gravatar, Rating};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{
@@ -79,6 +80,63 @@ pub async fn login_by_email(email: String, pwd: String) -> Result<(Model, user_t
 pub async fn login_by_token(token_value: String) -> Result<(Model, user_token::Model)> {
     let (token, user) = super::user_token::find_by_value_with_active_user(token_value).await?;
     Ok((user, token))
+}
+
+/// signup_by_email creates a new user by email and password
+/// return user and token
+pub async fn signup_by_email(
+    email: String,
+    pwd: String,
+    nickname: String,
+) -> Result<(Model, user_token::Model)> {
+    let user = find_by_email(email.clone()).await?;
+    if user.is_some() {
+        return Err(anyhow::anyhow!("user is exist"));
+    }
+    let password_salt: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(10)
+        .map(char::from)
+        .collect();
+    let full_password = format!("{}{}", pwd, password_salt);
+    let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
+    let avatar = Gravatar::new(&email)
+        .set_size(Some(400))
+        .set_rating(Some(Rating::Pg))
+        .image_url()
+        .to_string();
+
+    let now = chrono::Utc::now();
+    let user_model = user_info::Model {
+        id: 0,
+        email,
+        password,
+        password_salt,
+        avatar,
+        nick_name: nickname.clone(),
+        bio: nickname,
+        status: Status::Active.to_string(),
+        role: Role::Normal.to_string(),
+        created_at: now,
+        updated_at: now,
+        deleted_at: None,
+        oauth_id: String::new(),
+        oauth_provider: String::from("email"),
+        oauth_social: String::new(),
+    };
+
+    let user_active_model: user_info::ActiveModel = user_model.into();
+    let db = DB.get().unwrap();
+    let user_model = user_active_model.insert(db).await?;
+    // create token from webpage, expire in 10 days
+    let token = super::user_token::create(
+        user_model.id,
+        String::from("signup_by_email"),
+        60 * 60 * 24 * 10, // 10 days
+        super::user_token::CreatedByCases::EmailLogin,
+    )
+    .await?;
+    Ok((user_model, token))
 }
 
 pub async fn signup_by_oauth(

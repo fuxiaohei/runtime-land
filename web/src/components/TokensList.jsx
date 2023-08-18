@@ -1,11 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { ListGroup, Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
 import { BiTrash } from "react-icons/bi";
 import ReactTimeAgo from "react-time-ago";
+import { removeToken } from "../api/token";
 import TokenNewCard from "./TokenNewCard";
 import TokenRemoveModal from "./TokenRemoveModal";
-import { useMutation } from "@tanstack/react-query";
-import { removeToken } from "../api/token";
 
 function TokensList({
   tokens,

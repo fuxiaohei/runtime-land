@@ -1,11 +1,13 @@
 {
   "name": "runtime-land-dashboard",
-  "version": "0.1.0-b17",
+  "version": "0.1.0-b19",
   "description": "web dashboard for runtime.land",
   "main": "index.js",
   "scripts": {
-    "start": "node updateVersion.js && rspack serve",
-    "build": "node updateVersion.js && rspack build --mode=production"
+    "start": "node updateConfig.js && rspack serve",
+    "build": "node updateConfig.js && rspack build --mode=production",
+    "start-self-host": "node updateConfig.js self-host && SELF_HOST=true rspack serve",
+    "build-self-host": "node updateConfig.js self-host && SELF_HOST=true rspack build --mode=production"
   },
   "author": "",
   "license": "MIT",

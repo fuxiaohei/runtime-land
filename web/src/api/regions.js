@@ -31,10 +31,5 @@ async function getStats() {
 }
 
 export {
-    listRegions,
-    listDomainSettings,
-    updateDomainSettings,
-    listStorageSettings,
-    updateStorageSettings,
-    getStats,
-}
+    getStats, listDomainSettings, listRegions, listStorageSettings, updateDomainSettings, updateStorageSettings
+};

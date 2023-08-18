@@ -1,4 +1,4 @@
-import { BiTime, BiLinkExternal } from "react-icons/bi";
+import { BiLinkExternal, BiTime } from "react-icons/bi";
 import ReactTimeAgo from "react-time-ago";
 
 function DeploymentProd({ project }) {

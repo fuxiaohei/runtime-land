@@ -21,9 +21,6 @@ async function removeToken(uuid) {
 }
 
 export {
-    createOauthToken,
-    verifyToken,
-    createDeploymentToken,
-    listDeploymentTokens,
-    removeToken,
+    createDeploymentToken, createOauthToken, listDeploymentTokens,
+    removeToken, verifyToken
 };

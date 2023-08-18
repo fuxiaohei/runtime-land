@@ -1,6 +1,6 @@
 import { Button, Container } from "react-bootstrap";
-import { ButtonLink } from "../layouts/Links";
 import { useNavigate } from "react-router-dom";
+import { ButtonLink } from "../layouts/Links";
 
 function NotFoundPage() {
   const nav = useNavigate();

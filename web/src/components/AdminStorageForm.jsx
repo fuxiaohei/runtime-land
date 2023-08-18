@@ -1,4 +1,4 @@
-import { Alert, Form, Button } from "react-bootstrap";
+import { Alert, Button, Form } from "react-bootstrap";
 
 function LocalStorageForm({ data }) {
   return (

@@ -1,9 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { Badge, Container, ListGroup } from "react-bootstrap";
+import { listRegions } from "../../api/regions";
+import AdminNavHeader from "../../components/AdminNavHeader";
 import { AuthProvider } from "../../layouts/AuthContext";
 import MainLayout from "../../layouts/MainLayout";
-import AdminNavHeader from "../../components/AdminNavHeader";
-import { useQuery } from "@tanstack/react-query";
-import { listRegions } from "../../api/regions";
 import QueryWrapper from "../../layouts/QueryWrapper";
 
 function AdminRegionsPage() {

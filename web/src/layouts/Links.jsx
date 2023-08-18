@@ -1,8 +1,8 @@
 // code from https://github.com/react-bootstrap/code-sandbox-examples/blob/master/ts-react-router-v6/src/ButtonLink.tsx
 
-import { Dropdown, Button, Nav, NavDropdown } from "react-bootstrap";
-import { useHref, useLinkClickHandler } from "react-router-dom";
 import * as React from "react";
+import { Button, Dropdown, Nav, NavDropdown } from "react-bootstrap";
+import { useHref, useLinkClickHandler } from "react-router-dom";
 
 const DropdownItemLink = React.forwardRef(
   ({ onClick, replace = false, state, target, to, ...props }, ref) => {
@@ -88,4 +88,4 @@ const ButtonLink = React.forwardRef(
   }
 );
 
-export { DropdownItemLink, NavbarLink, NavDropdownLink, ButtonLink };
+export { ButtonLink, DropdownItemLink, NavDropdownLink, NavbarLink };

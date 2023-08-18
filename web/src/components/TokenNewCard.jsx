@@ -1,7 +1,7 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { FaRegCopy, FaCheck } from "react-icons/fa";
-import { Button } from "react-bootstrap";
 import { useState } from "react";
+import { Button } from "react-bootstrap";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { FaCheck, FaRegCopy } from "react-icons/fa";
 
 function TokenNewCard({ token, onDone }) {
   const newToken = token;

@@ -1,14 +1,13 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button, Container, Form, InputGroup } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
+import { getProject, removeProject, renameProject } from "../api/projects";
 import ProjectHeader from "../components/ProjectHeader";
+import ProjectRemoveModal from "../components/ProjectRemoveModal";
 import { AuthProvider } from "../layouts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
-import { useParams } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getProject, removeProject, renameProject } from "../api/projects";
 import LoadingPage from "./Loading";
-import { useState } from "react";
-import ProjectRemoveModal from "../components/ProjectRemoveModal";
-import { useNavigate } from "react-router-dom";
 
 function ProjectSettingPage() {
   const { name: projectName } = useParams();
@@ -16,7 +15,6 @@ function ProjectSettingPage() {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removeAlert, setRemoveAlert] = useState("");
   const [inputProjectName, setInputProjectName] = useState(projectName);
-  const queryClient = useQueryClient();
 
   const {
     isLoading,

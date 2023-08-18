@@ -1,8 +1,8 @@
 import { Badge, Dropdown, ListGroup } from "react-bootstrap";
 import {
-  BiDotsVerticalRounded,
   BiCheckCircle,
   BiDisc,
+  BiDotsVerticalRounded,
   BiErrorCircle,
 } from "react-icons/bi";
 import ReactTimeAgo from "react-time-ago";

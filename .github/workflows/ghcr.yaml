@@ -58,6 +58,8 @@ jobs:
         include:
           - dockerfile: ./deploy/dashboard.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/runtime-land-dashboard
+          - dockerfile: ./deploy/dashboard-selfhost.Dockerfile
+            image: ghcr.io/${{ github.repository_owner }}/runtime-land-dashboard-selfhost
     steps:
       - uses: actions/checkout@v3
         with:

@@ -8,6 +8,10 @@ if (process.env.API_URL) {
 }
 
 let clerk_key = (process.env.NODE_ENV === 'development') ? "pk_test_cGV0LW1vb3NlLTc1LmNsZXJrLmFjY291bnRzLmRldiQ" : "pk_live_Y2xlcmsucnVudGltZS5sYW5kJA";
+let selfHost = !!process.env.SELF_HOST;
+if (selfHost) {
+  clerk_key = "";
+}
 
 console.log("API_URL:", api_url);
 console.log("CLERK_KEY:", clerk_key)

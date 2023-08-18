@@ -1,15 +1,21 @@
-import React from "react";
 import {
+  RedirectToSignIn,
   SignedIn,
   SignedOut,
-  RedirectToSignIn,
+  useClerk,
   useUser,
 } from "@clerk/clerk-react";
-import { getLocalInfo, setLocalInfo } from "../api/client";
-import { createOauthToken, verifyToken } from "../api/token";
 import { useQuery } from "@tanstack/react-query";
-import LoadingPage from "../pages/Loading";
+import React from "react";
+import {
+  getLocalInfo,
+  handleTokenResponse,
+  removeLocalInfo,
+} from "../api/client";
+import { createOauthToken, verifyToken } from "../api/token";
+import { selfHost } from "../config";
 import ErrorPage from "../pages/Error";
+import LoadingPage from "../pages/Loading";
 
 const AuthContext = React.createContext(null);
 
@@ -17,54 +23,71 @@ function useAuthContext() {
   return React.useContext(AuthContext);
 }
 
-function AuthProvider({ children }) {
-  const { isLoaded, isSignedIn, user } = useUser();
+async function verifyLocalToken() {
+  let localInfo = getLocalInfo();
+  if (localInfo && localInfo.token) {
+    let now_ts = Date.now() / 1000;
+    // if token is in active interval, use local token
+    let active_at = localInfo.token.active_at;
+    if (now_ts - active_at < localInfo.token.active_interval) {
+      console.log("local token is in active interval");
+      return true;
+    }
+    // if token is not expired, use local token
+    let expired_at = localInfo.token.expired_at;
+    if (expired_at && expired_at > now_ts) {
+      console.log("local token is valid");
+      let response = await verifyToken(localInfo.token.value);
+      handleTokenResponse(response);
+      console.log("verify local token");
+      return true;
+    }
+  }
+  return false;
+}
 
-  const handleTokenResponse = (response) => {
-    let value = {
-      user: {
-        name: response.nick_name,
-        email: response.email,
-        avatar_url: response.avatar_url,
-        oauth_id: response.oauth_id,
-        role: response.role,
-      },
-      token: {
-        value: response.token_value,
-        uuid: response.token_uuid,
-        expired_at: response.token_expired_at,
-        active_at: response.token_active_at,
-        active_interval: response.token_active_interval,
-      },
-    };
-    setLocalInfo(value);
+function AuthProvider({ children }) {
+  return selfHost
+    ? SelfHostAuthProvider({ children })
+    : ClerkAuthProvider({ children });
+}
+
+function SelfHostAuthProvider({ children }) {
+  const { isLoading, isError, error } = useQuery({
+    queryKey: ["auth-context-selfhost"],
+    queryFn: async () => {
+      return await verifyLocalToken();
+    },
+    retry: false,
+  });
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (isError) {
+    return <ErrorPage message={error.toString()} />;
+  }
+
+  let v = getLocalInfo();
+  v.signOut = async () => {
+    removeLocalInfo();
+    window.location.reload(); // it will redirect to login page
   };
+
+  return <AuthContext.Provider value={v}>{children}</AuthContext.Provider>;
+}
+
+function ClerkAuthProvider({ children }) {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
   const { isLoading, isError, error } = useQuery({
     queryKey: ["auth-context"],
     queryFn: async () => {
-      let localInfo = getLocalInfo();
-      if (localInfo && localInfo.token) {
-        let now_ts = Date.now() / 1000;
-
-        // if token is in active interval, use local token
-        let active_at = localInfo.token.active_at;
-        if (now_ts - active_at < localInfo.token.active_interval) {
-          console.log("local token is in active interval");
-          return true;
-        }
-
-        // if token is not expired, use local token
-        let expired_at = localInfo.token.expired_at;
-        if (expired_at && expired_at > now_ts) {
-          console.log("local token is valid");
-          let response = await verifyToken(localInfo.token.value);
-          handleTokenResponse(response);
-          console.log("verify local token");
-          return true;
-        }
+      if (await verifyLocalToken()) {
+        return true;
       }
-
       console.log("local token is invalid, fetch new token");
       let req = {
         name: user.username || user.firstName,
@@ -100,8 +123,13 @@ function AuthProvider({ children }) {
     return <ErrorPage message={error.toString()} />;
   }
 
+  let v = getLocalInfo();
+  v.signOut = async () => {
+    signOut();
+  };
+
   return (
-    <AuthContext.Provider value={getLocalInfo()}>
+    <AuthContext.Provider value={v}>
       <SignedIn>{children}</SignedIn>
       <SignedOut>
         <RedirectToSignIn />

@@ -1,10 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card, Container } from "react-bootstrap";
+import { BiDetail, BiLayer, BiServer, BiUserCircle } from "react-icons/bi";
+import { getStats } from "../../api/regions";
+import AdminNavHeader from "../../components/AdminNavHeader";
 import { AuthProvider } from "../../layouts/AuthContext";
 import MainLayout from "../../layouts/MainLayout";
-import AdminNavHeader from "../../components/AdminNavHeader";
-import { BiUserCircle, BiDetail, BiLayer, BiServer } from "react-icons/bi";
-import { getStats } from "../../api/regions";
-import { useQuery } from "@tanstack/react-query";
 import QueryWrapper from "../../layouts/QueryWrapper";
 
 function AdminStatsPage() {

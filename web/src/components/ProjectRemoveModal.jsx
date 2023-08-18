@@ -1,4 +1,4 @@
-import { Modal, Button, Alert } from "react-bootstrap";
+import { Alert, Button, Modal } from "react-bootstrap";
 
 function ProjectRemoveModal({ show, handleClose, handleRemove, alert }) {
   return (

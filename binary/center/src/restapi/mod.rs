@@ -15,12 +15,15 @@ mod auth;
 mod deployment;
 mod params;
 mod project;
+mod register;
 mod ws;
 
 fn auth_router() -> Router {
     Router::new()
         .route("/v1/token/oauth", post(auth::create_oauth_token))
         .route("/v1/token/verify/:token", post(auth::verify_token))
+        .route("/v1/signup", post(register::register))
+        .route("/v1/login", post(register::login_by_email))
 }
 
 fn api_router() -> Router {

@@ -1,12 +1,12 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Alert, Container } from "react-bootstrap";
-import { AuthProvider } from "../../layouts/AuthContext";
-import MainLayout from "../../layouts/MainLayout";
+import { listStorageSettings, updateStorageSettings } from "../../api/regions";
 import AdminNavHeader from "../../components/AdminNavHeader";
 import AdminStorageForm from "../../components/AdminStorageForm";
-import { listStorageSettings, updateStorageSettings } from "../../api/regions";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { AuthProvider } from "../../layouts/AuthContext";
+import MainLayout from "../../layouts/MainLayout";
 import QueryWrapper from "../../layouts/QueryWrapper";
-import { useState } from "react";
 
 function AdminStoragePage() {
   const queryClient = useQueryClient();

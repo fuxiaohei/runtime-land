@@ -1,18 +1,18 @@
-import { Container } from "react-bootstrap";
-import DeploymentsList from "../components/DeploymentsList";
-import ProjectHeader from "../components/ProjectHeader";
-import { AuthProvider } from "../layouts/AuthContext";
-import MainLayout from "../layouts/MainLayout";
-import DeploymentProd from "../components/DeploymentProd";
-import { useParams } from "react-router-dom";
-import { getProjectOverview } from "../api/projects";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import LoadingPage from "./Loading";
+import { Container } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import {
   disableDeployment,
   enableDeployment,
   publishDeployment,
 } from "../api/deployments";
+import { getProjectOverview } from "../api/projects";
+import DeploymentProd from "../components/DeploymentProd";
+import DeploymentsList from "../components/DeploymentsList";
+import ProjectHeader from "../components/ProjectHeader";
+import { AuthProvider } from "../layouts/AuthContext";
+import MainLayout from "../layouts/MainLayout";
+import LoadingPage from "./Loading";
 
 function ProjectOverviewPage() {
   let { name: projectName } = useParams();

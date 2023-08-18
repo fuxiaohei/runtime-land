@@ -1,11 +1,11 @@
-import { Container, Button } from "react-bootstrap";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button, Container } from "react-bootstrap";
+import { createDeploymentToken, listDeploymentTokens } from "../api/token";
 import TokensList from "../components/TokensList";
 import { AuthProvider, useAuthContext } from "../layouts/AuthContext";
 import MainLayout from "../layouts/MainLayout";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createDeploymentToken, listDeploymentTokens } from "../api/token";
 import LoadingPage from "./Loading";
-import { useState } from "react";
 
 function AccountCard() {
   const { user } = useAuthContext();

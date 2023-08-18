@@ -1,8 +1,8 @@
-import { Card, Form, Button, Row, Col } from "react-bootstrap";
-import { listDomainSettings } from "../api/regions";
 import { useQuery } from "@tanstack/react-query";
-import LoadingPage from "../pages/Loading";
 import { useState } from "react";
+import { Button, Card, Col, Form, Row } from "react-bootstrap";
+import { listDomainSettings } from "../api/regions";
+import LoadingPage from "../pages/Loading";
 
 function ProductionDomainForm() {
   const [domainSuffix, setDomainSuffix] = useState("");

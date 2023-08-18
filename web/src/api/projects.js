@@ -1,4 +1,4 @@
-import { clientDelete, clientPost, clientGet } from "./client";
+import { clientDelete, clientGet, clientPost } from "./client";
 
 async function listProjects() {
     return await clientGet("/v1/projects");
@@ -28,10 +28,6 @@ async function renameProject(name, new_name) {
 }
 
 export {
-    listProjects,
-    removeProject,
-    createProject,
-    getProjectOverview,
-    getProject,
-    renameProject,
-}
+    createProject, getProject, getProjectOverview, listProjects,
+    removeProject, renameProject
+};

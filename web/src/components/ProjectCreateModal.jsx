@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Modal, Button, Form, InputGroup, Alert } from "react-bootstrap";
+import { Alert, Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { BiRefresh } from "react-icons/bi";
 import {
-  uniqueNamesGenerator,
   NumberDictionary,
   adjectives,
   colors,
+  uniqueNamesGenerator,
 } from "unique-names-generator";
 
 const generateName = () => {

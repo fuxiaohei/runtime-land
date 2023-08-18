@@ -1,19 +1,18 @@
-import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { NavbarLink, NavDropdownLink } from "./Links";
-import { useClerk } from "@clerk/clerk-react";
-import { useAuthContext } from "./AuthContext";
+import { Container, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
-import { version, buildDate } from "../version";
+import { Link } from "react-router-dom";
+import { buildDate, version } from "../config";
+import { useAuthContext } from "./AuthContext";
+import { NavDropdownLink, NavbarLink } from "./Links";
 
 function MainLayout({ title, children }) {
-  const { signOut } = useClerk();
-  const { user } = useAuthContext();
+  // const { signOut } = useClerk();
+  const { user, signOut } = useAuthContext();
 
-  const handleSignOut = (event) => {
+  const handleSignOut = async (event) => {
     console.log("sign out");
     event.preventDefault();
-    signOut();
+    await signOut();
     console.log("call sign out");
   };
 

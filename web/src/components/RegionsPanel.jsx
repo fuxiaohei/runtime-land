@@ -1,7 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Badge, Card, ListGroup } from "react-bootstrap";
 import { listRegions } from "../api/regions";
 import LoadingPage from "../pages/Loading";
-import { useQuery } from "@tanstack/react-query";
 
 function RegionsPanel() {
   const {

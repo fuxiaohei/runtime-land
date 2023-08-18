@@ -1,14 +1,20 @@
-import { Routes, Route, Outlet, Navigate } from "react-router";
-import { SignIn, SignUp } from "@clerk/clerk-react";
-import ProjectsPage from "./pages/Projects";
+import {
+  ClerkLoaded,
+  ClerkLoading,
+  ClerkProvider,
+  SignIn,
+  SignUp,
+} from "@clerk/clerk-react";
+import { Navigate, Outlet, Route, Routes } from "react-router";
+import AccountPage from "./pages/Account";
+import LoadingPage from "./pages/Loading";
+import NotFoundPage from "./pages/NotFound";
 import ProjectOverviewPage from "./pages/ProjectOverview";
 import ProjectSettingPage from "./pages/ProjectSetting";
-import AccountPage from "./pages/Account";
-import NotFoundPage from "./pages/NotFound";
-import AdminPage from "./pages/admin/Admin";
-import AdminStatsPage from "./pages/admin/Stats";
-import AdminRegionsPage from "./pages/admin/Regions";
+import ProjectsPage from "./pages/Projects";
 import AdminDomainsPage from "./pages/admin/Domains";
+import AdminRegionsPage from "./pages/admin/Regions";
+import AdminStatsPage from "./pages/admin/Stats";
 import AdminStoragePage from "./pages/admin/Storage";
 
 function App() {
@@ -34,7 +40,6 @@ function App() {
           element={<ProjectSettingPage />}
         />
         <Route path="/account" element={<AccountPage />} />
-        <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/stats" element={<AdminStatsPage />} />
         <Route path="/admin/regions" element={<AdminRegionsPage />} />
         <Route path="/admin/domains" element={<AdminDomainsPage />} />
@@ -45,4 +50,17 @@ function App() {
   );
 }
 
-export default App;
+function ClerkApp() {
+  return (
+    <ClerkProvider publishableKey={CLERK_KEY}>
+      <ClerkLoading>
+        <LoadingPage />
+      </ClerkLoading>
+      <ClerkLoaded>
+        <App />
+      </ClerkLoaded>
+    </ClerkProvider>
+  );
+}
+
+export default ClerkApp;
