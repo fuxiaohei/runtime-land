@@ -1,5 +1,8 @@
 use land_worker::compiler::{generate_guest, GuestGeneratorType};
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
@@ -14,14 +17,26 @@ fn main() {
 fn build_wit_guest_code() {
     let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
 
+    // set world name to parse. in Wit file, it can provide multiple worlds
     let worlds = vec!["http-handler", "http-service"];
+
+    // set exports to parse.  
+    // For example. You need set StructName(eg: HttpImpl) for implmentation of HttpIncoming. 
+    // then you write impl HttpIncoming for HttpImpl.
+    let mut exports = HashMap::new();
+    exports.insert(
+        "land:http/http-incoming".to_string(),
+        "HttpImpl".to_string(),
+    );
+
     for world_name in worlds {
         let outputs = generate_guest(
             wit_dir.as_path(),
             Some(world_name.to_string()),
             GuestGeneratorType::Rust,
+            exports.clone(),
         )
-        .unwrap();
+        .expect(format!("generate guest for {} failed", world_name).as_str());
 
         // for range outputs, write content with key name
         for (name, content) in outputs.iter() {

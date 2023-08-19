@@ -7,8 +7,8 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 http = { workspace = true }
-quote = "1.0.30"
-syn = { version = "2.0.28", features = ["full"] }
+quote = "1.0.33"
+syn = { version = "2.0.29", features = ["full"] }
 
 [lib]
 proc-macro = true

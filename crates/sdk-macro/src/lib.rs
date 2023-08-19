@@ -75,8 +75,6 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        export_http_handler!(HttpImpl);
-
     );
     let value = format!("{iface}\n{iface_impl}");
     value.parse().unwrap()

@@ -76,10 +76,11 @@ fn create_wasmtime_config() -> Config {
     // in docker container, it will cause error
     config.wasm_simd(false);
 
-    const MB: usize = 1 << 20;
-    let mut pooling_allocation_config = PoolingAllocationConfig::default();
-    pooling_allocation_config.instance_size(MB);
-    pooling_allocation_config.instance_memory_pages(128 * (MB as u64) / (64 * 1024));
+    // const MB: usize = 1 << 20;
+    // let mut pooling_allocation_config = PoolingAllocationConfig::default();
+    // pooling_allocation_config.max_core_instance_size(MB);
+    // pooling_allocation_config.max_memories_per_component(128 * (MB as u32) / (64 * 1024));
+    let pooling_allocation_config = PoolingAllocationConfig::default();
     config.allocation_strategy(InstanceAllocationStrategy::Pooling(
         pooling_allocation_config,
     ));

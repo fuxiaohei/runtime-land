@@ -19,11 +19,21 @@ pub enum GuestGeneratorType {
 
 impl GuestGeneratorType {
     /// create generator by type
-    fn create_generator(&self) -> Result<Box<dyn WorldGenerator>> {
+    fn create_generator(
+        &self,
+        gen_exports: HashMap<String, String>,
+    ) -> Result<Box<dyn WorldGenerator>> {
+        let mut exports = HashMap::new();
+        for (name, content) in gen_exports.iter() {
+            exports.insert(
+                wit_bindgen_rust::ExportKey::Name(name.to_string()),
+                content.to_string(),
+            );
+        }
         match self {
             GuestGeneratorType::Rust => {
                 let opts = wit_bindgen_rust::Opts {
-                    macro_export: true,
+                    exports,
                     rustfmt: true,
                     ..Default::default()
                 };
@@ -40,8 +50,9 @@ pub fn generate_guest(
     wit_dir: &Path,
     world: Option<String>,
     t: GuestGeneratorType,
+    gen_exports: HashMap<String, String>,
 ) -> Result<HashMap<String, String>> {
-    let mut generator = t.create_generator()?;
+    let mut generator = t.create_generator(gen_exports)?;
 
     let mut resolve = Resolve::default();
     let pkg = resolve.push_dir(wit_dir)?.0;
@@ -49,7 +60,7 @@ pub fn generate_guest(
     let mut output_maps = HashMap::new();
     let mut files = Files::default();
     let world = resolve.select_world(pkg, world.as_deref())?;
-    generator.generate(&resolve, world, &mut files);
+    generator.generate(&resolve, world, &mut files)?;
     for (name, contents) in files.iter() {
         output_maps.insert(
             name.to_string(),

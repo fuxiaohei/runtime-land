@@ -19,7 +19,7 @@ wasmtime-wasi = { workspace = true }
 which = "4.4.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
-wit-component = "0.13.1"
+wit-component = { workspace = true }
 
 [lib]
 doctest = false
