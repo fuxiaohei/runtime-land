@@ -101,7 +101,8 @@ pub async fn connect(cfg: DbConfig) -> Result<()> {
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(600))
         .max_lifetime(Duration::from_secs(1800))
-        .sqlx_logging(cfg.log_sql);
+        .sqlx_logging(cfg.log_sql)
+        .sqlx_logging_level(tracing::log::LevelFilter::Info);
 
     let db = Database::connect(opt).await?;
 
