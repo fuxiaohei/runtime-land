@@ -106,3 +106,77 @@ pub async fn stats_handler(
     };
     Ok((StatusCode::OK, Json(response)))
 }
+
+/// list_tokens_for_region lists all tokens of current user.
+#[tracing::instrument(name = "[list_tokens_for_region]", skip_all)]
+pub async fn list_tokens_for_region(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<Vec<params::TokenResponse>>), AppError> {
+    is_admin(&current_user)?;
+    let tokens = land_dao::user_token::list_by_created(
+        current_user.id,
+        land_dao::user_token::CreatedByCases::Edgehub,
+    )
+    .await?;
+    let values: Vec<params::TokenResponse> = tokens
+        .into_iter()
+        .map(|t| params::TokenResponse {
+            name: t.name,
+            created_at: t.created_at.timestamp(),
+            updated_at: t.updated_at.timestamp(),
+            expired_at: t.expired_at.unwrap().timestamp(),
+            origin: t.created_by.to_string(),
+            uuid: t.uuid,
+            value: t.value,
+        })
+        .collect();
+    info!(
+        "list_tokens_for_region success, count:{}, userid: {}",
+        values.len(),
+        current_user.id
+    );
+    Ok((StatusCode::OK, Json(values)))
+}
+
+#[tracing::instrument(name = "[create_token_for_region]", skip_all)]
+pub async fn create_token_for_region(
+    Extension(current_user): Extension<CurrentUser>,
+    Json(payload): Json<params::CreateRegionTokenRequest>,
+) -> Result<(StatusCode, Json<params::TokenResponse>), AppError> {
+    is_admin(&current_user)?;
+
+    let token = land_dao::user_token::find_by_name(
+        current_user.id,
+        payload.name.clone(),
+        land_dao::user_token::CreatedByCases::Edgehub,
+    )
+    .await?;
+    if token.is_some() {
+        return Err(anyhow::anyhow!("token name is exist").into());
+    }
+
+    let token = land_dao::user_token::create(
+        current_user.id,
+        payload.name.clone(),
+        365 * 24 * 60 * 60, // 1 year
+        land_dao::user_token::CreatedByCases::Edgehub,
+    )
+    .await?;
+
+    info!(
+        "create_token_for_region success, userid:{}, name:{}",
+        current_user.id, payload.name
+    );
+    Ok((
+        StatusCode::OK,
+        Json(params::TokenResponse {
+            name: token.name,
+            created_at: token.created_at.timestamp(),
+            updated_at: token.updated_at.timestamp(),
+            expired_at: token.expired_at.unwrap().timestamp(),
+            origin: token.created_by.to_string(),
+            uuid: token.uuid,
+            value: token.value,
+        }),
+    ))
+}

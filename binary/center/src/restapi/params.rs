@@ -150,3 +150,8 @@ pub struct StatsResponse {
     pub users: i32,
     pub regions: i32,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateRegionTokenRequest {
+    pub name: String,
+}

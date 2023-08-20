@@ -51,7 +51,15 @@ fn api_router() -> Router {
             "/v1/deployment/:uuid/enable",
             post(deployment::enable_handler),
         )
-        .route("/v1/regions", get(admin::list_regions))
+        .route("/v1/settings/regions", get(admin::list_regions))
+        .route(
+            "/v1/settings/region_tokens",
+            get(admin::list_tokens_for_region),
+        )
+        .route(
+            "/v1/settings/region_tokens",
+            post(admin::create_token_for_region),
+        )
         .route("/v1/settings/domains", get(admin::list_settings_domains))
         .route("/v1/settings/domains", post(admin::update_settings_domain))
         .route("/v1/settings/storage", get(admin::list_settings_storage))
