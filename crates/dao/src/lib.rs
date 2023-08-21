@@ -13,6 +13,8 @@ mod model;
 pub use model::project::Model as Project;
 pub use model::region::Model as Region;
 pub use model::settings::Model as Setting;
+pub use model::user_info::Model as User;
+pub use model::user_token::Model as UserToken;
 
 pub mod deployment;
 pub mod project;

@@ -1,3 +1,4 @@
+use land_dao::{User, UserToken};
 use land_storage::{FsConfig, S3Config};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -13,17 +14,49 @@ pub struct SignupRequest {
 }
 
 #[derive(Serialize, Debug)]
-pub struct LoginResponse {
-    pub token_value: String,
-    pub token_uuid: String,
-    pub token_expired_at: i64,
-    pub token_active_at: i64,
-    pub token_active_interval: i64,
-    pub nick_name: String,
-    pub email: String,
+pub struct LoginResponseTokenField {
+    pub active_at: i64,
+    pub active_interval: i64,
+    pub expired_at: i64,
+    pub uuid: String,
+    pub value: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct LoginResponseUserField {
     pub avatar_url: String,
+    pub email: String,
+    pub name: String,
     pub oauth_id: String,
     pub role: String,
+    pub oauth_provider: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct LoginResponse {
+    pub token: LoginResponseTokenField,
+    pub user: LoginResponseUserField,
+}
+
+impl LoginResponse {
+    pub fn new(user: &User, token: &UserToken) -> Self {
+        let t = LoginResponseTokenField {
+            active_at: token.updated_at.timestamp(),
+            active_interval: 60,
+            expired_at: token.expired_at.unwrap().timestamp(),
+            uuid: token.uuid.clone(),
+            value: token.value.clone(),
+        };
+        let u = LoginResponseUserField {
+            avatar_url: user.avatar.clone(),
+            email: user.email.clone(),
+            name: user.nick_name.clone(),
+            oauth_id: user.oauth_id.clone(),
+            role: user.role.clone(),
+            oauth_provider: user.oauth_provider.clone(),
+        };
+        Self { token: t, user: u }
+    }
 }
 
 #[derive(Deserialize, Debug, Validate)]

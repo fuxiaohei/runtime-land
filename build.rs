@@ -20,8 +20,8 @@ fn build_wit_guest_code() {
     // set world name to parse. in Wit file, it can provide multiple worlds
     let worlds = vec!["http-handler", "http-service"];
 
-    // set exports to parse.  
-    // For example. You need set StructName(eg: HttpImpl) for implmentation of HttpIncoming. 
+    // set exports to parse.
+    // For example. You need set StructName(eg: HttpImpl) for implmentation of HttpIncoming.
     // then you write impl HttpIncoming for HttpImpl.
     let mut exports = HashMap::new();
     exports.insert(
@@ -36,7 +36,7 @@ fn build_wit_guest_code() {
             GuestGeneratorType::Rust,
             exports.clone(),
         )
-        .expect(format!("generate guest for {} failed", world_name).as_str());
+        .unwrap_or_else(|_| panic!("generate guest for {} failed", world_name));
 
         // for range outputs, write content with key name
         for (name, content) in outputs.iter() {

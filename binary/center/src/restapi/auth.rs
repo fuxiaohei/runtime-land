@@ -73,18 +73,7 @@ pub async fn verify_token(
 
     Ok((
         StatusCode::OK,
-        Json(params::LoginResponse {
-            token_value: token.value,
-            token_uuid: token.uuid,
-            token_expired_at: token.expired_at.unwrap().timestamp(),
-            token_active_at: token.updated_at.timestamp(),
-            token_active_interval: 60,
-            nick_name: user.nick_name,
-            email: user.email,
-            avatar_url: user.avatar,
-            oauth_id: user.oauth_id,
-            role: user.role,
-        }),
+        Json(params::LoginResponse::new(&user, &token)),
     ))
 }
 
@@ -109,18 +98,7 @@ pub async fn create_oauth_token(
         info!("success, email:{}, nickname:{}", user.email, user.nick_name,);
         return Ok((
             StatusCode::OK,
-            Json(params::LoginResponse {
-                token_value: token.value,
-                token_uuid: token.uuid,
-                token_expired_at: token.expired_at.unwrap().timestamp(),
-                token_active_at: token.updated_at.timestamp(),
-                token_active_interval: 60,
-                nick_name: user.nick_name,
-                email: user.email,
-                avatar_url: user.avatar,
-                oauth_id: user.oauth_id,
-                role: user.role,
-            }),
+            Json(params::LoginResponse::new(&user, &token)),
         ));
     }
 
@@ -141,18 +119,7 @@ pub async fn create_oauth_token(
 
     Ok((
         StatusCode::OK,
-        Json(params::LoginResponse {
-            token_value: token.value,
-            token_uuid: token.uuid,
-            token_expired_at: token.expired_at.unwrap().timestamp(),
-            token_active_at: token.updated_at.timestamp(),
-            token_active_interval: 60,
-            nick_name: user.nick_name,
-            email: user.email,
-            avatar_url: user.avatar,
-            oauth_id: user.oauth_id,
-            role: user.role,
-        }),
+        Json(params::LoginResponse::new(&user, &token)),
     ))
 }
 
