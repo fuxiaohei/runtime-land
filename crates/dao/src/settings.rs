@@ -11,6 +11,7 @@ pub enum Key {
     StorageType,
     S3Storage,
     LocalStorage,
+    EmailSmtp,
 }
 
 /// list_maps lists settings with key field as hashmap
@@ -65,4 +66,50 @@ async fn update(values: Vec<settings::Model>) -> Result<()> {
         .await?;
 
     Ok(())
+}
+
+/// EmailStmp is email stmp settings
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub struct EmailStmp {
+    pub host: String,
+    pub port: String,
+    pub username: String,
+    pub password: String,
+    pub from: String,
+}
+
+impl Default for EmailStmp {
+    fn default() -> Self {
+        Self {
+            host: "smtp.example.com".to_string(),
+            port: "465".to_string(),
+            username: "username".to_string(),
+            password: "password".to_string(),
+            from: "no-reploy@example.com".to_string(),
+        }
+    }
+}
+
+/// get_email_setting gets email stmp settings
+pub async fn get_email_setting() -> EmailStmp {
+    let db = DB.get().unwrap();
+    let settings = settings::Entity::find()
+        .filter(settings::Column::Key.eq(Key::EmailSmtp.to_string()))
+        .one(db)
+        .await
+        .unwrap();
+    if settings.is_none() {
+        return EmailStmp::default();
+    }
+    let settings = settings.unwrap();
+    let email_setting: EmailStmp = serde_json::from_str(&settings.value).unwrap();
+    email_setting
+}
+
+/// update_email_setting updates email stmp settings
+pub async fn update_email_setting(email: &EmailStmp) -> Result<()> {
+    let key = Key::EmailSmtp.to_string();
+    let value = serde_json::to_string(email)?;
+    let values: HashMap<String, String> = vec![(key.clone(), value)].into_iter().collect();
+    update_maps(values).await
 }

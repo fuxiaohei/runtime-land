@@ -180,3 +180,23 @@ pub async fn create_token_for_region(
         }),
     ))
 }
+
+#[tracing::instrument(name = "[email_handler]", skip_all)]
+pub async fn email_handler(
+    Extension(current_user): Extension<CurrentUser>,
+) -> Result<(StatusCode, Json<land_dao::settings::EmailStmp>), AppError> {
+    is_admin(&current_user)?;
+    let setting = land_dao::settings::get_email_setting().await;
+    Ok((StatusCode::OK, Json(setting)))
+}
+
+#[tracing::instrument(name = "[update_email]", skip_all)]
+pub async fn update_email(
+    Extension(current_user): Extension<CurrentUser>,
+    Json(payload): Json<land_dao::settings::EmailStmp>,
+) -> Result<StatusCode, AppError> {
+    is_admin(&current_user)?;
+    land_dao::settings::update_email_setting(&payload).await?;
+    info!("success, config:{:?}", payload);
+    Ok(StatusCode::OK)
+}

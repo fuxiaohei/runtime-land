@@ -7,6 +7,7 @@ mod region;
 mod restapi;
 mod server;
 mod settings;
+mod email;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]

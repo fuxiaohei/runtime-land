@@ -24,6 +24,8 @@ fn auth_router() -> Router {
         .route("/v1/token/verify/:token", post(auth::verify_token))
         .route("/v1/signup", post(register::register))
         .route("/v1/login", post(register::login_by_email))
+        .route("/v1/forget-password", post(register::forget_password))
+        .route("/v1/reset-password/:token", post(register::reset_password))
 }
 
 fn api_router() -> Router {
@@ -65,6 +67,8 @@ fn api_router() -> Router {
         .route("/v1/settings/storage", get(admin::list_settings_storage))
         .route("/v1/settings/storage", post(admin::update_settings_storage))
         .route("/v1/settings/stats", get(admin::stats_handler))
+        .route("/v1/settings/email", get(admin::email_handler))
+        .route("/v1/settings/email", post(admin::update_email))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

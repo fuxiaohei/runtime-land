@@ -188,3 +188,15 @@ pub struct StatsResponse {
 pub struct CreateRegionTokenRequest {
     pub name: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ForgetPasswordRequest {
+    pub email: String,
+    pub base: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ResetPasswordResponse {
+    pub email: String,
+    pub password: String,
+}

@@ -16,6 +16,13 @@ land-core = { workspace = true }
 land-dao = { workspace = true }
 land-storage = { workspace = true }
 lazy_static = { workspace = true }
+lettre = { version = "0.10.4", default-features = false, features = [
+    "rustls-tls",
+    "smtp-transport",
+    "pool",
+    "hostname",
+    "builder",
+] }
 once_cell = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -23,3 +30,4 @@ tokio = { workspace = true }
 tower-http = { version = "0.4.3", features = ["cors"] }
 tracing = { workspace = true }
 validator = { version = "0.16.1", features = ["derive"] }
+hyper = { workspace = true }

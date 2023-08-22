@@ -19,6 +19,8 @@ sea-orm = { version = "0.12.2", features = [
     "runtime-tokio-rustls",
 ] }
 sea-orm-migration = { version = "0.12.2" }
+serde = { workspace = true }
+serde_json = { workspace = true }
 strum = { version = "0.25.0", features = ["derive"] }
 tracing = { workspace = true }
 uuid = { workspace = true }
