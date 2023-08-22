@@ -8,6 +8,7 @@ use axum::{
     Router,
 };
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::trace::TraceLayer;
 use tracing::warn;
 
 mod admin;
@@ -92,6 +93,7 @@ pub fn router() -> Router {
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
         .layer(cors)
+        .layer(TraceLayer::new_for_http())
 }
 
 // Make our own error that wraps `anyhow::Error`.
