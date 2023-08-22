@@ -240,6 +240,37 @@ pub async fn forget_password(email: &str) -> Result<user_token::Model> {
     Ok(token)
 }
 
+pub async fn update_password(
+    id: i32,
+    current_password: String,
+    new_password: String,
+) -> Result<()> {
+    let user = find_by_id(id).await?;
+    if user.is_none() {
+        return Err(anyhow::anyhow!("user not found"));
+    }
+    let user = user.unwrap();
+    let full_password = format!("{}{}", current_password, user.password_salt);
+    bcrypt::verify(full_password, &user.password)
+        .map_err(|_| anyhow::anyhow!("old password not match"))?;
+
+    let password_salt: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(10)
+        .map(char::from)
+        .collect();
+    let full_password = format!("{}{}", new_password, password_salt);
+    let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
+
+    let mut user_active_model: user_info::ActiveModel = user.into();
+    user_active_model.password = Set(password);
+    user_active_model.password_salt = Set(password_salt);
+    user_active_model.updated_at = Set(chrono::Utc::now());
+    let db = DB.get().unwrap();
+    user_active_model.update(db).await?;
+    Ok(())
+}
+
 pub async fn reset_password(token_str: String) -> Result<(String, String)> {
     let (token, user) = crate::user_token::find_by_value_with_active_user(token_str).await?;
     let expire_at = token.expired_at.unwrap().timestamp();

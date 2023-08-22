@@ -206,3 +206,21 @@ pub async fn remove_token(
     );
     Ok(())
 }
+
+#[tracing::instrument(name = "[update_password]", skip_all)]
+pub async fn update_password(
+    Extension(current_user): Extension<CurrentUser>,
+    Json(payload): Json<params::UpdatePasswordRequest>,
+) -> Result<StatusCode, AppError> {
+    if payload.new_password != payload.confirm_password {
+        return Err(anyhow::anyhow!("confirm password not match").into());
+    }
+    land_dao::user::update_password(
+        current_user.id,
+        payload.current_password,
+        payload.new_password,
+    )
+    .await?;
+    info!("success, userid:{}", current_user.id);
+    Ok(StatusCode::OK)
+}

@@ -70,6 +70,7 @@ fn api_router() -> Router {
         .route("/v1/settings/stats", get(admin::stats_handler))
         .route("/v1/settings/email", get(admin::email_handler))
         .route("/v1/settings/email", post(admin::update_email))
+        .route("/v1/update-password", post(auth::update_password))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 

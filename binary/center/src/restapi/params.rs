@@ -200,3 +200,10 @@ pub struct ResetPasswordResponse {
     pub email: String,
     pub password: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdatePasswordRequest{
+    pub new_password: String,
+    pub confirm_password: String,
+    pub current_password: String,
+}
