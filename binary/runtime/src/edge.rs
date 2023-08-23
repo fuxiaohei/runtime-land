@@ -5,7 +5,7 @@ use tracing::{debug, info, instrument, warn};
 
 #[derive(Envconfig, Debug)]
 pub struct Config {
-    #[envconfig(from = "EDGE_ADDR", default = "http://127.0.0.1:7899")]
+    #[envconfig(from = "EDGE_ADDR", default = "http://127.0.0.1:7902")]
     addr: String,
     #[envconfig(from = "EDGE_SYNC_ENABLED", default = "true")]
     sync_enabled: bool,

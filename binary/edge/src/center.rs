@@ -5,8 +5,24 @@ use land_core::confdata::{RegionRecvData, RegionReportData};
 use std::ops::ControlFlow;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
-use tracing::{debug, warn};
+use tracing::{debug, debug_span, warn, Instrument};
 use tracing::{info, instrument};
+
+async fn build_report_data() -> RegionReportData {
+    let localip = localip::IPINFO.get().unwrap().clone();
+    let region = localip.region();
+    let runtimes = server::get_living_runtimes().await;
+    let local_conf = CONF_VALUES.lock().await;
+    let report_data = RegionReportData {
+        localip,
+        region,
+        runtimes,
+        conf_value_time_version: local_conf.created_at,
+        time_at: chrono::Utc::now().timestamp() as u64,
+        owner_id: 0,
+    };
+    report_data
+}
 
 #[instrument(name = "[WS]", skip_all)]
 pub async fn init(addr: String, protocol: String, token: String) {
@@ -49,22 +65,10 @@ pub async fn init(addr: String, protocol: String, token: String) {
             loop {
                 interval.tick().await;
 
-                let localip = localip::IPINFO.get().unwrap().clone();
-                let region = localip.region();
-                let runtimes = server::get_living_runtimes().await;
-                let local_conf = CONF_VALUES.lock().await;
-                let sync_data = RegionReportData {
-                    localip,
-                    region,
-                    runtimes,
-                    conf_value_time_version: local_conf.created_at,
-                    time_at: chrono::Utc::now().timestamp() as u64,
-                    owner_id: 0,
-                };
-                let data = serde_json::to_vec(&sync_data).unwrap();
-                debug!("send report data, {}", data.len());
+                let report_data = build_report_data().await;
+                let content = serde_json::to_vec(&report_data).unwrap();
 
-                if sender.send(Message::Binary(data)).await.is_err() {
+                if sender.send(Message::Binary(content)).await.is_err() {
                     warn!("send report data failed");
                     return;
                 }
@@ -72,14 +76,15 @@ pub async fn init(addr: String, protocol: String, token: String) {
         });
 
         let mut recv_task = tokio::spawn(async move {
-            let mut cnt = 0;
             while let Some(Ok(msg)) = receiver.next().await {
-                cnt += 1;
-                if process_message(msg).await.is_break() {
+                if process_message(msg)
+                    .instrument(debug_span!("[WS]"))
+                    .await
+                    .is_break()
+                {
                     break;
                 }
             }
-            cnt
         });
 
         tokio::select! {
@@ -115,11 +120,11 @@ async fn process_message(msg: Message) -> ControlFlow<(), ()> {
             }
             return ControlFlow::Break(());
         }
-        Message::Pong(v) => {
-            debug!("recv pong: {:?}", v)
+        Message::Pong(_v) => {
+            info!("recv pong")
         }
-        Message::Ping(v) => {
-            debug!("recv ping: {:?}", v)
+        Message::Ping(_v) => {
+            info!("recv ping")
         }
         Message::Frame(_) => {
             unreachable!("This is never supposed to happen")
