@@ -98,3 +98,4 @@ opendal = { version = "0.39.0", default-features = false, features = [
     "services-memory",
     "rustls",
 ] }
+strum = { version = "0.25.0", features = ["derive"] }

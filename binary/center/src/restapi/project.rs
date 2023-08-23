@@ -3,7 +3,7 @@ use super::{
     params::{self, ProjectResponse},
     AppError,
 };
-use crate::{conf, settings};
+use crate::{region::conf, settings};
 use anyhow::Result;
 use axum::{extract::Path, http::StatusCode, Extension, Json};
 use tracing::info;

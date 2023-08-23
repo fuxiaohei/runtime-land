@@ -1,4 +1,4 @@
-use crate::conf::CONF_VALUES;
+use crate::region::conf::CONF_VALUES;
 use crate::region::REGIONS;
 use anyhow::Result;
 use axum::{
@@ -12,7 +12,7 @@ use axum::{
 };
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
-use land_core::confdata::{RegionRecvData, RegionReportData};
+use land_core::confdata::RegionReportData;
 use land_dao::{user, user_token};
 use once_cell::sync::OnceCell;
 use serde::Deserialize;
@@ -62,8 +62,7 @@ async fn handle_socket(mut socket: WebSocket, region: String, addr: SocketAddr, 
 
     let mut send_task = tokio::spawn(async move {
         while rx.changed().await.is_ok() {
-            let conf_values = CONF_VALUES.lock().await.clone();
-            let send_data = RegionRecvData { conf_values };
+            let send_data = crate::region::build_recv_data().await.unwrap();
             let bytes = serde_json::to_vec(&send_data).unwrap();
             if sender.send(Message::Binary(bytes)).await.is_ok() {
                 debug!("Send values ok");

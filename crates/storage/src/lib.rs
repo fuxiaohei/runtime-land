@@ -14,6 +14,24 @@ mod s3;
 pub use s3::reload_global as reload_s3_global;
 pub use s3::Config as S3Config;
 
+#[derive(strum::Display, PartialEq)]
+#[strum(serialize_all = "lowercase")]
+pub enum Type {
+    Fs,
+    CloudflareR2,
+    Unknown,
+}
+
+impl Type {
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "fs" => Type::Fs,
+            "cloudflare-r2" => Type::CloudflareR2,
+            _ => Type::Unknown,
+        }
+    }
+}
+
 #[derive(Envconfig, Debug)]
 pub struct Config {
     #[envconfig(from = "STORAGE_TYPE", default = "fs")]
@@ -48,16 +66,17 @@ pub async fn init_from_type(typename: &str) -> Result<()> {
 
 /// build_operator returns the storage operator
 pub async fn build_operator(type_name: &str) -> Result<Operator> {
-    match type_name {
-        "fs" => {
+    let type_value = Type::from_str(type_name);
+    match type_value {
+        Type::Fs => {
             let op = fs::build_from_env().await?;
             Ok(op)
         }
-        "cloudflare-r2" => {
+        Type::CloudflareR2 => {
             let op = s3::init().await?;
             Ok(op)
         }
-        _ => Err(anyhow!("unknown storage type: {}", type_name)),
+        Type::Unknown => Err(anyhow!("unknown storage type: {}", type_name)),
     }
 }
 

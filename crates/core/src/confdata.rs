@@ -99,6 +99,7 @@ pub struct RegionReportData {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RegionRecvData {
     pub conf_values: RoutesConf,
+    pub storage_basepath: String,
 }
 
 #[derive(Debug)]

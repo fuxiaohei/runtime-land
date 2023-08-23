@@ -17,6 +17,8 @@ pub struct Config {
     secret_access_key: String,
     #[envconfig(from = "S3_ROOT_PATH", default = "/wasm-bin")]
     root_path: String,
+    #[envconfig(from = "S3_BUCKET_BASEPATH")]
+    pub bucket_basepath: String,
 }
 
 impl Default for Config {
@@ -29,6 +31,7 @@ impl Default for Config {
             access_key_id: "access_key_id".to_string(),
             secret_access_key: "secret_access_key".to_string(),
             root_path: "/wasm-bin".to_string(),
+            bucket_basepath: "https://s3.us-east-2.amazonaws.com".to_string(),
         }
     }
 }

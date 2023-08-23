@@ -1,11 +1,8 @@
 use anyhow::Result;
 use land_core::confdata::RegionReportData;
-use lazy_static::lazy_static;
-use std::collections::HashMap;
-use tokio::sync::Mutex;
-use tracing::{info, warn, Instrument};
+use tracing::{info, warn};
 
-pub fn region_data_to_model(rg: &RegionReportData, key: String) -> land_dao::Region {
+fn report_data_to_model(rg: &RegionReportData, key: String) -> land_dao::Region {
     let now = chrono::Utc::now();
     land_dao::Region {
         id: 0,
@@ -23,51 +20,19 @@ pub fn region_data_to_model(rg: &RegionReportData, key: String) -> land_dao::Reg
     }
 }
 
-lazy_static! {
-    pub static ref REGIONS: Mutex<HashMap<String, RegionReportData>> = {
-        let map = HashMap::new();
-        Mutex::new(map)
-    };
-}
-
-/// REGION_REFRESH_INTERVAL is the interval to refresh REGIONS to database
-const REGION_REFRESH_INTERVAL: u64 = 30;
-/// REGION_INACTIVE_EXPIRE is the expiry to check if region is inactive
-const REGION_INACTIVE_EXPIRE: u64 = 120;
-
-pub async fn init() {
-    // start 10s interval to update REGIONS to database
-    tokio::spawn(
-        async move {
-            let mut interval =
-                tokio::time::interval(std::time::Duration::from_secs(REGION_REFRESH_INTERVAL));
-            loop {
-                interval.tick().await;
-                match refresh_regions().await {
-                    Ok(_) => {}
-                    Err(e) => {
-                        warn!("refresh regions error: {:?}", e);
-                    }
-                }
-            }
-        }
-        .instrument(tracing::info_span!("[REGION]")),
-    );
-}
-
-async fn refresh_regions() -> Result<()> {
+pub async fn refresh() -> Result<()> {
     // get regions from database
     let saved_regions = land_dao::region::list_maps().await?;
 
     // get active regions from REGIONS
-    let mut regions = REGIONS.lock().await;
+    let mut regions = super::REGIONS.lock().await;
     let now_ts = chrono::Utc::now().timestamp() as u64;
 
     // compare saved_regions and regions
     // iterate regions. if region not in saved_regions, create it to database
     let mut expired_keys = vec![];
     for (key, region_data) in regions.iter_mut() {
-        let expired = now_ts - region_data.time_at > REGION_INACTIVE_EXPIRE;
+        let expired = now_ts - region_data.time_at > super::REGION_INACTIVE_EXPIRE;
         if expired {
             expired_keys.push(key.clone());
         }
@@ -84,7 +49,7 @@ async fn refresh_regions() -> Result<()> {
             continue;
         }
         info!("create {:?}: {:?}", key, region_data);
-        let model = region_data_to_model(region_data, key.clone());
+        let model = report_data_to_model(region_data, key.clone());
         land_dao::region::create(model).await?;
     }
 
@@ -95,7 +60,7 @@ async fn refresh_regions() -> Result<()> {
             continue;
         }
         // region record is not expired
-        if region.updated_at.timestamp() as u64 + REGION_INACTIVE_EXPIRE > now_ts {
+        if region.updated_at.timestamp() as u64 + super::REGION_INACTIVE_EXPIRE > now_ts {
             continue;
         }
         // region record is already inactive

@@ -1,4 +1,4 @@
-use crate::conf;
+use crate::region::conf;
 use anyhow::Result;
 use land_core::confdata::DomainSetting;
 use land_dao::settings;

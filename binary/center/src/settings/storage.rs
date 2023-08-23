@@ -62,16 +62,17 @@ pub async fn init() -> Result<()> {
         return install_storage().await;
     }
     let type_name = std::env::var("STORAGE_TYPE").unwrap_or_else(|_| current_type.clone());
-    match type_name.as_str() {
-        "fs" => {
+    let type_value = land_storage::Type::from_str(&type_name);
+    match type_value {
+        land_storage::Type::Fs => {
             debug!("Init, STORAGE_TYPE:{}", "fs");
             land_storage::reload_fs_global(&local_config).await?;
         }
-        "cloudflare-r2" => {
+        land_storage::Type::CloudflareR2 => {
             debug!("Init, STORAGE_TYPE:{}", "cloudflare-r2");
             land_storage::reload_s3_global(&s3_config).await?;
         }
-        _ => {
+        land_storage::Type::Unknown => {
             anyhow::bail!("STORAGE_TYPE not support");
         }
     }
@@ -85,16 +86,17 @@ async fn install_storage() -> Result<()> {
         error!("STORAGE_TYPE not set");
         anyhow::bail!("STORAGE_TYPE not set");
     }
-    match type_name.as_str() {
-        "fs" => {
+    let type_value = land_storage::Type::from_str(&type_name);
+    match type_value {
+        land_storage::Type::Fs => {
             debug!("Init, STORAGE_TYPE:{}", "fs");
             install_fs().await?;
         }
-        "cloudflare-r2" => {
+        land_storage::Type::CloudflareR2 => {
             debug!("Init, STORAGE_TYPE:{}", "cloudflare-r2");
             install_s3().await?;
         }
-        _ => {
+        land_storage::Type::Unknown => {
             error!("STORAGE_TYPE {} not support", type_name);
             anyhow::bail!("STORAGE_TYPE not support");
         }
