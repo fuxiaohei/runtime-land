@@ -2,11 +2,15 @@ use crate::{conf::process_conf, conf::CONF_VALUES, localip, server};
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use land_core::confdata::{RegionRecvData, RegionReportData};
+use once_cell::sync::OnceCell;
 use std::ops::ControlFlow;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
 use tracing::{debug, debug_span, warn, Instrument};
 use tracing::{info, instrument};
+
+/// CENTER_ADDR is the address of center server
+pub static CENTER_ADDR: OnceCell<String> = OnceCell::new();
 
 async fn build_report_data() -> RegionReportData {
     let localip = localip::IPINFO.get().unwrap().clone();
@@ -24,24 +28,13 @@ async fn build_report_data() -> RegionReportData {
     report_data
 }
 
-#[instrument(name = "[WS]", skip_all)]
-pub async fn init(addr: String, protocol: String, token: String) {
-    let ipinfo = crate::localip::IPINFO.get().unwrap();
-    let url = format!(
-        "{}://{}/v1/region/ws?token={}&region={}",
-        protocol,
-        addr,
-        token,
-        ipinfo.region_ip()
-    );
-    info!("connect to {}", url);
+async fn init_ws(ws_url: String) {
+    info!("connect to {}", ws_url);
 
     let reconnect_interval = std::time::Duration::from_secs(5);
 
     loop {
-        debug!("connect to {} in loop", url);
-
-        let ws_stream = match connect_async(&url).await {
+        let ws_stream = match connect_async(&ws_url).await {
             Ok((stream, _response)) => stream,
             Err(e) => {
                 warn!("Error during handshake {:?}", e);
@@ -101,6 +94,34 @@ pub async fn init(addr: String, protocol: String, token: String) {
         info!("reconnect after {:?}", reconnect_interval);
         tokio::time::sleep(reconnect_interval).await;
     }
+}
+
+#[instrument(name = "[WS]", skip_all)]
+pub async fn init(addr: String, token: String) {
+    let ipinfo = crate::localip::IPINFO.get().unwrap();
+    let protocol = if addr.starts_with("https://") {
+        "wss"
+    } else {
+        "ws"
+    };
+
+    // set CENTER_ADDR
+    let center_addr = if !addr.starts_with("http") {
+        format!("http://{}", addr)
+    } else {
+        addr.clone()
+    };
+    CENTER_ADDR.set(center_addr).unwrap();
+
+    // init ws
+    let ws_url = format!(
+        "{}://{}/v1/region/ws?token={}&region={}",
+        protocol,
+        addr,
+        token,
+        ipinfo.region_ip()
+    );
+    init_ws(ws_url).await;
 }
 
 async fn process_message(msg: Message) -> ControlFlow<(), ()> {

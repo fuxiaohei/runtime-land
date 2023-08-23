@@ -15,8 +15,6 @@ struct Cli {
     pub center_addr: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,
-    #[clap(long, env("CENTER_PROTOCOL"), default_value("ws"))]
-    pub center_protocol: String,
 }
 
 #[tokio::main]
@@ -30,11 +28,7 @@ async fn main() {
 
     conf::init().await.expect("init conf failed");
 
-    tokio::spawn(center::init(
-        args.center_addr,
-        args.center_protocol,
-        args.center_token,
-    ));
+    tokio::spawn(center::init(args.center_addr, args.center_token));
 
     server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[SERVER]"))
