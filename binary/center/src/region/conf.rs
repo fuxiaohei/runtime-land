@@ -73,8 +73,9 @@ async fn build_conf() -> Result<()> {
         match typename.as_str() {
             "s3" => {
                 format!(
-                    "{}/{}",
+                    "{}/{}/{}",
                     s3_config.bucket_basepath.trim_end_matches('/'),
+                    s3_config.root_path.trim_start_matches('/'),
                     path
                 )
             }

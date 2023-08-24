@@ -16,7 +16,7 @@ pub struct Config {
     #[envconfig(from = "S3_SECRET_ACCESS_KEY")]
     secret_access_key: String,
     #[envconfig(from = "S3_ROOT_PATH", default = "/wasm-bin")]
-    root_path: String,
+    pub root_path: String,
     #[envconfig(from = "S3_BUCKET_BASEPATH")]
     pub bucket_basepath: String,
 }
