@@ -1,4 +1,5 @@
 use super::{auth::CurrentUser, params, AppError};
+use crate::region::conf;
 use axum::{http::StatusCode, Extension, Json};
 use land_dao::settings;
 use std::collections::HashMap;
@@ -84,12 +85,22 @@ pub async fn list_settings_storage(
 #[tracing::instrument(name = "[update_settings_storage]", skip_all)]
 pub async fn update_settings_storage(
     Extension(current_user): Extension<CurrentUser>,
-    body: axum::body::Bytes,
+    Json(payload): Json<params::StorageSettingRequest>,
 ) -> Result<StatusCode, AppError> {
     is_admin(&current_user)?;
-    let config = serde_json::from_slice::<land_storage::S3Config>(&body)?;
-    crate::settings::reload_s3(&config).await?;
-    info!("success, config:{:?}", config);
+    match payload.typename.as_str() {
+        "fs" => {
+            crate::settings::reload_fs(&payload.fs.unwrap()).await?;
+        }
+        "s3" => {
+            crate::settings::reload_s3(&payload.s3.unwrap()).await?;
+        }
+        _ => {
+            return Err(anyhow::anyhow!("invalid typename").into());
+        }
+    }
+    info!("success, typename:{:?}", payload.typename);
+    conf::trigger().await;
     Ok(StatusCode::OK)
 }
 

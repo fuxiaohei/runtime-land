@@ -1,10 +1,9 @@
+use crate::settings::{self, load_storage_settings};
 use anyhow::Result;
 use land_core::confdata::{RouteConfItem, RoutesConf};
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 use tracing::{debug, info, warn, Instrument};
-
-use crate::settings;
 
 #[derive(Debug)]
 struct OperationFlag {
@@ -68,6 +67,21 @@ async fn build_conf() -> Result<()> {
 
     debug!("deployments: {:?}", deployments.len());
 
+    let (typename, _, s3_config) = load_storage_settings().await?;
+
+    let build_download_url = |path: &str| -> String {
+        match typename.as_str() {
+            "s3" => {
+                format!(
+                    "{}/{}",
+                    s3_config.bucket_basepath.trim_end_matches('/'),
+                    path
+                )
+            }
+            _ => path.to_string(),
+        }
+    };
+
     let d = settings::DOMAIN.lock().await;
     let prod_domain = d.domain.clone();
 
@@ -77,14 +91,16 @@ async fn build_conf() -> Result<()> {
             format!("{}.{}", deployment.domain, prod_domain),
             deployment.storage_path.clone(),
             deployment.uuid,
+            build_download_url(&deployment.storage_path),
             deployment.updated_at.timestamp() as u64,
         );
         conf_items.push(conf_item);
         if !deployment.prod_domain.is_empty() {
             let conf_item = RouteConfItem::new(
                 format!("{}.{}", deployment.prod_domain, prod_domain),
-                deployment.storage_path,
+                deployment.storage_path.clone(),
                 format!("{}-prod", deployment.project_uuid),
+                build_download_url(&deployment.storage_path),
                 deployment.updated_at.timestamp() as u64,
             );
             conf_items.push(conf_item);

@@ -1,4 +1,5 @@
 use crate::{conf::process_conf, conf::CONF_VALUES, localip, server};
+use anyhow::Result;
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use land_core::confdata::{RegionRecvData, RegionReportData};
@@ -6,7 +7,7 @@ use once_cell::sync::OnceCell;
 use std::ops::ControlFlow;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::Message;
-use tracing::{debug, debug_span, warn, Instrument};
+use tracing::{debug, debug_span, error, warn, Instrument};
 use tracing::{info, instrument};
 
 /// CENTER_ADDR is the address of center server
@@ -17,15 +18,14 @@ async fn build_report_data() -> RegionReportData {
     let region = localip.region();
     let runtimes = server::get_living_runtimes().await;
     let local_conf = CONF_VALUES.lock().await;
-    let report_data = RegionReportData {
+    RegionReportData {
         localip,
         region,
         runtimes,
         conf_value_time_version: local_conf.created_at,
         time_at: chrono::Utc::now().timestamp() as u64,
         owner_id: 0,
-    };
-    report_data
+    }
 }
 
 async fn init_ws(ws_url: String) {
@@ -97,27 +97,27 @@ async fn init_ws(ws_url: String) {
 }
 
 #[instrument(name = "[WS]", skip_all)]
-pub async fn init(addr: String, token: String) {
-    let ipinfo = crate::localip::IPINFO.get().unwrap();
-    let protocol = if addr.starts_with("https://") {
-        "wss"
-    } else {
-        "ws"
-    };
-
+pub async fn init(center_url: String, token: String) {
     // set CENTER_ADDR
-    let center_addr = if !addr.starts_with("http") {
-        format!("http://{}", addr)
+    let center_addr = if !center_url.starts_with("http") {
+        format!("http://{}", center_url)
     } else {
-        addr.clone()
+        center_url.clone()
     };
-    CENTER_ADDR.set(center_addr).unwrap();
+    CENTER_ADDR.set(center_addr.clone()).unwrap();
+
+    // set websocket protocol follow http protocol
+    let ws_addr = if center_addr.starts_with("https://") {
+        center_addr.replace("https://", "wss://")
+    } else {
+        center_addr.replace("http://", "ws://")
+    };
 
     // init ws
+    let ipinfo = crate::localip::IPINFO.get().unwrap();
     let ws_url = format!(
-        "{}://{}/v1/region/ws?token={}&region={}",
-        protocol,
-        addr,
+        "{}/v1/region/ws?token={}&region={}",
+        ws_addr,
         token,
         ipinfo.region_ip()
     );
@@ -130,7 +130,14 @@ async fn process_message(msg: Message) -> ControlFlow<(), ()> {
             debug!("recv text: {:?}", t);
         }
         Message::Binary(d) => {
-            let recv_data: RegionRecvData = serde_json::from_slice(&d).unwrap();
+            let recv_data: RegionRecvData = match serde_json::from_slice(&d) {
+                Ok(data) => data,
+                Err(e) => {
+                    error!("parse region data error: {:?}", e);
+                    return ControlFlow::Continue(());
+                }
+            };
+
             process_conf(recv_data.conf_values).await;
         }
         Message::Close(c) => {
@@ -152,4 +159,17 @@ async fn process_message(msg: Message) -> ControlFlow<(), ()> {
         }
     }
     ControlFlow::Continue(())
+}
+
+/// request_file request file from center server
+pub async fn request_file(download_url: &str) -> Result<reqwest::Response> {
+    let resp = reqwest::get(download_url).await?;
+    if !resp.status().is_success() {
+        return Err(anyhow::anyhow!(
+            "request file failed, status: {}, url:{}",
+            resp.status(),
+            download_url,
+        ));
+    }
+    Ok(resp)
 }

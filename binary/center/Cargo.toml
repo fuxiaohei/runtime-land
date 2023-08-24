@@ -12,6 +12,7 @@ clap = { workspace = true }
 envconfig = { workspace = true }
 futures-util = { workspace = true }
 headers = "0.3.8"
+hyper = { workspace = true }
 land-core = { workspace = true }
 land-dao = { workspace = true }
 land-storage = { workspace = true }
@@ -30,4 +31,3 @@ tokio = { workspace = true }
 tower-http = { version = "0.4.3", features = ["cors", "trace"] }
 tracing = { workspace = true }
 validator = { version = "0.16.1", features = ["derive"] }
-hyper = { workspace = true }

@@ -11,9 +11,9 @@ once_cell = { workspace = true }
 opendal = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+strum = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-strum = { workspace = true }
 
 [lib]
 doctest = false

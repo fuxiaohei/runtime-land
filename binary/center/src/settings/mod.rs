@@ -11,6 +11,7 @@ mod storage;
 pub use storage::init as init_storage;
 pub use storage::load_settings as load_storage_settings;
 pub use storage::reload_s3;
+pub use storage::reload_fs;
 
 /// DOMAIN is the domain to access the function
 pub static DOMAIN: Lazy<Mutex<DomainSetting>> = Lazy::new(|| {

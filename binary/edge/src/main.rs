@@ -11,8 +11,8 @@ mod server;
 struct Cli {
     #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7902"))]
     pub http_addr: String,
-    #[clap(long, env("CENTER_ADDR"), default_value("127.0.0.1:7901"))]
-    pub center_addr: String,
+    #[clap(long, env("CENTER_URL"), default_value("http://127.0.0.1:7901"))]
+    pub center_url: String,
     #[clap(long, env("CENTER_TOKEN"))]
     pub center_token: String,
 }
@@ -28,7 +28,7 @@ async fn main() {
 
     conf::init().await.expect("init conf failed");
 
-    tokio::spawn(center::init(args.center_addr, args.center_token));
+    tokio::spawn(center::init(args.center_url, args.center_token));
 
     server::start(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[SERVER]"))

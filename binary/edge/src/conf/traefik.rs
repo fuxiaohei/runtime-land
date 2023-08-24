@@ -1,4 +1,4 @@
-use super::ConfOperatorTrait;
+use super::operator::ConfOperatorTrait;
 use anyhow::Result;
 use async_trait::async_trait;
 use envconfig::Envconfig;
@@ -33,6 +33,8 @@ impl TraefikOperator {
         }
     }
     async fn deploy_inner(&self, item: &RouteConfItem) -> Result<()> {
+        debug!("deploy item: {:?}", item);
+
         let mut commands: Vec<(String, String)> = vec![];
         commands.push((
             format!("traefik/http/routers/{}/rule", item.key),
@@ -68,7 +70,10 @@ impl TraefikOperator {
         }
 
         // download file
-        super::store::save_remote_to_local(&item.module).await?;
+        // if uses local file system, it skips
+        if item.download_url.starts_with("http") {
+            super::store::download_file(&item.download_url, &item.module).await?;
+        }
 
         Ok(())
     }

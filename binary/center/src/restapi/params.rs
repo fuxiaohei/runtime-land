@@ -207,3 +207,10 @@ pub struct UpdatePasswordRequest {
     pub confirm_password: String,
     pub current_password: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StorageSettingRequest {
+    pub typename: String,
+    pub fs: Option<land_storage::FsConfig>,
+    pub s3: Option<land_storage::S3Config>,
+}

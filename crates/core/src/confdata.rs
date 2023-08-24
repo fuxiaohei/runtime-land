@@ -10,12 +10,19 @@ pub struct RouteConfItem {
     pub key: String,
     pub time_at: u64,
     pub md5: String,
+    pub download_url: String,
 }
 
 impl RouteConfItem {
-    pub fn new(domain: String, module: String, key: String, time_at: u64) -> Self {
+    pub fn new(
+        domain: String,
+        module: String,
+        key: String,
+        download_url: String,
+        time_at: u64,
+    ) -> Self {
         let mut hasher = Md5::new();
-        hasher.update(format!("{}-{}-{}", domain, module, key));
+        hasher.update(format!("{}|{}|{}|{}", domain, module, key, download_url));
         let result = hasher.finalize();
         let md5 = format!("{:x}", result);
         Self {
@@ -24,6 +31,7 @@ impl RouteConfItem {
             key,
             time_at,
             md5,
+            download_url,
         }
     }
 }

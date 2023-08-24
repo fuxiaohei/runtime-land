@@ -10,9 +10,8 @@ pub async fn build_data() -> Result<RegionRecvData> {
         storage_basepath: String::new(),
     };
 
-    let (type_key_value, _local_config, s3_config) = load_storage_settings().await?;
-    let type_value = land_storage::Type::from_str(&type_key_value.as_str());
-    if type_value == land_storage::Type::CloudflareR2 {
+    let (typename, _local_config, s3_config) = load_storage_settings().await?;
+    if typename == "s3" {
         send_data.storage_basepath = s3_config.bucket_basepath;
     }
     Ok(send_data)

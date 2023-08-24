@@ -1,56 +1,33 @@
 use anyhow::Result;
-use envconfig::Envconfig;
 use futures_util::StreamExt;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
 use tracing::debug;
 
+use crate::center;
+
 pub static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
 
-static REMOTE_STORE: OnceCell<Operator> = OnceCell::new();
-static REMOTE_STORE_ENABLED: OnceCell<bool> = OnceCell::new();
-
-#[derive(Envconfig, Debug)]
-pub struct Config {
-    #[envconfig(from = "REMOTE_STORE_TYPE", default = "cloudflare-r2")]
-    pub remote_store_type: String,
-    #[envconfig(from = "REMOTE_STORE_ENABLED", default = "true")]
-    pub remote_store_enabled: bool,
-}
-
 pub async fn init() -> Result<()> {
-    let cfg = Config::init_from_env().unwrap();
-    debug!("Init storage cfg: {:?}", cfg);
-
     let local_op = land_storage::build_operator("fs").await?;
     LOCAL_STORE
         .set(local_op)
         .map_err(|_| anyhow::anyhow!("set local store error"))?;
 
-    if cfg.remote_store_enabled {
-        let remote_op = land_storage::build_operator(&cfg.remote_store_type).await?;
-        REMOTE_STORE
-            .set(remote_op)
-            .map_err(|_| anyhow::anyhow!("set remote store error"))?;
-        REMOTE_STORE_ENABLED.set(true).unwrap();
-    } else {
-        REMOTE_STORE_ENABLED.set(false).unwrap();
-    }
-
     Ok(())
 }
 
-/// save_remote_to_local saves the remote file to local
-pub async fn save_remote_to_local(path: &str) -> Result<()> {
-    if REMOTE_STORE_ENABLED.get().unwrap() == &false {
+/// download_file saves the remote file to local
+pub async fn download_file(download_url: &str, path: &str) -> Result<()> {
+    // if local file exist, skip download
+    let local_op = LOCAL_STORE.get().unwrap();
+    if local_op.is_exist(path).await? {
+        debug!("local file exist, path: {}", path);
         return Ok(());
     }
-    let remote_op = REMOTE_STORE.get().unwrap();
-    let local_op = LOCAL_STORE.get().unwrap();
-
-    let mut reader = remote_op.reader(path).await?;
+    let resp = center::request_file(download_url).await?;
+    let mut reader = resp.bytes_stream();
     let mut writer = local_op.writer(path).await?;
-    // reader is Stream<Item = <io::Result<Bytes>>>, so write bytes to writer via pipeline
     while let Some(bytes) = reader.next().await {
         let bytes = bytes?;
         writer.write(bytes).await?;

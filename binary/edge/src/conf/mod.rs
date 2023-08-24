@@ -1,10 +1,10 @@
 use anyhow::Result;
-use async_trait::async_trait;
 use land_core::confdata::{RouteConfItem, RoutesConf};
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
-use tracing::{info, instrument, warn};
+use tracing::{debug, info, instrument, warn};
 
+mod operator;
 mod store;
 mod traefik;
 
@@ -17,10 +17,6 @@ lazy_static! {
 
 /// CONF_LOCAL_FILE is the local file name for conf
 const CONF_LOCAL_FILE: &str = "edge-conf.json";
-
-/// OPERATOR is the conf operator
-pub static OPERATOR: once_cell::sync::OnceCell<Box<dyn ConfOperatorTrait + Send + Sync>> =
-    once_cell::sync::OnceCell::new();
 
 /// init conf
 #[instrument(name = "[Conf]")]
@@ -41,22 +37,7 @@ pub async fn init() -> Result<()> {
     }
 
     // init operator
-    let operator_type =
-        std::env::var("CONF_OPERATOR_TYPE").unwrap_or_else(|_| "traefik-redis".to_string());
-    info!("operator type: {}", operator_type);
-    match operator_type.as_str() {
-        "traefik-redis" => {
-            let mut op = traefik::TraefikOperator::new();
-            op.init().await?;
-            OPERATOR
-                .set(Box::new(op))
-                .map_err(|_| anyhow::anyhow!("set operator error"))?;
-            info!("init operator: {:?}", operator_type);
-        }
-        _ => {
-            return Err(anyhow::anyhow!("operator unknown"));
-        }
-    }
+    operator::init_operator().await?;
 
     Ok(())
 }
@@ -94,7 +75,7 @@ async fn compare_conf(
 }
 
 pub async fn process_conf(remote_conf: RoutesConf) {
-    println!("process conf: {:?}", remote_conf);
+    debug!("remote conf: {:?}", remote_conf.items.len());
 
     let mut local_conf = CONF_VALUES.lock().await;
     if local_conf.created_at > remote_conf.created_at {
@@ -102,13 +83,14 @@ pub async fn process_conf(remote_conf: RoutesConf) {
         return;
     }
 
+    // compare remote conf and local conf
     let (updates, removes) = compare_conf(&remote_conf, &local_conf).await;
 
-    info!("updates: {:?}", updates);
-    info!("removes: {:?}", removes);
+    info!("updates: {:?}", updates.len());
+    info!("removes: {:?}", removes.len());
 
-    let operator = OPERATOR.get().unwrap();
-
+    // deploy updates
+    let operator = operator::OPERATOR.get().unwrap();
     for item in updates {
         match operator.deploy(item.clone()).await {
             Ok(_) => {
@@ -119,7 +101,7 @@ pub async fn process_conf(remote_conf: RoutesConf) {
             }
         }
     }
-
+    // delete removes
     for item in removes {
         match operator.remove(item.clone()).await {
             Ok(_) => {
@@ -131,6 +113,7 @@ pub async fn process_conf(remote_conf: RoutesConf) {
         }
     }
 
+    // update local conf
     local_conf.items = remote_conf.items;
     local_conf.created_at = remote_conf.created_at;
     match write_conf(&local_conf).await {
@@ -159,11 +142,4 @@ async fn exist_conf() -> Result<bool> {
     let s = store::LOCAL_STORE.get().unwrap();
     let exist = s.is_exist(CONF_LOCAL_FILE).await?;
     Ok(exist)
-}
-
-#[async_trait]
-pub trait ConfOperatorTrait {
-    async fn init(&mut self) -> Result<()>;
-    async fn deploy(&self, item: RouteConfItem) -> Result<()>;
-    async fn remove(&self, item: RouteConfItem) -> Result<()>;
 }
