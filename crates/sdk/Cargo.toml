@@ -3,6 +3,8 @@ name = "land-sdk"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
+description = "land sdk API"
+license = "Apache-2.0"
 
 [dependencies]
 anyhow = { workspace = true }
