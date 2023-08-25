@@ -3,6 +3,8 @@ name = "land-sdk-macro"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
+description = "Land SDK macro provides a procedural macro to generate Land SDK code."
+license = "Apache-2.0"
 
 [dependencies]
 anyhow = { workspace = true }
