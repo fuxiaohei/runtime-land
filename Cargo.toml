@@ -40,20 +40,20 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-rc.2"
+version = "0.1.0-rc.3"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.0-rc.2" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-rc.2" }
-land-sdk = { path = "crates/sdk", version = "0.1.0-rc.2" }
-land-core = { path = "crates/core", version = "0.1.0-rc.2" }
-land-dao = { path = "crates/dao", version = "0.1.0-rc.2" }
-land-storage = { path = "crates/storage", version = "0.1.0-rc.2" }
+land-worker = { path = "crates/worker", version = "0.1.0-rc.3" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.0-rc.3" }
+land-sdk = { path = "crates/sdk", version = "0.1.0-rc.3" }
+land-core = { path = "crates/core", version = "0.1.0-rc.3" }
+land-dao = { path = "crates/dao", version = "0.1.0-rc.3" }
+land-storage = { path = "crates/storage", version = "0.1.0-rc.3" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
-clap = { version = "4.3.24", features = ["derive", "env"] }
+clap = { version = "4.4.0", features = ["derive", "env"] }
 tokio = { version = "1.32.0", features = ["full"] }
 tracing = "0.1.37"
 lazy_static = "1.4.0"
@@ -70,12 +70,12 @@ wit-bindgen = "0.10.0"
 async-trait = "0.1.73"
 hyper = { version = "0.14.27", features = ["full"] }
 uuid = { version = "1.4.1", features = ["v4"] }
-wasmtime = { version = "12.0.0", features = ["component-model", "async"] }
-wasmtime-wasi = "12.0.0"
+wasmtime = { version = "12.0.1", features = ["component-model", "async"] }
+wasmtime-wasi = "12.0.1"
 wit-bindgen-core = "0.10.0"
 wit-bindgen-rust = "0.10.0"
-wit-component = "0.13.2"
-serde = { version = "1.0.186", features = ["derive"] }
+wit-component = "0.14.0"
+serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.105"
 reqwest = { version = "0.11.20", default-features = false, features = [
     "stream",

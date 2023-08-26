@@ -70,7 +70,7 @@ fn copy_recursively(
 
 fn copy_guest_code_to_sdk() {
     let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
-    let expects = vec![
+    let expects = [
         ("http_handler.rs", "crates/sdk-macro/src/http_handler.rs"),
         ("http_service.rs", "crates/sdk/src/http_service.rs"),
     ];

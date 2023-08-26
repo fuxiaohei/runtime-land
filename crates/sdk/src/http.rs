@@ -23,3 +23,6 @@ pub fn error_response(status: http::StatusCode, message: String) -> Response {
     *response.status_mut() = status;
     response
 }
+
+/// Error type for SDK, alias to `anyhow::Error`
+pub type Error = anyhow::Error;

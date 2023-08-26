@@ -3,44 +3,44 @@
 //! # Example
 //!
 //! ```no_run
-//! use land_sdk::http::{Body, Request, Response};
+//! use land_sdk::http::{Body, Error, Request, Response};
 //! use land_sdk::http_main;
 //! use land_sdk::router;
 //!
 //! #[http_main]
-//! pub fn handle_http_request(mut req: Request) -> Response {
+//! pub fn handle_http_request(mut req: Request) -> Result<Response, Error> {
 //!     router::get("/hello", echo_hello).unwrap();
 //!     router::get("/foo/bar", echo_foo_bar).unwrap();
 //!     router::get("/params/:value", echo_params).unwrap();
 //!     router::route(req)
 //! }
 //!
-//! pub fn echo_hello(_req: Request) -> Response {
-//!     http::Response::builder()
+//! pub fn echo_hello(_req: Request) -> Result<Response, Error> {
+//!     Ok(http::Response::builder()
 //!         .status(200)
 //!         .body(Body::from("Hello, World"))
-//!         .unwrap()
+//!         .unwrap())
 //! }
 //!
-//! pub fn echo_foo_bar(_req: Request) -> Response {
-//!     http::Response::builder()
+//! pub fn echo_foo_bar(_req: Request) -> Result<Response, Error> {
+//!     Ok(http::Response::builder()
 //!         .status(200)
 //!         .body(Body::from("Foo Bar"))
-//!         .unwrap()
+//!         .unwrap())
 //! }
 //!
-//! pub fn echo_params(req: Request) -> Response {
+//! pub fn echo_params(req: Request) -> Result<Response, Error> {
 //!     let value = router::params(&req, "value".to_string()).unwrap();
-//!     http::Response::builder()
+//!     Ok(http::Response::builder()
 //!         .status(200)
 //!         .body(Body::from(format!("value: {value}")))
-//!         .unwrap()
+//!         .unwrap())
 //! }
 //!
 //! ```
 //!
 
-use crate::http::{error_response, Request, Response};
+use crate::http::{error_response, Error, Request, Response};
 use http::{Method, StatusCode};
 use matchit::Router;
 use std::collections::HashMap;
@@ -51,7 +51,7 @@ use std::sync::{Arc, Mutex};
 /// trait Handler for handle http request
 pub trait Handler: Send + Sync + 'static {
     /// call is a function for handle http request
-    fn call(&self, req: Request) -> Response;
+    fn call(&self, req: Request) -> Result<Response, Error>;
 }
 
 impl Debug for dyn Handler {
@@ -62,9 +62,9 @@ impl Debug for dyn Handler {
 
 impl<F> Handler for F
 where
-    F: Send + Sync + 'static + Fn(Request) -> Response,
+    F: Send + Sync + 'static + Fn(Request) -> Result<Response, Error>,
 {
-    fn call<'a>(&'_ self, req: Request) -> Response {
+    fn call<'a>(&'_ self, req: Request) -> Result<Response, Error> {
         (self)(req)
     }
 }
@@ -120,7 +120,7 @@ pub fn any(
 }
 
 /// route runs handler
-pub fn route(mut req: Request) -> Response {
+pub fn route(mut req: Request) -> Result<Response, Error> {
     // get method and path to match router
     let method = req.method().clone();
     let path = req.uri().clone();
@@ -133,7 +133,10 @@ pub fn route(mut req: Request) -> Response {
     // match router
     let matched = router.at(path);
     if matched.is_err() {
-        return error_response(StatusCode::NOT_FOUND, "route mismatch".to_string());
+        return Ok(error_response(
+            StatusCode::NOT_FOUND,
+            "route mismatch".to_string(),
+        ));
     }
 
     // prepare params
@@ -161,29 +164,29 @@ pub fn params(req: &Request, key: String) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::http::{Body, Request, Response};
+    use crate::http::{Body, Error, Request, Response};
 
     #[test]
     fn test_handler_impl() {
-        let handler: Arc<dyn Handler> = Arc::new(|_req: Request| Response::new(Body::new(2)));
+        let handler: Arc<dyn Handler> = Arc::new(|_req: Request| Ok(Response::new(Body::new(2))));
         let req = http::Request::builder()
             .uri("/")
             .body(Body::new(1))
             .unwrap();
-        let resp = handler.call(req);
+        let resp = handler.call(req).unwrap();
         assert_eq!(resp.status(), 200);
         assert_eq!(resp.body().body_handle(), 2);
     }
 
-    pub fn test_route_1(req: Request) -> Response {
+    pub fn test_route_1(req: Request) -> Result<Response, Error> {
         let url = req.uri().clone();
         let method = req.method().to_string().to_uppercase();
-        http::Response::builder()
+        Ok(http::Response::builder()
             .status(200)
             .header("X-Request-Url", url.to_string())
             .header("X-Request-Method", method)
             .body(Body::new(2))
-            .unwrap()
+            .unwrap())
     }
 
     #[test]
@@ -212,7 +215,7 @@ mod tests {
                 .uri("/abc")
                 .body(Body::new(1))
                 .unwrap();
-            let resp = handler.value.call(req);
+            let resp = handler.value.call(req).unwrap();
             assert_eq!(resp.status(), 200);
         }
         Ok(())
@@ -245,7 +248,7 @@ mod tests {
             let p = params(&req, "path".to_string());
             assert_eq!(p, Some("abc".to_string()));
 
-            let resp = handler.value.call(req);
+            let resp = handler.value.call(req).unwrap();
             assert_eq!(resp.status(), 200);
         }
         Ok(())

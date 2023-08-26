@@ -4,7 +4,7 @@
 //!
 //! This macro is used to develop Runtime.land functions in `land-sdk`.
 //! It should not be used directly.
-//! 
+//!
 //! # Hello World
 //!
 //! ```no_run
@@ -89,7 +89,15 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
                 // convert wasm_request to sdk_request
                 let sdk_request: Request = req.try_into().unwrap();
-                let sdk_response = #func_name(sdk_request);
+                let sdk_response = match #func_name(sdk_request){
+                    Ok(r) => r,
+                    Err(e) => {
+                        land_sdk::http::error_response(
+                            http::StatusCode::INTERNAL_SERVER_ERROR,
+                            e.to_string(),
+                        )
+                    }
+                };
 
                 let sdk_response_body_handle = sdk_response.body().body_handle();
                 // convert sdk_response to wasm_response
