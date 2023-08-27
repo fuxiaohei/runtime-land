@@ -18,3 +18,52 @@ pub async fn test_rust_basic(wasm: &str) -> Result<()> {
     assert_eq!(headers.get("x-served-by").unwrap(), "land-edge");
     Ok(())
 }
+
+pub async fn test_rust_fetch(wasm: &str) -> Result<()> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(RUMTIME_SERVER)
+        .header("x-land-module", wasm)
+        .send()
+        .await?;
+    info!("resp: {:?}", resp);
+    assert_eq!(resp.status(), 200);
+    let body = resp.text().await?;
+    assert!(body.contains("Rust Programming Language"));
+    Ok(())
+}
+
+pub async fn test_rust_router(wasm: &str) -> Result<()> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(format!("{}/hello", RUMTIME_SERVER))
+        .header("x-land-module", wasm)
+        .send()
+        .await?;
+    info!("resp: {:?}", resp);
+    assert_eq!(resp.status(), 200);
+    let body = resp.text().await?;
+    assert_eq!(body, "Hello, World");
+
+    let resp = client
+        .get(format!("{}/foo/bar", RUMTIME_SERVER))
+        .header("x-land-module", wasm)
+        .send()
+        .await?;
+    info!("resp: {:?}", resp);
+    assert_eq!(resp.status(), 200);
+    let body = resp.text().await?;
+    assert_eq!(body, "Foo Bar");
+
+    let resp = client
+        .get(format!("{}/params/xyz", RUMTIME_SERVER))
+        .header("x-land-module", wasm)
+        .send()
+        .await?;
+    info!("resp: {:?}", resp);
+    assert_eq!(resp.status(), 200);
+    let body = resp.text().await?;
+    assert_eq!(body, "value: xyz");
+
+    Ok(())
+}

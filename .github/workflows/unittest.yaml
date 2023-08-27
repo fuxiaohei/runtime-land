@@ -23,6 +23,10 @@ jobs:
           rustup component add rustfmt
           rustup target add wasm32-wasi
           cargo install wasm-tools
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "unittest"
       - name: Build testing wasm
         run: ./tests/build_tests_wasm.sh
       - name: Run Tests
