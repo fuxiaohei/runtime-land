@@ -80,6 +80,7 @@ pub async fn init() {
     info!("Load args: {:?}", cfg);
     if !cfg.sync_enabled {
         warn!("sync disabled");
+        return;
     }
     tokio::spawn(sync_interval(cfg));
 }

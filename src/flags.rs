@@ -5,6 +5,8 @@ use path_slash::PathBufExt as _;
 use std::path::{Path, PathBuf};
 use tracing::{debug, debug_span, info, Instrument};
 
+static SDK_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 /// Command Init
 #[derive(Args, Debug)]
 pub struct Init {
@@ -99,6 +101,13 @@ impl Init {
             .unwrap()
             .to_string();
         content = content.replace(template, name);
+        // SDK_VERSION from SDK_VERSION env or const
+        content = content.replace(
+            "{{sdk_version}}",
+            std::env::var("SDK_VERSION")
+                .unwrap_or(format!("\"{}\"", SDK_VERSION))
+                .as_str(),
+        );
         std::fs::write(target_file.to_str().unwrap(), content).unwrap();
 
         info!("Created Cargo.toml: {:?}", target_file);

@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.75"
 http = "0.2.9"
-land-sdk = "0.0.4"
+land-sdk = {{sdk_version}}
 wit-bindgen = "0.10.0"
 
 [lib]
