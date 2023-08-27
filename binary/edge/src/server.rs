@@ -53,8 +53,12 @@ async fn sync_handler(Json(mut payload): Json<RuntimeData>) -> Response<Body> {
     let mut runtimes = RUNTIMES.lock().unwrap();
     runtimes.insert(payload.hostname.clone(), payload);
 
-    let builder = Response::builder().status(204);
-    builder.body(Body::empty()).unwrap()
+    let builder = Response::builder().status(200);
+    let body = serde_json::to_string(&land_core::confdata::RuntimeRecvData {
+        region_name: crate::localip::REGION_NAME.get().unwrap().clone(),
+    })
+    .unwrap();
+    builder.body(Body::from(body)).unwrap()
 }
 
 pub async fn start(addr: SocketAddr) -> Result<()> {

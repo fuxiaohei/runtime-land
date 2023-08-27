@@ -61,6 +61,12 @@ pub async fn wasm_caller_handler(
     if builder.headers_ref().unwrap().get("x-request-id").is_none() {
         builder = builder.header("x-request-id", req_id.clone());
     }
+    builder = builder.header(
+        "x-served-by",
+        crate::edge::SERVER_NAME
+            .get()
+            .unwrap_or(&String::from("land-edge")),
+    );
     if wasm_resp.status >= 400 {
         warn!( status=%wasm_resp.status, "[Response]");
     } else {
@@ -92,6 +98,12 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
         let _enter = span.enter();
         let mut builder = Response::builder().status(404);
         builder = builder.header("x-request-id", req_id);
+        builder = builder.header(
+            "x-served-by",
+            crate::edge::SERVER_NAME
+                .get()
+                .unwrap_or(&String::from("land-edge")),
+        );
         warn!(status = 404, "[Response] x-land-module not found");
         return builder.body(Body::from("x-land-module not found")).unwrap();
     }
@@ -105,6 +117,12 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
             warn!(status = 500, "[Response] {}", e.to_string());
             let mut builder = Response::builder().status(500);
             builder = builder.header("x-request-id", req_id);
+            builder = builder.header(
+                "x-served-by",
+                crate::edge::SERVER_NAME
+                    .get()
+                    .unwrap_or(&String::from("land-edge")),
+            );
             builder.body(Body::from(e.to_string())).unwrap()
         }
     }

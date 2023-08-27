@@ -110,6 +110,11 @@ pub struct RegionRecvData {
     pub storage_basepath: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RuntimeRecvData {
+    pub region_name: String,
+}
+
 #[derive(Debug)]
 /// DomainSetting is the domain settings
 pub struct DomainSetting {

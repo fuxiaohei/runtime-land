@@ -1,11 +1,15 @@
 use anyhow::Result;
 use land_core::confdata::RegionIPInfo;
-use std::sync::OnceLock;
+use once_cell::sync::OnceCell;
 use tracing::{debug, info, instrument};
 
 const IPINFO_LINK: &str = "https://ipinfo.io/json";
 const IPINFO_LOCAL_FILE: &str = "ipinfo.json";
-pub static IPINFO: OnceLock<RegionIPInfo> = OnceLock::new();
+
+// IPINFO is the local ip info
+pub static IPINFO: OnceCell<RegionIPInfo> = OnceCell::new();
+// REGION_NAME is the region name
+pub static REGION_NAME: OnceCell<String> = OnceCell::new();
 
 /*
 {
@@ -35,6 +39,7 @@ pub async fn init() -> Result<()> {
         }
     };
     info!("ip : {:?}, region: {}", ip, ip.region());
+    REGION_NAME.get_or_init(|| ip.region());
     IPINFO.get_or_init(|| ip);
     Ok(())
 }

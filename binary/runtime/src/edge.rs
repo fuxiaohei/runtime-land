@@ -1,5 +1,6 @@
 use envconfig::Envconfig;
 use land_core::confdata::RuntimeData;
+use once_cell::sync::OnceCell;
 use sysinfo::{CpuExt, System, SystemExt};
 use tracing::{debug, info, instrument, warn};
 
@@ -9,9 +10,12 @@ pub struct Config {
     addr: String,
     #[envconfig(from = "EDGE_SYNC_ENABLED", default = "true")]
     sync_enabled: bool,
-    #[envconfig(from = "EDGE_SYNC_INTERVAL", default = "1")]
+    #[envconfig(from = "EDGE_SYNC_INTERVAL", default = "5")]
     sync_interval: u64,
 }
+
+/// SERVER_NAME is the name of region
+pub static SERVER_NAME: OnceCell<String> = OnceCell::new();
 
 #[instrument(skip_all, name = "[EDGE]")]
 async fn sync_interval(cfg: Config) {
@@ -19,6 +23,7 @@ async fn sync_interval(cfg: Config) {
 
     let mut sys = System::new_all();
     let url = format!("{}/v1/sync", cfg.addr);
+    let client = reqwest::Client::new();
 
     loop {
         interval.tick().await;
@@ -40,7 +45,7 @@ async fn sync_interval(cfg: Config) {
             used_memory,
             updated_at: now_ts,
         };
-        let client = reqwest::Client::new();
+
         let resp = match client.post(&url).json(&data).send().await {
             Ok(resp) => resp,
             Err(e) => {
@@ -48,11 +53,24 @@ async fn sync_interval(cfg: Config) {
                 continue;
             }
         };
-        if resp.status().is_success() {
-            debug!("sync success");
-        } else {
+        if !resp.status().is_success() {
             warn!("sync responst status failed: {}", resp.status());
+            // sleep 5s to retry
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            continue;
         }
+
+        let recv = match resp.json::<land_core::confdata::RuntimeRecvData>().await {
+            Ok(recv) => recv,
+            Err(e) => {
+                warn!("sync response json failed: {}", e);
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                continue;
+            }
+        };
+
+        debug!("sync recv: {:?}", recv);
+        SERVER_NAME.get_or_init(|| recv.region_name);
     }
 }
 
