@@ -65,6 +65,10 @@ jobs:
         with:
           name: integration-test
       - name: Run integration-test
-        run: ./integration-test
+        run: |
+          chmod +x ./integration-test
+          chmod +x ./land-cli
+          chmod +x ./land-runtime
+          ./integration-test
         env:
           SDK_VERSION: "{ git = \"https://github.com/fuxiaohei/runtime-land\" }"
