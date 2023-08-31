@@ -20,7 +20,7 @@ impl Host for HttpContext {
             return Ok(Ok((vec![], true))); // end of stream
         }
         let chunk = chunk.unwrap().unwrap();
-        debug!("read chunk: {}", chunk.len());
+        debug!("read chunk: {}, handle: {}", chunk.len(), handle);
         Ok(Ok((chunk.to_vec(), false)))
     }
 
