@@ -9,7 +9,7 @@ use reqwest::redirect;
 use std::collections::HashMap;
 use std::str::FromStr;
 use tokio::sync::Mutex;
-use tracing::{debug, instrument, warn};
+use tracing::{debug, info, instrument, warn};
 
 /// CLIENTS_POOL is a global pool of HTTP clients with options key
 static CLIENTS_POOL: Lazy<Mutex<HashMap<String, reqwest::Client>>> =
@@ -39,7 +39,7 @@ impl TryFrom<RedirectPolicy> for redirect::Policy {
 
 #[async_trait::async_trait]
 impl Host for HttpContext {
-    #[instrument(skip_all, name = "[Fetch]", level = "debug", fields(req_id = self.req_id, counter = self.fetch_counter))]
+    #[instrument(skip_all, name = "[Fetch]", level = "warn", fields(req_id = self.req_id, counter = self.fetch_counter))]
     async fn fetch_request(
         &mut self,
         request: Request,
@@ -66,6 +66,8 @@ impl Host for HttpContext {
             }
         };
 
+        info!("fetch: {} {}", request.method, request.uri);
+
         let fetch_response = match client
             .request(
                 reqwest::Method::from_str(request.method.as_str()).unwrap(),
@@ -79,6 +81,10 @@ impl Host for HttpContext {
             Ok(r) => r,
             Err(e) => {
                 warn!("failed: {e}");
+                let content = e.to_string();
+                if content.contains("connect") {
+                    return Ok(Err(RequestError::NetworkError));
+                }
                 return Ok(Err(RequestError::InvalidRequest));
             }
         };

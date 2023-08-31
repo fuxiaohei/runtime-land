@@ -83,7 +83,7 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        impl http_incoming::HttpIncoming for HttpImpl {
+        impl http_incoming::Guest for HttpImpl {
             fn handle_request(req: http_incoming::Request) -> http_incoming::Response {
                 #func
 

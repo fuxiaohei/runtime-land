@@ -40,12 +40,14 @@ impl Body {
         let resp = http_body_read(self.body_handle);
         Ok(resp.unwrap())
     }
-    pub fn into_bytes(self) -> Result<Vec<u8>> {
+
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
         match http_body_read_all(self.body_handle) {
             Ok(resp) => Ok(resp),
             Err(e) => Err(e.into()),
         }
     }
+    
     pub fn write(&self, data: &[u8]) -> Result<u64> {
         if !self.is_streaming {
             return Err(anyhow::anyhow!("body is not streaming"));

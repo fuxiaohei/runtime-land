@@ -10,8 +10,8 @@ Add this to your `Cargo.toml`:
 [dependencies]
 anyhow = "1.0.75"
 http = "0.2.9"
-land-sdk = "0.1.0"
-wit-bindgen = "0.10.0"
+land-sdk = "0.1.1"
+wit-bindgen = "0.11.0"
 
 [lib]
 crate-type = ["cdylib"] # target wasm32-wasi

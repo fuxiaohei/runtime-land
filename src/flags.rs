@@ -191,7 +191,7 @@ pub struct Deploy {
     #[clap(
         long,
         env("API_ADDR"),
-        default_value("https://center-api.runtime.land")
+        default_value("https://center.runtime.land")
     )]
     pub api_addr: Option<String>,
     /// The project name override meta.toml

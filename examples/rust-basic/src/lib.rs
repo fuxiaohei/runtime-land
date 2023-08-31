@@ -9,6 +9,5 @@ pub fn handle_request(req: Request) -> Result<Response, Error> {
         .status(200)
         .header("X-Request-Url", url.to_string())
         .header("X-Request-Method", method)
-        .body(Body::from("Hello Runtime.land!!"))
-        .unwrap())
+        .body(Body::from("Hello Runtime.land!!"))?)
 }

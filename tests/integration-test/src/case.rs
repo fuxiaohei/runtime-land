@@ -1,4 +1,5 @@
 use anyhow::Result;
+use reqwest::Body;
 use tracing::info;
 
 static RUMTIME_SERVER: &str = "http://127.0.0.1:7909";
@@ -46,14 +47,15 @@ pub async fn test_rust_router(wasm: &str) -> Result<()> {
     assert_eq!(body, "Hello, World");
 
     let resp = client
-        .get(format!("{}/foo/bar", RUMTIME_SERVER))
+        .post(format!("{}/foo/bar", RUMTIME_SERVER))
+        .body(Body::from("Foo Bar"))
         .header("x-land-module", wasm)
         .send()
         .await?;
     info!("resp: {:?}", resp);
     assert_eq!(resp.status(), 200);
     let body = resp.text().await?;
-    assert_eq!(body, "Foo Bar");
+    assert_eq!(body, "Foo Bar, BodySize: 7");
 
     let resp = client
         .get(format!("{}/params/xyz", RUMTIME_SERVER))

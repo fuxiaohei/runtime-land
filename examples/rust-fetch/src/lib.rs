@@ -6,11 +6,9 @@ pub fn handle_request(_req: Request) -> Result<Response, Error> {
     let fetch_request = http::Request::builder()
         .method("GET")
         .uri("https://www.rust-lang.org/")
-        .body(Body::from(""))
-        .unwrap();
-    let fetch_response = fetch(fetch_request, RequestOptions::default()).unwrap();
+        .body(Body::empty())?;
+    let fetch_response = fetch(fetch_request, RequestOptions::default())?;
     Ok(http::Response::builder()
         .status(fetch_response.status())
-        .body(fetch_response.into_body())
-        .unwrap())
+        .body(fetch_response.into_body())?)
 }
