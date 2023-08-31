@@ -60,7 +60,7 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     http_req = http_req.header(key, value);
                 }
                 // 1 is the request body handle, which is defined in wasi host functions
-                let body = Body::new(wasm_req.body.unwrap_or(1));
+                let body = Body::from_handle(wasm_req.body.unwrap_or(1));
                 Ok(http_req.body(body)?)
             }
         }

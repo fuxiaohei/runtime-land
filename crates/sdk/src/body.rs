@@ -3,6 +3,7 @@ use super::http_service::land::http::http_body::{
     HttpBodyHandle,
 };
 use anyhow::Result;
+use std::fmt::Debug;
 
 /// Body is a wrapper around the wasi http_body API
 pub struct Body {
@@ -12,8 +13,17 @@ pub struct Body {
     is_streaming: bool,
 }
 
+impl Debug for Body {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Body")
+            .field("body_handle", &self.body_handle)
+            .field("is_streaming", &self.is_streaming)
+            .finish()
+    }
+}
+
 impl Body {
-    pub fn new(body_handle: u32) -> Self {
+    pub fn from_handle(body_handle: u32) -> Self {
         Self {
             body_handle,
             is_streaming: false,
@@ -47,7 +57,7 @@ impl Body {
             Err(e) => Err(e.into()),
         }
     }
-    
+
     pub fn write(&self, data: &[u8]) -> Result<u64> {
         if !self.is_streaming {
             return Err(anyhow::anyhow!("body is not streaming"));
@@ -71,7 +81,7 @@ impl From<&[u8]> for Body {
     fn from(s: &[u8]) -> Self {
         let body_handle = http_body_new().unwrap();
         http_body_write(body_handle, s).unwrap();
-        Body::new(body_handle)
+        Body::from_handle(body_handle)
     }
 }
 
@@ -79,7 +89,7 @@ impl From<&str> for Body {
     fn from(s: &str) -> Self {
         let body_handle = http_body_new().unwrap();
         http_body_write(body_handle, s.as_bytes()).unwrap();
-        Body::new(body_handle)
+        Body::from_handle(body_handle)
     }
 }
 
@@ -87,7 +97,7 @@ impl From<String> for Body {
     fn from(s: String) -> Self {
         let body_handle = http_body_new().unwrap();
         http_body_write(body_handle, s.as_bytes()).unwrap();
-        Body::new(body_handle)
+        Body::from_handle(body_handle)
     }
 }
 
@@ -95,6 +105,6 @@ impl From<Vec<u8>> for Body {
     fn from(v: Vec<u8>) -> Self {
         let body_handle = http_body_new().unwrap();
         http_body_write(body_handle, v.as_slice()).unwrap();
-        Body::new(body_handle)
+        Body::from_handle(body_handle)
     }
 }

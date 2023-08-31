@@ -168,10 +168,11 @@ mod tests {
 
     #[test]
     fn test_handler_impl() {
-        let handler: Arc<dyn Handler> = Arc::new(|_req: Request| Ok(Response::new(Body::new(2))));
+        let handler: Arc<dyn Handler> =
+            Arc::new(|_req: Request| Ok(Response::new(Body::from_handle(2))));
         let req = http::Request::builder()
             .uri("/")
-            .body(Body::new(1))
+            .body(Body::from_handle(1))
             .unwrap();
         let resp = handler.call(req).unwrap();
         assert_eq!(resp.status(), 200);
@@ -185,7 +186,7 @@ mod tests {
             .status(200)
             .header("X-Request-Url", url.to_string())
             .header("X-Request-Method", method)
-            .body(Body::new(2))
+            .body(Body::from_handle(2))
             .unwrap())
     }
 
@@ -213,7 +214,7 @@ mod tests {
             let req = http::Request::builder()
                 .method(Method::GET)
                 .uri("/abc")
-                .body(Body::new(1))
+                .body(Body::from_handle(1))
                 .unwrap();
             let resp = handler.value.call(req).unwrap();
             assert_eq!(resp.status(), 200);
@@ -243,7 +244,7 @@ mod tests {
             let handler = matched.unwrap();
             let mut req = http::Request::builder().method(Method::GET).uri("/xyz/abc");
             req.extensions_mut().unwrap().insert(route_params);
-            let req = req.body(Body::new(1)).unwrap();
+            let req = req.body(Body::from_handle(1)).unwrap();
 
             let p = params(&req, "path".to_string());
             assert_eq!(p, Some("abc".to_string()));

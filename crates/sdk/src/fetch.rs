@@ -55,7 +55,7 @@ pub fn fetch(req: Request, options: RequestOptions) -> Result<Response, RequestE
     for (key, value) in fetch_resp.headers {
         builder = builder.header(key, value);
     }
-    let resp_body = Body::new(fetch_resp.body.unwrap());
+    let resp_body = Body::from_handle(fetch_resp.body.unwrap());
     let resp = builder.body(resp_body).unwrap();
 
     Ok(resp)
