@@ -76,8 +76,9 @@ fn api_router() -> Router {
 
 /// default_handler is the default handler for all requests.
 async fn default_handler(_req: Request<Body>) -> Response<Body> {
-    let builder = Response::builder().status(404);
-    builder.body(Body::from("Route Not Matched")).unwrap()
+    let mut builder = Response::builder().status(200);
+    builder = builder.header("x-land-version", land_core::version::get());
+    builder.body(Body::from("Hello, Runtime.land!")).unwrap()
 }
 
 pub fn router() -> Router {

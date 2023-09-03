@@ -41,17 +41,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.1"
+version = "0.1.2-beta.1"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.1" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.1" }
-land-sdk = { path = "crates/sdk", version = "0.1.1" }
-land-core = { path = "crates/core", version = "0.1.1" }
-land-dao = { path = "crates/dao", version = "0.1.1" }
-land-storage = { path = "crates/storage", version = "0.1.1" }
+land-worker = { path = "crates/worker", version = "0.1.2-beta.1" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.2-beta.1" }
+land-sdk = { path = "crates/sdk", version = "0.1.2-beta.1" }
+land-core = { path = "crates/core", version = "0.1.2-beta.1" }
+land-dao = { path = "crates/dao", version = "0.1.2-beta.1" }
+land-storage = { path = "crates/storage", version = "0.1.2-beta.1" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.4.1", features = ["derive", "env"] }
