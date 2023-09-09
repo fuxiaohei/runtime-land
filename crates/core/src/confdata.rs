@@ -97,6 +97,14 @@ impl RegionIPInfo {
         remove_whitespace(&mut s);
         s
     }
+    pub fn region_ip_hostname(&self, hostname: &str) -> String {
+        let mut s = format!(
+            "{}-{}-{}-{}-{}",
+            self.country, self.region, self.city, self.ip, hostname
+        );
+        remove_whitespace(&mut s);
+        s
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -7,8 +7,7 @@ mod store;
 pub use endpoint::ENDPOINT;
 
 pub async fn init(addr: String, token: String) {
-    let endpoint = std::env::var("ENDPOINT").unwrap_or_else(|_| "endpoint".to_string());
-    ENDPOINT.set(endpoint).unwrap();
+    endpoint::init().await.unwrap();
 
     tokio::spawn(async move {
         confs_core::start_sync(&addr, &token).await;

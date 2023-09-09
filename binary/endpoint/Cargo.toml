@@ -13,6 +13,7 @@ clap = { workspace = true }
 deadpool = { workspace = true }
 envconfig = { workspace = true }
 futures-util = { workspace = true }
+gethostname = "0.4.3"
 land-core = { workspace = true }
 land-storage = { workspace = true }
 land-worker = { workspace = true }
