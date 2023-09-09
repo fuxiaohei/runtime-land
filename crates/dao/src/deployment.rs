@@ -198,6 +198,29 @@ pub async fn list_success() -> Result<Vec<deployment::Model>> {
     Ok(deployments)
 }
 
+/// is_recent_updated checks if the deployment is recent updated
+pub async fn is_recent_updated() -> Result<bool> {
+    let db = DB.get().unwrap();
+    let deployments = deployment::Entity::find()
+        .filter(deployment::Column::Status.eq(Status::Active.to_string()))
+        .filter(deployment::Column::DeployStatus.eq(DeployStatus::Success.to_string()))
+        .order_by_desc(deployment::Column::UpdatedAt)
+        .one(db)
+        .await?;
+    if deployments.is_none() {
+        return Ok(false);
+    }
+    let deployment = deployments.unwrap();
+    let now = chrono::Utc::now();
+    let updated_at = deployment.updated_at;
+    let duration = now.signed_duration_since(updated_at);
+    let duration = duration.num_minutes();
+    if duration > 1 {
+        return Ok(false);
+    }
+    Ok(true)
+}
+
 /// list_by_project_id lists the deployments by project without deleted
 pub async fn list_by_project_id(project_id: i32) -> Result<Vec<deployment::Model>> {
     let db = DB.get().unwrap();

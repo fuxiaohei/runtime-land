@@ -53,6 +53,23 @@ impl RoutesConf {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EndpointConf {
+    pub items: Vec<RouteConfItem>,
+    pub created_at: u64,
+    pub md5: String,
+}
+
+impl EndpointConf {
+    pub fn to_map(&self) -> HashMap<String, RouteConfItem> {
+        let mut map = HashMap::new();
+        for item in &self.items {
+            map.insert(item.key.clone(), item.clone());
+        }
+        map
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RegionIPInfo {
     pub ip: String,

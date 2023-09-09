@@ -11,9 +11,12 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing::warn;
 
+use crate::apiv2;
+
 mod admin;
 mod auth;
 mod deployment;
+mod ops;
 mod params;
 mod project;
 mod register;
@@ -71,6 +74,7 @@ fn api_router() -> Router {
         .route("/v1/settings/email", get(admin::email_handler))
         .route("/v1/settings/email", post(admin::update_email))
         .route("/v1/update-password", post(auth::update_password))
+        .route("/v1/ops/projects/:page", get(ops::list_projects))
         .route_layer(middleware::from_fn(auth::middleware))
 }
 
@@ -90,6 +94,7 @@ pub fn router() -> Router {
     Router::new()
         .merge(auth_router())
         .merge(api_router())
+        .merge(apiv2::api_router())
         .route("/v1/region/ws", get(ws::ws_handler))
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))

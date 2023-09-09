@@ -3,6 +3,8 @@ use land_storage::{FsConfig, S3Config};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::settings;
+
 #[derive(Deserialize, Debug, Validate)]
 pub struct SignupRequest {
     #[validate(email)]
@@ -114,6 +116,36 @@ pub struct ProjectResponse {
     pub deployment_url: String,
     pub status: String,
     pub subdomain: String,
+}
+
+impl ProjectResponse {
+    pub async fn from_models(projects: &Vec<land_dao::Project>) -> Vec<ProjectResponse> {
+        let (prod_domain, _) = settings::get_domains().await;
+        let mut values = vec![];
+        for project in projects {
+            let value = ProjectResponse {
+                language: project.language.clone(),
+                uuid: project.uuid.clone(),
+                prod_deployment: project.prod_deploy_id,
+                prod_url: "".to_string(),
+                deployment_url: "".to_string(),
+                status: project.status.clone(),
+                name: project.name.clone(),
+                created_at: project.created_at.timestamp(),
+                updated_at: project.updated_at.timestamp(),
+                subdomain: prod_domain.to_string(),
+            };
+            values.push(value);
+        }
+        values
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectPagination {
+    pub projects: Vec<ProjectResponse>,
+    pub total_page: u64,
+    pub total_items: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

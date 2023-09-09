@@ -2,8 +2,8 @@ use crate::{model::project, DB};
 use anyhow::Result;
 use rand::{thread_rng, Rng};
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
-    QueryOrder, Set, Statement,
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue,
+    PaginatorTrait, QueryFilter, QueryOrder, Set, Statement,
 };
 
 #[derive(strum::Display)]
@@ -152,4 +152,17 @@ pub async fn get_stats() -> Result<i32> {
     .await?;
     let counter = values[0]["counter"].as_i64().unwrap() as i32;
     Ok(counter)
+}
+
+/// get_pagination gets the pagination of projects
+pub async fn get_pagination(page: u64, page_size: u64) -> Result<(Vec<project::Model>, u64, u64)> {
+    let db = DB.get().unwrap();
+    let pager = project::Entity::find()
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt)
+        .paginate(db, page_size);
+    let projects = pager.fetch_page(page).await?;
+    let total_pages = pager.num_pages().await?;
+    let total_items = pager.num_items().await?;
+    Ok((projects, total_pages, total_items))
 }

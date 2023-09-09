@@ -2,11 +2,13 @@ use anyhow::Result;
 use clap::Parser;
 use tracing::debug;
 
+mod apiv2;
+mod confs;
+mod email;
 mod region;
 mod restapi;
 mod server;
 mod settings;
-mod email;
 
 #[derive(Parser, Debug)]
 #[clap(name = "land-center", version = land_core::version::get())]
@@ -30,6 +32,9 @@ async fn main() -> Result<()> {
     settings::init().await?;
     settings::init_storage().await?;
     region::init().await;
+
+    // start confs generator loop
+    confs::run(1);
 
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 
