@@ -1,7 +1,8 @@
 manifest = "v1"
 name = "rust-fetch"
+template_name = "Fetch HTML"
 project = "rust-fetch-example"
-description = "example rust project with fetch api"
+description = "Send a request to a remote server, read HTML from the response, and serve that HTML."
 authors = []
 language = "rust"
 

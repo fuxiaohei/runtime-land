@@ -15,6 +15,8 @@ pub struct Metadata {
     pub language: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub build: Option<MetadataBuild>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub template_name: Option<String>,
 }
 
 /// MetadataBuild is the build section of the Meta

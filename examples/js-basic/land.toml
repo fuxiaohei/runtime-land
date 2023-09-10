@@ -1,5 +1,6 @@
 manifest = "v1"
 name = "js-basic"
-description = "example js project with hello world"
+template_name = "Hello World"
+description = "Deliver a simple Hello World message to the browser."
 authors = []
 language = "javascript"

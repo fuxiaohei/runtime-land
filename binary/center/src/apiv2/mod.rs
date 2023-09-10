@@ -1,23 +1,21 @@
 use axum::{
     body::Body,
     http::{Request, Response},
-    middleware::{self, Next},
-    response,
     response::IntoResponse,
     routing::any,
     Router,
 };
 use hyper::StatusCode;
-use land_dao::user_token;
 use tracing::error;
 
 mod endpoint;
+mod rest;
 
 pub fn api_router() -> Router {
     Router::new()
         .merge(endpoint::router())
+        .merge(rest::router())
         .route("/v2/*path", any(v2_handler))
-        .route_layer(middleware::from_fn(auth_middleware))
 }
 
 async fn v2_handler(_req: Request<Body>) -> Response<Body> {
@@ -59,44 +57,4 @@ where
     fn from(err: E) -> Self {
         Self(err.into(), StatusCode::INTERNAL_SERVER_ERROR)
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct SessionUser {
-    pub id: i32,
-    pub role: String,
-}
-
-pub async fn auth_middleware<B>(
-    mut request: Request<B>,
-    next: Next<B>,
-) -> Result<response::Response, StatusCode> {
-    let auth_header = request.headers().get("authorization");
-    if auth_header.is_none() {
-        error!("no authorization header or bear token");
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-    let auth_token = auth_header.unwrap().to_str().unwrap();
-    let auth_token = auth_token.replace("Bearer ", "");
-    let auth_token = auth_token.trim();
-    let (token, user) = user_token::find_by_value_with_active_user(auth_token.to_string())
-        .await
-        .map_err(|e| {
-            error!("auth, find token error: {:?}", e);
-            StatusCode::UNAUTHORIZED
-        })?;
-    if token.created_by != user_token::CreatedByCases::Edgehub.to_string() {
-        error!("token created by not land-edge");
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-    user_token::refresh(token.id).await.map_err(|e| {
-        error!("auth, refresh token error: {:?}", e);
-        StatusCode::UNAUTHORIZED
-    })?;
-    request.extensions_mut().insert(SessionUser {
-        id: token.owner_id,
-        role: user.role,
-    });
-    let response = next.run(request).await;
-    Ok(response)
 }

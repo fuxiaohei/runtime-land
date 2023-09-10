@@ -10,6 +10,7 @@ mod migration;
 mod model;
 
 // re-export
+pub use model::deployment::Model as Deployment;
 pub use model::project::Model as Project;
 pub use model::region::Model as Region;
 pub use model::settings::Model as Setting;

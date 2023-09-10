@@ -5,6 +5,7 @@ use tracing::debug;
 mod apiv2;
 mod confs;
 mod email;
+mod embed;
 mod region;
 mod restapi;
 mod server;

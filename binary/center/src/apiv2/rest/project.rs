@@ -1,0 +1,57 @@
+use super::params::{CreateProjectRequest, ProjectOverview, ProjectResponse};
+use super::SessionUser;
+use crate::{apiv2::RouteError, settings};
+use axum::{extract::Path, Extension, Json};
+use hyper::StatusCode;
+use land_dao::{deployment, project};
+use tracing::info;
+use validator::Validate;
+
+#[tracing::instrument(name = "[project_list_handler]", skip_all)]
+pub async fn list_handler(
+    Extension(user): Extension<SessionUser>,
+) -> Result<(StatusCode, Json<Vec<ProjectOverview>>), RouteError> {
+    let projects = project::list_available(user.id).await?;
+    let counters = deployment::list_counter(user.id).await?;
+    let overviews = ProjectOverview::from_vec(projects, counters, user.id).await?;
+    Ok((StatusCode::OK, Json(overviews)))
+}
+
+#[tracing::instrument(name = "[project_create_handler]", skip_all)]
+pub async fn create_handler(
+    Extension(current_user): Extension<SessionUser>,
+    Json(payload): Json<CreateProjectRequest>,
+) -> Result<(StatusCode, Json<ProjectResponse>), RouteError> {
+    payload.validate()?;
+    let project = project::create(
+        payload.name,
+        payload.prefix,
+        payload.language,
+        current_user.id,
+    )
+    .await?;
+    info!(
+        "success, project_name:{}, project_uuid:{}",
+        project.name, project.uuid,
+    );
+    let (prod_domain, _) = settings::get_domains().await;
+    let project_response = ProjectResponse::from_model(&project, &prod_domain);
+    Ok((StatusCode::OK, Json(project_response)))
+}
+
+#[tracing::instrument(name = "[project_overview_handler]", skip_all)]
+pub async fn overview_handler(
+    Extension(current_user): Extension<SessionUser>,
+    Path(name): Path<String>,
+) -> Result<(StatusCode, Json<ProjectOverview>), RouteError> {
+    let project = land_dao::project::find_by_name(name, current_user.id).await?;
+    if project.is_none() {
+        return Err(RouteError(
+            anyhow::anyhow!("project not found"),
+            StatusCode::NOT_FOUND,
+        ));
+    }
+    let project = project.unwrap();
+    let overview = ProjectOverview::from_model(&project).await?;
+    Ok((StatusCode::OK, Json(overview)))
+}

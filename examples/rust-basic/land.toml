@@ -1,7 +1,8 @@
 manifest = "v1"
 name = "rust-basic"
+template_name = "Hello World"
 project = "rust-basic-example"
-description = "example rust project"
+description = "Deliver a simple Hello World message to the browser."
 authors = []
 language = "rust"
 

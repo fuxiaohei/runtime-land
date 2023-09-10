@@ -1,14 +1,10 @@
 use super::RouteError;
 use crate::confs;
-use axum::{extract::Query, routing::get, Json, Router};
+use axum::{extract::Query, Json};
 use hyper::StatusCode;
 use land_core::confdata::EndpointConf;
 use serde::Deserialize;
 use tracing::debug;
-
-pub fn router() -> Router {
-    Router::new().route("/v2/endpoint/conf", get(get_conf))
-}
 
 #[derive(Debug, Deserialize)]
 pub struct ConfValuesMD5Query {
@@ -17,7 +13,7 @@ pub struct ConfValuesMD5Query {
 }
 
 #[tracing::instrument(name = "[endpoint_get_conf]", skip_all)]
-async fn get_conf(
+pub async fn conf_handler(
     Query(query): Query<ConfValuesMD5Query>,
 ) -> Result<(StatusCode, Json<Option<EndpointConf>>), RouteError> {
     let conf_values = confs::CONF_VALUES.lock().await;
