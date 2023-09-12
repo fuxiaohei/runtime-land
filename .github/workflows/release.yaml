@@ -93,7 +93,7 @@ jobs:
           curl --progress-bar --show-error --location --fail "https://github.com/bytecodealliance/wizer/releases/download/v3.0.1/wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.xz" --output "wizer.tar.xz"
           mkdir -p "./wizer-bin"
           tar -xf wizer.tar.xz -C "./wizer-bin"
-          ls -lh wizer-bin
+          ls -lhR wizer-bin
 
       - name: download wizer binary for windows
         if: runner.os == 'Windows'
@@ -101,7 +101,6 @@ jobs:
           curl --progress-bar --show-error --location --fail "https://github.com/bytecodealliance/wizer/releases/download/v3.0.1/wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.zip" --output "wizer.zip"
           mkdir -p "./wizer-bin"
           unzip wizer.zip -d "./wizer-bin"
-          ls -lh wizer-bin
 
       - name: build release
         uses: actions-rs/cargo@v1
@@ -189,7 +188,7 @@ jobs:
             This is a "nightly" release of land-cli. It is automatically built from the latest commit on the main branch. It includes some new features and bug fixes that have not yet been released. Be careful when using this version of land-cli as it may be unstable.
 
   publish-crates-io:
-    name: update nightly release
+    name: publish crates.io
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build
