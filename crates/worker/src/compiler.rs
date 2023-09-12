@@ -102,8 +102,10 @@ pub fn compile_rust(arch: &str, target: &str) -> Result<()> {
 
 /// convert_component is used to convert wasm module to component
 pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
+    let opt_path = optimize_module(path)?;
+    let path = opt_path.unwrap_or_else(|| path.to_string());
     debug!("Convert component, {path}");
-    let file_bytes = std::fs::read(path).expect("parse wasm file error");
+    let file_bytes = std::fs::read(&path).expect("parse wasm file error");
     let wasi_adapter = include_bytes!("../engine/wasi_snapshot_preview1.reactor.wasm");
 
     let component = ComponentEncoder::default()
@@ -115,7 +117,7 @@ pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
         .encode()
         .expect("Encode component");
 
-    let output = output.unwrap_or_else(|| path.to_string());
+    let output = output.unwrap_or_else(|| path);
     std::fs::write(&output, component).expect("Write component file error");
     info!("Convert component success, {}", &output);
 
@@ -123,6 +125,44 @@ pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
     let size = std::fs::metadata(&output)?.len();
     info!("Component size: {} KB", size / 1024);
     Ok(())
+}
+
+fn optimize_module(path: &str) -> Result<Option<String>> {
+    println!("----env:{:?}", std::env::current_exe());
+    let cmd = which("wasm-opt");
+    if cmd.is_err() {
+        debug!("Wasm-opt not found, skip optimize");
+        return Ok(None);
+    }
+    debug!("Optimize module: {}", path);
+    let target = path.replace(".wasm", ".opt.wasm");
+    let cmd = cmd.unwrap();
+    let child = Command::new(cmd)
+        .arg("-O")
+        .arg("--strip-debug")
+        .arg("-o")
+        .arg(&target)
+        .arg(path)
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .expect("failed to execute wasm-opt child process");
+
+    let output = child
+        .wait_with_output()
+        .expect("failed to wait on wizer child process");
+    if output.status.success() {
+        // print output
+        debug!(
+            "Wasm-opt output: \n{}",
+            std::str::from_utf8(&output.stdout).unwrap()
+        );
+        info!("Wasm-opt success: {}", &target);
+    } else {
+        panic!("Wasm-opt failed: {output:?}");
+    }
+    info!("Optimize module success: {}", &target);
+    Ok(Some(target))
 }
 
 pub fn compile_js(target: &str, src_js_path: &str, js_engine_path: Option<String>) -> Result<()> {
