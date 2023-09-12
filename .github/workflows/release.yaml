@@ -20,7 +20,7 @@ jobs:
         config:
           - {
               os: "ubuntu-latest",
-              arch: "amd64",
+              arch: "x86_64",
               extension: "",
               extraArgs: "",
               target: "",
@@ -36,7 +36,7 @@ jobs:
             }
           - {
               os: "macos-latest",
-              arch: "amd64",
+              arch: "x86_64",
               extension: "",
               extraArgs: "",
               target: "",
@@ -52,7 +52,7 @@ jobs:
             }
           - {
               os: "windows-latest",
-              arch: "amd64",
+              arch: "x86_64",
               extension: ".exe",
               extraArgs: "",
               target: "",
@@ -83,9 +83,26 @@ jobs:
         if: matrix.config.target == 'aarch64-unknown-linux-gnu'
         run: |
           sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu xz-utils
           echo '[target.aarch64-unknown-linux-gnu]' >> ${HOME}/.cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> ${HOME}/.cargo/config.toml
+
+      - name: download wizer binary
+        if: runner.os != 'Windows'
+        run:  |
+          curl --progress-bar --show-error --location --fail "https://github.com/bytecodealliance/wizer/releases/download/v3.0.1/wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.xz" --output "wizer.tar.xz"
+          mkdir -p "./wizer-bin"
+          tar -xf wizer.tar.xz -C "./wizer-bin"
+          ls -lh wizer-bin
+
+      - name: download wizer binary for windows
+        if: runner.os == 'Windows'
+        run:  |
+          curl --progress-bar --show-error --location --fail "https://github.com/bytecodealliance/wizer/releases/download/v3.0.1/wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.zip" --output "wizer.zip"
+          mkdir -p "./wizer-bin"
+          unzip wizer.zip -d "./wizer-bin"
+          ls -lh wizer-bin
+
       - name: build release
         uses: actions-rs/cargo@v1
         with:
@@ -102,7 +119,7 @@ jobs:
           tar czf \
             land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.tar.gz \
             LICENSE README.md land-cli${{ matrix.config.extension }}
-      - name: package release assets
+      - name: package release assets for windows
         if: runner.os == 'Windows'
         shell: bash
         run: |
@@ -119,7 +136,7 @@ jobs:
         with:
           name: land-cli
           path: _dist/land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.tar.gz
-      - name: upload binary as GitHub artifact
+      - name: upload binary as GitHub artifact for windows
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
@@ -133,7 +150,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: _dist/land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.tar.gz
           tag: ${{ github.ref }}
-      - name: upload binary to Github release
+      - name: upload binary to Github release for windows
         if: startsWith(github.ref, 'refs/tags/v') &&  runner.os == 'Windows'
         uses: svenstaro/upload-release-action@v2
         with:
