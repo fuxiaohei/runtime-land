@@ -19,7 +19,7 @@ pub async fn wasm_caller_handler(
     let pool = crate::pool::prepare_worker_pool(wasm_path)
         .instrument(info_span!("[WASM]", wasm_path = %wasm_path))
         .await?;
-    let mut worker = pool.get().await.map_err(|e| anyhow!(e.to_string()))?;
+    let worker = pool.get().await.map_err(|e| anyhow!(e.to_string()))?;
     debug!("[HTTP] wasm worker pool get worker success: {}", wasm_path);
 
     // convert request to host-call request

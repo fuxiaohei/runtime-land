@@ -4,16 +4,9 @@ use super::host::land::http::http_outgoing::{
 use super::host::land::http::http_types::RedirectPolicy;
 use super::HttpContext;
 use hyper::Body;
-use once_cell::sync::Lazy;
 use reqwest::redirect;
-use std::collections::HashMap;
 use std::str::FromStr;
-use tokio::sync::Mutex;
 use tracing::{debug, info, instrument, warn};
-
-/// CLIENTS_POOL is a global pool of HTTP clients with options key
-static CLIENTS_POOL: Lazy<Mutex<HashMap<String, reqwest::Client>>> =
-    Lazy::new(|| Mutex::new(HashMap::new()));
 
 impl Default for RequestOptions {
     fn default() -> Self {
@@ -52,21 +45,10 @@ impl Host for HttpContext {
             None => Body::empty(),
         };
 
-        // use client pool to reuse client
-        let client_key = options.key();
-        let mut pool = CLIENTS_POOL.lock().await;
-        let client = match pool.get(&client_key) {
-            Some(client) => client,
-            None => {
-                let client = reqwest::Client::builder()
-                    .redirect(options.redirect.try_into()?)
-                    .build()?;
-                pool.insert(client_key.clone(), client);
-                pool.get(&client_key).unwrap()
-            }
-        };
-
         info!("fetch: {} {}", request.method, request.uri);
+
+        // use client pool to reuse client
+        let client = HttpContext::get_client(options.redirect);
 
         let fetch_response = match client
             .request(

@@ -9,9 +9,12 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 axum = { workspace = true }
 clap = { workspace = true }
+console-subscriber = "0.1.10"
 deadpool = { workspace = true }
 land-core = { workspace = true }
 land-worker = { workspace = true }
+lazy_static = { workspace = true }
+moka = { workspace = true }
 once_cell = { workspace = true }
 path-slash = "0.2.1"
 reqwest = { workspace = true }
@@ -42,17 +45,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.4-beta.1"
+version = "0.1.4-beta.3"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.4-beta.1" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-beta.1" }
-land-sdk = { path = "crates/sdk", version = "0.1.4-beta.1" }
-land-core = { path = "crates/core", version = "0.1.4-beta.1" }
-land-dao = { path = "crates/dao", version = "0.1.4-beta.1" }
-land-storage = { path = "crates/storage", version = "0.1.4-beta.1" }
+land-worker = { path = "crates/worker", version = "0.1.4-beta.3" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-beta.3" }
+land-sdk = { path = "crates/sdk", version = "0.1.4-beta.3" }
+land-core = { path = "crates/core", version = "0.1.4-beta.3" }
+land-dao = { path = "crates/dao", version = "0.1.4-beta.3" }
+land-storage = { path = "crates/storage", version = "0.1.4-beta.3" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.4.1", features = ["derive", "env"] }
@@ -99,3 +102,4 @@ opendal = { version = "0.39.0", default-features = false, features = [
 ] }
 strum = { version = "0.25.0", features = ["derive"] }
 rust-embed = "8.0.0"
+moka = { version = "0.11.3", default-features = false, features = ["sync"] }

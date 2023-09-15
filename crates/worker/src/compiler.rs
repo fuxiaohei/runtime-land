@@ -117,7 +117,7 @@ pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
         .encode()
         .expect("Encode component");
 
-    let output = output.unwrap_or_else(|| path);
+    let output = output.unwrap_or(path);
     std::fs::write(&output, component).expect("Write component file error");
     info!("Convert component success, {}", &output);
 

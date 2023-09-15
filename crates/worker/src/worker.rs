@@ -89,10 +89,10 @@ fn create_wasmtime_config() -> Config {
 }
 
 /// Worker is used to run wasm component
+#[derive(Clone)]
 pub struct Worker {
     path: String,
     engine: Engine,
-    // component: Component,
     instance_pre: InstancePre<Context>,
 }
 
@@ -131,11 +131,7 @@ impl Worker {
     }
 
     /// handle_request is used to handle http request
-    pub async fn handle_request(
-        &mut self,
-        req: Request,
-        context: Context,
-    ) -> Result<(Response, Body)> {
+    pub async fn handle_request(&self, req: Request, context: Context) -> Result<(Response, Body)> {
         // create store
         let mut store = Store::new(&self.engine, context);
 
@@ -162,7 +158,7 @@ mod tests {
     #[tokio::test]
     async fn run_wasm() {
         let wasm_file = "../../tests/rust_test.component.wasm";
-        let mut worker = Worker::new(wasm_file).await.unwrap();
+        let  worker = Worker::new(wasm_file).await.unwrap();
 
         for _ in 1..10 {
             let headers: Vec<(String, String)> = vec![];
