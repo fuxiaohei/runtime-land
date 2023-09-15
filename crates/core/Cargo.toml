@@ -10,12 +10,12 @@ lazy_static = { workspace = true }
 md-5 = "0.10.5"
 serde = { workspace = true }
 time = { workspace = true }
-toml = "0.7.6"
+toml = "0.8.0"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [build-dependencies]
-vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitcl"] }
+vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitcl"] }
 
 [lib]
 doctest = false
