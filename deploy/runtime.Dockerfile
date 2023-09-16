@@ -1,4 +1,4 @@
-FROM rust:1.71.1 as builder
+FROM rust:1.72 as builder
 WORKDIR /usr/src/runtime-land
 ADD . .
 RUN cargo --version --verbose

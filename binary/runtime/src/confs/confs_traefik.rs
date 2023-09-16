@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use envconfig::Envconfig;
 use land_core::confdata::RouteConfItem;
 use opendal::Operator;
-use tracing::debug;
+use tracing::{debug, info};
 
 #[derive(Envconfig, Debug)]
 pub struct TraefikConfig {
@@ -115,6 +115,7 @@ impl ConfOperatorTrait for TraefikOperator {
     #[tracing::instrument(skip_all, name = "[TRAEFIK_REDIS]")]
     async fn init(&mut self) -> Result<()> {
         let cfg = TraefikConfig::init_from_env()?;
+        info!("init traefik redis: {:?}", cfg);
         // init redis operator
         let mut builder = opendal::services::Redis::default();
         builder

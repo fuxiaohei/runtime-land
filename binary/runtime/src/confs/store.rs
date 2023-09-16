@@ -2,7 +2,7 @@ use anyhow::Result;
 use futures_util::StreamExt;
 use once_cell::sync::OnceCell;
 use opendal::Operator;
-use tracing::debug;
+use tracing::{debug, info};
 
 pub static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
 
@@ -31,6 +31,7 @@ pub async fn download_file(download_url: &str, path: &str) -> Result<()> {
             download_url,
         ));
     }
+    let content_length = resp.content_length().unwrap_or(0);
     let mut reader = resp.bytes_stream();
     let mut writer = local_op.writer(path).await?;
     while let Some(bytes) = reader.next().await {
@@ -38,7 +39,10 @@ pub async fn download_file(download_url: &str, path: &str) -> Result<()> {
         writer.write(bytes).await?;
     }
     writer.close().await?;
-    debug!("save remote to local success, path: {}", path);
+    info!(
+        "save remote to local, path: {}, size:{}",
+        path, content_length
+    );
     Ok(())
 }
 

@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  runtime_land_network:
+    external: true
+
+services:
+  redis:
+    image: redis:7.2
+    restart: always
+    command: redis-server --save 20 1 --loglevel notice --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ${REDIS_DIR}:/data
+    networks:
+      - runtime_land_network
+  proxy:
+    image: traefik:3.0
+    command: --api.insecure=true --providers.redis.endpoints=redis:6379 --providers.redis.password=${REDIS_PASSWORD} --providers.docker=true --providers.docker.exposedByDefault=false --accesslog=true
+    ports:
+      - "80:80"
+      - "8080:8080" # traefik dashboard
+    networks:
+      - runtime_land_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+  runtime:
+    image: docker.io/library/runtime-land-runtime:main
+    restart: always
+    environment:
+      - CENTER_TOKEN=${LAND_RUNTIME_CENTER_TOKEN}
+      - CENTER_URL=${LAND_RUNTIME_CENTER_URL}
+      - HTTP_ADDR=${LAND_RUMTIME_HTTP_ADDR}
+      - FS_PATH=/data
+      - TRAEFIK_REDIS_ADDR=redis:6379
+      - TRAEFIK_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - TRAEFIK_REDIS_DB=0
+      - TRAEFIK_RUNTIME_NAME=${TRAEFIK_RUNTIME_NAME}
+    networks:
+      - runtime_land_network
+    volumes:
+      - ${LAND_RUMTIME_STORAGE_LOCAL_PATH}:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land-runtime.rule=Host(`${LAND_RUNTIME_DOMAIN}`)

@@ -4,7 +4,7 @@ use tracing::{debug, debug_span, Instrument};
 #[derive(Parser, Debug)]
 #[clap(name = "land-endpoint", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7902"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7909"))]
     pub http_addr: String,
     #[clap(long, env("CENTER_URL"), default_value("http://127.0.0.1:7901"))]
     pub center_url: String,

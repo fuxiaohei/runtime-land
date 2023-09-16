@@ -22,7 +22,10 @@ pub async fn init_conf_file() -> Result<()> {
         local_conf.items = conf.items;
         local_conf.created_at = conf.created_at;
         local_conf.md5 = conf.md5;
-        info!("init local conf version: {}", local_conf.created_at);
+        info!(
+            "init local conf version: {}, file:{}",
+            local_conf.md5, CONF_LOCAL_FILE
+        );
     } else {
         info!("conf file not exist");
     }
@@ -135,7 +138,12 @@ pub async fn process_conf(local_conf: &EndpointConf, remote_conf: &EndpointConf)
     info!("removes: {:?}", removes.len());
 
     // deploy updates
-    let operator = super::confs_operator::OPERATOR.get().unwrap();
+    let operator = super::confs_operator::OPERATOR.get();
+    if operator.is_none() {
+        warn!("operator not init");
+        return;
+    }
+    let operator = operator.unwrap();
     for item in updates {
         match operator.deploy(item.clone()).await {
             Ok(_) => {

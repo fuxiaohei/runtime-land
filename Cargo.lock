@@ -2333,30 +2333,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "land-edge"
-version = "0.1.4-beta.3"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "chrono",
- "clap",
- "envconfig",
- "futures-util",
- "land-core",
- "land-storage",
- "lazy_static",
- "once_cell",
- "opendal",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "tokio-tungstenite",
- "tracing",
-]
-
-[[package]]
 name = "land-runtime"
 version = "0.1.4-beta.3"
 dependencies = [
@@ -4714,11 +4690,8 @@ checksum = "2b2dbec703c26b00d74844519606ef15d09a7d6857860f84ad223dec002ddea2"
 dependencies = [
  "futures-util",
  "log",
- "rustls",
  "tokio",
- "tokio-rustls",
  "tungstenite",
- "webpki-roots 0.23.1",
 ]
 
 [[package]]
@@ -4946,7 +4919,6 @@ dependencies = [
  "httparse",
  "log",
  "rand",
- "rustls",
  "sha1",
  "thiserror",
  "url 2.4.1",

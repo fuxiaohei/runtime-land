@@ -19,8 +19,6 @@ jobs:
         include:
           - dockerfile: ./deploy/runtime.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/runtime-land-runtime
-          - dockerfile: ./deploy/edge.Dockerfile
-            image: ghcr.io/${{ github.repository_owner }}/runtime-land-edge
           - dockerfile: ./deploy/center.Dockerfile
             image: ghcr.io/${{ github.repository_owner }}/runtime-land-center
     steps:

@@ -31,7 +31,6 @@ land-worker = { workspace = true }
 [workspace]
 members = [
     "binary/center",
-    "binary/edge",
     "binary/runtime",
     "crates/core",
     "crates/dao",
