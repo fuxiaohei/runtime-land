@@ -2357,7 +2357,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "land-endpoint"
+name = "land-runtime"
 version = "0.1.4-beta.3"
 dependencies = [
  "anyhow",
@@ -2379,33 +2379,6 @@ dependencies = [
  "opendal",
  "reqwest",
  "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "land-runtime"
-version = "0.1.4-beta.3"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "chrono",
- "clap",
- "deadpool",
- "envconfig",
- "gethostname",
- "hyper",
- "land-core",
- "land-storage",
- "land-worker",
- "lazy_static",
- "moka",
- "once_cell",
- "reqwest",
- "serde",
- "sysinfo",
  "tokio",
  "tracing",
  "uuid",
@@ -2720,15 +2693,6 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
-]
-
-[[package]]
-name = "ntapi"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8a3895c6391c39d7fe7ebc444a87eb2991b2a0bc718fdabd071eec617fc68e4"
-dependencies = [
- "winapi",
 ]
 
 [[package]]
@@ -4528,21 +4492,6 @@ name = "sync_wrapper"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
-
-[[package]]
-name = "sysinfo"
-version = "0.29.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a18d114d420ada3a891e6bc8e96a2023402203296a47cdd65083377dad18ba5"
-dependencies = [
- "cfg-if",
- "core-foundation-sys",
- "libc",
- "ntapi",
- "once_cell",
- "rayon",
- "winapi",
-]
 
 [[package]]
 name = "system-interface"

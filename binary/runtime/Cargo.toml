@@ -12,6 +12,7 @@ chrono = { workspace = true }
 clap = { workspace = true }
 deadpool = { workspace = true }
 envconfig = { workspace = true }
+futures-util = { workspace = true }
 gethostname = "0.4.3"
 land-core = { workspace = true }
 land-storage = { workspace = true }
@@ -19,9 +20,9 @@ land-worker = { workspace = true }
 lazy_static = { workspace = true }
 moka = { version = "0.11.3", default-features = false, features = ["sync"] }
 once_cell = { workspace = true }
+opendal = { workspace = true }
 reqwest = { workspace = true }
-serde = { workspace = true }
-sysinfo = "0.29.9"
+serde_json = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }

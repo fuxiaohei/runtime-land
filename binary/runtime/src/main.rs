@@ -1,16 +1,19 @@
 use clap::Parser;
 use tracing::{debug, debug_span, Instrument};
 
-mod edge;
-mod pool;
-mod server;
-
 #[derive(Parser, Debug)]
-#[clap(name = "land-runtime", version = land_core::version::get())]
+#[clap(name = "land-endpoint", version = land_core::version::get())]
 struct Cli {
-    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7909"))]
+    #[clap(long, env("HTTP_ADDR"), default_value("127.0.0.1:7902"))]
     pub http_addr: String,
+    #[clap(long, env("CENTER_URL"), default_value("http://127.0.0.1:7901"))]
+    pub center_url: String,
+    #[clap(long, env("CENTER_TOKEN"))]
+    pub center_token: String,
 }
+
+mod confs;
+mod runtime;
 
 #[tokio::main]
 async fn main() {
@@ -19,15 +22,9 @@ async fn main() {
     let args = Cli::parse();
     debug!("Load args: {:?}", args);
 
-    // init storage
-    land_storage::init_from_type("fs")
-        .await
-        .expect("init storage failed");
+    confs::init(args.center_url, args.center_token).await;
 
-    // init edge sync
-    edge::init().await;
-
-    server::start(args.http_addr.parse().unwrap())
+    runtime::start_server(args.http_addr.parse().unwrap())
         .instrument(debug_span!("[SERVER]"))
         .await
         .unwrap();
