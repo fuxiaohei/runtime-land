@@ -105,12 +105,14 @@ jobs:
         if: runner.os != 'Windows'
         run:  |
           curl --progress-bar --show-error --location --fail "https://runtime.land/binaryen-version_114-wasm-opt-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.gz" --output "wasm-opt.tar.gz"
+          mkdir wasm-opt-bin
           tar -xzf wasm-opt.tar.gz -C wasm-opt-bin
           ls -lhR wasm-opt-bin
       - name: download wasm-opt binary for windows
         if: runner.os == 'Windows'
         run:  |
           curl --progress-bar --show-error --location --fail "https://runtime.land/binaryen-version_114-wasm-opt-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.gz" --output "wasm-opt.tar.gz"
+          mkdir wasm-opt-bin
           tar -xzf wasm-opt.tar.gz -C wasm-opt-bin
 
       - name: build release
