@@ -24,6 +24,7 @@ pub fn run(interval: u64) {
                 let mut conf_values = CONF_VALUES.lock().await;
 
                 if !should_generate().await && conf_values.created_at > 0 {
+                    debug!("skip generate conf by recent updated");
                     continue;
                 }
 

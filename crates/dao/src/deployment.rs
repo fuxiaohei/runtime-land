@@ -214,8 +214,8 @@ pub async fn is_recent_updated() -> Result<bool> {
     let now = chrono::Utc::now();
     let updated_at = deployment.updated_at;
     let duration = now.signed_duration_since(updated_at);
-    let duration = duration.num_minutes();
-    if duration > 1 {
+    let duration = duration.num_seconds();
+    if duration > 60 {
         return Ok(false);
     }
     Ok(true)

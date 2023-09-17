@@ -10,7 +10,6 @@ async-trait = { workspace = true }
 axum = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
-deadpool = { workspace = true }
 envconfig = { workspace = true }
 futures-util = { workspace = true }
 gethostname = "0.4.3"

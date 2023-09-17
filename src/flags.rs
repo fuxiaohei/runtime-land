@@ -188,11 +188,7 @@ pub struct Deploy {
     #[clap(long, default_value("false"))]
     pub production: bool,
     /// The api address
-    #[clap(
-        long,
-        env("API_ADDR"),
-        default_value("https://center.runtime.land")
-    )]
+    #[clap(long, env("API_ADDR"), default_value("https://center.runtime.land"))]
     pub api_addr: Option<String>,
     /// The project name override meta.toml
     #[clap(long)]
@@ -201,6 +197,11 @@ pub struct Deploy {
 
 impl Deploy {
     pub async fn run(&self) {
+        // init global client
+        deploy::CLIENT
+            .set(reqwest::Client::new())
+            .expect("Set global client failed");
+
         debug!("Deploy: {self:?}");
         let addr = self.api_addr.as_ref().unwrap();
 

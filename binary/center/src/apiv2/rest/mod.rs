@@ -1,13 +1,14 @@
 use axum::{
     middleware::{self, Next},
     response,
-    routing::{get, post},
+    routing::{get, post, put},
     Router,
 };
 use hyper::{Request, StatusCode};
 use land_dao::user_token;
 use tracing::error;
 
+mod deployment;
 mod params;
 mod project;
 mod templates;
@@ -18,6 +19,8 @@ pub fn router() -> Router {
         .route("/v2/project", post(project::create_handler))
         .route("/v2/project/:name/overview", get(project::overview_handler))
         .route("/v2/templates", get(templates::list_handler))
+        .route("/v2/deployment", post(deployment::create_handler))
+        .route("/v2/deployment", put(deployment::update_handler))
         .route_layer(middleware::from_fn(auth_middleware))
 }
 

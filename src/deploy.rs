@@ -1,11 +1,15 @@
 use anyhow::Result;
 use land_core::metadata::Metadata;
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::debug;
 
 /// LOCAL_PROJECT_ENV_FILE is the file name of the local project env file
 const LOCAL_PROJECT_ENV_FILE: &str = ".land.env";
+
+/// CLIENT is the global http client
+pub static CLIENT: OnceCell<reqwest::Client> = OnceCell::new();
 
 /// load_project loads the project from local env or cloud
 pub async fn load_project(
@@ -27,8 +31,8 @@ pub async fn load_project(
         // use cloud project name to override local env
         debug!("Try to load project from cloud: {}", project_name);
         let project = query_project(addr, token, project_name.to_string()).await?;
-        write_project_env(&project)?;
-        return Ok(project);
+        write_project_env(&project.project)?;
+        return Ok(project.project);
     }
 
     // if project name not provided, load from local env
@@ -62,10 +66,15 @@ pub struct Project {
     status: String,*/
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectOverView {
+    pub project: Project,
+}
+
 /// query_project queries the project from cloud
-pub async fn query_project(addr: &str, token: &str, name: String) -> Result<Project> {
-    let url = format!("{}/v1/project/{}", addr, name);
-    let client = reqwest::Client::new();
+pub async fn query_project(addr: &str, token: &str, name: String) -> Result<ProjectOverView> {
+    let url = format!("{}/v2/project/{}/overview", addr, name);
+    let client = CLIENT.get().unwrap();
     let resp = client
         .get(&url)
         .header("Authorization", format!("Bearer {}", token))
@@ -77,7 +86,7 @@ pub async fn query_project(addr: &str, token: &str, name: String) -> Result<Proj
             resp.status()
         ));
     }
-    let project = resp.json::<Project>().await?;
+    let project = resp.json::<ProjectOverView>().await?;
     Ok(project)
 }
 
@@ -144,14 +153,14 @@ pub async fn create_deployment(
     addr: &str,
     token: &str,
 ) -> Result<DeploymentResponse> {
-    let url = format!("{}/v1/deployment", addr);
+    let url = format!("{}/v2/deployment", addr);
     let data = CreateDeployRequest {
         project_name: project.name,
         project_uuid: project.uuid,
         deploy_chunk: content,
         deploy_content_type: content_type,
     };
-    let client = reqwest::Client::new();
+    let client = CLIENT.get().unwrap();
     let resp = client
         .post(&url)
         .header("Authorization", format!("Bearer {}", token))
@@ -160,12 +169,20 @@ pub async fn create_deployment(
         .await?;
     if !resp.status().is_success() {
         return Err(anyhow::anyhow!(
-            "create deployment failed, status: {}",
-            resp.status()
+            "create deployment failed, status: {}, body: {}",
+            resp.status(),
+            resp.text().await?
         ));
     }
     let deployment = resp.json::<DeploymentResponse>().await?;
     Ok(deployment)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct UpdateDeployRequest {
+    pub project_uuid: String,
+    pub deployment_uuid: String,
+    pub action: String,
 }
 
 /// publish_deployment publishes the deployment
@@ -174,17 +191,24 @@ pub async fn publish_deployment(
     addr: &str,
     token: &str,
 ) -> Result<DeploymentResponse> {
-    let url = format!("{}/v1/deployment/{}/publish", addr, uuid);
-    let client = reqwest::Client::new();
+    let url = format!("{}/v2/deployment", addr);
+    let data = UpdateDeployRequest {
+        project_uuid: String::new(),
+        deployment_uuid: uuid,
+        action: String::from("publish"),
+    };
+    let client = CLIENT.get().unwrap();
     let resp = client
-        .post(&url)
+        .put(&url)
+        .json(&data)
         .header("Authorization", format!("Bearer {}", token))
         .send()
         .await?;
     if !resp.status().is_success() {
         return Err(anyhow::anyhow!(
-            "publish deployment failed, status: {}",
-            resp.status()
+            "publish deployment failed, status: {}, body: {}",
+            resp.status(),
+            resp.text().await?
         ));
     }
     let deployment = resp.json::<DeploymentResponse>().await?;

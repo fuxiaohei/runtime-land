@@ -159,3 +159,19 @@ pub struct CreateProjectRequest {
     pub prefix: Option<String>,
     pub language: String,
 }
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct CreateDeployRequest {
+    #[validate(length(min = 3))]
+    pub project_name: String,
+    pub project_uuid: String,
+    pub deploy_chunk: Vec<u8>,
+    pub deploy_content_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateDeployRequest {
+    pub project_uuid: String,
+    pub deployment_uuid: String,
+    pub action: String,
+}
