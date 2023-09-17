@@ -94,13 +94,24 @@ jobs:
           tar -xf wizer.tar.xz
           mv wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }} wizer-bin
           ls -lhR wizer-bin
-
       - name: download wizer binary for windows
         if: runner.os == 'Windows'
         run:  |
           curl --progress-bar --show-error --location --fail "https://github.com/bytecodealliance/wizer/releases/download/v3.0.1/wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.zip" --output "wizer.zip"
           unzip wizer.zip
           mv wizer-v3.0.1-${{ matrix.config.arch }}-${{ env.RUNNER_OS }} wizer-bin
+
+      - name: download wasm-opt binary
+        if: runner.os != 'Windows'
+        run:  |
+          curl --progress-bar --show-error --location --fail "https://runtime.land/binaryen-version_114-wasm-opt-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.gz" --output "wasm-opt.tar.gz"
+          tar -xzf wasm-opt.tar.gz -C wasm-opt-bin
+          ls -lhR wasm-opt-bin
+      - name: download wasm-opt binary for windows
+        if: runner.os == 'Windows'
+        run:  |
+          curl --progress-bar --show-error --location --fail "https://runtime.land/binaryen-version_114-wasm-opt-${{ matrix.config.arch }}-${{ env.RUNNER_OS }}.tar.gz" --output "wasm-opt.tar.gz"
+          tar -xzf wasm-opt.tar.gz -C wasm-opt-bin
 
       - name: build release
         uses: actions-rs/cargo@v1
@@ -115,10 +126,11 @@ jobs:
           mkdir _dist
           cp LICENSE README.md ${{ matrix.config.targetDir }}/land-cli${{ matrix.config.extension }} _dist/
           cp -R wizer-bin _dist/
+          cp -R wasm-opt-bin _dist/
           cd _dist
           tar czf \
             land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.tar.gz \
-            LICENSE README.md wizer-bin land-cli${{ matrix.config.extension }}
+            LICENSE README.md wizer-bin wasm-opt-bin land-cli${{ matrix.config.extension }}
       - name: package release assets for windows
         if: runner.os == 'Windows'
         shell: bash
@@ -126,10 +138,11 @@ jobs:
           mkdir _dist
           cp README.md LICENSE ${{ matrix.config.targetDir }}/land-cli${{ matrix.config.extension }} _dist/
           cp -R wizer-bin _dist/
+          cp -R wasm-opt-bin _dist/
           cd _dist
           7z a -tzip \
             land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.zip \
-            README.md LICENSE wizer-bin land-cli${{ matrix.config.extension }}
+            README.md LICENSE wizer-bin wasm-opt-bin land-cli${{ matrix.config.extension }}
 
       - name: upload binary as GitHub artifact
         if: runner.os != 'Windows'
