@@ -66,7 +66,7 @@ fn get_runtime_path() -> String {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     init_tracing();
 
     // get cli and runtime path
@@ -82,7 +82,7 @@ async fn main() {
         info!("create wasm-dist dir: {:?}", wasm_dist);
     }
 
-    let test_templates = ["rust-basic", "rust-fetch", "rust-router"];
+    let test_templates = ["rust-basic", "rust-fetch", "rust-router", "js-basic"];
     let mut target_files = HashMap::new();
     for name in test_templates.iter() {
         // build template project
@@ -109,12 +109,13 @@ async fn main() {
             Err(e) => {
                 error!("test template runtime failed: {}, {}", name, e);
                 runtime_server.kill().unwrap();
-                return;
+                return Err(e);
             }
         }
     }
 
     runtime_server.kill().unwrap();
+    Ok(())
 }
 
 fn build_template_project(name: &str, cli_path: &str, dist_dir: &str) -> Result<String> {

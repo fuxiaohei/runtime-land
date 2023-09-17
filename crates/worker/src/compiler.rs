@@ -128,11 +128,21 @@ pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
 }
 
 fn optimize_module(path: &str) -> Result<Option<String>> {
-    println!("----env:{:?}", std::env::current_exe());
-    let cmd = which("wasm-opt");
+    let mut cmd = which("wasm-opt");
     if cmd.is_err() {
-        debug!("Wasm-opt not found, skip optimize");
-        return Ok(None);
+        // find wasm-opt binary in current exe directroy ./wasm-opt-bin/wasm
+        let exe_path = std::env::current_exe()?;
+        let file = exe_path.parent().unwrap().join("wasm-opt-bin/wasm-opt");
+
+        #[cfg(target_os = "windows")]
+        let file = file.with_extension("exe");
+
+        if file.exists() {
+            cmd = Ok(file);
+        } else {
+            debug!("Wasm-opt not found, skip optimize");
+            return Ok(None);
+        }
     }
     debug!("Optimize module: {}", path);
     let target = path.replace(".wasm", ".opt.wasm");
@@ -167,15 +177,24 @@ fn optimize_module(path: &str) -> Result<Option<String>> {
 
 pub fn compile_js(target: &str, src_js_path: &str, js_engine_path: Option<String>) -> Result<()> {
     // js need wizer command
-    let cmd = match which("wizer") {
-            Ok(cmd) => cmd,
-            Err(_) => {
-                return Err(anyhow::anyhow!(
-                    "Wizer not found \n\tplease install wizer first: \n\tcargo install wizer --all-features\n\tmore infomation see: https://github.com/bytecodealliance/wizer"
-                ))
-            }
-        };
+    let mut cmd = which("wizer");
+    if cmd.is_err() {
+        let exe_path = std::env::current_exe()?;
+        let file = exe_path.parent().unwrap().join("wizer-bin/wizer");
 
+        #[cfg(target_os = "windows")]
+        let file = file.with_extension("exe");
+
+        if file.exists() {
+            cmd = Ok(file);
+        } else {
+            return Err(anyhow::anyhow!(
+            "Wizer not found \n\tplease install wizer first: \n\tcargo install wizer --all-features\n\tmore infomation see: https://github.com/bytecodealliance/wizer"
+        ));
+        }
+    }
+
+    let cmd = cmd.unwrap();
     // create dir
     let engine_dir = Path::new(&target).parent().unwrap();
     std::fs::create_dir_all(engine_dir).expect("create dir failed");
