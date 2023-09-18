@@ -101,9 +101,13 @@ pub fn compile_rust(arch: &str, target: &str) -> Result<()> {
 }
 
 /// convert_component is used to convert wasm module to component
-pub fn convert_component(path: &str, output: Option<String>) -> Result<()> {
-    let opt_path = optimize_module(path)?;
-    let path = opt_path.unwrap_or_else(|| path.to_string());
+pub fn convert_component(path: &str, output: Option<String>, language: String) -> Result<()> {
+    let path = if language == "js" || language == "javascript" {
+        // js sdk wasm is already optimized
+        path.to_string()
+    } else {
+        optimize_module(path)?.unwrap_or(path.to_string())
+    };
     debug!("Convert component, {path}");
     let file_bytes = std::fs::read(&path).expect("parse wasm file error");
     let wasi_adapter = include_bytes!("../engine/wasi_snapshot_preview1.reactor.wasm");

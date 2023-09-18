@@ -150,7 +150,8 @@ impl Build {
 
         // convert wasm module to component
         let output = meta.get_output();
-        land_worker::compiler::convert_component(&target, Some(output)).expect("Convert failed");
+        land_worker::compiler::convert_component(&target, Some(output), meta.language)
+            .expect("Convert failed");
     }
 }
 
