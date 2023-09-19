@@ -158,7 +158,7 @@ mod tests {
     #[tokio::test]
     async fn run_wasm() {
         let wasm_file = "../../tests/rust_test.component.wasm";
-        let  worker = Worker::new(wasm_file).await.unwrap();
+        let worker = Worker::new(wasm_file).await.unwrap();
 
         for _ in 1..10 {
             let headers: Vec<(String, String)> = vec![];

@@ -112,7 +112,7 @@ async fn build_conf() -> Result<()> {
 
     let mut conf_values = CONF_VALUES.lock().await;
     conf_values.items = conf_items;
-    conf_values.created_at = chrono::Utc::now().timestamp_nanos() as u64;
+    conf_values.created_at = chrono::Utc::now().timestamp_nanos_opt().unwrap() as u64;
 
     Ok(())
 }

@@ -47,3 +47,4 @@ Temporary Items
 demo/
 ipinfo.json
 edge-conf.json
+_dist/
