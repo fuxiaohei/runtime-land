@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-tar -xzvf land-cli-nightly-linux-x64_64.tar.gz
+tar -xzvf land-cli-nightly-linux-x86_64.tar.gz
 
 export SDK_VERSION='{ git = "https://github.com/fuxiaohei/runtime-land" }'
 

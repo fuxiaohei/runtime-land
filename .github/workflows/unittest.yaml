@@ -58,7 +58,7 @@ jobs:
         run: |
           tar -xzf integration-test.tar.gz
           chmod +x ./download-deps-binary.sh
-          ./download-deps-binary.sh
+          ./download-deps-binary.sh x86_64 linux
           chmod +x ./integration-test
           chmod +x ./land-cli
           chmod +x ./land-runtime
