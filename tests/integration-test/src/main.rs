@@ -95,7 +95,7 @@ async fn main() -> Result<()> {
     // start runtime server in spawn
     let mut runtime_server = Command::new(&runtime_path)
         .env("FS_PATH", &wasm_dist)
-        .env("EDGE_SYNC_ENABLED", "false")
+        .env("STANDALONE", "true")
         .spawn()
         .expect("failed to start runtime server");
     info!("runtime server started");

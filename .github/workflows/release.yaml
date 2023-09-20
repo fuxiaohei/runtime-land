@@ -157,6 +157,7 @@ jobs:
         env:
           SDK_VERSION: '{ git = "https://github.com/fuxiaohei/runtime-land" }'
         run: |
+          chmod +x ./build-templates-wasm.sh
           ./build-templates-wasm.sh
       - name: upload templates-wasm
         if: runner.os == 'Windows'

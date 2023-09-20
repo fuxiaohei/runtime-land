@@ -45,6 +45,7 @@ jobs:
             target/release/land-cli
             target/release/land-runtime
             target/release/integration-test
+            deploy/download-deps-binary.sh
   integration-test:
     runs-on: ubuntu-latest
     needs: unit-test
@@ -60,6 +61,8 @@ jobs:
           name: integration-test
       - name: Run integration-test
         run: |
+          chmod +x ./download-deps-binary.sh
+          ./download-deps-binary.sh
           chmod +x ./integration-test
           chmod +x ./land-cli
           chmod +x ./land-runtime
