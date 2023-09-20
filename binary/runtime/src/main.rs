@@ -16,6 +16,7 @@ struct Cli {
 }
 
 mod confs;
+mod localstore;
 mod runtime;
 
 #[tokio::main]
@@ -24,6 +25,9 @@ async fn main() -> Result<()> {
 
     let args = Cli::parse();
     debug!("Load args: {:?}", args);
+
+    localstore::init().await?;
+    info!("Local store init success");
 
     if !args.standalone {
         if args.center_token.is_none() {

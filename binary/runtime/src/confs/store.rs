@@ -1,19 +1,7 @@
 use anyhow::Result;
 use futures_util::StreamExt;
-use once_cell::sync::OnceCell;
-use opendal::Operator;
 use tracing::{debug, info};
-
-pub static LOCAL_STORE: OnceCell<Operator> = OnceCell::new();
-
-pub async fn init() -> Result<()> {
-    let local_op = land_storage::build_operator("fs").await?;
-    LOCAL_STORE
-        .set(local_op)
-        .map_err(|_| anyhow::anyhow!("set local store error"))?;
-
-    Ok(())
-}
+use crate::localstore::LOCAL_STORE;
 
 /// download_file saves the remote file to local
 pub async fn download_file(download_url: &str, path: &str) -> Result<()> {

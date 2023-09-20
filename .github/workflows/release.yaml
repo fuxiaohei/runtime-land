@@ -144,6 +144,11 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: build
     steps:
+      - name: Update local toolchain
+        run: |
+          rustup update stable
+          rustup component add rustfmt
+          rustup target add wasm32-wasi
       - name: Download release assets
         uses: actions/download-artifact@v3
         with:
