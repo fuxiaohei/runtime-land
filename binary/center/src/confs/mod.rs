@@ -24,7 +24,6 @@ pub fn run(interval: u64) {
                 let mut conf_values = CONF_VALUES.lock().await;
 
                 if !should_generate().await && conf_values.created_at > 0 {
-                    debug!("skip generate conf by recent updated");
                     continue;
                 }
 
@@ -58,7 +57,7 @@ async fn should_generate() -> bool {
     }
 }
 
-pub async fn generate() -> Result<EndpointConf> {
+async fn generate() -> Result<EndpointConf> {
     // get all success deployments
     let deployments = land_dao::deployment::list_success().await?;
     debug!("deployments: {:?}", deployments.len());

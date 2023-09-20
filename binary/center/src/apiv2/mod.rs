@@ -8,11 +8,13 @@ use axum::{
 use hyper::StatusCode;
 use tracing::error;
 
+mod auth;
 mod endpoint;
 mod rest;
 
 pub fn api_router() -> Router {
     Router::new()
+        .merge(auth::router())
         .merge(endpoint::router())
         .merge(rest::router())
         .route("/v2/*path", any(v2_handler))

@@ -99,7 +99,39 @@ pub async fn update_handler(
         "publish" => {
             let deployment = deployment::publish(current_user.id, payload.deployment_uuid).await?;
             info!(
-                "success, deployment_name:{}, deployment_uuid:{}",
+                "publish success, deployment_name:{}, deployment_uuid:{}",
+                deployment.domain, deployment.uuid,
+            );
+            let (prod_domain, prod_protocol) = settings::get_domains().await;
+            Ok((
+                StatusCode::OK,
+                Json(DeploymentResponse::from_model(
+                    &deployment,
+                    &prod_domain,
+                    &prod_protocol,
+                )),
+            ))
+        }
+        "enable" => {
+            let deployment = deployment::enable(current_user.id, payload.deployment_uuid).await?;
+            info!(
+                "enable success, deployment_name:{}, deployment_uuid:{}",
+                deployment.domain, deployment.uuid,
+            );
+            let (prod_domain, prod_protocol) = settings::get_domains().await;
+            Ok((
+                StatusCode::OK,
+                Json(DeploymentResponse::from_model(
+                    &deployment,
+                    &prod_domain,
+                    &prod_protocol,
+                )),
+            ))
+        }
+        "disable" => {
+            let deployment = deployment::disable(current_user.id, payload.deployment_uuid).await?;
+            info!(
+                "disable success, deployment_name:{}, deployment_uuid:{}",
                 deployment.domain, deployment.uuid,
             );
             let (prod_domain, prod_protocol) = settings::get_domains().await;

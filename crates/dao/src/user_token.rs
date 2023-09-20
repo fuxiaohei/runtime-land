@@ -134,7 +134,7 @@ pub async fn create(
     Ok(token_model)
 }
 
-pub async fn remove(owner_id: i32, token_uuid: String) -> Result<()> {
+pub async fn remove(owner_id: i32, token_uuid: &str) -> Result<()> {
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()
         .filter(user_token::Column::Uuid.eq(token_uuid))

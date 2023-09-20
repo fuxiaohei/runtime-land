@@ -1,4 +1,4 @@
-use super::params::{CreateProjectRequest, ProjectOverview, ProjectResponse};
+use super::params::{CreateProjectRequest, ProjectOverview, ProjectRenameRequest, ProjectResponse};
 use super::SessionUser;
 use crate::{apiv2::RouteError, settings};
 use axum::{extract::Path, Extension, Json};
@@ -54,4 +54,40 @@ pub async fn overview_handler(
     let project = project.unwrap();
     let overview = ProjectOverview::from_model(&project).await?;
     Ok((StatusCode::OK, Json(overview)))
+}
+
+#[tracing::instrument(name = "[project_rename_handler]", skip_all)]
+pub async fn rename_handler(
+    Extension(current_user): Extension<SessionUser>,
+    Json(payload): Json<ProjectRenameRequest>,
+) -> Result<StatusCode, RouteError> {
+    let project = project::rename(
+        current_user.id,
+        payload.old_name.clone(),
+        payload.new_name.clone(),
+    )
+    .await?;
+
+    if project.prod_deploy_id > 0 {
+        deployment::update_prod_domain(project.prod_deploy_id, project.name).await?;
+    }
+    info!(
+        "success, owner_id:{}, old_name:{}, new_name:{}",
+        current_user.id, payload.old_name, payload.new_name
+    );
+
+    Ok(StatusCode::OK)
+}
+
+#[tracing::instrument(name = "[project_remove_handler]", skip_all)]
+pub async fn remove_handler(
+    Extension(current_user): Extension<SessionUser>,
+    Path(name): Path<String>,
+) -> Result<StatusCode, RouteError> {
+    // name is uuid in this api
+    let project_id = project::remove_project(current_user.id, name.clone()).await?;
+    info!("success, owner_id:{}, uuid:{}", current_user.id, name);
+    // set related deployments to deleted
+    deployment::set_deleted_by_project(project_id).await?;
+    Ok(StatusCode::OK)
 }

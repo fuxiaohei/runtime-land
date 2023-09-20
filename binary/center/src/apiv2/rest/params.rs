@@ -175,3 +175,54 @@ pub struct UpdateDeployRequest {
     pub deployment_uuid: String,
     pub action: String,
 }
+
+#[derive(Serialize, Debug)]
+pub struct TokenResponse {
+    pub name: String,
+    pub value: String,
+    pub origin: String,
+    pub uuid: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub expired_at: i64,
+}
+
+impl TokenResponse {
+    pub fn from_vec(tokens: Vec<land_dao::UserToken>) -> Vec<TokenResponse> {
+        let mut values = vec![];
+        for token in tokens {
+            let value = TokenResponse::from_model(&token);
+            values.push(value);
+        }
+        values
+    }
+
+    pub fn from_model(t: &land_dao::UserToken) -> TokenResponse {
+        TokenResponse {
+            name: t.name.clone(),
+            created_at: t.created_at.timestamp(),
+            updated_at: t.updated_at.timestamp(),
+            expired_at: t.expired_at.unwrap().timestamp(),
+            origin: t.created_by.to_string(),
+            uuid: t.uuid.clone(),
+            value: String::new(),
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct CreateTokenRequest {
+    #[validate(length(min = 3))]
+    pub name: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct RemoveTokenRequest {
+    pub uuid: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectRenameRequest {
+    pub old_name: String,
+    pub new_name: String,
+}

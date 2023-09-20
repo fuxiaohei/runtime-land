@@ -199,7 +199,7 @@ pub async fn remove_token(
     Extension(current_user): Extension<CurrentUser>,
     Path(uuid): Path<String>,
 ) -> Result<(), AppError> {
-    land_dao::user_token::remove(current_user.id, uuid.clone()).await?;
+    land_dao::user_token::remove(current_user.id, &uuid).await?;
     info!(
         "remove_token success, userid:{}, uuid:{}",
         current_user.id, uuid

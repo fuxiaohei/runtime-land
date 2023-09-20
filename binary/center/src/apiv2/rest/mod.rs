@@ -1,7 +1,7 @@
 use axum::{
     middleware::{self, Next},
     response,
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
     Router,
 };
 use hyper::{Request, StatusCode};
@@ -12,15 +12,20 @@ mod deployment;
 mod params;
 mod project;
 mod templates;
+mod tokens;
 
 pub fn router() -> Router {
     Router::new()
         .route("/v2/projects", get(project::list_handler))
         .route("/v2/project", post(project::create_handler))
+        .route("/v2/project/rename", post(project::rename_handler))
         .route("/v2/project/:name/overview", get(project::overview_handler))
         .route("/v2/templates", get(templates::list_handler))
         .route("/v2/deployment", post(deployment::create_handler))
         .route("/v2/deployment", put(deployment::update_handler))
+        .route("/v2/tokens", get(tokens::list_handler))
+        .route("/v2/token", post(tokens::create_handler))
+        .route("/v2/token", delete(tokens::remove_handler))
         .route_layer(middleware::from_fn(auth_middleware))
 }
 
@@ -36,7 +41,7 @@ pub async fn auth_middleware<B>(
 ) -> Result<response::Response, StatusCode> {
     let auth_header = request.headers().get("authorization");
     if auth_header.is_none() {
-        error!("no authorization header or bear token");
+        error!("no authorization header");
         return Err(StatusCode::UNAUTHORIZED);
     }
     let auth_token = auth_header.unwrap().to_str().unwrap();

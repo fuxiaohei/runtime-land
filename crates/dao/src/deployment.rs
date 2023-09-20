@@ -202,7 +202,6 @@ pub async fn list_success() -> Result<Vec<deployment::Model>> {
 pub async fn is_recent_updated() -> Result<bool> {
     let db = DB.get().unwrap();
     let deployments = deployment::Entity::find()
-        .filter(deployment::Column::Status.eq(Status::Active.to_string()))
         .filter(deployment::Column::DeployStatus.eq(DeployStatus::Success.to_string()))
         .order_by_desc(deployment::Column::UpdatedAt)
         .one(db)
@@ -243,6 +242,10 @@ pub async fn set_deleted_by_project(project_id: i32) -> Result<()> {
         )
         .col_expr(
             deployment::Column::DeletedAt,
+            Expr::value(chrono::Utc::now()),
+        )
+        .col_expr(
+            deployment::Column::UpdatedAt,
             Expr::value(chrono::Utc::now()),
         )
         .filter(deployment::Column::ProjectId.eq(project_id))
