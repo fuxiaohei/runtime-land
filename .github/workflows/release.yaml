@@ -117,6 +117,13 @@ jobs:
           name: land-cli
           path: _dist/land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.zip
 
+      - name: upload build-template-script
+        if: ${{ matrix.config.os }} == 'ubuntu-latest' && ${{ matrix.config.arch }} == 'x86_64'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-template-script
+          path: ./deploy/build-templates-wasm.sh
+
       - name: upload binary to Github release
         if: startsWith(github.ref, 'refs/tags/v') && runner.os != 'Windows'
         uses: svenstaro/upload-release-action@v2
@@ -131,6 +138,32 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: _dist/land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.zip
           tag: ${{ github.ref }}
+
+  build-templates-wasm:
+    name: build templates webassembly
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v3
+        with:
+          name: land-cli
+      - name: Download build script
+        uses: actions/download-artifact@v3
+        with:
+          name: build-template-script
+      - name: Build templates wasm
+        shell: bash
+        env:
+          SDK_VERSION: '{ git = "https://github.com/fuxiaohei/runtime-land" }'
+        run: |
+          ./build-templates-wasm.sh
+      - name: upload templates-wasm
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: templates-wasm
+          path: ./templates-wasm.tar.gz
 
   update-nightly:
     name: update nightly release

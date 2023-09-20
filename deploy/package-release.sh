@@ -47,5 +47,13 @@ cp LICENSE README.md $TARGET_DIR/land-cli$EXT _dist/
 cp -R wizer-bin _dist/
 cp -R wasm-opt-bin _dist/
 cd _dist
+# if os=windows, use 7z to package zip
+if [[ "$OS" == "windows" ]]; then
+    log_print 1 "Packaging zip"
+    7z a -tzip land-cli-$VERSION-$OS-$ARCH.zip LICENSE README.md wizer-bin wasm-opt-bin land-cli$EXT
+    log_print 1 "Done: land-cli-$VERSION-$OS-$ARCH.zip"
+    exit 0
+fi
+log_print 1 "Packaging tar.gz"
 tar cvzf land-cli-$VERSION-$OS-$ARCH.tar.gz LICENSE README.md wizer-bin wasm-opt-bin land-cli$EXT
 log_print 1 "Done: land-cli-$VERSION-$OS-$ARCH.tar.gz"
