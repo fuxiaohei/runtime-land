@@ -34,18 +34,13 @@ jobs:
         run: cargo test --workspace --release
       - name: Build cli, runtime and integration-test
         run: |
-          cargo build --release -p land-cli
-          cargo build --release -p land-runtime
-          cargo build --release -p integration-test
+          chmod +x ./tests/build_integration_test.sh
+          ./tests/build_integration_test.sh
       - name: Upload cli, runtime and integration-test
         uses: actions/upload-artifact@v3
         with:
           name: integration-test
-          path: |
-            target/release/land-cli
-            target/release/land-runtime
-            target/release/integration-test
-            deploy/download-deps-binary.sh
+          path: integration-test.tar.gz
   integration-test:
     runs-on: ubuntu-latest
     needs: unit-test
@@ -61,6 +56,7 @@ jobs:
           name: integration-test
       - name: Run integration-test
         run: |
+          tar -xzf integration-test.tar.gz
           chmod +x ./download-deps-binary.sh
           ./download-deps-binary.sh
           chmod +x ./integration-test

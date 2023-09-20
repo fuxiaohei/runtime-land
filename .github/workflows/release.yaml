@@ -117,7 +117,7 @@ jobs:
           path: _dist/land-cli-${{ env.RELEASE_VERSION }}-${{ env.RUNNER_OS }}-${{ matrix.config.arch }}.zip
 
       - name: upload build-template-script
-        if: ${{ matrix.config.os }} == 'ubuntu-latest' && ${{ matrix.config.arch }} == 'x86_64'
+        if: matrix.config.os == 'ubuntu-latest' && matrix.config.arch == 'x86_64'
         uses: actions/upload-artifact@v3
         with:
           name: build-template-script
