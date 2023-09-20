@@ -30,4 +30,4 @@ build_template "rust-router"
 build_template "js-basic"
 
 # build templates-wasm.tar.gz from dist
-tar -czvf templates-wasm.tar.gz dist
+tar -czvf land-cli-nightly-templates-wasm.tar.gz dist

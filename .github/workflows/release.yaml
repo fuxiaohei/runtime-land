@@ -99,7 +99,6 @@ jobs:
           args: "-p land-cli --release ${{ matrix.config.extraArgs }}"
 
       - name: package release assets
-        if: runner.os != 'Windows'
         shell: bash
         run: |
           ./deploy/package-release.sh ${{ matrix.config.arch }} ${{ env.RUNNER_OS }} ${{ env.RELEASE_VERSION }} ${{ matrix.config.targetDir }}
@@ -143,6 +142,7 @@ jobs:
     name: build templates webassembly
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    needs: build
     steps:
       - name: Download release assets
         uses: actions/download-artifact@v3
@@ -162,13 +162,15 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
-          name: templates-wasm
-          path: ./templates-wasm.tar.gz
+          name: land-cli
+          path: ./land-cli-nightly-templates-wasm.tar.gz
 
   update-nightly:
     name: update nightly release
     runs-on: ubuntu-latest
-    needs: build
+    needs: 
+      - build
+      - build-templates-wasm
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Download release assets
