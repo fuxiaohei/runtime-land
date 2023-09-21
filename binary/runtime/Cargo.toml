@@ -14,10 +14,9 @@ envconfig = { workspace = true }
 futures-util = { workspace = true }
 gethostname = "0.4.3"
 land-core = { workspace = true }
-land-storage = { workspace = true }
 land-worker = { workspace = true }
 lazy_static = { workspace = true }
-moka = { version = "0.11.3", default-features = false, features = ["sync"] }
+moka = { workspace = true }
 once_cell = { workspace = true }
 opendal = { workspace = true }
 reqwest = { workspace = true }

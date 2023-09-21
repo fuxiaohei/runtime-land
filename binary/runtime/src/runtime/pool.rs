@@ -1,11 +1,11 @@
 use anyhow::anyhow;
 use anyhow::Result;
+use land_core::storage;
 use land_worker::Worker;
 use lazy_static::lazy_static;
 use moka::sync::Cache;
 use std::time::Duration;
 use tracing::{debug, info};
-use crate::localstore;
 
 lazy_static! {
     pub static ref WASM_INSTANCES: Cache<String,Worker > = Cache::builder()
@@ -24,10 +24,10 @@ pub async fn prepare_worker(key: &str) -> Result<Worker> {
         return Ok(instances_pool.unwrap());
     }
 
-    if !localstore::is_exist(key).await? {
+    if !storage::is_exist(key).await? {
         return Err(anyhow!("pool key not found: {}", key));
     }
-    let binary = localstore::read(key).await?;
+    let binary = storage::read(key).await?;
 
     // write binary to local file
     let mut path = std::env::temp_dir();

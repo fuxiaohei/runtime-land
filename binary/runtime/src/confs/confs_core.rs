@@ -1,7 +1,7 @@
 use super::endpoint;
-use crate::localstore::LOCAL_STORE;
 use anyhow::Result;
 use land_core::confdata::{EndpointConf, RouteConfItem};
+use land_core::storage;
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 use tracing::{debug, info, instrument, warn};
@@ -172,21 +172,18 @@ pub async fn process_conf(local_conf: &EndpointConf, remote_conf: &EndpointConf)
 const CONF_LOCAL_FILE: &str = "endpoint-conf.json";
 
 async fn write_conf(conf: &EndpointConf) -> Result<()> {
-    let s = LOCAL_STORE.get().unwrap();
     let data = serde_json::to_vec(conf)?;
-    s.write(CONF_LOCAL_FILE, data).await?;
+    storage::write(CONF_LOCAL_FILE, data).await?;
     Ok(())
 }
 
 async fn read_conf() -> Result<EndpointConf> {
-    let s = LOCAL_STORE.get().unwrap();
-    let data = s.read(CONF_LOCAL_FILE).await?;
+    let data = storage::read(CONF_LOCAL_FILE).await?;
     let conf: EndpointConf = serde_json::from_slice(&data)?;
     Ok(conf)
 }
 
 async fn exist_conf() -> Result<bool> {
-    let s = LOCAL_STORE.get().unwrap();
-    let exist = s.is_exist(CONF_LOCAL_FILE).await?;
+    let exist = storage::is_exist(CONF_LOCAL_FILE).await?;
     Ok(exist)
 }

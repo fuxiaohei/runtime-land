@@ -165,11 +165,10 @@ jobs:
           chmod +x ./build-templates-wasm.sh
           ./build-templates-wasm.sh
       - name: upload templates-wasm
-        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
           name: land-cli
-          path: ./land-cli-nightly-templates-wasm.tar.gz
+          path: land-cli-nightly-templates-wasm.tar.gz
 
   update-nightly:
     name: update nightly release

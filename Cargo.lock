@@ -2262,10 +2262,14 @@ name = "land-core"
 version = "0.1.4-beta.4"
 dependencies = [
  "anyhow",
+ "envconfig",
  "lazy_static",
  "md-5 0.10.5",
+ "once_cell",
+ "opendal",
  "serde",
  "time",
+ "tokio",
  "toml 0.8.0",
  "tracing",
  "tracing-subscriber",
@@ -2308,7 +2312,6 @@ dependencies = [
  "gethostname",
  "hyper",
  "land-core",
- "land-storage",
  "land-worker",
  "lazy_static",
  "moka",

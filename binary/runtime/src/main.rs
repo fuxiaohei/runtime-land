@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use land_core::storage;
 use tracing::{debug, debug_span, error, info, Instrument};
 
 #[derive(Parser, Debug)]
@@ -16,7 +17,6 @@ struct Cli {
 }
 
 mod confs;
-mod localstore;
 mod runtime;
 
 #[tokio::main]
@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
     let args = Cli::parse();
     debug!("Load args: {:?}", args);
 
-    localstore::init().await?;
+    storage::build_global("fs").await.unwrap();
     info!("Local store init success");
 
     if !args.standalone {
