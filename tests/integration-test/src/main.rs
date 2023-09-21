@@ -191,6 +191,7 @@ async fn test_template_runtime(name: &str, wasm: &str) -> Result<()> {
         "rust-basic" => case::test_rust_basic(wasm).await?,
         "rust-fetch" => case::test_rust_fetch(wasm).await?,
         "rust-router" => case::test_rust_router(wasm).await?,
+        "js-basic" => case::test_js_basic(wasm).await?,
         _ => return Err(anyhow::anyhow!("unknown template name: {}", name)),
     }
 

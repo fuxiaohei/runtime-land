@@ -16,7 +16,7 @@ pub async fn test_rust_basic(wasm: &str) -> Result<()> {
     let headers = resp.headers();
     assert_eq!(headers.get("x-request-url").unwrap(), "/");
     assert_eq!(headers.get("x-request-method").unwrap(), "GET");
-    assert_eq!(headers.get("x-served-by").unwrap(), "land-edge");
+    assert_eq!(headers.get("x-served-by").unwrap(), "land-runtime");
     Ok(())
 }
 
@@ -67,5 +67,19 @@ pub async fn test_rust_router(wasm: &str) -> Result<()> {
     let body = resp.text().await?;
     assert_eq!(body, "value: xyz");
 
+    Ok(())
+}
+
+pub async fn test_js_basic(wasm: &str) -> Result<()> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(RUMTIME_SERVER)
+        .header("x-land-module", wasm)
+        .send()
+        .await?;
+    info!("resp: {:?}", resp);
+    assert_eq!(resp.status(), 200);
+    let body = resp.text().await.unwrap();
+    assert!(body.contains("Runtime.land JS SDK"));
     Ok(())
 }

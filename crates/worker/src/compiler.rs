@@ -212,7 +212,7 @@ pub fn compile_js(target: &str, src_js_path: &str, js_engine_path: Option<String
         }
         std::fs::read(&js_engine).unwrap()
     } else {
-        let engine_bytes = include_bytes!("../engine/land-js-v0.1.0-b14.wasm");
+        let engine_bytes = include_bytes!("../engine/land_js_sdk.wasm");
         engine_bytes.to_vec()
     };
     debug!("Use engine_wasm len: {}", engine_wasm.len());

@@ -64,7 +64,7 @@ pub async fn wasm_caller_handler(
         "x-served-by",
         crate::confs::ENDPOINT
             .get()
-            .unwrap_or(&String::from("land-endpoint")),
+            .unwrap_or(&String::from("land-runtime")),
     );
     if wasm_resp.status >= 400 {
         warn!( status=%wasm_resp.status, "[Response]");
@@ -97,7 +97,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
             "x-served-by",
             crate::confs::ENDPOINT
                 .get()
-                .unwrap_or(&String::from("land-endpoint")),
+                .unwrap_or(&String::from("land-runtime")),
         );
         warn!(status = 404, "[Response] x-land-module not found");
         return builder.body(Body::from("x-land-module not found")).unwrap();
@@ -116,7 +116,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
                 "x-served-by",
                 crate::confs::ENDPOINT
                     .get()
-                    .unwrap_or(&String::from("land-endpoint")),
+                    .unwrap_or(&String::from("land-runtime")),
             );
             builder.body(Body::from(e.to_string())).unwrap()
         }

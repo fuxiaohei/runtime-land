@@ -28,12 +28,14 @@ cargo build --release -p land-runtime
 log_print 1 "Building integration-test"
 cargo build --release -p integration-test
 
-# mv binary to top dir
-mv target/release/land-cli .
-mv target/release/land-runtime .
-mv target/release/integration-test .
-mv deploy/download-deps-binary.sh .
+# cp binary to top dir
+cp target/release/land-cli .
+cp target/release/land-runtime .
+cp target/release/integration-test .
+cp deploy/download-deps-binary.sh .
 
 # package integration-test.tar.gz
 log_print 1 "Packaging integration-test.tar.gz"
 tar -czvf integration-test.tar.gz land-cli land-runtime integration-test download-deps-binary.sh
+
+rm land-cli land-runtime integration-test download-deps-binary.sh
