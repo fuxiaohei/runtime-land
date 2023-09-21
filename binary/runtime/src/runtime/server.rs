@@ -85,8 +85,6 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
         .and_then(|v| v.to_str().ok())
         .unwrap_or(&empty_wasm_path);
 
-    println!("land_wasm: {}", land_wasm);
-
     let method = req.method().clone();
     let uri = req.uri().to_string();
     let span = info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri,);

@@ -12,3 +12,15 @@ pub async fn init() -> Result<()> {
 
     Ok(())
 }
+
+/// is_exist checks if the file exists
+pub async fn is_exist(name: &str) -> Result<bool> {
+    let op = LOCAL_STORE.get().unwrap();
+    Ok(op.is_exist(name).await?)
+}
+
+/// read reads the content from the storage
+pub async fn read(name: &str) -> Result<Vec<u8>> {
+    let op = LOCAL_STORE.get().unwrap();
+    Ok(op.read(name).await?)
+}
