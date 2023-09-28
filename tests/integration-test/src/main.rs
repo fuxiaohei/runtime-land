@@ -82,7 +82,12 @@ async fn main() -> Result<()> {
         info!("create wasm-dist dir: {:?}", wasm_dist);
     }
 
-    let test_templates = ["rust-basic", "rust-fetch", "rust-router", "js-basic"];
+    let test_templates = [
+        "rust-hello-world",
+        "rust-fetch",
+        "rust-router",
+        "js-hello-world",
+    ];
     let mut target_files = HashMap::new();
     for name in test_templates.iter() {
         // build template project
@@ -188,10 +193,10 @@ async fn test_template_runtime(name: &str, wasm: &str) -> Result<()> {
     tokio::time::sleep(std::time::Duration::from_secs(2)).await;
 
     match name {
-        "rust-basic" => case::test_rust_basic(wasm).await?,
+        "rust-hello-world" => case::test_rust_basic(wasm).await?,
         "rust-fetch" => case::test_rust_fetch(wasm).await?,
         "rust-router" => case::test_rust_router(wasm).await?,
-        "js-basic" => case::test_js_basic(wasm).await?,
+        "js-hello-world" => case::test_js_basic(wasm).await?,
         _ => return Err(anyhow::anyhow!("unknown template name: {}", name)),
     }
 

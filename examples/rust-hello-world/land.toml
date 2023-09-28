@@ -1,6 +1,10 @@
 manifest = "v1"
-name = "js-basic"
+name = "rust-hello-world"
 template_name = "Hello World"
+project = "rust-basic-example"
 description = "Deliver a simple Hello World message to the browser."
 authors = []
-language = "javascript"
+language = "rust"
+
+[build]
+rust_target_dir = "../../target"

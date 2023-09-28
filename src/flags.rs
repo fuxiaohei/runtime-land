@@ -13,7 +13,7 @@ pub struct Init {
     /// The name of the project
     pub name: String,
     /// The template to use
-    #[clap(long, default_value("rust-basic"))]
+    #[clap(long, default_value("rust-hello-world"))]
     pub template: Option<String>,
 }
 

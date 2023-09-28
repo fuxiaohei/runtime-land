@@ -24,10 +24,10 @@ build_template() {
     echo "Done: $template, output: dist/$template.component.wasm"
 }
 
-build_template "rust-basic"
+build_template "rust-hello-world"
 build_template "rust-fetch"
 build_template "rust-router"
-build_template "js-basic"
+build_template "js-hello-world"
 
 # build templates-wasm.tar.gz from dist
 tar -czvf land-cli-nightly-templates-wasm.tar.gz dist
