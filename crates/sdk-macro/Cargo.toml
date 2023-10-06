@@ -10,7 +10,7 @@ license = "Apache-2.0"
 anyhow = { workspace = true }
 http = { workspace = true }
 quote = "1.0.33"
-syn = { version = "2.0.29", features = ["full"] }
+syn = { version = "2.0.38", features = ["full"] }
 
 [lib]
 proc-macro = true

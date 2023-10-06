@@ -20,8 +20,8 @@ lazy_static! {
 pub async fn prepare_worker(key: &str) -> Result<Worker> {
     let mut instances_pool = WASM_INSTANCES.get(key);
 
-    if instances_pool.is_some() {
-        return Ok(instances_pool.unwrap());
+    if let Some(instance) = instances_pool {
+        return Ok(instance);
     }
 
     if !storage::is_exist(key).await? {

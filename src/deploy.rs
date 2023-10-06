@@ -23,8 +23,10 @@ pub async fn load_project(
         // load project info from given name, local env
         let project_name = project_name.as_ref().unwrap();
         debug!("Try to load project from given name: {}", project_name);
-        if local_project.is_some() && project_name == &local_project.as_ref().unwrap().name {
-            return Ok(local_project.unwrap());
+        if let Some(local_project) = local_project {
+            if project_name == &local_project.name {
+                return Ok(local_project);
+            }
         }
 
         // if local env not found, load from cloud
@@ -37,8 +39,8 @@ pub async fn load_project(
 
     // if project name not provided, load from local env
     debug!("Try to load project from local env");
-    if local_project.is_some() {
-        return Ok(local_project.unwrap());
+    if let Some(local_project) = local_project {
+        return Ok(local_project);
     }
     debug!("Try to create new project from cloud");
     let project = create_project(meta, addr, token).await?;

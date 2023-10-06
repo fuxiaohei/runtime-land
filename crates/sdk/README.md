@@ -11,7 +11,7 @@ Add this to your `Cargo.toml`:
 anyhow = "1.0.75"
 http = "0.2.9"
 land-sdk = "0.1.1"
-wit-bindgen = "0.11.0"
+wit-bindgen = "0.12.0"
 
 [lib]
 crate-type = ["cdylib"] # target wasm32-wasi

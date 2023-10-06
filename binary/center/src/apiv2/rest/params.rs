@@ -35,8 +35,7 @@ impl ProjectOverview {
             if project.prod_deploy_id > 0 {
                 let deployment =
                     land_dao::deployment::find_by_id(user_id, project.prod_deploy_id).await?;
-                if deployment.is_some() {
-                    let deployment = deployment.unwrap();
+                if let Some(deployment) = deployment {
                     overview.project.prod_url =
                         format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain);
                     overview.prod_deployment = Some(DeploymentResponse::from_model(

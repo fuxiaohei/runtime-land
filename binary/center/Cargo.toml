@@ -24,7 +24,7 @@ lettre = { version = "0.10.4", default-features = false, features = [
     "hostname",
     "builder",
 ] }
-md-5 = "0.10.5"
+md-5 = { workspace = true }
 once_cell = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
