@@ -58,12 +58,12 @@ ARCH=${ARCH:-$(get_arch)}
 VERSION=$2
 VERSION=${VERSION:-nightly}
 
-# EXTRA_ARGS
-EXTRA_ARGS=$3
-
 # TARGET_DIR if not set, use "target/release"
-TARGET_DIR=$4
+TARGET_DIR=$3
 TARGET_DIR=${TARGET_DIR:-target/release}
+
+# EXTRA_ARGS
+EXTRA_ARGS=$4
 
 log_print 0 "Checking for system os and architecture..."
 
