@@ -86,22 +86,9 @@ jobs:
           sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu xz-utils
           echo '[target.aarch64-unknown-linux-gnu]' >> ${HOME}/.cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> ${HOME}/.cargo/config.toml
-
-      - name: download deps binary
-        shell: bash
+      - name: build land-cli
         run: |
-          ./deploy/download-deps-binary.sh ${{ matrix.config.arch }} ${{ env.RUNNER_OS }}
-
-      - name: build release
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: "-p land-cli --release ${{ matrix.config.extraArgs }}"
-
-      - name: package release assets
-        shell: bash
-        run: |
-          ./deploy/package-release.sh ${{ matrix.config.arch }} ${{ env.RUNNER_OS }} ${{ env.RELEASE_VERSION }} ${{ matrix.config.targetDir }}
+          ./deploy/build-cli.sh ${{ matrix.config.arch }} ${{ env.RELEASE_VERSION }} ${{ matrix.config.extraArgs }} ${{ matrix.config.targetDir }}
 
       - name: upload binary as GitHub artifact
         if: runner.os != 'Windows'

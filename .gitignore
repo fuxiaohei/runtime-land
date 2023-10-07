@@ -49,4 +49,9 @@ ipinfo.json
 edge-conf.json
 _dist/
 integration-test.tar.gz
-templates-wasm-binary/
+templates-wasm.tar.gz
+templates-wasm/
+wasm-opt.tar.gz
+wasm-opt-bin/
+wizer.tar.xz
+wizer-bin/
