@@ -4,7 +4,7 @@ use crate::{apiv2::RouteError, settings};
 use anyhow::Result;
 use axum::{Extension, Json};
 use hyper::StatusCode;
-use land_dao::{deployment, project, Project};
+use land_dao::{deployment, project, Deployment, Project};
 use tracing::{debug_span, info, warn, Instrument};
 use validator::Validate;
 
@@ -37,24 +37,19 @@ async fn upload_chunks(id: i32, storage_path: &str, deploy_chunk: Vec<u8>) -> an
     Ok(())
 }
 
-#[tracing::instrument(name = "[create_deployment_handler]", skip_all)]
-pub async fn create_handler(
-    Extension(current_user): Extension<SessionUser>,
-    Json(payload): Json<CreateDeployRequest>,
-) -> Result<(StatusCode, Json<DeploymentResponse>), RouteError> {
-    payload.validate()?;
-
-    let project =
-        get_active_project(payload.project_name, payload.project_uuid, current_user.id).await?;
-
+/// create_deployment creates a deployment
+pub async fn create_deployment(
+    user_id: i32,
+    project: &Project,
+    chunk: Vec<u8>,
+) -> anyhow::Result<Deployment> {
     let deployment = deployment::create(
-        current_user.id,
+        user_id,
         project.id,
-        project.name,
+        project.name.clone(),
         String::from("todo"),
     )
     .await?;
-
     info!(
         "success, deployment_name:{}, deployment_uuid:{}",
         deployment.domain, deployment.uuid,
@@ -69,15 +64,28 @@ pub async fn create_handler(
     let storage_path = format!("deployments/{}/{}.wasm", project.uuid, deployment.domain);
     let deployment_id = deployment.id;
     tokio::task::spawn(
-        async move {
-            match upload_chunks(deployment_id, &storage_path, payload.deploy_chunk).await{
-                Ok(_) => info!("success to upload deploy chunk to storage, deployment_id:{}, storage_path:{}", deployment_id, storage_path),
-                Err(e) => warn!("failed to upload deploy chunk to storage, deployment_id:{}, storage_path:{}, err:{}", deployment_id, storage_path, e),
-            }
-        }
-        .instrument(debug_span!("[upload_deploy_chunk]")),
-    );
+         async move {
+             match upload_chunks(deployment_id, &storage_path, chunk).await{
+                 Ok(_) => info!("success to upload deploy chunk to storage, deployment_id:{}, storage_path:{}", deployment_id, storage_path),
+                 Err(e) => warn!("failed to upload deploy chunk to storage, deployment_id:{}, storage_path:{}, err:{}", deployment_id, storage_path, e),
+             }
+         }
+         .instrument(debug_span!("[upload_deploy_chunk]")),
+     );
 
+    Ok(deployment)
+}
+
+#[tracing::instrument(name = "[create_deployment_handler]", skip_all)]
+pub async fn create_handler(
+    Extension(current_user): Extension<SessionUser>,
+    Json(payload): Json<CreateDeployRequest>,
+) -> Result<(StatusCode, Json<DeploymentResponse>), RouteError> {
+    payload.validate()?;
+
+    let project =
+        get_active_project(payload.project_name, payload.project_uuid, current_user.id).await?;
+    let deployment = create_deployment(current_user.id, &project, payload.deploy_chunk).await?;
     let (prod_domain, prod_protocol) = settings::get_domains().await;
 
     Ok((

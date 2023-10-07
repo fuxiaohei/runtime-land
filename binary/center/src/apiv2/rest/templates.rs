@@ -1,20 +1,9 @@
+use super::params::{TemplateInfo, TemplateInfosMap};
 use crate::apiv2::RouteError;
 use axum::Json;
 use hyper::StatusCode;
 use land_core::metadata::Metadata;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TemplateInfo {
-    pub name: String,
-    pub template_name: String,
-    pub description: String,
-    pub content: String,
-    pub language: String,
-}
-
-type TemplateInfosMap = HashMap<String, Vec<TemplateInfo>>;
 
 #[tracing::instrument(name = "[templates_list_handler]", skip_all)]
 pub async fn list_handler() -> Result<(StatusCode, Json<TemplateInfosMap>), RouteError> {

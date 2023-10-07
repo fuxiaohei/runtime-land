@@ -49,3 +49,4 @@ ipinfo.json
 edge-conf.json
 _dist/
 integration-test.tar.gz
+templates-wasm-binary/

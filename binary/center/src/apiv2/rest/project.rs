@@ -34,6 +34,29 @@ pub async fn create_handler(
         "success, project_name:{}, project_uuid:{}",
         project.name, project.uuid,
     );
+
+    // if template is set, generate default production deployment with template wasm file
+    if let Some(template) = payload.template {
+        let wasm_file = format!(
+            "templates-wasm-binary/dist/{}.component.wasm",
+            template.name
+        );
+        let chunk = std::fs::read(wasm_file)?;
+        let deployment =
+            super::deployment::create_deployment(current_user.id, &project, chunk).await?;
+        info!(
+            "success with template, deployment_name:{}, deployment_uuid:{}, template:{}",
+            deployment.domain, deployment.uuid, template.name,
+        );
+
+        // publish deployment
+        let deployment = deployment::publish(current_user.id, deployment.uuid).await?;
+        info!(
+            "publish success, deployment_name:{}, deployment_uuid:{}",
+            deployment.domain, deployment.uuid,
+        );
+    }
+
     let (prod_domain, _) = settings::get_domains().await;
     let project_response = ProjectResponse::from_model(&project, &prod_domain);
     Ok((StatusCode::OK, Json(project_response)))

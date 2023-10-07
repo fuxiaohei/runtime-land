@@ -157,6 +157,7 @@ pub struct CreateProjectRequest {
     pub name: Option<String>,
     pub prefix: Option<String>,
     pub language: String,
+    pub template: Option<TemplateInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
@@ -225,3 +226,14 @@ pub struct ProjectRenameRequest {
     pub old_name: String,
     pub new_name: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TemplateInfo {
+    pub name: String,
+    pub template_name: String,
+    pub description: String,
+    pub content: String,
+    pub language: String,
+}
+
+pub type TemplateInfosMap = HashMap<String, Vec<TemplateInfo>>;
