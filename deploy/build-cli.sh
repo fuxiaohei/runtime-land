@@ -84,6 +84,8 @@ require curl
 require tar
 require uname
 
+./deploy/download-wasm-deps.sh
+
 log_print 0 "Build land-cli..."
 cargo build -p land-cli --release $EXTRA_ARGS
 
