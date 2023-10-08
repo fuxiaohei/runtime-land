@@ -39,8 +39,8 @@ get_os() {
         darwin) OS='macos' ;;
         linux) OS='linux' ;;
         freebsd) OS='freebsd' ;;
-        # mingw*) OS='windows';;
-        # msys*) OS='windows';;
+        mingw*) OS='windows';;
+        msys*) OS='windows';;
         *)
             log_print 2 "The OS (${OS}) is not supported by this script."
             exit 1
