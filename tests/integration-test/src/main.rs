@@ -87,6 +87,8 @@ async fn main() -> Result<()> {
         "rust-fetch",
         "rust-router",
         "js-hello-world",
+        "js-fetch",
+        "js-itty-router",
     ];
     let mut target_files = HashMap::new();
     for name in test_templates.iter() {
@@ -197,6 +199,8 @@ async fn test_template_runtime(name: &str, wasm: &str) -> Result<()> {
         "rust-fetch" => case::test_rust_fetch(wasm).await?,
         "rust-router" => case::test_rust_router(wasm).await?,
         "js-hello-world" => case::test_js_basic(wasm).await?,
+        "js-fetch" => case::test_js_fetch(wasm).await?,
+        "js-itty-router" => case::test_js_itty_router(wasm).await?,
         _ => return Err(anyhow::anyhow!("unknown template name: {}", name)),
     }
 

@@ -44,7 +44,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     let body_handle = context.set_body(body);
     let wasm_req = WasmRequest {
         method: method.to_string(),
-        uri,
+        uri: uri.clone(),
         headers,
         body: Some(body_handle),
     };
@@ -67,9 +67,9 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
     }
     let elapsed = now.elapsed();
     if wasm_resp.status >= 400 {
-        warn!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, "[Response]");
+        warn!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, uri=%uri, "[Response]");
     } else {
-        info!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, "[Response]");
+        info!(elapsed = ?elapsed,req_id=%req_id, status=%wasm_resp.status, uri=%uri, "[Response]");
     }
     builder.body(wasm_resp_body).unwrap()
 }

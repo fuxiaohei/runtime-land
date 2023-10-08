@@ -1,0 +1,7 @@
+manifest = "v1"
+name = "js-fetch"
+template_name = "Fetch JSON"
+project = "js-fetch-json"
+description = "Send a request to a remote server, read JSON from the response, and serve that JSON."
+authors = []
+language = "javascript"

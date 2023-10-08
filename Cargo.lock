@@ -2080,6 +2080,7 @@ version = "0.1.4-beta.6"
 dependencies = [
  "anyhow",
  "reqwest",
+ "serde",
  "time",
  "tokio",
  "tracing",

@@ -73,6 +73,28 @@ log_print 0 "OS = $OS, ARCH = $ARCH"
 rustup component add rustfmt
 rustup target add wasm32-wasi
 
+download_wasi_snapshot_preview1_reactor_wasm() {
+    log_print 0 "Downloading wasi_snapshot_preview1 reactor.wasm"
+    local filename="wasi_snapshot_preview1.reactor.wasm"
+    local archive_url="https://github.com/bytecodealliance/wasmtime/releases/download/v13.0.0/wasi_snapshot_preview1.reactor.wasm"
+    log_print 1 "Downloading wasi_snapshot_preview1 reactor.wasm: $archive_url"
+    curl --progress-bar --show-error --location --fail $archive_url --output "$filename"
+    mv "$filename" "crates/worker/engine/wasi_snapshot_preview1.reactor.wasm"
+}
+
+download_wasi_snapshot_preview1_reactor_wasm
+
+download_js_sdk_wasm() {
+    log_print 0 "Downloading js-sdk.wasm"
+    local filename="land-js-sdk.wasm"
+    local archive_url="https://github.com/fuxiaohei/runtime-land-js/releases/download/nightly/land-js-sdk-nightly.wasm"
+    log_print 1 "Downloading js-sdk.wasm: $archive_url"
+    curl --progress-bar --show-error --location --fail $archive_url --output "$filename"
+    mv "$filename" "crates/worker/engine/land-js-sdk.wasm"
+}
+
+download_js_sdk_wasm
+
 log_print 0 "Build land-center..."
 cargo build --release -p land-center
 
@@ -150,6 +172,8 @@ build_template "rust-hello-world"
 build_template "rust-fetch"
 build_template "rust-router"
 build_template "js-hello-world"
+build_template "js-fetch"
+build_template "js-itty-router"
 
 # build templates-wasm.tar.gz from dist
 tar -czvf templates-wasm.tar.gz templates-wasm

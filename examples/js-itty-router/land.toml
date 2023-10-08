@@ -1,0 +1,6 @@
+manifest = "v1"
+name = "js-itty-router"
+template_name = "HTTP Router"
+description = "Serve different content based on the request with a simple router."
+authors = []
+language = "javascript"
