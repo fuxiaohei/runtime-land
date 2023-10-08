@@ -32,10 +32,10 @@ cargo build --release -p integration-test
 cp target/release/land-cli .
 cp target/release/land-runtime .
 cp target/release/integration-test .
-cp deploy/download-deps-binary.sh .
+cp tests/download_deps.sh .
 
 # package integration-test.tar.gz
 log_print 1 "Packaging integration-test.tar.gz"
-tar -czvf integration-test.tar.gz land-cli land-runtime integration-test download-deps-binary.sh
+tar -czvf integration-test.tar.gz land-cli land-runtime integration-test download_deps.sh
 
-rm land-cli land-runtime integration-test download-deps-binary.sh
+rm land-cli land-runtime integration-test download_deps.sh

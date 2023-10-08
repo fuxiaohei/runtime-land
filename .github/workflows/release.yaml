@@ -88,7 +88,7 @@ jobs:
           echo 'linker = "aarch64-linux-gnu-gcc"' >> ${HOME}/.cargo/config.toml
       - name: build land-cli
         run: |
-          ./deploy/build-cli.sh ${{ matrix.config.arch }} ${{ env.RELEASE_VERSION }} ${{ matrix.config.targetDir }} ${{ matrix.config.extraArgs }} 
+          ./deploy/build-cli.sh ${{ matrix.config.arch }} ${{ env.RELEASE_VERSION }} "${{ matrix.config.targetDir }}" "${{ matrix.config.extraArgs }}"
 
       - name: upload binary as GitHub artifact
         if: runner.os != 'Windows'
