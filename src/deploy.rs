@@ -3,7 +3,7 @@ use land_core::metadata::Metadata;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use tracing::debug;
+use tracing::{debug, error};
 
 /// LOCAL_PROJECT_ENV_FILE is the file name of the local project env file
 const LOCAL_PROJECT_ENV_FILE: &str = ".land.env";
@@ -17,7 +17,7 @@ pub async fn load_project(
     meta: &Metadata,
     addr: &str,
     token: &str,
-) -> Result<Project> {
+) -> Result<Option<Project>> {
     let local_project = read_project_env()?;
     if project_name.is_some() {
         // load project info from given name, local env
@@ -25,7 +25,7 @@ pub async fn load_project(
         debug!("Try to load project from given name: {}", project_name);
         if let Some(local_project) = local_project {
             if project_name == &local_project.name {
-                return Ok(local_project);
+                return Ok(Some(local_project));
             }
         }
 
@@ -34,18 +34,20 @@ pub async fn load_project(
         debug!("Try to load project from cloud: {}", project_name);
         let project = query_project(addr, token, project_name.to_string()).await?;
         write_project_env(&project.project)?;
-        return Ok(project.project);
+        return Ok(Some(project.project));
     }
 
     // if project name not provided, load from local env
     debug!("Try to load project from local env");
     if let Some(local_project) = local_project {
-        return Ok(local_project);
+        return Ok(Some(local_project));
     }
     debug!("Try to create new project from cloud");
-    let project = create_project(meta, addr, token).await?;
-    write_project_env(&project)?;
-    Ok(project)
+    if let Some(project) = create_project(meta, addr, token).await? {
+        write_project_env(&project)?;
+        return Ok(Some(project));
+    }
+    Ok(None)
 }
 
 #[derive(Serialize, Default, Debug)]
@@ -93,8 +95,8 @@ pub async fn query_project(addr: &str, token: &str, name: String) -> Result<Proj
 }
 
 /// create_project creates a new project
-pub async fn create_project(meta: &Metadata, addr: &str, token: &str) -> Result<Project> {
-    let url = format!("{}/v1/project", addr);
+pub async fn create_project(meta: &Metadata, addr: &str, token: &str) -> Result<Option<Project>> {
+    let url = format!("{}/v2/project", addr);
     let data = CreateProjectRequest {
         language: meta.language.clone(),
         prefix: Some(meta.name.clone().replace('-', "")),
@@ -107,8 +109,12 @@ pub async fn create_project(meta: &Metadata, addr: &str, token: &str) -> Result<
         .json(&data)
         .send()
         .await?;
+    if !resp.status().is_success() {
+        error!("create project failed, status: {}", resp.status());
+        return Ok(None);
+    }
     let project = resp.json::<Project>().await?;
-    Ok(project)
+    Ok(Some(project))
 }
 
 /// read_project_env reads the project name from env file

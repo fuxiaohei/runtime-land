@@ -23,6 +23,7 @@ pub struct Metadata {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct MetadataBuild {
     pub rust_target_dir: Option<String>,
+    pub rust_src_dir: Option<Vec<String>>,
 }
 
 impl Metadata {
@@ -69,6 +70,17 @@ impl Metadata {
         let target_dir = Path::new(&target).join(arch).join("release");
         let name = self.name.replace('-', "_") + ".wasm";
         target_dir.join(name).to_str().unwrap().to_string()
+    }
+
+    /// get source dir
+    pub fn get_source_dirs(&self) -> Vec<String> {
+        let src_dir = self
+            .build
+            .clone()
+            .unwrap_or_default()
+            .rust_src_dir
+            .unwrap_or_else(|| vec!["src".to_string()]);
+        src_dir
     }
 
     /// get output file

@@ -8,8 +8,9 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 axum = { workspace = true }
+bytesize = "1.3.0"
+tempfile = "3.8.0"
 clap = { workspace = true }
-console-subscriber = "0.1.10"
 land-core = { workspace = true }
 land-worker = { workspace = true }
 lazy_static = { workspace = true }
@@ -23,6 +24,9 @@ serde_json = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
+tar = { workspace = true }
+flate2 = { workspace = true }
+bytes = { workspace = true }
 
 [build-dependencies]
 land-worker = { workspace = true }
@@ -42,17 +46,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.4-beta.6"
+version = "0.1.4-rc.1"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.4-beta.6" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-beta.6" }
-land-sdk = { path = "crates/sdk", version = "0.1.4-beta.6" }
-land-core = { path = "crates/core", version = "0.1.4-beta.6" }
-land-dao = { path = "crates/dao", version = "0.1.4-beta.6" }
-land-storage = { path = "crates/storage", version = "0.1.4-beta.6" }
+land-worker = { path = "crates/worker", version = "0.1.4-rc.1" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-rc.1" }
+land-sdk = { path = "crates/sdk", version = "0.1.4-rc.1" }
+land-core = { path = "crates/core", version = "0.1.4-rc.1" }
+land-dao = { path = "crates/dao", version = "0.1.4-rc.1" }
+land-storage = { path = "crates/storage", version = "0.1.4-rc.1" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.4.6", features = ["derive", "env"] }
@@ -100,3 +104,6 @@ strum = { version = "0.25.0", features = ["derive"] }
 rust-embed = "8.0.0"
 moka = { version = "0.12.1", default-features = false, features = ["sync"] }
 md-5 = "0.10.6"
+tar = "0.4.40"
+flate2 = "1.0.27"
+bytes = "1.5.0"

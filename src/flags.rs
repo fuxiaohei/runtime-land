@@ -1,9 +1,15 @@
 use crate::deploy;
+use anyhow::Result;
+use bytesize::ByteSize;
 use clap::Args;
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use land_core::metadata::{Metadata, DEFAULT_FILE as DEFAULT_METADATA_FILE};
 use path_slash::PathBufExt as _;
 use std::path::{Path, PathBuf};
-use tracing::{debug, debug_span, info, Instrument};
+use tar::Header;
+use tempfile::tempdir;
+use tracing::{debug, debug_span, error, info, Instrument};
 
 static SDK_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -209,13 +215,29 @@ impl Deploy {
         let meta = Metadata::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
         debug!("Meta: {meta:?}");
 
-        let project = deploy::load_project(self.project.clone(), &meta, addr, &self.token)
-            .await
-            .expect("Load project failed");
+        let project =
+            match deploy::load_project(self.project.clone(), &meta, addr, &self.token).await {
+                Ok(project) => {
+                    if project.is_none() {
+                        error!("Load project failed");
+                        return;
+                    }
+                    project.unwrap()
+                }
+                Err(e) => {
+                    error!("Load project failed: {}", e);
+                    return;
+                }
+            };
         info!("Project name: {}", project.name);
 
-        let output = meta.get_output();
-        let content = std::fs::read(output).expect("Read compiled target failed");
+        let content = match prepare_upload_bundle(&meta) {
+            Ok(content) => content,
+            Err(e) => {
+                error!("Prepare upload bundle failed: {}", e);
+                return;
+            }
+        };
 
         let deployment = deploy::create_deployment(
             project,
@@ -237,4 +259,54 @@ impl Deploy {
 
         info!("Deployment url: \t\n{}", deployment.domain_url);
     }
+}
+
+fn prepare_upload_bundle(meta: &Metadata) -> Result<Vec<u8>> {
+    let output = meta.get_output();
+
+    // print output file size
+    let size = std::fs::metadata(&output)?.len();
+    info!(
+        "Webassembly size: {}, size: {}",
+        bytesize::to_string(size, true),
+        size
+    );
+
+    let dir = tempdir()?;
+    let file_path = "bundle.tar.gz";
+    debug!("Bundle file: {:?}", file_path);
+
+    let tar_gz = std::fs::File::create(&file_path)?;
+    let enc = GzEncoder::new(tar_gz, Compression::default());
+    let mut tar = tar::Builder::new(enc);
+
+    // add wasm module
+    let mut wasm_file = std::fs::File::open(output)?;
+    tar.append_file("bin/bundle.wasm", &mut wasm_file)?;
+
+    // add src dir
+    let src_dirs = meta.get_source_dirs();
+    for src_dir in src_dirs {
+        let src_dir_path = Path::new(&src_dir);
+        if !src_dir_path.exists() {
+            continue;
+        }
+        debug!("Add src dir: {:?}", src_dir);
+        tar.append_dir_all(src_dir.clone(), src_dir)?;
+    }
+
+    tar.finish()?;
+
+    std::thread::sleep(std::time::Duration::from_secs(3));
+
+    let size = std::fs::metadata(&file_path)?.len();
+    println!("------size:{}", size);
+    info!("Bundle size: {}", bytesize::ByteSize::b(size));
+
+    let content2 = std::fs::read(file_path)?;
+    println!("content2.size: {}", content2.len());
+
+    dir.close()?;
+
+    Ok(content2)
 }
