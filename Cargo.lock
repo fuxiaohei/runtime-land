@@ -2290,6 +2290,7 @@ version = "0.1.4-rc.2"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bytesize",
  "futures-util",
  "hyper",
  "once_cell",

@@ -23,8 +23,7 @@ enum Cli {
 
 #[tokio::main]
 async fn main() {
-    land_core::trace::init();
-    // console_subscriber::init();
+    land_core::trace::init_for_cli();
 
     let args = Cli::parse();
     match args {

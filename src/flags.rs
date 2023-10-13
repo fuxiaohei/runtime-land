@@ -213,17 +213,17 @@ impl Deploy {
             match deploy::load_project(self.project.clone(), &meta, addr, &self.token).await {
                 Ok(project) => {
                     if project.is_none() {
-                        error!("Load project failed");
+                        error!("Load project failed with empty value");
                         return;
                     }
                     project.unwrap()
                 }
                 Err(e) => {
-                    error!("Load project failed: {}", e);
+                    error!("Load project failed:\n\t{}", e);
                     return;
                 }
             };
-        info!("Project name: {}", project.name);
+        info!("Load project: {}", project.name);
 
         let content = match crate::bundle::prepare(&meta) {
             Ok(content) => {
@@ -234,7 +234,7 @@ impl Deploy {
                 content
             }
             Err(e) => {
-                error!("Prepare upload bundle failed: {}", e);
+                error!("Prepare upload bundle failed: \n\t{}", e);
                 return;
             }
         };

@@ -127,7 +127,10 @@ pub fn convert_component(path: &str, output: Option<String>, language: String) -
 
     // get output file size
     let size = std::fs::metadata(&output)?.len();
-    info!("Component size: {} KB", size / 1024);
+    info!(
+        "Webassembly size: {}",
+        bytesize::to_string(size as u64, true)
+    );
     Ok(())
 }
 

@@ -1,17 +1,23 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use land_core::metadata::Metadata;
 use md5::{Digest, Md5};
 use std::fs::File;
 use std::io::{Read, Write};
+use std::path::Path;
 use tracing::{debug, info};
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 
 pub fn prepare(meta: &Metadata) -> Result<Vec<u8>> {
     let output = meta.get_output();
+    // if output file is not exist, return error
+    if !Path::new(&output).exists() {
+        return Err(anyhow!("Wasm file not found: {}\n\tTry run 'land-cli build' to generate wasm file.", output));
+    }
+
     let output_content = std::fs::read(&output)?;
     info!(
-        "Webassembly size: {}",
+        "Wasm size: {}",
         bytesize::to_string(output_content.len() as u64, true),
     );
 

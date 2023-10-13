@@ -3,7 +3,7 @@ use land_core::metadata::Metadata;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use tracing::{debug, error};
+use tracing::{debug, info};
 
 /// LOCAL_PROJECT_ENV_FILE is the file name of the local project env file
 const LOCAL_PROJECT_ENV_FILE: &str = ".land.env";
@@ -42,7 +42,7 @@ pub async fn load_project(
     if let Some(local_project) = local_project {
         return Ok(Some(local_project));
     }
-    debug!("Try to create new project from cloud");
+    info!("No local project found, try to create new project in cloud");
     if let Some(project) = create_project(meta, addr, token).await? {
         write_project_env(&project)?;
         return Ok(Some(project));
@@ -110,8 +110,11 @@ pub async fn create_project(meta: &Metadata, addr: &str, token: &str) -> Result<
         .send()
         .await?;
     if !resp.status().is_success() {
-        error!("create project failed, status: {}", resp.status());
-        return Ok(None);
+        return Err(anyhow::anyhow!(
+            "create project failed in cloud\nresponse status: {}, body: {}",
+            resp.status(),
+            resp.text().await?
+        ));
     }
     let project = resp.json::<Project>().await?;
     Ok(Some(project))
