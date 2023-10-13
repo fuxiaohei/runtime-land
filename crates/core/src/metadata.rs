@@ -72,15 +72,20 @@ impl Metadata {
         target_dir.join(name).to_str().unwrap().to_string()
     }
 
+    fn get_default_source_dirs(&self) -> Vec<String> {
+        if self.language == "rust" {
+            return vec!["src".to_string(), "Cargo.toml".to_string()];
+        }
+        vec![]
+    }
+
     /// get source dir
     pub fn get_source_dirs(&self) -> Vec<String> {
-        let src_dir = self
-            .build
+        self.build
             .clone()
             .unwrap_or_default()
             .rust_src_dir
-            .unwrap_or_else(|| vec!["src".to_string()]);
-        src_dir
+            .unwrap_or_else(|| self.get_default_source_dirs())
     }
 
     /// get output file

@@ -42,12 +42,15 @@ pub async fn create_deployment(
     user_id: i32,
     project: &Project,
     chunk: Vec<u8>,
+    content_type: String,
 ) -> anyhow::Result<Deployment> {
     let deployment = deployment::create(
         user_id,
         project.id,
         project.name.clone(),
         String::from("todo"),
+        chunk.len() as i32,
+        content_type.clone(),
     )
     .await?;
     info!(
@@ -61,7 +64,15 @@ pub async fn create_deployment(
     }
 
     // upload deploy chunk to storage
-    let storage_path = format!("deployments/{}/{}.wasm", project.uuid, deployment.domain);
+    let suffix = if content_type == "application/zip" {
+        ".zip"
+    } else {
+        ".wasm"
+    };
+    let storage_path = format!(
+        "deployments/{}/{}{}",
+        project.uuid, deployment.domain, suffix
+    );
     let deployment_id = deployment.id;
     tokio::task::spawn(
          async move {
@@ -85,7 +96,13 @@ pub async fn create_handler(
 
     let project =
         get_active_project(payload.project_name, payload.project_uuid, current_user.id).await?;
-    let deployment = create_deployment(current_user.id, &project, payload.deploy_chunk).await?;
+    let deployment = create_deployment(
+        current_user.id,
+        &project,
+        payload.deploy_chunk,
+        payload.deploy_content_type,
+    )
+    .await?;
     let (prod_domain, prod_protocol) = settings::get_domains().await;
 
     Ok((

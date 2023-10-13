@@ -32,6 +32,8 @@ pub async fn create(
     project_id: i32,
     project_name: String,
     storage_path: String,
+    storage_size: i32,
+    storage_content_type: String,
 ) -> Result<deployment::Model> {
     let project = crate::project::find_by_id(project_id)
         .await?
@@ -58,6 +60,8 @@ pub async fn create(
         status: Status::Active.to_string(),
         deploy_status: DeployStatus::Deploying.to_string(),
         deleted_at: None,
+        storage_size,
+        storage_content_type,
     };
     let active_model: deployment::ActiveModel = deployment.into();
     let db = DB.get().unwrap();

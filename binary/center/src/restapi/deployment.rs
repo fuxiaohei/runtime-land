@@ -37,6 +37,8 @@ pub async fn create_handler(
         project.id,
         project.name,
         String::from("todo"),
+        payload.deploy_chunk.len() as i32,
+        payload.deploy_content_type,
     )
     .await?;
 

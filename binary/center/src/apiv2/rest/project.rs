@@ -37,13 +37,15 @@ pub async fn create_handler(
 
     // if template is set, generate default production deployment with template wasm file
     if let Some(template) = payload.template {
-        let wasm_file = format!(
-            "templates-wasm/{}.component.wasm",
-            template.name
-        );
+        let wasm_file = format!("templates-wasm/{}.component.wasm", template.name);
         let chunk = std::fs::read(wasm_file)?;
-        let deployment =
-            super::deployment::create_deployment(current_user.id, &project, chunk).await?;
+        let deployment = super::deployment::create_deployment(
+            current_user.id,
+            &project,
+            chunk,
+            "application/wasm".to_string(),
+        )
+        .await?;
         info!(
             "success with template, deployment_name:{}, deployment_uuid:{}, template:{}",
             deployment.domain, deployment.uuid, template.name,
