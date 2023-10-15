@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// RouteConfItem is config item for one project deployment route
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct RouteConfItem {
     pub domain: String,
     pub module: String,
@@ -53,7 +53,7 @@ impl RoutesConf {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct EndpointConf {
     pub items: Vec<RouteConfItem>,
     pub created_at: u64,
@@ -71,7 +71,7 @@ impl EndpointConf {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RegionIPInfo {
+pub struct RuntimeNodeInfo {
     pub ip: String,
     pub city: String,
     pub region: String,
@@ -80,13 +80,14 @@ pub struct RegionIPInfo {
     pub org: String,
     pub timezone: String,
     pub readme: String,
+    pub conf_hash: Option<String>,
 }
 
 fn remove_whitespace(s: &mut String) {
     s.retain(|c| !c.is_whitespace());
 }
 
-impl RegionIPInfo {
+impl RuntimeNodeInfo {
     pub fn region(&self) -> String {
         let mut s = format!("{}-{}-{}", self.country, self.region, self.city);
         remove_whitespace(&mut s);
@@ -119,7 +120,7 @@ pub struct RuntimeData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RegionReportData {
-    pub localip: RegionIPInfo,
+    pub localip: RuntimeNodeInfo,
     pub region: String,
     pub runtimes: HashMap<String, RuntimeData>,
     pub conf_value_time_version: u64,
@@ -149,11 +150,11 @@ pub struct DomainSetting {
 
 #[cfg(test)]
 mod tests {
-    use super::RegionIPInfo;
+    use super::RuntimeNodeInfo;
 
     #[test]
     fn region_ipinfo() {
-        let r = RegionIPInfo {
+        let r = RuntimeNodeInfo {
             ip: "1.1.1.1".to_string(),
             city: "Los Angeles".to_string(),
             region: "California".to_string(),
@@ -162,6 +163,7 @@ mod tests {
             org: "AS13335 Cloudflare, Inc.".to_string(),
             timezone: "America/Los_Angeles".to_string(),
             readme: "https://ipinfo.io/missingauth".to_string(),
+            conf_hash: None,
         };
         let region_str = r.region();
         let region_ip_str = r.region_ip();

@@ -2,7 +2,7 @@ use super::RouteError;
 use axum::{
     middleware::{self, Next},
     response,
-    routing::get,
+    routing::post,
     Router,
 };
 use hyper::{Request, StatusCode};
@@ -13,7 +13,7 @@ mod conf;
 
 pub fn router() -> Router {
     Router::new()
-        .route("/v2/endpoint/conf", get(conf::conf_handler))
+        .route("/v2/endpoint/conf", post(conf::conf_handler))
         .route_layer(middleware::from_fn(auth_middleware))
 }
 

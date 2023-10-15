@@ -1,48 +1,49 @@
 use super::endpoint;
 use anyhow::Result;
+use base64::{engine::general_purpose, Engine as _};
 use land_core::confdata::{EndpointConf, RouteConfItem};
 use land_core::storage;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 use tokio::sync::Mutex;
 use tracing::{debug, info, instrument, warn};
 
 lazy_static! {
-    pub static ref CONF_VALUES: Mutex<EndpointConf> = Mutex::new(EndpointConf {
-        items: vec![],
-        created_at: 0,
-        md5: "".to_string(),
-    });
+    pub static ref CONFS_MAP: Mutex<HashMap<String, EndpointConf>> = Mutex::new(HashMap::new());
 }
 
-pub async fn init_conf_file() -> Result<()> {
+pub async fn init_conf_file(addr: &str) -> Result<()> {
     // check local conf file exist
-    if exist_conf().await? {
+    if exist_conf(addr).await? {
         // read local conf file to global conf
-        let conf = read_conf().await?;
-        let mut local_conf = CONF_VALUES.lock().await;
-        local_conf.items = conf.items;
-        local_conf.created_at = conf.created_at;
-        local_conf.md5 = conf.md5;
-        info!(
-            "init local conf version: {}, file:{}",
-            local_conf.md5, CONF_LOCAL_FILE
-        );
+        let conf = read_conf(addr).await?;
+        let mut confs_map = CONFS_MAP.lock().await;
+        info!("init local conf version: {}, addr: {}", conf.md5, addr,);
+        confs_map.insert(addr.to_string(), conf);
     } else {
-        info!("conf file not exist");
+        info!("conf file not exist, addr: {}", addr);
     }
     Ok(())
 }
 
 #[instrument(skip_all, name = "[CONF]")]
-pub async fn start_sync(addr: &str, token: &str) {
+pub async fn start_sync(addr: String, token: String) {
     let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
 
     let client = reqwest::Client::new();
     let endpoint = endpoint::ENDPOINT.get().unwrap().clone();
+    let endpoint_info = endpoint::ENDPOINT_INFO.get().unwrap().clone();
     loop {
         interval.tick().await;
 
-        let mut conf_values = CONF_VALUES.lock().await;
+        let mut confs_map = CONFS_MAP.lock().await;
+
+        // if not exist ,set default conf
+        if !confs_map.contains_key(&addr) {
+            confs_map.insert(addr.to_string(), EndpointConf::default());
+        }
+
+        let conf_values = confs_map.get_mut(&addr).unwrap();
 
         let url = format!(
             "{}/v2/endpoint/conf?md5={}&endpoint={}",
@@ -50,7 +51,8 @@ pub async fn start_sync(addr: &str, token: &str) {
         );
 
         let resp = match client
-            .get(&url)
+            .post(&url)
+            .json(&endpoint_info)
             .header("Authorization", format!("Bearer {}", token))
             .send()
             .await
@@ -87,7 +89,7 @@ pub async fn start_sync(addr: &str, token: &str) {
             process_conf(&conf_values, &new_conf_values).await;
 
             *conf_values = new_conf_values;
-            match write_conf(&conf_values).await {
+            match write_conf(&addr, &conf_values).await {
                 Ok(_) => {}
                 Err(e) => {
                     warn!("write conf error: {:?}", e);
@@ -168,22 +170,25 @@ pub async fn process_conf(local_conf: &EndpointConf, remote_conf: &EndpointConf)
     }
 }
 
-/// CONF_LOCAL_FILE is the local file name for conf
-const CONF_LOCAL_FILE: &str = "endpoint-conf.json";
-
-async fn write_conf(conf: &EndpointConf) -> Result<()> {
+async fn write_conf(addr: &str, conf: &EndpointConf) -> Result<()> {
+    let key = general_purpose::STANDARD_NO_PAD.encode(addr);
+    let filename = format!("endpoint-conf-{}.json", key);
     let data = serde_json::to_vec(conf)?;
-    storage::write(CONF_LOCAL_FILE, data).await?;
+    storage::write(&filename, data).await?;
     Ok(())
 }
 
-async fn read_conf() -> Result<EndpointConf> {
-    let data = storage::read(CONF_LOCAL_FILE).await?;
+async fn read_conf(addr: &str) -> Result<EndpointConf> {
+    let key = general_purpose::STANDARD_NO_PAD.encode(addr);
+    let filename = format!("endpoint-conf-{}.json", key);
+    let data = storage::read(&filename).await?;
     let conf: EndpointConf = serde_json::from_slice(&data)?;
     Ok(conf)
 }
 
-async fn exist_conf() -> Result<bool> {
-    let exist = storage::is_exist(CONF_LOCAL_FILE).await?;
+async fn exist_conf(addr: &str) -> Result<bool> {
+    let key = general_purpose::STANDARD_NO_PAD.encode(addr);
+    let filename = format!("endpoint-conf-{}.json", key);
+    let exist = storage::is_exist(&filename).await?;
     Ok(exist)
 }

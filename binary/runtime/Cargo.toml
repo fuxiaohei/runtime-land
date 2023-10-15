@@ -24,6 +24,7 @@ serde_json = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
+base64 = "0.21.4"
 
 [dev-dependencies]
 hyper = { workspace = true }

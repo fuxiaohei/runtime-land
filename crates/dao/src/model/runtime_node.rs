@@ -3,26 +3,22 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "deployment")]
+#[sea_orm(table_name = "runtime_node")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub project_id: i32,
+    pub name: String,
     #[sea_orm(unique)]
-    pub domain: String,
-    pub prod_domain: String,
-    pub project_uuid: String,
-    #[sea_orm(unique)]
-    pub uuid: String,
-    pub storage_path: String,
-    pub owner_id: i32,
+    pub key: String,
+    pub ip: String,
+    pub city: String,
+    pub region: String,
+    pub country: String,
+    pub conf_hash: String,
     pub status: String,
-    pub deploy_status: String,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
     pub deleted_at: Option<DateTimeUtc>,
-    pub storage_size: i32,
-    pub storage_content_type: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

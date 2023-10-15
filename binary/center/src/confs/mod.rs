@@ -6,6 +6,8 @@ use md5::{Digest, Md5};
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, Instrument};
 
+pub mod runtime_node;
+
 lazy_static! {
     pub static ref CONF_VALUES: Mutex<EndpointConf> = Mutex::new(EndpointConf {
         items: vec![],
@@ -14,35 +16,45 @@ lazy_static! {
     });
 }
 
-pub fn run(interval: u64) {
-    tokio::spawn(
-        async move {
-            let mut interval = tokio::time::interval(std::time::Duration::from_secs(interval));
-            loop {
-                interval.tick().await;
+async fn sync_conf_loop(interval: u64) {
+    let mut interval = tokio::time::interval(std::time::Duration::from_secs(interval));
+    loop {
+        interval.tick().await;
 
-                let mut conf_values = CONF_VALUES.lock().await;
+        let mut conf_values = CONF_VALUES.lock().await;
 
-                if !should_generate().await && conf_values.created_at > 0 {
-                    continue;
-                }
+        if !should_generate().await && conf_values.created_at > 0 {
+            continue;
+        }
 
-                let new_conf_values = generate().await;
-                match new_conf_values {
-                    Ok(new_conf_values) => {
-                        debug!("generate conf: {:?}", new_conf_values.md5);
-                        if conf_values.md5 != new_conf_values.md5 {
-                            info!("update conf: {:?}", new_conf_values.md5);
-                            *conf_values = new_conf_values;
-                        }
-                    }
-                    Err(e) => {
-                        error!("generate conf error: {:?}", e);
-                    }
+        let new_conf_values = generate().await;
+        match new_conf_values {
+            Ok(new_conf_values) => {
+                debug!("generate conf: {:?}", new_conf_values.md5);
+                if conf_values.md5 != new_conf_values.md5 {
+                    info!("update conf: {:?}", new_conf_values.md5);
+                    *conf_values = new_conf_values;
                 }
             }
+            Err(e) => {
+                error!("generate conf error: {:?}", e);
+            }
+        }
+    }
+}
+
+pub fn run(interval: u64, runtime_node_interval: u64) {
+    tokio::spawn(
+        async move {
+            sync_conf_loop(interval).await;
         }
         .instrument(tracing::info_span!("[CONFS]")),
+    );
+    tokio::spawn(
+        async move {
+            runtime_node::sync_runtime_node(runtime_node_interval).await;
+        }
+        .instrument(tracing::info_span!("[RTNODES]")),
     );
 }
 

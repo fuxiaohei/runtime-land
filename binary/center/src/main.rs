@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
     region::init().await;
 
     // start confs generator loop
-    confs::run(1);
+    confs::run(1, 30);
 
     crate::server::start(args.http_addr.parse().unwrap()).await?;
 

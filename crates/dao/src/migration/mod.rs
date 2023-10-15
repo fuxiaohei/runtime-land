@@ -9,6 +9,7 @@ mod m04_create_project_table;
 mod m05_create_deployment_table;
 mod m06_create_settings_table;
 mod m07_alter_deployment_size_column;
+mod m08_create_runtime_table;
 
 #[async_trait::async_trait]
 impl MigratorTrait for Migrator {
@@ -21,6 +22,7 @@ impl MigratorTrait for Migrator {
             Box::new(m05_create_deployment_table::Migration),
             Box::new(m06_create_settings_table::Migration),
             Box::new(m07_alter_deployment_size_column::Migration),
+            Box::new(m08_create_runtime_table::Migration),
         ]
     }
 }

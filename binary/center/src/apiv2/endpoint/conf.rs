@@ -15,7 +15,11 @@ pub struct ConfValuesMD5Query {
 #[tracing::instrument(name = "[endpoint_get_conf]", skip_all)]
 pub async fn conf_handler(
     Query(query): Query<ConfValuesMD5Query>,
+    Json(info): Json<land_core::confdata::RuntimeNodeInfo>,
 ) -> Result<(StatusCode, Json<Option<EndpointConf>>), RouteError> {
+    
+    confs::runtime_node::update_data(info.clone(), query.md5.clone()).await;
+
     let conf_values = confs::CONF_VALUES.lock().await;
     if conf_values.md5 == query.md5 {
         debug!("conf_values.md5 == query.md5");

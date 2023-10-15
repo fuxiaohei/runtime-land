@@ -36,7 +36,13 @@ async fn main() -> Result<()> {
                 "--center_token or CENTER_TOKEN env is required"
             ))?;
         }
-        confs::init(args.center_url.unwrap(), args.center_token.unwrap()).await;
+        match confs::init(args.center_url.unwrap(), args.center_token.unwrap()).await {
+            Ok(_) => info!("Confs init success"),
+            Err(e) => {
+                error!("Confs init failed: {:?}", e);
+                Err(anyhow::anyhow!("Confs init failed: {:?}", e))?;
+            }
+        }
     } else {
         info!("Only runtime standalone");
     }

@@ -20,6 +20,7 @@ pub use model::user_token::Model as UserToken;
 pub mod deployment;
 pub mod project;
 pub mod region;
+pub mod runtime_node;
 pub mod settings;
 pub mod user;
 pub mod user_token;
