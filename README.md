@@ -5,14 +5,13 @@
 
 <p align="center">
   <a href="https://github.com/fuxiaohei/runtime-land/actions/workflows/release.yaml">
-    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/fuxiaohei/runtime-land/release.yaml
-?label=Build&style=flat-square">
+    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/fuxiaohei/runtime-land/release.yaml?label=Release">
   </a>
   <a href="https://github.com/fuxiaohei/runtime-land/releases/latest">
-    <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/fuxiaohei/runtime-land?label=Release&style=flat-square">
+    <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/fuxiaohei/runtime-land?label=Release">
   </a>
   <a href="https://github.com/fuxiaohei/runtime-land/blob/main/LICENSE">
-    <img alt="GitHub" src="https://img.shields.io/github/license/fuxiaohei/runtime-land?color=427ece&label=License&style=flat-square">
+    <img alt="GitHub" src="https://img.shields.io/github/license/fuxiaohei/runtime-land?color=427ece&label=License">
   </a>
 </p>
 
