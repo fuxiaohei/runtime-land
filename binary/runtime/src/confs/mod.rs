@@ -10,11 +10,11 @@ pub use endpoint::ENDPOINT;
 
 pub async fn init(addr_values: String, token_values: String) -> Result<()> {
     let addrs = addr_values
-        .split(",")
+        .split(',')
         .map(str::to_string)
         .collect::<Vec<String>>();
     let tokens = token_values
-        .split(",")
+        .split(',')
         .map(str::to_string)
         .collect::<Vec<String>>();
     if addrs.len() != tokens.len() {

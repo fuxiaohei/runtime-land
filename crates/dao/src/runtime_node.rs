@@ -14,34 +14,34 @@ pub enum Status {
 }
 
 // into converts runtime node model to runtime node info
-impl Into<RuntimeNodeInfo> for runtime_node::Model {
-    fn into(self) -> RuntimeNodeInfo {
+impl From<runtime_node::Model> for RuntimeNodeInfo {
+    fn from(val: runtime_node::Model) -> Self {
         RuntimeNodeInfo {
-            ip: self.ip,
-            city: self.city,
-            country: self.country,
-            region: self.region,
+            ip: val.ip,
+            city: val.city,
+            country: val.country,
+            region: val.region,
             loc: String::new(),
             org: String::new(),
             timezone: String::new(),
             readme: String::new(),
-            conf_hash: Some(self.conf_hash),
+            conf_hash: Some(val.conf_hash),
         }
     }
 }
 
 // into converts runtime node info to runtime node model
-impl Into<runtime_node::Model> for RuntimeNodeInfo {
-    fn into(self) -> runtime_node::Model {
+impl From<RuntimeNodeInfo> for runtime_node::Model {
+    fn from(val: RuntimeNodeInfo) -> Self {
         let now = chrono::Utc::now();
         runtime_node::Model {
             id: 0,
-            name: self.region(),
-            key: self.region_ip(),
-            ip: self.ip,
-            city: self.city,
-            region: self.region,
-            country: self.country,
+            name: val.region(),
+            key: val.region_ip(),
+            ip: val.ip,
+            city: val.city,
+            region: val.region,
+            country: val.country,
             status: Status::Online.to_string(),
             created_at: now,
             updated_at: now,

@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use once_cell::sync::Lazy;
 use opendal::services::Memory;
-use opendal::Operator;
+use opendal::{Metadata, Operator};
 use tokio::sync::Mutex;
 
 mod fs;
@@ -63,4 +63,11 @@ pub async fn delete(name: &str) -> Result<()> {
     let op = GLOBAL.lock().await;
     op.delete(name).await?;
     Ok(())
+}
+
+/// stat returns the storage stats
+pub async fn stat(name: &str) -> Result<Metadata> {
+    let op = GLOBAL.lock().await;
+    let metadata = op.stat(name).await?;
+    Ok(metadata)
 }

@@ -98,10 +98,10 @@ impl RuntimeNodeInfo {
         remove_whitespace(&mut s);
         s
     }
-    pub fn region_ip_hostname(&self, hostname: &str) -> String {
+    pub fn region_hostname(&self, hostname: &str) -> String {
         let mut s = format!(
-            "{}-{}-{}-{}-{}",
-            self.country, self.region, self.city, self.ip, hostname
+            "{}-{}-{}-{}",
+            self.country, self.region, self.city, hostname
         );
         remove_whitespace(&mut s);
         s

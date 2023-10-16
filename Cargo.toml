@@ -46,17 +46,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.4-rc.2"
+version = "0.1.4-rc.4"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.4-rc.2" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-rc.2" }
-land-sdk = { path = "crates/sdk", version = "0.1.4-rc.2" }
-land-core = { path = "crates/core", version = "0.1.4-rc.2" }
-land-dao = { path = "crates/dao", version = "0.1.4-rc.2" }
-land-storage = { path = "crates/storage", version = "0.1.4-rc.2" }
+land-worker = { path = "crates/worker", version = "0.1.4-rc.4" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.4-rc.4" }
+land-sdk = { path = "crates/sdk", version = "0.1.4-rc.4" }
+land-core = { path = "crates/core", version = "0.1.4-rc.4" }
+land-dao = { path = "crates/dao", version = "0.1.4-rc.4" }
+land-storage = { path = "crates/storage", version = "0.1.4-rc.4" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.4.6", features = ["derive", "env"] }
@@ -93,7 +93,7 @@ reqwest = { version = "0.11.22", default-features = false, features = [
 envconfig = "0.10.0"
 futures-util = "0.3.28"
 rand = "0.8.5"
-opendal = { version = "0.40.0", default-features = false, features = [
+opendal = { version = "0.41.0", default-features = false, features = [
     "services-fs",
     "services-redis",
     "services-s3",

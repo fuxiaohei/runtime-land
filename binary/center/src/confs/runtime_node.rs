@@ -16,9 +16,9 @@ pub static RUNTIME_NODES_MAP: Lazy<Mutex<HashMap<String, RuntimeNodeData>>> =
 
 /// update_runtime_node_data update runtime node data
 pub async fn update_data(info: RuntimeNodeInfo, conf_md5: String) {
+    debug!("update runtime node data: {}", info.region_ip());
     let data = RuntimeNodeData { info, conf_md5 };
     let mut map = RUNTIME_NODES_MAP.lock().await;
-    debug!("update runtime node data: {:?}", data);
     map.insert(data.info.region_ip(), data);
 }
 
@@ -39,21 +39,19 @@ async fn compare_and_update() {
         db_nodes.len(),
         current_nodes.len()
     );
-    debug!("db nodes: {:?}", db_nodes);
-    debug!("current nodes: {:?}", current_nodes);
 
     // iterator current nodes map
     for (key, data) in current_nodes.iter_mut() {
         // if key not in db nodes, create new one
         if !db_nodes.contains_key(key) {
-            info!("create new runtime node: {:?}", data);
+            info!("create new runtime node: {}", data.info.region_ip());
             land_dao::runtime_node::create(data.info.clone(), data.conf_md5.clone())
                 .await
                 .unwrap();
             continue;
         }
 
-        info!("update runtime node: {:?}", data);
+        info!("update runtime node: {}", data.info.region_ip());
         land_dao::runtime_node::update_online(key.clone(), data.conf_md5.clone())
             .await
             .unwrap();

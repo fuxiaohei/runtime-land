@@ -9,6 +9,7 @@ use land_worker::hostcall::Request as WasmRequest;
 use land_worker::Context;
 use std::net::SocketAddr;
 use tokio::signal;
+use tokio::time::Instant;
 use tracing::{debug, info, info_span, warn, Instrument};
 
 pub async fn wasm_caller_handler(
@@ -19,7 +20,7 @@ pub async fn wasm_caller_handler(
     let worker = super::pool::prepare_worker(wasm_path)
         .instrument(info_span!("[WASM]", wasm_path = %wasm_path))
         .await?;
-    debug!("[HTTP] wasm worker pool get worker success: {}", wasm_path);
+    debug!("Wasm worker pool ok: {}", wasm_path);
 
     // convert request to host-call request
     let mut headers: Vec<(String, String)> = vec![];
@@ -66,16 +67,12 @@ pub async fn wasm_caller_handler(
             .get()
             .unwrap_or(&String::from("land-runtime")),
     );
-    if wasm_resp.status >= 400 {
-        warn!( status=%wasm_resp.status, "[Response]");
-    } else {
-        info!( status=%wasm_resp.status, "[Response]");
-    }
     Ok(builder.body(wasm_resp_body).unwrap())
 }
 
 // basic handler that responds with a static string
 async fn default_handler(req: Request<Body>) -> Response<Body> {
+    let st = Instant::now();
     let req_id = uuid::Uuid::new_v4().to_string();
     // get header x-land-module
     let headers = req.headers().clone();
@@ -87,7 +84,15 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
 
     let method = req.method().clone();
     let uri = req.uri().to_string();
-    let span = info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri,);
+    let host = req
+        .headers()
+        .get("host")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+
+    let span =
+        info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri, host = %host);
+    let span_clone = span.clone();
 
     if land_wasm.is_empty() {
         let _enter = span.enter();
@@ -99,17 +104,21 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
                 .get()
                 .unwrap_or(&String::from("land-runtime")),
         );
-        warn!(status = 404, "[Response] x-land-module not found");
+        let elapsed = st.elapsed().as_micros();
+        warn!(
+            status = 404,
+            elapsed = %elapsed,
+            "x-land-module not found",
+        );
         return builder.body(Body::from("x-land-module not found")).unwrap();
     }
 
-    match wasm_caller_handler(req, land_wasm, req_id.clone())
-        .instrument(span)
-        .await
-    {
-        Ok(resp) => resp,
-        Err(e) => {
-            warn!(status = 500, "[Response] {}", e.to_string());
+    async move {
+        let result = wasm_caller_handler(req, land_wasm, req_id.clone())
+            .instrument(span)
+            .await;
+        if result.is_err() {
+            let e = result.err().unwrap();
             let mut builder = Response::builder().status(500);
             builder = builder.header("x-request-id", req_id);
             builder = builder.header(
@@ -118,9 +127,27 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
                     .get()
                     .unwrap_or(&String::from("land-runtime")),
             );
-            builder.body(Body::from(e.to_string())).unwrap()
+            let elapsed = st.elapsed().as_micros();
+            warn!(
+                status = 500,
+                elapsed = %elapsed,
+                "internal error: {}",
+                e.to_string(),
+            );
+            return builder.body(Body::from(e.to_string())).unwrap();
         }
+        let resp = result.unwrap();
+        let status_code = resp.status().as_u16();
+        let elapsed = st.elapsed().as_micros();
+        if status_code >= 400 {
+            warn!( status=%status_code,elapsed=%elapsed, "Done");
+        } else {
+            info!( status=%status_code,elapsed=%elapsed, "Done");
+        }
+        resp
     }
+    .instrument(span_clone)
+    .await
 }
 
 pub async fn start(addr: SocketAddr) -> Result<()> {

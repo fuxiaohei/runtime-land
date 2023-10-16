@@ -40,7 +40,7 @@ pub async fn init() -> Result<()> {
         }
     };
     info!("ip : {:?}, region: {}", info, info.region());
-    ENDPOINT.get_or_init(|| info.region_ip_hostname(hostname.to_str().unwrap()));
+    ENDPOINT.get_or_init(|| info.region_hostname(hostname.to_str().unwrap()));
     ENDPOINT_INFO.get_or_init(|| info);
     Ok(())
 }

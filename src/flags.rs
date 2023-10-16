@@ -3,6 +3,7 @@ use clap::Args;
 use land_core::metadata::{Metadata, DEFAULT_FILE as DEFAULT_METADATA_FILE};
 use path_slash::PathBufExt as _;
 use std::path::{Path, PathBuf};
+use tokio::time::sleep;
 use tracing::{debug, debug_span, error, info, Instrument};
 
 static SDK_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -194,6 +195,9 @@ pub struct Deploy {
     /// The project name override meta.toml
     #[clap(long)]
     pub project: Option<String>,
+    /// Upload bundle artifact with source code to cloud
+    #[clap(long, default_value("true"))]
+    pub with_source: Option<bool>,
 }
 
 impl Deploy {
@@ -208,6 +212,12 @@ impl Deploy {
 
         let meta = Metadata::from_file(DEFAULT_METADATA_FILE).expect("Project meta.toml not found");
         debug!("Meta: {meta:?}");
+
+        if self.with_source.unwrap() {
+            info!("Deploy with source code. You can view the source code in the cloud\n\tIf you want to deploy without source code, use -with-source=false");
+        } else {
+            info!("Deploy without source code. You can not view the source code in the cloud\n\tIf you want to deploy with source code, use -with-source=true");
+        }
 
         let project =
             match deploy::load_project(self.project.clone(), &meta, addr, &self.token).await {
@@ -255,6 +265,7 @@ impl Deploy {
             }
         };
 
+        info!("Deploying to cloud...");
         if self.production {
             let deployment =
                 match deploy::publish_deployment(deployment.uuid, addr, &self.token).await {
@@ -264,10 +275,13 @@ impl Deploy {
                         return;
                     }
                 };
+            // FIXME: wait for real deployment task success
+            sleep(std::time::Duration::from_secs(2)).await;
             info!("Deployment url: \t\n{}", deployment.prod_url);
             return;
         }
 
+        sleep(std::time::Duration::from_secs(2)).await;
         info!("Deployment url: \t\n{}", deployment.domain_url);
     }
 }

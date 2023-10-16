@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { workspace = true }
+bytesize =  { workspace = true }
 futures-util = "0.3.28"
 hyper = { workspace = true }
 once_cell = { workspace = true }
@@ -20,7 +21,6 @@ which = "4.4.2"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-component = { workspace = true }
-bytesize =  { workspace = true }
 
 [lib]
 doctest = false

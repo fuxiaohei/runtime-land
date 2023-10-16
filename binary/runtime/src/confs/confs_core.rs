@@ -85,11 +85,9 @@ pub async fn start_sync(addr: String, token: String) {
 
         if conf_values.md5 != new_conf_values.md5 {
             info!("update conf: {:?}", new_conf_values.md5);
-
-            process_conf(&conf_values, &new_conf_values).await;
-
+            process_conf(conf_values, &new_conf_values).await;
             *conf_values = new_conf_values;
-            match write_conf(&addr, &conf_values).await {
+            match write_conf(&addr, conf_values).await {
                 Ok(_) => {}
                 Err(e) => {
                     warn!("write conf error: {:?}", e);

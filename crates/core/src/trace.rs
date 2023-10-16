@@ -6,9 +6,9 @@ use tracing_subscriber::EnvFilter;
 pub fn init() {
     if std::env::var("RUST_LOG").ok().is_none() {
         if cfg!(debug_assertions) {
-            std::env::set_var("RUST_LOG", "debug")
+            std::env::set_var("RUST_LOG", "land=debug")
         } else {
-            std::env::set_var("RUST_LOG", "info")
+            std::env::set_var("RUST_LOG", "land=info")
         }
     }
 

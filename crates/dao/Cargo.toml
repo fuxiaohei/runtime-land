@@ -11,6 +11,7 @@ bcrypt = "0.15.0"
 chrono = { workspace = true }
 clap = { workspace = true }
 gravatar = "0.2.0"
+land-core = { workspace = true }
 once_cell = { workspace = true }
 rand = { workspace = true }
 random_word = { version = "0.4.1", features = ["en"] }
@@ -24,7 +25,6 @@ serde_json = { workspace = true }
 strum = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
-land-core = { workspace = true }
 
 [lib]
 doctest = false
