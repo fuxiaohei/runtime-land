@@ -2053,7 +2053,7 @@ dependencies = [
 
 [[package]]
 name = "integration-test"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "reqwest",
@@ -2181,7 +2181,7 @@ dependencies = [
 
 [[package]]
 name = "land-center"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "axum",
@@ -2209,7 +2209,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2237,7 +2237,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "envconfig",
@@ -2256,7 +2256,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "async-std",
@@ -2279,7 +2279,7 @@ dependencies = [
 
 [[package]]
 name = "land-runtime"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2307,7 +2307,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "http",
@@ -2319,7 +2319,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "http",
@@ -2329,7 +2329,7 @@ dependencies = [
 
 [[package]]
 name = "land-storage"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "envconfig",
@@ -2344,7 +2344,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.1.4-rc.4"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "async-trait",
