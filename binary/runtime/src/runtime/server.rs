@@ -1,4 +1,5 @@
 use anyhow::Result;
+use axum::extract::ConnectInfo;
 use axum::{
     body::Body,
     http::{Request, Response},
@@ -71,7 +72,10 @@ pub async fn wasm_caller_handler(
 }
 
 // basic handler that responds with a static string
-async fn default_handler(req: Request<Body>) -> Response<Body> {
+async fn default_handler(
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    req: Request<Body>,
+) -> Response<Body> {
     let st = Instant::now();
     let req_id = uuid::Uuid::new_v4().to_string();
     // get header x-land-module
@@ -91,7 +95,7 @@ async fn default_handler(req: Request<Body>) -> Response<Body> {
         .unwrap_or("unknown");
 
     let span =
-        info_span!("[HTTP]",req_id = %req_id.clone(), method = %method, uri = %uri, host = %host);
+        info_span!("[HTTP]",remote = %addr.to_string(), req_id = %req_id.clone(), method = %method, uri = %uri, host = %host);
     let span_clone = span.clone();
 
     if land_wasm.is_empty() {
@@ -158,7 +162,7 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
     info!("Starting on {}", addr);
 
     axum::Server::bind(&addr)
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())

@@ -7,10 +7,17 @@
 Add this to your `Cargo.toml`:
 
 ```toml
+[package]
+name = "rust-hello-world"
+version = "0.1.0"
+edition = "2021"
+
 [dependencies]
 anyhow = "1.0.75"
 http = "0.2.9"
-land-sdk = "0.1.1"
+land-sdk = "0.1.4"
+# wit-component > 0.14.5 is not compatible with wit-bindgen 0.12.0
+wit-component = "= 0.14.5"
 wit-bindgen = "0.12.0"
 
 [lib]

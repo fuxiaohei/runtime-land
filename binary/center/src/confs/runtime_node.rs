@@ -16,7 +16,6 @@ pub static RUNTIME_NODES_MAP: Lazy<Mutex<HashMap<String, RuntimeNodeData>>> =
 
 /// update_runtime_node_data update runtime node data
 pub async fn update_data(info: RuntimeNodeInfo, conf_md5: String) {
-    debug!("update runtime node data: {}", info.region_ip());
     let data = RuntimeNodeData { info, conf_md5 };
     let mut map = RUNTIME_NODES_MAP.lock().await;
     map.insert(data.info.region_ip(), data);
