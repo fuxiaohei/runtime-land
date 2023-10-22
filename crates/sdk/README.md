@@ -16,9 +16,7 @@ edition = "2021"
 anyhow = "1.0.75"
 http = "0.2.9"
 land-sdk = "0.1.4"
-# wit-component > 0.14.5 is not compatible with wit-bindgen 0.12.0
-wit-component = "= 0.14.5"
-wit-bindgen = "0.12.0"
+wit-bindgen = "0.13.0"
 
 [lib]
 crate-type = ["cdylib"] # target wasm32-wasi

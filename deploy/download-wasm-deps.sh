@@ -27,7 +27,7 @@ download_wasi_snapshot_preview1_reactor_wasm() {
         return
     fi
     local filename="wasi_snapshot_preview1.reactor.wasm"
-    local archive_url="https://github.com/bytecodealliance/wasmtime/releases/download/v13.0.0/wasi_snapshot_preview1.reactor.wasm"
+    local archive_url="https://github.com/bytecodealliance/wasmtime/releases/download/v14.0.0/wasi_snapshot_preview1.reactor.wasm"
     log_print 1 "Downloading wasi_snapshot_preview1.reactor.wasm: $archive_url"
     curl --progress-bar --show-error --location --fail $archive_url --output "$filename"
     mv "$filename" "$targetfile"

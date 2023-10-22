@@ -34,13 +34,12 @@ impl WasiView for Context {
 
 impl Context {
     pub fn new(req_id: String) -> Self {
-        let mut table = Table::new();
+        let table = Table::new();
         Context {
             wasi_ctx: WasiCtxBuilder::new()
                 .inherit_stderr()
                 .inherit_stdout()
-                .build(&mut table)
-                .unwrap(),
+                .build(),
             http_ctx: HttpContext::new(req_id),
             table,
         }
