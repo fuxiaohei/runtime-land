@@ -76,8 +76,8 @@ wit-bindgen = "0.13.0"
 async-trait = "0.1.74"
 hyper = { version = "0.14.27", features = ["full"] }
 uuid = { version = "1.5.0", features = ["v4"] }
-wasmtime = { version = "14.0.0", features = ["component-model", "async"] }
-wasmtime-wasi = "14.0.0"
+wasmtime = { version = "14.0.1", features = ["component-model", "async"] }
+wasmtime-wasi = "14.0.1"
 wit-bindgen-core = "0.13.0"
 wit-bindgen-rust = "0.13.0"
 wit-component = "0.16.0"

@@ -9,7 +9,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 async_zip = { version = "0.0.15", features = ["full"] }
 axum = { workspace = true }
-base64 = "0.21.4"
+base64 = "0.21.5"
 chrono = { workspace = true }
 clap = { workspace = true }
 envconfig = { workspace = true }
