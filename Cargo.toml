@@ -46,17 +46,17 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace.dependencies]
-land-worker = { path = "crates/worker", version = "0.1.5-beta.1" }
-land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.5-beta.1" }
-land-sdk = { path = "crates/sdk", version = "0.1.5-beta.1" }
-land-core = { path = "crates/core", version = "0.1.5-beta.1" }
-land-dao = { path = "crates/dao", version = "0.1.5-beta.1" }
-land-storage = { path = "crates/storage", version = "0.1.5-beta.1" }
+land-worker = { path = "crates/worker", version = "0.1.8-beta.1" }
+land-sdk-macro = { path = "crates/sdk-macro", version = "0.1.8-beta.1" }
+land-sdk = { path = "crates/sdk", version = "0.1.8-beta.1" }
+land-core = { path = "crates/core", version = "0.1.8-beta.1" }
+land-dao = { path = "crates/dao", version = "0.1.8-beta.1" }
+land-storage = { path = "crates/storage", version = "0.1.8-beta.1" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
 clap = { version = "4.4.6", features = ["derive", "env"] }
@@ -101,7 +101,7 @@ opendal = { version = "0.41.0", default-features = false, features = [
     "rustls",
 ] }
 strum = { version = "0.25.0", features = ["derive"] }
-rust-embed = "8.0.0"
+rust-embed = { version = "8.0.0", features = ["include-exclude"] }
 moka = { version = "0.12.1", default-features = false, features = ["sync"] }
 md-5 = "0.10.6"
 tar = "0.4.40"

@@ -423,6 +423,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "axum-template"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "780c683749470cd805a3b0e01e821396661c4523dbe84dc772e531199fba70b4"
+dependencies = [
+ "axum",
+ "handlebars",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "backon"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -620,6 +632,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "bstr"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c79ad7fb2dd38f3dabd76b09c6a5a20c038fc0213ef1e9afd30eb777f120f019"
+dependencies = [
+ "memchr",
+ "serde",
 ]
 
 [[package]]
@@ -1697,6 +1719,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
+name = "globset"
+version = "0.4.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "759c97c1e17c55525b57192c06a267cda0ac5210b222d6b82189a2338fa1c13d"
+dependencies = [
+ "aho-corasick",
+ "bstr",
+ "fnv",
+ "log",
+ "regex",
+]
+
+[[package]]
 name = "gloo-timers"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1735,6 +1770,20 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
+]
+
+[[package]]
+name = "handlebars"
+version = "4.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c39b3bc2a8f715298032cf5087e58573809374b08160aa7d750582bdb82d2683"
+dependencies = [
+ "log",
+ "pest",
+ "pest_derive",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -2053,7 +2102,7 @@ dependencies = [
 
 [[package]]
 name = "integration-test"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "reqwest",
@@ -2170,14 +2219,16 @@ dependencies = [
 
 [[package]]
 name = "land-center"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "axum",
+ "axum-template",
  "chrono",
  "clap",
  "envconfig",
  "futures-util",
+ "handlebars",
  "headers",
  "hyper",
  "land-core",
@@ -2186,6 +2237,7 @@ dependencies = [
  "lazy_static",
  "lettre",
  "md-5 0.10.6",
+ "mime_guess",
  "once_cell",
  "rust-embed",
  "serde",
@@ -2198,7 +2250,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2226,7 +2278,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "envconfig",
@@ -2245,7 +2297,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "async-std",
@@ -2268,7 +2320,7 @@ dependencies = [
 
 [[package]]
 name = "land-runtime"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2296,7 +2348,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "http",
@@ -2308,7 +2360,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "http",
@@ -2318,7 +2370,7 @@ dependencies = [
 
 [[package]]
 name = "land-storage"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "envconfig",
@@ -2333,7 +2385,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.1.5-beta.1"
+version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2878,6 +2930,51 @@ name = "percent-encoding"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b2a4787296e9989611394c33f193f676704af1686e70b8f8033ab5ba9a35a94"
+
+[[package]]
+name = "pest"
+version = "2.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae9cee2a55a544be8b89dc6848072af97a20f2422603c10865be2a42b580fff5"
+dependencies = [
+ "memchr",
+ "thiserror",
+ "ucd-trie",
+]
+
+[[package]]
+name = "pest_derive"
+version = "2.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81d78524685f5ef2a3b3bd1cafbc9fcabb036253d9b1463e726a91cd16e2dfc2"
+dependencies = [
+ "pest",
+ "pest_generator",
+]
+
+[[package]]
+name = "pest_generator"
+version = "2.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68bd1206e71118b5356dae5ddc61c8b11e28b09ef6a31acbd15ea48a28e0c227"
+dependencies = [
+ "pest",
+ "pest_meta",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "pest_meta"
+version = "2.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c747191d4ad9e4a4ab9c8798f1e82a39affe7ef9648390b7e5548d18e099de6"
+dependencies = [
+ "once_cell",
+ "pest",
+ "sha2",
+]
 
 [[package]]
 name = "pin-project"
@@ -3453,6 +3550,7 @@ version = "8.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "873feff8cb7bf86fdf0a71bb21c95159f4e4a37dd7a4bd1855a940909b583ada"
 dependencies = [
+ "globset",
  "sha2",
  "walkdir",
 ]
@@ -4812,6 +4910,12 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
+
+[[package]]
+name = "ucd-trie"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed646292ffc8188ef8ea4d1e0e0150fb15a5c2e12ad9b8fc191ae7a8a7f3c4b9"
 
 [[package]]
 name = "unicase"

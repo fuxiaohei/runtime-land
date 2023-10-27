@@ -6,18 +6,25 @@ use axum::{
     Router,
 };
 use hyper::StatusCode;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::error;
 
 mod auth;
 mod endpoint;
 mod rest;
 
-pub fn api_router() -> Router {
+pub fn router() -> Router {
+    let cors = CorsLayer::new()
+        .allow_headers(Any)
+        .allow_methods(Any)
+        .allow_origin(Any);
+
     Router::new()
         .merge(auth::router())
         .merge(endpoint::router())
         .merge(rest::router())
         .route("/v2/*path", any(v2_handler))
+        .layer(cors)
 }
 
 async fn v2_handler(_req: Request<Body>) -> Response<Body> {

@@ -3,11 +3,12 @@ use clap::Parser;
 use tracing::debug;
 
 mod apiv2;
+mod pages;
 mod confs;
-mod email;
+// mod email;
 mod embed;
 mod region;
-mod restapi;
+// mod restapi;
 mod server;
 mod settings;
 

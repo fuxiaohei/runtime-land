@@ -7,10 +7,12 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
+axum-template = { version = "1.0.0", features = ["handlebars"] }
 chrono = { workspace = true }
 clap = { workspace = true }
 envconfig = { workspace = true }
 futures-util = { workspace = true }
+handlebars = "4.4.0"
 headers = "0.3.8"
 hyper = { workspace = true }
 land-core = { workspace = true }
@@ -25,6 +27,7 @@ lettre = { version = "0.10.4", default-features = false, features = [
     "builder",
 ] }
 md-5 = { workspace = true }
+mime_guess = "2.0.4"
 once_cell = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }

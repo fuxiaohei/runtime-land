@@ -8,7 +8,7 @@ use std::collections::HashMap;
 #[tracing::instrument(name = "[templates_list_handler]", skip_all)]
 pub async fn list_handler() -> Result<(StatusCode, Json<TemplateInfosMap>), RouteError> {
     let mut templates = HashMap::new();
-    crate::embed::TemplateAssets::iter().for_each(|asset| {
+    crate::embed::ExamplesAssets::iter().for_each(|asset| {
         let asset_path = asset.to_string();
         let path = std::path::Path::new(&asset_path);
 
@@ -17,7 +17,7 @@ pub async fn list_handler() -> Result<(StatusCode, Json<TemplateInfosMap>), Rout
             return;
         }
 
-        let content = crate::embed::TemplateAssets::get(&asset_path).unwrap().data;
+        let content = crate::embed::ExamplesAssets::get(&asset_path).unwrap().data;
         let metadata = Metadata::from_binary(&content).unwrap();
         let language = metadata.language.clone();
         let template_info = build_template_info(&metadata);
@@ -39,7 +39,7 @@ fn build_template_info(metadata: &Metadata) -> TemplateInfo {
         _ => "",
     };
     let src_file = format!("{}/{}", metadata.name, src_index_name);
-    let content = crate::embed::TemplateAssets::get(&src_file).unwrap().data;
+    let content = crate::embed::ExamplesAssets::get(&src_file).unwrap().data;
     TemplateInfo {
         name: metadata.name.clone(),
         template_name: metadata.template_name.clone().unwrap_or("".to_string()),

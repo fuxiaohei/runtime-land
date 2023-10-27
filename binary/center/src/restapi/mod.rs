@@ -11,7 +11,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing::warn;
 
-use crate::apiv2;
+use crate::{apiv2, pages};
 
 mod admin;
 mod auth;
@@ -94,8 +94,8 @@ pub fn router() -> Router {
     Router::new()
         .merge(auth_router())
         .merge(api_router())
-        .merge(apiv2::api_router())
-        .route("/v1/region/ws", get(ws::ws_handler))
+        .merge(apiv2::router())
+        .merge(pages::router())
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))

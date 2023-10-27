@@ -1,13 +1,29 @@
-use crate::restapi;
+use crate::apiv2;
+use crate::pages;
 use anyhow::Result;
+use axum::extract::DefaultBodyLimit;
+use axum::{
+    body::Body,
+    http::{Request, Response},
+    routing::any,
+    Router,
+};
 use std::net::SocketAddr;
+use std::process::exit;
 use tokio::signal;
+use tower_http::trace::TraceLayer;
 use tracing::info;
 
 /// start starts the server.
 #[tracing::instrument(name = "[SERVER]", skip_all)]
 pub async fn start(addr: SocketAddr) -> Result<()> {
-    let app = restapi::router();
+    let app = Router::new()
+        .merge(apiv2::router())
+        .merge(pages::router())
+        .route("/", any(default_handler))
+        .route("/*path", any(default_handler))
+        .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
+        .layer(TraceLayer::new_for_http());
 
     info!("Starting on {}", addr);
 
@@ -16,6 +32,13 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
         .with_graceful_shutdown(shutdown_signal())
         .await?;
     Ok(())
+}
+
+/// default_handler is the default handler for all requests.
+async fn default_handler(_req: Request<Body>) -> Response<Body> {
+    let mut builder = Response::builder().status(200);
+    builder = builder.header("x-land-version", land_core::version::get());
+    builder.body(Body::from("Hello, Runtime.land!")).unwrap()
 }
 
 async fn shutdown_signal() {
@@ -41,4 +64,6 @@ async fn shutdown_signal() {
         _ = terminate => {},
     }
     info!("Shutting down");
+
+    exit(0)
 }
