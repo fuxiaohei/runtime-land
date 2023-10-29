@@ -129,7 +129,11 @@ download_wasm_opt_binary() {
 
 download_wasm_opt_binary
 
-export SDK_VERSION='{ git = "https://github.com/fuxiaohei/runtime-land" }'
+# if RUNTIME_LAND_RELEASE is not set, use git version
+RUNTIME_LAND_RELEASE=${RUNTIME_LAND_RELEASE:-}
+if [[ -z "$RUNTIME_LAND_RELEASE" ]]; then
+    export SDK_VERSION='{ git = "https://github.com/fuxiaohei/runtime-land" }'
+fi
 
 LAND_CLI=$(pwd)/land-cli
 echo "LAND_CLI=$LAND_CLI"
