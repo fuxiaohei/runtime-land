@@ -19,7 +19,7 @@ type AppEngine = Engine<Handlebars<'static>>;
 pub fn router() -> Router {
     let hbs = init_templates().unwrap();
     Router::new()
-        .route("/demo", any(render_demo))
+        .route("/dashboard", any(render_dashboard))
         .route("/static/*path", get(render_static))
         .with_state(Engine::from(hbs))
 }
@@ -42,11 +42,8 @@ async fn render_static(Path(path): Path<String>) -> Response<Body> {
         .unwrap()
 }
 
-async fn render_demo(
-    // Obtain the engine
-    engine: AppEngine,
-) -> impl IntoResponse {
-    RenderHtml("demo", engine, &())
+async fn render_dashboard(engine: AppEngine) -> impl IntoResponse {
+    RenderHtml("dashboard.hbs", engine, &())
 }
 
 fn init_templates() -> Result<Handlebars<'static>> {
@@ -64,10 +61,8 @@ fn init_templates() -> Result<Handlebars<'static>> {
             .unwrap()
             .data;
 
-        // template name drop suffix .html and .hbs
-        let template_name = asset_path.replace(".html", "").replace(".hbs", "");
-        debug!("register template: {}", template_name);
-        hbs.register_template_string(&template_name, std::str::from_utf8(&content).unwrap())
+        debug!("register template: {}", asset_path);
+        hbs.register_template_string(&asset_path, std::str::from_utf8(&content).unwrap())
             .unwrap();
     });
     Ok(hbs)

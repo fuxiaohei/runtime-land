@@ -11,7 +11,7 @@
   @apply self-center text-xl whitespace-nowrap dark:text-white;
 }
 #top-nav-user-button {
-  @apply flex mr-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600;
+  @apply flex mr-3 text-sm bg-gray-800 rounded-full ring-4 ring-slate-400 dark:focus:ring-slate-600;
 }
 #top-nav-user-avatar {
   @apply w-8 h-8 rounded-full;
@@ -26,9 +26,17 @@
   @apply flex flex-col font-medium ml-4 p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700;
 }
 #top-navbar .item {
-  @apply block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700;
+  @apply block p-0 text-gray-900 rounded hover:text-primary;
 }
 #top-navbar .item.active {
-  @apply block p-0 text-white rounded;
-  color: #2a70b6;
+  @apply block p-0 rounded text-primary;
+}
+#top-nav-user-dropdown .username {
+  @apply block text-sm text-gray-900 dark:text-white;
+}
+#top-nav-user-dropdown .email {
+  @apply block text-sm  text-gray-500 truncate dark:text-gray-400;
+}
+#top-nav-user-dropdown .item {
+  @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white;
 }
