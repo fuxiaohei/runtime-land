@@ -30,18 +30,25 @@
                 return;
             }
 
-            // show sign-in panel
-            const signInComponent = document.querySelector('#sign-in');
-            window.Clerk.openSignIn(signInComponent, {
-                appearance: {
-                    baseTheme: "dark"
+            let show = function () {
+                if (!window.Clerk.isReady()) {
+                    return
                 }
-            });
+                clearInterval(window.intervalID)
+                const signInComponent = document.querySelector('#sign-in');
+                window.Clerk.openSignIn(signInComponent, {
+                    appearance: {
+                        baseTheme: "dark"
+                    }
+                });
 
-            // update sign-in button to open sign-in panel
-            let button = document.querySelector('#sign-in-button');
-            button.disabled = false;
-            button.textContent = "Sign-in via Clerk.js"
+                // update sign-in button to open sign-in panel
+                let button = document.querySelector('#sign-in-button');
+                button.disabled = false;
+                button.textContent = "Sign-in via Clerk.js"
+            }
+            
+            window.intervalID = setInterval(show, 200);
         }
 
         async function clerkOpen() {
