@@ -2,12 +2,8 @@ use crate::apiv2;
 use crate::pages;
 use anyhow::Result;
 use axum::extract::DefaultBodyLimit;
-use axum::{
-    body::Body,
-    http::{Request, Response},
-    routing::any,
-    Router,
-};
+use axum::response::{IntoResponse, Redirect};
+use axum::{body::Body, http::Request, routing::any, Router};
 use std::net::SocketAddr;
 use std::process::exit;
 use tokio::signal;
@@ -35,10 +31,8 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
 }
 
 /// default_handler is the default handler for all requests.
-async fn default_handler(_req: Request<Body>) -> Response<Body> {
-    let mut builder = Response::builder().status(200);
-    builder = builder.header("x-land-version", land_core::version::get());
-    builder.body(Body::from("Hello, Runtime.land!")).unwrap()
+async fn default_handler(_req: Request<Body>) -> impl IntoResponse {
+    Redirect::to("/projects").into_response()
 }
 
 async fn shutdown_signal() {

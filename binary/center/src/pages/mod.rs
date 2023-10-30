@@ -1,11 +1,7 @@
 use anyhow::Result;
 use axum::extract::Path;
 use axum::response::{IntoResponse, Response};
-use axum::{
-    body::Body,
-    routing::{any, get},
-    Router,
-};
+use axum::{body::Body, routing::get, Router};
 use axum_template::engine::Engine;
 use axum_template::RenderHtml;
 use handlebars::Handlebars;
@@ -19,7 +15,9 @@ type AppEngine = Engine<Handlebars<'static>>;
 pub fn router() -> Router {
     let hbs = init_templates().unwrap();
     Router::new()
-        .route("/dashboard", any(render_dashboard))
+        .route("/projects", get(render_projects))
+        .route("/projects/:name", get(render_project_single))
+        .route("/sign-in", get(render_signin))
         .route("/static/*path", get(render_static))
         .with_state(Engine::from(hbs))
 }
@@ -42,8 +40,17 @@ async fn render_static(Path(path): Path<String>) -> Response<Body> {
         .unwrap()
 }
 
-async fn render_dashboard(engine: AppEngine) -> impl IntoResponse {
-    RenderHtml("dashboard.hbs", engine, &())
+async fn render_projects(engine: AppEngine) -> impl IntoResponse {
+    RenderHtml("projects.hbs", engine, &())
+}
+
+async fn render_project_single(engine: AppEngine, Path(param): Path<String>) -> impl IntoResponse {
+    debug!("param: {}", param);
+    RenderHtml("project-single.hbs", engine, &())
+}
+
+async fn render_signin(engine: AppEngine) -> impl IntoResponse {
+    RenderHtml("signin.hbs", engine, &())
 }
 
 fn init_templates() -> Result<Handlebars<'static>> {

@@ -41,13 +41,13 @@
   @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white;
 }
 #main {
-  @apply max-w-4xl mx-auto my-6;
+  @apply max-w-4xl mx-auto my-6 min-h-[70%];
 }
 #project-top h1 {
   @apply text-3xl font-semibold;
 }
 #project-top .count {
-  @apply text-gray-500 leading-8;
+  @apply text-gray-400 block py-2;
 }
 #project-searchbar {
   @apply flex justify-between items-center my-4;
@@ -92,4 +92,17 @@
 
 .project-card .action-button {
   @apply px-3 py-2 rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 duration-200;
+}
+
+#footer {
+  @apply border-t p-6 text-center text-gray-300 mt-6;
+}
+
+#sign-in-btn-container {
+  @apply text-center;
+  padding-top: 8rem;
+}
+
+#sign-in-button {
+  @apply text-xl px-4 py-2 bg-primary rounded-lg text-white hover:bg-white hover:border hover:border-primary hover:text-primary;
 }
