@@ -7,6 +7,64 @@
 
 <body>
     {{> partials/navbar.hbs}}
+    <main id="main">
+        <div id="project-top">
+            <h1>Projects</h1>
+            <span class="count">13 projects</span>
+        </div>
+        <div id="project-searchbar">
+            <form>
+                <label for="project-search-input">Search</label>
+                <div class="relative">
+                    <div class="search-icon">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input type="search" id="project-search-input" placeholder="Project name" required>
+                </div>
+            </form>
+            <div id="project-createbar">
+                <a href="#" class="new-project-button">+ New Project</a>
+            </div>
+        </div>
+        <div id="projects-list" class="mt-6">
+            <div class="flex space-x-4">
+                <div class="project-card flex justify-between w-1/2">
+                    <div class="card-left">
+                        <div class="card-title">spryest-pyknoses-242</div>
+                        <div class="card-metadata">
+                            <span class="item">Rust</span>
+                            <span class="item">1 Deploys</span>
+                            <span class="item">30 Days ago</span>
+                        </div>
+                        <div class="card-link">
+                            <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                    class="w-5 h-5 inline-block mr-1">
+                                    <path fill-rule="evenodd"
+                                        d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
+                                        clip-rule="evenodd" />
+                                    <path fill-rule="evenodd"
+                                        d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                spryest-pyknoses-242.binary.com</a>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <a href="#" class="action-button">Running</a>
+                    </div>
+                </div>
+                <div class="project-card w-1/2">w-1/2</div>
+            </div>
+            <div class="flex">
+                <div class="project-card w-1/2">w-1/2</div>
+                <div class="project-card w-1/2">w-1/2</div>
+            </div>
+        </div>
+    </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.js"></script>
 </body>
 

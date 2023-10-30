@@ -48,7 +48,11 @@ async fn render_dashboard(engine: AppEngine) -> impl IntoResponse {
 
 fn init_templates() -> Result<Handlebars<'static>> {
     let mut hbs = Handlebars::new();
+    load_template_from_assets(&mut hbs);
+    Ok(hbs)
+}
 
+fn load_template_from_assets(hbs: &mut Handlebars<'static>) {
     crate::embed::TemplatesAssets::iter().for_each(|asset| {
         let asset_path = asset.to_string();
 
@@ -65,5 +69,4 @@ fn init_templates() -> Result<Handlebars<'static>> {
         hbs.register_template_string(&asset_path, std::str::from_utf8(&content).unwrap())
             .unwrap();
     });
-    Ok(hbs)
 }
