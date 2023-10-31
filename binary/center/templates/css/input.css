@@ -106,3 +106,62 @@
 #sign-in-button {
   @apply text-xl px-4 py-2 bg-primary rounded-lg text-white hover:bg-white hover:border hover:border-primary hover:text-primary;
 }
+#project-navbar {
+  @apply font-medium text-center text-gray-500 border-b border-gray-200;
+}
+#project-navbar li {
+  @apply mr-2;
+}
+#project-navbar li a.item {
+  @apply inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300;
+}
+#project-navbar li a.item.active {
+  @apply text-primary border-primary hover:text-primary hover:border-primary;
+}
+#project-navbar li a.item.disable {
+  @apply cursor-not-allowed text-gray-400 hover:text-gray-400 hover:border-transparent;
+}
+#project-main {
+  @apply mt-6 flex space-x-4;
+}
+#project-main > .left {
+  @apply w-3/4;
+}
+#project-main > .right {
+  @apply w-1/4;
+}
+#project-main .deployment-status {
+  @apply bg-sky-50 rounded-lg p-6;
+}
+#project-main .deployment-status h3,
+.deployment-lists h3 {
+  @apply text-xl font-semibold;
+}
+#project-main .deployment-status .desc,
+.deployment-lists .desc,
+#deployment-list .date {
+  @apply text-gray-400;
+}
+#project-main .deployment-status p {
+  @apply leading-6;
+}
+#project-main .deployment-status .label {
+  @apply mt-6 text-gray-400 uppercase;
+}
+#project-main .deployment-status .domains .link,
+#deployment-list .link {
+  @apply hover:underline;
+}
+
+.deployment-lists {
+  @apply p-6 border rounded-lg border-gray-200 my-4;
+}
+#deployment-list {
+  @apply mt-4;
+}
+#deployment-list .item {
+  @apply py-3 flex justify-between;
+}
+#deployment-list .prod-badge {
+  @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg;
+}

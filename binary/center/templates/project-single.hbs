@@ -13,49 +13,62 @@
             <span class="count">PENDING PRODUCTION DEPLOYMENT</span>
         </div>
         <div id="project-navbar">
-            
+            <ul class="flex flex-wrap -mb-px">
+                <li>
+                    <a href="#" class="item active">Overview</a>
+                </li>
+                <li>
+                    <a class="item disable">Traffic</a>
+                </li>
+                <li>
+                    <a href="#" class="item">Settings</a>
+                </li>
+            </ul>
         </div>
-        <div id="projects-list" class="mt-6">
-            <div class="flex space-x-4">
-                <div class="project-card">
-                    <div class="card-left">
-                        <div class="card-title">spryest-pyknoses-242</div>
-                        <div class="card-metadata">
-                            <span class="item">Rust</span>
-                            <span class="item">1 Deploys</span>
-                            <span class="item">30 Days ago</span>
-                        </div>
-                        <div class="card-link">
-                            <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                    class="w-5 h-5 inline-block mr-1">
-                                    <path fill-rule="evenodd"
-                                        d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
-                                        clip-rule="evenodd" />
-                                    <path fill-rule="evenodd"
-                                        d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                spryest-pyknoses-242.binary.com</a>
-                        </div>
+        <div id="project-main" class="mt-6 flex space-x-4">
+            <div class="left">
+                <div class="deployment-status">
+                    <h3>Production Deployment</h3>
+                    <p class="desc">This project is in Production.</p>
+                    <div class="domains">
+                        <p class="label">domain</p>
+                        <p class="link"><a href="#">calm-cod-79-hxzfdq7zh6w7.dev</a></p>
+                        <p class="link"><a href="#">calm-cod-79.dev</a></p>
                     </div>
-                    <div class="card-right">
-                        <a href="#" class="action-button">Running</a>
+                    <div class="updated">
+                        <p class="label">updated</p>
+                        <p>3 Days ago</p>
                     </div>
                 </div>
-                <div class="project-card">
-                    <div class="card-left">
-                        <div class="card-title">spryest-pyknoses-242</div>
-                        <div class="card-metadata">
-                            <span class="item">Rust</span>
-                            <span class="item">1 Deploys</span>
-                            <span class="item">30 Days ago</span>
-                        </div>
-                    </div>
-                    <div class="card-right">
-                        <a href="#" class="action-button">Running</a>
-                    </div>
+
+                <div class="deployment-lists">
+                    <h3>All Deployments</h3>
+                    <p class="desc">All deployments for this project.</p>
+                    <ul id="deployment-list">
+                        <li class="item">
+                            <div class="left">
+                                <a href="#" class="link">calm-cod-79-hxzfdq7zh6w7.xxxx.dev</a>
+                                <span class="prod-badge">prod</span>
+                            </div>
+                            <div class="right">
+                                <span class="date">3 Days ago</span>
+                                <span class="ops">ops</span>
+                            </div>
+                        </li>
+                        <li class="item">
+                            <div class="left">
+                                <span class="status">ok</span>
+                                <a href="#" class="link">calm-cod-79-hxzfdq7zh6w7.xxxx.dev</a>
+                            </div>
+                            <div class="right">
+                                <span class="date">3 Days ago</span>
+                                <span class="ops">ops</span>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
+            <div class="right">w-1/4</div>
         </div>
     </main>
     {{> partials/footer.hbs}}
