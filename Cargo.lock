@@ -423,6 +423,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "axum-extra"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ab90e7b70bea63a153137162affb6a0bce26b584c24a4c7885509783e2cf30b"
+dependencies = [
+ "axum",
+ "axum-core",
+ "bytes",
+ "cookie",
+ "futures-util",
+ "http",
+ "http-body",
+ "mime",
+ "pin-project-lite",
+ "serde",
+ "tokio",
+ "tower",
+ "tower-layer",
+ "tower-service",
+]
+
+[[package]]
 name = "axum-template"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,6 +985,17 @@ dependencies = [
  "getrandom",
  "once_cell",
  "tiny-keccak",
+]
+
+[[package]]
+name = "cookie"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7efb37c3e1ccb1ff97164ad95ac1606e8ccd35b3fa0a7d99a304c7f4a428cc24"
+dependencies = [
+ "percent-encoding 2.3.0",
+ "time",
+ "version_check",
 ]
 
 [[package]]
@@ -2223,7 +2256,9 @@ version = "0.1.8-beta.1"
 dependencies = [
  "anyhow",
  "axum",
+ "axum-extra",
  "axum-template",
+ "base64",
  "chrono",
  "clap",
  "envconfig",
@@ -2239,9 +2274,11 @@ dependencies = [
  "md-5 0.10.6",
  "mime_guess",
  "once_cell",
+ "reqwest",
  "rust-embed",
  "serde",
  "serde_json",
+ "time",
  "tokio",
  "tower-http",
  "tracing",

@@ -59,6 +59,7 @@ land-dao = { path = "crates/dao", version = "0.1.8-beta.1" }
 land-storage = { path = "crates/storage", version = "0.1.8-beta.1" }
 anyhow = "1.0.75"
 axum = { version = "0.6.20", features = ["headers", "ws"] }
+axum-extra = { version = "0.8.0", features = ["cookie"] }
 clap = { version = "4.4.6", features = ["derive", "env"] }
 tokio = { version = "1.33.0", features = ["full"] }
 tracing = "0.1.40"

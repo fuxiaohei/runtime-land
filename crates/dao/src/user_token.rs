@@ -15,6 +15,7 @@ pub enum CreatedByCases {
     Deployment,
     Edgehub,
     ForgetPassword,
+    Session,
 }
 
 #[derive(strum::Display)]

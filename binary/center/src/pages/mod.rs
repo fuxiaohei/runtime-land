@@ -1,13 +1,17 @@
 use anyhow::Result;
 use axum::extract::Path;
+use axum::middleware;
 use axum::response::{IntoResponse, Response};
 use axum::{body::Body, routing::get, Router};
+use axum_extra::extract::cookie::CookieJar;
 use axum_template::engine::Engine;
 use axum_template::RenderHtml;
 use handlebars::Handlebars;
 use hyper::StatusCode;
 use mime_guess::mime;
 use tracing::debug;
+
+mod auth;
 
 // Type alias for our engine. For this example, we are using Handlebars
 type AppEngine = Engine<Handlebars<'static>>;
@@ -18,8 +22,10 @@ pub fn router() -> Router {
         .route("/projects", get(render_projects))
         .route("/projects/:name", get(render_project_single))
         .route("/sign-in", get(render_signin))
+        .route("/sign-callback/*path", get(auth::clerk_callback))
         .route("/static/*path", get(render_static))
         .with_state(Engine::from(hbs))
+        .route_layer(middleware::from_fn(auth::session_auth_middleware))
 }
 
 async fn render_static(Path(path): Path<String>) -> Response<Body> {
@@ -40,7 +46,9 @@ async fn render_static(Path(path): Path<String>) -> Response<Body> {
         .unwrap()
 }
 
-async fn render_projects(engine: AppEngine) -> impl IntoResponse {
+async fn render_projects(engine: AppEngine, jar: CookieJar) -> impl IntoResponse {
+    let clerk_session = jar.get("__session");
+    println!("clerk_session: {:?}", clerk_session);
     RenderHtml("projects.hbs", engine, &())
 }
 

@@ -146,6 +146,58 @@ pub async fn signup_by_email(
     Ok((user_model, token))
 }
 
+pub async fn create_by_oauth(
+    name: String,
+    display_name: String,
+    email: String,
+    avatar: String,
+    oauth_id: String,
+    oauth_provider: String,
+    oauth_social: String,
+) -> Result<Model> {
+    let user = find_by_oauth_id(oauth_id.clone()).await?;
+    if user.is_some() {
+        return Err(anyhow::anyhow!("user is exist"));
+    }
+
+    // only support clerk oauth provider now
+    if oauth_provider != OauthProvider::Clerk.to_string() {
+        return Err(anyhow::anyhow!("oauth provider is not supported"));
+    }
+
+    // use bcrypt and salt to hash password
+    let password_salt: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(10)
+        .map(char::from)
+        .collect();
+    let full_password = format!("{}{}", oauth_id, password_salt);
+    let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
+
+    let now = chrono::Utc::now();
+    let user_model = user_info::Model {
+        id: 0,
+        email,
+        password,
+        password_salt,
+        avatar,
+        nick_name: display_name,
+        bio: name,
+        status: Status::Active.to_string(),
+        role: Role::Normal.to_string(),
+        created_at: now,
+        updated_at: now,
+        deleted_at: None,
+        oauth_id,
+        oauth_provider,
+        oauth_social,
+    };
+    let user_active_model: user_info::ActiveModel = user_model.into();
+    let db = DB.get().unwrap();
+    let user_model = user_active_model.insert(db).await?;
+    Ok(user_model)
+}
+
 pub async fn signup_by_oauth(
     name: String,
     display_name: String,

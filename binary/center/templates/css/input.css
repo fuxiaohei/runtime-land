@@ -1,3 +1,11 @@
+.alert-card {
+  @apply p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50;
+}
+
+#sign-in-alert {
+  @apply w-80 m-auto mb-6 text-2xl;
+}
+
 #top-nav {
   @apply bg-white border-b border-gray-200 dark:bg-gray-900;
 }
@@ -104,7 +112,10 @@
 }
 
 #sign-in-button {
-  @apply text-xl px-4 py-2 bg-primary rounded-lg text-white hover:bg-white hover:border hover:border-primary hover:text-primary;
+  @apply text-2xl px-4 py-2 bg-primary rounded-lg text-white hover:bg-white hover:border hover:border-primary hover:text-primary;
+}
+#sign-in-button:hover svg {
+  @apply text-primary;
 }
 #project-navbar {
   @apply font-medium text-center text-gray-500 border-b border-gray-200;
