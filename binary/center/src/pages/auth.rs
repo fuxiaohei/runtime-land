@@ -3,6 +3,7 @@ use axum::response::{IntoResponse, Redirect};
 use axum::{middleware::Next, response};
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
+use axum_template::RenderHtml;
 use base64::{engine::general_purpose, Engine as _};
 use hyper::{Request, StatusCode};
 use land_dao::user::{create_by_oauth, find_by_oauth_id, OauthProvider};
@@ -10,8 +11,19 @@ use land_dao::user_token::{self, CreatedByCases};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error, info};
 
+use super::AppEngine;
+
+#[derive(Clone, Debug)]
+pub struct SessionUser {
+    pub id: i32,
+    pub name: String,
+    pub role: String,
+    pub email: String,
+    pub avatar: String,
+}
+
 pub async fn session_auth_middleware<B>(
-    request: Request<B>,
+    mut request: Request<B>,
     next: Next<B>,
 ) -> Result<response::Response, StatusCode> {
     let uri = request.uri().clone();
@@ -29,9 +41,32 @@ pub async fn session_auth_middleware<B>(
         .get("__runtime_land_session")
         .map(|c| c.value())
         .unwrap_or_default();
-    if session_id.is_empty() {
+    let clerk_session = jar.get("__session").map(|c| c.value()).unwrap_or_default();
+    if session_id.is_empty() || clerk_session.is_empty() {
+        error!("session-auth-middleware: clerk_session or session_id is empty");
         return Ok(Redirect::to("/sign-in").into_response());
     }
+    let (token, user) =
+        match user_token::find_by_value_with_active_user(session_id.to_string()).await {
+            Ok(v) => v,
+            Err(e) => {
+                error!("session-auth-middleware error: {}", e);
+                return Ok(Redirect::to("/sign-in").into_response());
+            }
+        };
+    if token.created_by != CreatedByCases::Session.to_string() {
+        error!("session-auth-middleware: token created by not session");
+        return Ok(Redirect::to("/sign-in").into_response());
+    }
+    let session_user = SessionUser {
+        id: user.id,
+        name: user.nick_name,
+        role: user.role,
+        email: user.email,
+        avatar: user.avatar,
+    };
+    debug!("session-auth-middleware: session_user: {:?}", session_user);
+    request.extensions_mut().insert(session_user);
     Ok(next.run(request).await)
 }
 
@@ -135,6 +170,7 @@ pub async fn clerk_callback(
             return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
+    debug!("clerk-callback-new-session_id: {}", session_id);
     let mut session_cookie = Cookie::new("__runtime_land_session", session_id);
     session_cookie.set_max_age(Some(time::Duration::days(1)));
     session_cookie.set_path("/");
@@ -171,4 +207,9 @@ async fn create_session_id(req: &ClerkCallbackRequest) -> anyhow::Result<String>
     )
     .await?;
     Ok(token.value)
+}
+
+/// render_signin renders sign-in page
+pub async fn render_signin(engine: AppEngine) -> impl IntoResponse {
+    RenderHtml("sign-in.hbs", engine, &())
 }

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+    {{> partials/meta.hbs}}
+</head>
+
+<body>
+    {{> partials/navbar.hbs}}
+    <main id="main">
+        <div id="project-top">
+            <h1>spryest-pyknoses-242</h1>
+            <span class="count">PENDING PRODUCTION DEPLOYMENT</span>
+        </div>
+        <div id="project-navbar">
+            <ul class="flex flex-wrap -mb-px">
+                <li>
+                    <a href="#" class="item">Overview</a>
+                </li>
+                <li>
+                    <a class="item disable">Traffic</a>
+                </li>
+                <li>
+                    <a href="#" class="item active">Settings</a>
+                </li>
+            </ul>
+        </div>
+        <div id="project-main" class="mt-6 flex space-x-4">
+            <div class="left">
+                <div class="settings-project-name">
+                    <h3>Project Name</h3>
+                    <p class="desc">The name of this project</p>
+                    <form id="settings-project-name-form">
+                        <div class="flex items-center mt-4">
+                            <input type="text" id="project-name-input" value="spryest-pyknoses-242" />
+                            <span class="domain-suffix">.127-0-0-1.nip.io</span>
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" id="project-name-btn">Update</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="settings-delete-project">
+                    <h3>Delete Project</h3>
+                    <p class="desc">Delete all deployments and remove this project from your account. This operation is
+                        <strong class="text-red-900">irreversible</strong>. Be careful!
+                    </p>
+                    <form class="mt-4">
+                        <button type="submit" id="delete-project-btn">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="right"></div>
+        </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

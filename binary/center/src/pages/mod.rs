@@ -2,30 +2,42 @@ use anyhow::Result;
 use axum::extract::Path;
 use axum::middleware;
 use axum::response::{IntoResponse, Response};
-use axum::{body::Body, routing::get, Router};
-use axum_extra::extract::cookie::CookieJar;
+use axum::{
+    body::Body,
+    routing::{any, get},
+    Router,
+};
 use axum_template::engine::Engine;
-use axum_template::RenderHtml;
 use handlebars::Handlebars;
 use hyper::StatusCode;
 use mime_guess::mime;
 use tracing::debug;
 
 mod auth;
+mod projects;
+mod vars;
 
-// Type alias for our engine. For this example, we are using Handlebars
-type AppEngine = Engine<Handlebars<'static>>;
+pub type AppEngine = Engine<Handlebars<'static>>;
 
 pub fn router() -> Router {
     let hbs = init_templates().unwrap();
     Router::new()
-        .route("/projects", get(render_projects))
-        .route("/projects/:name", get(render_project_single))
-        .route("/sign-in", get(render_signin))
+        .route("/projects", get(projects::render))
+        .route("/projects/:name", get(projects::render_single))
+        .route("/projects/:name/settings", get(projects::render_settings))
+        .route("/sign-in", get(auth::render_signin))
         .route("/sign-callback/*path", get(auth::clerk_callback))
         .route("/static/*path", get(render_static))
+        .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))
         .route_layer(middleware::from_fn(auth::session_auth_middleware))
+}
+
+async fn render_notfound() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(Body::from("page not found"))
+        .unwrap()
 }
 
 async fn render_static(Path(path): Path<String>) -> Response<Body> {
@@ -44,21 +56,6 @@ async fn render_static(Path(path): Path<String>) -> Response<Body> {
         .status(StatusCode::OK)
         .body(Body::from(content.unwrap().data))
         .unwrap()
-}
-
-async fn render_projects(engine: AppEngine, jar: CookieJar) -> impl IntoResponse {
-    let clerk_session = jar.get("__session");
-    println!("clerk_session: {:?}", clerk_session);
-    RenderHtml("projects.hbs", engine, &())
-}
-
-async fn render_project_single(engine: AppEngine, Path(param): Path<String>) -> impl IntoResponse {
-    debug!("param: {}", param);
-    RenderHtml("project-single.hbs", engine, &())
-}
-
-async fn render_signin(engine: AppEngine) -> impl IntoResponse {
-    RenderHtml("signin.hbs", engine, &())
 }
 
 fn init_templates() -> Result<Handlebars<'static>> {

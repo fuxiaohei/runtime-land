@@ -94,16 +94,33 @@
   @apply border-r border-gray-200 pr-2 mr-1;
 }
 
+.project-card .card-metadata .language {
+  @apply capitalize;
+}
+
 .project-card .card-metadata .item:last-child {
   @apply border-0;
 }
 
 .project-card .action-button {
-  @apply px-3 py-2 rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 duration-200;
+  @apply px-3 py-2 rounded-lg capitalize;
+}
+
+.project-card .action-button.running {
+  @apply text-white bg-emerald-600 hover:bg-emerald-700 duration-200;
+}
+
+.project-card .action-button.empty {
+  @apply text-gray-400;
+}
+
+.project-card .action-button.testing {
+  @apply text-yellow-800;
 }
 
 #footer {
-  @apply border-t p-6 text-center text-gray-300 mt-6;
+  @apply border-t p-6 text-center text-gray-300;
+  margin-top: 3rem;
 }
 
 #sign-in-btn-container {
@@ -144,15 +161,22 @@
 #project-main .deployment-status {
   @apply bg-sky-50 rounded-lg p-6;
 }
+
 #project-main .deployment-status h3,
-.deployment-lists h3 {
+.deployment-lists h3,
+.settings-project-name h3,
+.settings-delete-project h3 {
   @apply text-xl font-semibold;
 }
+
 #project-main .deployment-status .desc,
 .deployment-lists .desc,
-#deployment-list .date {
+#deployment-list .date,
+.settings-project-name .desc,
+.settings-delete-project .desc {
   @apply text-gray-400;
 }
+
 #project-main .deployment-status p {
   @apply leading-6;
 }
@@ -175,4 +199,32 @@
 }
 #deployment-list .prod-badge {
   @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg;
+}
+
+#project-main .settings-project-name {
+  @apply bg-slate-50 rounded-lg p-6;
+}
+
+#project-main .settings-delete-project {
+  @apply bg-red-50 rounded-lg p-6 mt-6;
+}
+
+.settings-delete-project h3 {
+  @apply text-red-950;
+}
+
+#project-name-input {
+  @apply w-72 rounded-lg px-3 h-9 border-slate-400 focus:border-slate-700 text-zinc-600 focus:outline-none focus:ring-0;
+}
+
+#settings-project-name-form .domain-suffix {
+  @apply text-gray-500 inline-block h-9 leading-9 px-3;
+}
+
+#project-name-btn {
+  @apply px-3 py-2 rounded-lg text-white bg-slate-500 hover:bg-slate-700 duration-200;
+}
+
+#delete-project-btn {
+  @apply px-3 py-2 rounded-lg text-white bg-red-500 hover:bg-red-700 duration-200;
 }

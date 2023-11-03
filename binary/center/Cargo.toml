@@ -36,6 +36,7 @@ rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 time = { workspace = true }
+timeago = { workspace = true }
 tokio = { workspace = true }
 tower-http = { version = "0.4.3", features = ["cors", "trace"] }
 tracing = { workspace = true }

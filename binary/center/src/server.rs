@@ -17,7 +17,6 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
         .merge(apiv2::router())
         .merge(pages::router())
         .route("/", any(default_handler))
-        .route("/*path", any(default_handler))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
         .layer(TraceLayer::new_for_http());
 
