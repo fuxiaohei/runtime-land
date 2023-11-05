@@ -191,6 +191,17 @@ pub async fn find_by_id(owner_id: i32, id: i32) -> Result<Option<deployment::Mod
     Ok(deployment)
 }
 
+/// find_by_uuid finds a deployment by uuid
+pub async fn find_by_uuid(owner_id: i32, uuid: String) -> Result<Option<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let deployment = deployment::Entity::find()
+        .filter(deployment::Column::Uuid.eq(uuid))
+        .filter(deployment::Column::OwnerId.eq(owner_id))
+        .one(db)
+        .await?;
+    Ok(deployment)
+}
+
 /// list_active lists the success deployments, deploy status is success, status is active
 pub async fn list_success() -> Result<Vec<deployment::Model>> {
     let db = DB.get().unwrap();

@@ -8,11 +8,12 @@
             </a>
             <ul id="top-navbar-ul">
                 <li>
-                    <a href="#" class="item active" aria-current="page">Projects</a>
+                    <a href="/projects" class="item active" aria-current="page">Projects</a>
                 </li>
                 <li>
                     <a href="https://runtime.land/docs/intro" target="_blank" class="item">Docs<svg
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 inline-block ml-1">
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            class="w-5 h-5 inline-block ml-1">
                             <path fill-rule="evenodd"
                                 d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
                                 clip-rule="evenodd" />
@@ -25,7 +26,8 @@
                 </li>
                 <li>
                     <a href="https://github.com/fuxiaohei/runtime-land/issues" target="_blank" class="item">Feedback<svg
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 inline-block ml-1">
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            class="w-5 h-5 inline-block ml-1">
                             <path fill-rule="evenodd"
                                 d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z"
                                 clip-rule="evenodd" />
@@ -42,22 +44,21 @@
             <button type="button" id="top-nav-user-button" aria-expanded="false"
                 data-dropdown-toggle="top-nav-user-dropdown" data-dropdown-placement="bottom">
                 <span class="sr-only">Open user menu</span>
-                <img id="top-nav-user-avatar" src="https://avatars.githubusercontent.com/u/2142787?v=4"
-                    alt="user photo">
+                <img id="top-nav-user-avatar" src="{{user.avatar}}" alt="user photo">
             </button>
             <!-- Dropdown menu -->
             <div id="top-nav-user-dropdown" class="hidden">
                 <div class="px-4 py-3">
-                    <span class="username">FuXiaohei</span>
-                    <span class="email">fudong0797@gmail.com</span>
+                    <span class="username">{{user.name}}</span>
+                    <span class="email">{{user.email}}</span>
                 </div>
                 <ul class="py-2" aria-labelledby="top-nav-user-button">
                     <li>
-                        <a href="#" class="item">Settings</a>
+                        <a href="/account/settings" class="item">Settings</a>
                     </li>
 
                     <li>
-                        <a href="#" class="item">Sign
+                        <a href="/sign-out" class="item">Sign
                             out</a>
                     </li>
                 </ul>

@@ -9,19 +9,23 @@
     {{> partials/navbar.hbs}}
     <main id="main">
         <div id="project-top">
-            <h1>spryest-pyknoses-242</h1>
+            <h1>{{project.name}}</h1>
+            {{#if project.production_url}}
+            <span class="count">RUNNING IN PRODUCTION</span>
+            {{else}}
             <span class="count">PENDING PRODUCTION DEPLOYMENT</span>
+            {{/if}}
         </div>
         <div id="project-navbar">
             <ul class="flex flex-wrap -mb-px">
                 <li>
-                    <a href="#" class="item">Overview</a>
+                    <a href="{{page.base_uri}}" class="item">Overview</a>
                 </li>
                 <li>
                     <a class="item disable">Traffic</a>
                 </li>
                 <li>
-                    <a href="#" class="item active">Settings</a>
+                    <a href="{{page.base_uri}}/settings" class="item active">Settings</a>
                 </li>
             </ul>
         </div>
@@ -30,10 +34,10 @@
                 <div class="settings-project-name">
                     <h3>Project Name</h3>
                     <p class="desc">The name of this project</p>
-                    <form id="settings-project-name-form">
+                    <form id="settings-project-name-form" method="post">
                         <div class="flex items-center mt-4">
-                            <input type="text" id="project-name-input" value="spryest-pyknoses-242" />
-                            <span class="domain-suffix">.127-0-0-1.nip.io</span>
+                            <input type="text" name="name" id="project-name-input" value="{{project.name}}" />
+                            <span class="domain-suffix">.{{project.prod_domain}}</span>
                         </div>
                         <div class="mt-4">
                             <button type="submit" id="project-name-btn">Update</button>
@@ -45,9 +49,38 @@
                     <p class="desc">Delete all deployments and remove this project from your account. This operation is
                         <strong class="text-red-900">irreversible</strong>. Be careful!
                     </p>
-                    <form class="mt-4">
-                        <button type="submit" id="delete-project-btn">Delete</button>
-                    </form>
+                    <div class="mt-4">
+                        <button data-modal-target="project-delete-modal" data-modal-toggle="project-delete-modal"
+                            type="submit" id="delete-project-btn">Delete</button>
+                    </div>
+                    <div id="project-delete-modal" tabindex="-1" aria-hidden="true" class="hidden">
+                        <div>
+                            <h3 class="block">Delete Project</h3>
+                            <div class="content mt-4">
+                                <p class="text-gray-400 mt-4">You are about to delete <i>{{project.name}}</i> and all of
+                                    its
+                                    deployments. You will no longer be able to access it at…</p>
+                                <p class="alert-card font-semibold mt-4"><svg xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                        class="w-6 h-6 inline-block">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                    </svg>
+                                    This action is irreversible. Be careful!</p>
+                                <p class="mt-4">Please type <strong>{{project.name}}</strong> to continue.</p>
+                                <form id="project-delete-form" action="/projects/{{project.name}}/delete" method="post">
+                                    <input id="project-delete-input" type="text" name="name" required />
+                                    <input type="hidden" name="uuid" value="{{project.uuid}}">
+                                    <div class="text-right mt-4">
+                                        <button id="project-delete-cancel-btn" type="button"
+                                            data-modal-hide="project-delete-modal">Cancel</button>
+                                        <button id="project-delete-btn" type="submit"
+                                            id="project-delete-btn">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="right"></div>

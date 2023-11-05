@@ -152,3 +152,19 @@ pub async fn remove(owner_id: i32, token_uuid: &str) -> Result<()> {
     token_active_model.update(db).await?;
     Ok(())
 }
+
+/// remove_by_value removes a token by value
+pub async fn remove_by_value(token_value: &str) -> Result<()> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::Value.eq(token_value))
+        .one(db)
+        .await?
+        .unwrap();
+    let now = chrono::Utc::now();
+    let mut token_active_model: user_token::ActiveModel = token.into();
+    token_active_model.deleted_at = Set(Some(now));
+    token_active_model.status = Set(Status::Deleted.to_string());
+    token_active_model.update(db).await?;
+    Ok(())
+}

@@ -49,7 +49,7 @@
   @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white;
 }
 #main {
-  @apply max-w-4xl mx-auto my-6 min-h-[70%];
+  @apply max-w-4xl mx-auto my-6 min-h-[70%] px-6 md:px-0;
 }
 #project-top h1 {
   @apply text-3xl font-semibold;
@@ -61,13 +61,16 @@
   @apply flex justify-between items-center my-4;
 }
 #project-search-input {
-  @apply block w-80 p-2 pl-10 text-sm text-gray-300 border border-gray-100 rounded-lg bg-gray-50 focus:ring-0 focus:border-gray-400 focus:bg-white focus:shadow-none duration-100;
+  @apply block w-80 p-2 pl-10 text-sm text-gray-700 border border-gray-100 rounded-lg bg-gray-50 focus:ring-0 focus:border-gray-400 focus:bg-white focus:shadow-none duration-100;
 }
 #project-searchbar form label {
   @apply mb-2 text-sm font-medium text-gray-600 sr-only;
 }
 #project-searchbar form .search-icon {
   @apply absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none;
+}
+#project-search-btn {
+  @apply ps-3 inline-block text-gray-500 hover:text-gray-600;
 }
 
 #project-createbar .new-project-button {
@@ -87,7 +90,7 @@
 }
 
 .project-card .card-link {
-  @apply text-gray-500 hover:text-primary pt-3;
+  @apply text-gray-500 hover:text-primary pt-3 overflow-hidden whitespace-nowrap text-ellipsis max-w-xs;
 }
 
 .project-card .card-metadata .item {
@@ -114,13 +117,14 @@
   @apply text-gray-400;
 }
 
-.project-card .action-button.testing {
+.project-card .action-button.develop {
   @apply text-yellow-800;
 }
 
 #footer {
-  @apply border-t p-6 text-center text-gray-300;
+  @apply border-t text-center text-gray-400;
   margin-top: 3rem;
+  padding: 3rem;
 }
 
 #sign-in-btn-container {
@@ -130,6 +134,9 @@
 
 #sign-in-button {
   @apply text-2xl px-4 py-2 bg-primary rounded-lg text-white hover:bg-white hover:border hover:border-primary hover:text-primary;
+}
+#sign-out-button {
+  @apply text-2xl px-4 py-2 bg-red-700 rounded-lg text-white hover:bg-white hover:border hover:border-red-700 hover:text-red-700;
 }
 #sign-in-button:hover svg {
   @apply text-primary;
@@ -161,6 +168,9 @@
 #project-main .deployment-status {
   @apply bg-sky-50 rounded-lg p-6;
 }
+#project-main .deployment-status.develop {
+  @apply bg-slate-50;
+}
 
 #project-main .deployment-status h3,
 .deployment-lists h3,
@@ -184,21 +194,50 @@
   @apply mt-6 text-gray-400 uppercase;
 }
 #project-main .deployment-status .domains .link,
-#deployment-list .link {
+#deployment-list a.link {
   @apply hover:underline;
 }
-
+#deployment-list span.link {
+  @apply text-gray-400 cursor-not-allowed;
+}
+#deployment-list .link {
+  @apply inline-block max-w-sm overflow-hidden whitespace-nowrap text-ellipsis;
+}
 .deployment-lists {
   @apply p-6 border rounded-lg border-gray-200 my-4;
 }
+.deployment-lists .empty {
+  @apply text-gray-600 py-4;
+}
 #deployment-list {
   @apply mt-4;
+}
+#deployment-list .left {
+  @apply flex justify-start;
 }
 #deployment-list .item {
   @apply py-3 flex justify-between;
 }
 #deployment-list .prod-badge {
-  @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg;
+  @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg inline-block;
+}
+#deployment-list .disable-badge {
+  @apply px-1 py-0.5 text-sm text-white bg-slate-500 rounded-lg inline-block;
+}
+#deployment-list .dropdown-btn {
+  @apply text-sm text-gray-600;
+}
+#deployment-list .dropdown {
+  @apply z-10 bg-white divide-y divide-gray-300 border border-gray-200 rounded-lg w-28;
+}
+#deployment-list .dropdown ul {
+  @apply py-2 text-sm text-gray-700;
+}
+#deployment-list .dropdown li a {
+  @apply block px-4 py-2 hover:bg-gray-100;
+}
+#deployment-list .date {
+  @apply text-sm pr-1;
 }
 
 #project-main .settings-project-name {
@@ -221,10 +260,26 @@
   @apply text-gray-500 inline-block h-9 leading-9 px-3;
 }
 
-#project-name-btn {
+#project-name-btn,
+#project-delete-cancel-btn {
   @apply px-3 py-2 rounded-lg text-white bg-slate-500 hover:bg-slate-700 duration-200;
 }
 
-#delete-project-btn {
+#delete-project-btn,
+#project-delete-btn {
   @apply px-3 py-2 rounded-lg text-white bg-red-500 hover:bg-red-700 duration-200;
+}
+
+#project-delete-modal {
+  @apply fixed top-0 left-0 right-0 m-auto z-50 p-6 bg-white border border-gray-200 rounded-lg;
+  width: 576px;
+  margin-top: 10rem;
+}
+
+#project-delete-input {
+  @apply px-4 py-2 mt-4 w-full text-gray-700 border border-gray-300 rounded-lg focus:ring-0 focus:border-gray-400 focus:bg-white focus:shadow-none duration-100;
+}
+
+#project-delete-btn {
+  @apply ml-6;
 }

@@ -4,7 +4,7 @@ use axum::middleware;
 use axum::response::{IntoResponse, Response};
 use axum::{
     body::Body,
-    routing::{any, get},
+    routing::{any, get, post},
     Router,
 };
 use axum_template::engine::Engine;
@@ -24,8 +24,14 @@ pub fn router() -> Router {
     Router::new()
         .route("/projects", get(projects::render))
         .route("/projects/:name", get(projects::render_single))
+        .route("/projects/:name/settings", post(projects::handle_rename))
         .route("/projects/:name/settings", get(projects::render_settings))
+        .route("/projects/:name/publish", get(projects::handle_publish))
+        .route("/projects/:name/enable", get(projects::handle_enable))
+        .route("/projects/:name/disable", get(projects::handle_disable))
+        .route("/projects/:name/delete", post(projects::handle_delete))
         .route("/sign-in", get(auth::render_signin))
+        .route("/sign-out", get(auth::render_signout))
         .route("/sign-callback/*path", get(auth::clerk_callback))
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))

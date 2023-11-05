@@ -213,3 +213,16 @@ async fn create_session_id(req: &ClerkCallbackRequest) -> anyhow::Result<String>
 pub async fn render_signin(engine: AppEngine) -> impl IntoResponse {
     RenderHtml("sign-in.hbs", engine, &())
 }
+
+/// render_signout renders sign-out page
+pub async fn render_signout(engine: AppEngine, jar: CookieJar) -> impl IntoResponse {
+    let value = jar
+        .get("__runtime_land_session")
+        .map(|c| c.value())
+        .unwrap_or_default();
+    if !value.is_empty() {
+        debug!("render-signout: remove session_id: {}", value);
+        let _ = user_token::remove_by_value(value).await;
+    }
+    RenderHtml("sign-out.hbs", engine, &())
+}

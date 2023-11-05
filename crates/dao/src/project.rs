@@ -114,17 +114,15 @@ pub async fn remove_project(owner_id: i32, uuid: String) -> Result<i32> {
     let project = project.unwrap();
     let project_id = project.id;
 
-    // if project status is pending, it can remove directly
-    if project.status == Status::Pending.to_string() {
-        let mut active_model: project::ActiveModel = project.into();
-        active_model.status = Set(Status::Deleted.to_string());
-        active_model.deleted_at = Set(Some(chrono::Utc::now()));
-        active_model.update(db).await?;
-        return Ok(project_id);
-    }
+    // set all deployments to deleted
+    super::deployment::set_deleted_by_project(project_id).await?;
 
-    // TODO: remove active project
-    Err(anyhow::anyhow!("project is not empty"))
+    // set project to deleted
+    let mut active_model: project::ActiveModel = project.into();
+    active_model.status = Set(Status::Deleted.to_string());
+    active_model.deleted_at = Set(Some(chrono::Utc::now()));
+    active_model.update(db).await?;
+    Ok(project_id)
 }
 
 /// rename renames a project
