@@ -13,6 +13,7 @@ use hyper::StatusCode;
 use mime_guess::mime;
 use tracing::debug;
 
+mod account;
 mod auth;
 mod projects;
 mod vars;
@@ -33,6 +34,7 @@ pub fn router() -> Router {
         .route("/sign-in", get(auth::render_signin))
         .route("/sign-out", get(auth::render_signout))
         .route("/sign-callback/*path", get(auth::clerk_callback))
+        .route("/account/settings", get(account::render_settings))
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))

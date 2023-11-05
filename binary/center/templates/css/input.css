@@ -51,12 +51,17 @@
 #main {
   @apply max-w-4xl mx-auto my-6 min-h-[70%] px-6 md:px-0;
 }
-#project-top h1 {
+
+#project-top h1,
+#account-top h1 {
   @apply text-3xl font-semibold;
 }
-#project-top .count {
+
+#project-top .count,
+#account-top .email {
   @apply text-gray-400 block py-2;
 }
+
 #project-searchbar {
   @apply flex justify-between items-center my-4;
 }
@@ -159,12 +164,17 @@
 #project-main {
   @apply mt-6 flex space-x-4;
 }
-#project-main > .left {
+
+#project-main > .left,
+#account-main > .left {
   @apply w-3/4;
 }
-#project-main > .right {
+
+#project-main > .right,
+#account-main > .right {
   @apply w-1/4;
 }
+
 #project-main .deployment-status {
   @apply bg-sky-50 rounded-lg p-6;
 }
@@ -175,7 +185,8 @@
 #project-main .deployment-status h3,
 .deployment-lists h3,
 .settings-project-name h3,
-.settings-delete-project h3 {
+.settings-delete-project h3,
+.account-deployment-tokens h3 {
   @apply text-xl font-semibold;
 }
 
@@ -183,7 +194,8 @@
 .deployment-lists .desc,
 #deployment-list .date,
 .settings-project-name .desc,
-.settings-delete-project .desc {
+.settings-delete-project .desc,
+.account-deployment-tokens .desc {
   @apply text-gray-400;
 }
 
@@ -282,4 +294,25 @@
 
 #project-delete-btn {
   @apply ml-6;
+}
+
+.account-deployment-tokens {
+  @apply bg-stone-50 rounded-lg p-6 mt-6;
+}
+
+.account-deployment-tokens ul {
+  @apply w-full text-gray-700 bg-white border border-gray-200 rounded-lg my-6;
+}
+
+.account-deployment-tokens ul li {
+  @apply w-full px-5 py-3 border-b border-gray-200 rounded-t-lg flex justify-between;
+}
+
+.account-deployment-tokens .new-token-btn {
+  @apply px-3 py-2 rounded-lg text-white bg-primary hover:bg-sky-700 duration-200;
+}
+
+.account-deployment-tokens .del-btn {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
