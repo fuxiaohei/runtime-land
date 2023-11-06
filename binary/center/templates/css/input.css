@@ -231,10 +231,10 @@
   @apply py-3 flex justify-between;
 }
 #deployment-list .prod-badge {
-  @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg inline-block;
+  @apply px-1 py-0.5 text-sm text-white bg-blue-500 rounded-lg inline-block ml-2;
 }
 #deployment-list .disable-badge {
-  @apply px-1 py-0.5 text-sm text-white bg-slate-500 rounded-lg inline-block;
+  @apply px-1 py-0.5 text-sm text-white bg-slate-500 rounded-lg inline-block ml-2;
 }
 #deployment-list .dropdown-btn {
   @apply text-sm text-gray-600;
@@ -315,4 +315,17 @@
 .account-deployment-tokens .del-btn {
   margin-top: 4px;
   margin-bottom: 4px;
+  @apply hover:text-red-800 inline-block;
+}
+
+.account-deployment-tokens .new-token-input {
+  @apply w-60 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg focus:ring-0 focus:border-gray-400 focus:bg-white focus:shadow-none duration-100;
+}
+
+.account-deployment-tokens .new-token-value {
+  @apply p-4 border border-emerald-300 bg-emerald-50 flex justify-between rounded-lg mt-4;
+}
+
+.account-deployment-tokens .new-token-btn-link {
+  @apply px-3 py-2 rounded-lg text-white bg-green-600 hover:bg-green-800 duration-200;
 }

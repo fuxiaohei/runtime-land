@@ -26,34 +26,62 @@
                     <p class="desc">
                         Deployment tokens are used to create deployments using <i>land-cli</i>.
                     </p>
+                    {{#if new_token}}
+                    <div class="new-token-value">
+                        <div>
+                            <p class="text-lg font-semibold">{{new_token.name}}</p>
+                            <p class="text-sm text-gray-500">{{new_token.value}}
+                                <button class="ml-4 text-gray-400 copy-btn"
+                                    data-clipboard-text="{{new_token.value}}">Copy</button>
+                            </p>
+                        </div>
+                        <div>
+                            <a class="new-token-btn-link" href="/account/settings">OK</a>
+                        </div>
+                    </div>
+                    {{/if}}
                     <ul>
+                        {{#each tokens}}
                         <li>
                             <div>
-                                <span class="text-lg font-semibold">Web Token</span>
-                                <span class="pl-6 text-sm text-gray-400">expires in 12 hours</span>
+                                <span class="text-lg font-semibold">{{name}}</span>
+                                <span class="pl-6 text-sm text-gray-400">expires in {{expired_timeago}}</span>
                             </div>
                             <div>
-                                <button class="del-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                <a href="/account/settings/delete-token?uuid={{uuid}}" class="del-btn"><svg
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                     </svg>
-                                </button>
+                                </a>
                             </div>
                         </li>
-                        <li>Settings</li>
-                        <li>Messages</li>
-                        <li>Download</li>
+                        {{/each}}
                     </ul>
-                    <p class="text-right">
-                        <button class="new-token-btn">+ New Token</button>
-                    </p>
+                    <div class="text-right">
+                        <form action="/account/settings/create-token" method="post">
+                            <input class="new-token-input" type="text" name="name" required
+                                placeholder="type in new token name" />
+                            <button type="submit" class="new-token-btn">+ New Token</button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="right"></div>
         </div>
     </main>
     {{> partials/footer.hbs}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+    <script>
+        var clipboard = new ClipboardJS('.copy-btn');
+        clipboard.on('success', function (e) {
+            e.trigger.innerHTML = 'Copied';
+            setTimeout(() => {
+                e.trigger.innerHTML = 'Copy';
+            }, 10000);
+        });
+    </script>
 </body>
 
 </html>

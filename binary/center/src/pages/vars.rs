@@ -1,7 +1,7 @@
-use crate::settings;
-
 use super::auth::SessionUser;
+use crate::settings;
 use anyhow::Result;
+use chrono::Duration;
 use land_dao::deployment::{self, Status};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -172,5 +172,89 @@ impl DeploymentVars {
             vars.push(deployment_vars);
         }
         Ok(vars)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct TokenVars {
+    pub name: String,
+    pub uuid: String,
+    pub expired_timeago: String,
+    pub value: String,
+}
+
+fn format_future(duration: Duration) -> String {
+    let days = duration.num_days();
+    if days > 30 {
+        let months = days / 30;
+        if months > 1 {
+            return format!("{} months", months);
+        }
+        if months == 1 {
+            return "1 month".to_string();
+        }
+    }
+    let weeks = duration.num_weeks();
+    if weeks > 1 {
+        return format!("{} weeks", weeks);
+    }
+    if weeks == 1 {
+        return "1 week".to_string();
+    }
+    if days > 1 {
+        return format!("{} days", days);
+    }
+    if days == 1 {
+        return "1 day".to_string();
+    }
+    let hours = duration.num_hours();
+    if hours > 1 {
+        return format!("{} hours", hours);
+    }
+    if hours == 1 {
+        return "1 hour".to_string();
+    }
+    let minutes = duration.num_minutes();
+    if minutes > 1 {
+        return format!("{} minutes", minutes);
+    }
+    if minutes == 1 {
+        return "1 minute".to_string();
+    }
+    let seconds = duration.num_seconds();
+    if seconds > 1 {
+        return format!("{} seconds", seconds);
+    }
+    "immidiately".to_string()
+}
+
+impl TokenVars {
+    pub async fn from_models(
+        tokens: &Vec<land_dao::UserToken>,
+        new_uuid: Option<String>,
+    ) -> (Vec<TokenVars>, Option<TokenVars>) {
+        let mut vars = vec![];
+        let mut new_token = None;
+        for token in tokens {
+            let duration = token
+                .expired_at
+                .unwrap()
+                .signed_duration_since(chrono::Utc::now());
+            let mut token_vars = TokenVars {
+                name: token.name.clone(),
+                uuid: token.uuid.clone(),
+                expired_timeago: format_future(duration),
+                value: String::new(),
+            };
+            if let Some(uuid) = &new_uuid {
+                if uuid == &token.uuid {
+                    token_vars.value = token.value.clone();
+                    new_token = Some(token_vars);
+                    continue;
+                }
+            }
+            vars.push(token_vars);
+        }
+        (vars, new_token)
     }
 }

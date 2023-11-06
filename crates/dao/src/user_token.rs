@@ -58,6 +58,22 @@ pub async fn find_by_name(
     Ok(token)
 }
 
+/// find_by_uuid finds a token by uuid
+pub async fn find_by_uuid(
+    owner_id: i32,
+    uuid: String,
+    created_by: CreatedByCases,
+) -> Result<Option<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::OwnerId.eq(owner_id))
+        .filter(user_token::Column::Uuid.eq(uuid))
+        .filter(user_token::Column::CreatedBy.eq(created_by.to_string()))
+        .one(db)
+        .await?;
+    Ok(token)
+}
+
 async fn find_by_value(value: String) -> Result<Option<user_token::Model>> {
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()

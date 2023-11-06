@@ -35,6 +35,14 @@ pub fn router() -> Router {
         .route("/sign-out", get(auth::render_signout))
         .route("/sign-callback/*path", get(auth::clerk_callback))
         .route("/account/settings", get(account::render_settings))
+        .route(
+            "/account/settings/create-token",
+            post(account::handle_create_token),
+        )
+        .route(
+            "/account/settings/delete-token",
+            get(account::handle_delete_token),
+        )
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))
