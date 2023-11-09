@@ -349,3 +349,23 @@
 #projects-table tbody td {
   @apply px-4 py-3;
 }
+
+#projects-pager{
+  @apply py-6 px-4 flex justify-center;
+}
+
+#projects-pager ul {
+  @apply inline-flex -space-x-px;
+}
+
+#projects-pager li a.page {
+  @apply flex items-center justify-center px-4 h-10 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700;
+}
+
+#projects-pager li a.prev {
+  @apply rounded-l-lg;
+}
+
+#projects-pager li a.next {
+  @apply rounded-r-lg;
+}
