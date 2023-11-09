@@ -30,6 +30,7 @@ pub struct UserVars {
     pub name: String,
     pub email: String,
     pub avatar: String,
+    pub is_admin: bool,
 }
 
 impl UserVars {
@@ -38,6 +39,7 @@ impl UserVars {
             name: user.name.clone(),
             email: user.email.clone(),
             avatar: user.avatar.clone(),
+            is_admin: user.is_admin,
         }
     }
 }

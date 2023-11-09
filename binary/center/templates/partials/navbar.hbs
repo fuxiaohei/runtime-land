@@ -8,7 +8,7 @@
             </a>
             <ul id="top-navbar-ul">
                 <li>
-                    <a href="/projects" class="item active" aria-current="page">Projects</a>
+                    <a href="/projects" class="item" aria-current="page">Projects</a>
                 </li>
                 <li>
                     <a href="https://runtime.land/docs/intro" target="_blank" class="item">Docs<svg
@@ -56,12 +56,18 @@
                     <li>
                         <a href="/account/settings" class="item">Settings</a>
                     </li>
-
+                </ul>
+                {{#if user.is_admin}}
+                <ul class="py-2" aria-labelledby="top-nav-user-button">
                     <li>
-                        <a href="/sign-out" class="item">Sign
-                            out</a>
+                        <a href="/admin/projects" class="item">Admin</a>
                     </li>
                 </ul>
+                {{/if}}
+                <div class="py-2">
+                    <a href="/sign-out" class="item">Sign
+                        out</a>
+                </div>
             </div>
         </div>
     </div>

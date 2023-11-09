@@ -6,7 +6,7 @@ use axum_extra::extract::CookieJar;
 use axum_template::RenderHtml;
 use base64::{engine::general_purpose, Engine as _};
 use hyper::{Request, StatusCode};
-use land_dao::user::{create_by_oauth, find_by_oauth_id, OauthProvider};
+use land_dao::user::{create_by_oauth, find_by_oauth_id, OauthProvider, Role};
 use land_dao::user_token::{self, CreatedByCases};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error, info};
@@ -17,9 +17,9 @@ use super::AppEngine;
 pub struct SessionUser {
     pub id: i32,
     pub name: String,
-    pub role: String,
     pub email: String,
     pub avatar: String,
+    pub is_admin: bool,
 }
 
 pub async fn session_auth_middleware<B>(
@@ -61,11 +61,19 @@ pub async fn session_auth_middleware<B>(
     let session_user = SessionUser {
         id: user.id,
         name: user.nick_name,
-        role: user.role,
         email: user.email,
         avatar: user.avatar,
+        is_admin: user.role == Role::Admin.to_string(),
     };
     debug!("session-auth-middleware: session_user: {:?}", session_user);
+
+    if path.starts_with("/admin") {
+        if !session_user.is_admin {
+            error!("session-auth-middleware: user role is not admin");
+            return Ok(Redirect::to("/projects").into_response());
+        }
+    }
+
     request.extensions_mut().insert(session_user);
     Ok(next.run(request).await)
 }

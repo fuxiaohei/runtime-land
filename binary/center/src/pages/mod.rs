@@ -14,6 +14,7 @@ use mime_guess::mime;
 use tracing::debug;
 
 mod account;
+mod admin;
 mod auth;
 mod projects;
 mod vars;
@@ -43,6 +44,7 @@ pub fn router() -> Router {
             "/account/settings/delete-token",
             get(account::handle_delete_token),
         )
+        .route("/admin/projects", get(admin::render_projects))
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))

@@ -36,6 +36,9 @@
 #top-navbar .item {
   @apply block p-0 text-gray-900 rounded hover:text-primary;
 }
+#top-navbar-ul.admin .item {
+  @apply hover:text-red-800;
+}
 #top-navbar .item.active {
   @apply block p-0 rounded text-primary;
 }
@@ -328,4 +331,21 @@
 
 .account-deployment-tokens .new-token-btn-link {
   @apply px-3 py-2 rounded-lg text-white bg-green-600 hover:bg-green-800 duration-200;
+}
+
+#projects-table-container {
+  @apply border-t border-gray-200 mt-6 pt-6;
+}
+
+#projects-table {
+  @apply w-full text-left text-zinc-600;
+}
+
+#projects-table thead {
+  @apply text-sm uppercase bg-zinc-50;
+}
+
+#projects-table thead th,
+#projects-table tbody td {
+  @apply px-4 py-3;
 }
