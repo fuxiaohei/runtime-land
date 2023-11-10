@@ -53,6 +53,9 @@ pub fn router() -> Router {
             "/admin/projects/:uuid/enable",
             get(admin::handle_project_enable),
         )
+        .route("/admin/deployments", get(admin::render_deployments))
+        .route("/admin/users", get(admin::render_users))
+        .route("/admin/endpoints", get(admin::render_endpoints))
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))

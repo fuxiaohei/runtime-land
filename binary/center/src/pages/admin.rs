@@ -101,3 +101,75 @@ pub async fn handle_project_enable(Path(uuid): Path<String>) -> Result<Redirect,
     project::set_active(project.id).await.unwrap();
     Ok(Redirect::to("/admin/projects"))
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AdminDeploymentsVars {
+    pub page: PageVars,
+    pub user: UserVars,
+}
+
+pub async fn render_deployments(
+    engine: AppEngine,
+    Extension(current_user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    let page_vars = PageVars::new(
+        "Admin - Deployments".to_string(),
+        "/admin/deployments".to_string(),
+    );
+    let user_vars = UserVars::new(&current_user);
+    RenderHtml(
+        "admin/deployments.hbs",
+        engine,
+        AdminDeploymentsVars {
+            page: page_vars,
+            user: user_vars,
+        },
+    )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AdminUsersVars {
+    pub page: PageVars,
+    pub user: UserVars,
+}
+
+pub async fn render_users(
+    engine: AppEngine,
+    Extension(current_user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    let page_vars = PageVars::new("Admin - Users".to_string(), "/admin/users".to_string());
+    let user_vars = UserVars::new(&current_user);
+    RenderHtml(
+        "admin/users.hbs",
+        engine,
+        AdminUsersVars {
+            page: page_vars,
+            user: user_vars,
+        },
+    )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AdminEndpointsVars {
+    pub page: PageVars,
+    pub user: UserVars,
+}
+
+pub async fn render_endpoints(
+    engine: AppEngine,
+    Extension(current_user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    let page_vars = PageVars::new(
+        "Admin - Endpoints".to_string(),
+        "/admin/endpoints".to_string(),
+    );
+    let user_vars = UserVars::new(&current_user);
+    RenderHtml(
+        "admin/endpoints.hbs",
+        engine,
+        AdminEndpointsVars {
+            page: page_vars,
+            user: user_vars,
+        },
+    )
+}
