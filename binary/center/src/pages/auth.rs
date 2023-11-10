@@ -1,3 +1,5 @@
+use super::AppEngine;
+use crate::pages::vars::PageVars;
 use axum::extract::Path;
 use axum::response::{IntoResponse, Redirect};
 use axum::{middleware::Next, response};
@@ -10,8 +12,6 @@ use land_dao::user::{create_by_oauth, find_by_oauth_id, OauthProvider, Role};
 use land_dao::user_token::{self, CreatedByCases};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error, info};
-
-use super::AppEngine;
 
 #[derive(Clone, Debug)]
 pub struct SessionUser {
@@ -67,11 +67,9 @@ pub async fn session_auth_middleware<B>(
     };
     debug!("session-auth-middleware: session_user: {:?}", session_user);
 
-    if path.starts_with("/admin") {
-        if !session_user.is_admin {
-            error!("session-auth-middleware: user role is not admin");
-            return Ok(Redirect::to("/projects").into_response());
-        }
+    if path.starts_with("/admin") && !session_user.is_admin {
+        error!("session-auth-middleware: user role is not admin");
+        return Ok(Redirect::to("/projects").into_response());
     }
 
     request.extensions_mut().insert(session_user);
@@ -217,9 +215,16 @@ async fn create_session_id(req: &ClerkCallbackRequest) -> anyhow::Result<String>
     Ok(token.value)
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct SigninVars {
+    page: PageVars,
+}
+
 /// render_signin renders sign-in page
 pub async fn render_signin(engine: AppEngine) -> impl IntoResponse {
-    RenderHtml("sign-in.hbs", engine, &())
+    let page_vars = PageVars::new("Sign-in".to_string(), String::new());
+    let vars = SigninVars { page: page_vars };
+    RenderHtml("sign-in.hbs", engine, vars)
 }
 
 /// render_signout renders sign-out page

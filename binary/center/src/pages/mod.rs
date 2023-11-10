@@ -45,6 +45,14 @@ pub fn router() -> Router {
             get(account::handle_delete_token),
         )
         .route("/admin/projects", get(admin::render_projects))
+        .route(
+            "/admin/projects/:uuid/disable",
+            get(admin::handle_project_disable),
+        )
+        .route(
+            "/admin/projects/:uuid/enable",
+            get(admin::handle_project_enable),
+        )
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
         .with_state(Engine::from(hbs))

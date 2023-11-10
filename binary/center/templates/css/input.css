@@ -55,6 +55,10 @@
   @apply max-w-4xl mx-auto my-6 min-h-[70%] px-6 md:px-0;
 }
 
+#admin-main {
+  @apply max-w-screen-lg mx-auto my-6 min-h-[70%] px-6 md:px-0;
+}
+
 #project-top h1,
 #account-top h1 {
   @apply text-3xl font-semibold;
@@ -347,10 +351,52 @@
 
 #projects-table thead th,
 #projects-table tbody td {
-  @apply px-4 py-3;
+  @apply p-4;
 }
 
-#projects-pager{
+#projects-table td.lang {
+  @apply capitalize text-gray-400;
+}
+
+#projects-table td.status {
+  @apply uppercase text-sm font-semibold;
+}
+
+#projects-table td.status.inactive {
+  @apply text-red-800;
+}
+
+#projects-table td.status.active {
+  @apply text-primary;
+}
+
+#projects-table td.name {
+  @apply font-semibold;
+}
+
+#projects-table td .prod {
+  @apply text-white text-xs px-2 py-1 rounded-md bg-primary ml-2;
+}
+
+#projects-table td.ops {
+  @apply text-sm;
+}
+
+#projects-table td.ops a {
+  @apply mr-1;
+}
+
+#projects-table td.ops .enable {
+  @apply text-green-700;
+}
+#projects-table td.ops .disable {
+  @apply text-red-700;
+}
+#projects-table td.ops svg {
+  @apply inline-block w-5 h-5;
+}
+
+#projects-pager {
   @apply py-6 px-4 flex justify-center;
 }
 
@@ -360,6 +406,10 @@
 
 #projects-pager li a.page {
   @apply flex items-center justify-center px-4 h-10 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700;
+}
+
+#projects-pager li a.page.active {
+  @apply text-white bg-primary border-primary;
 }
 
 #projects-pager li a.prev {

@@ -74,6 +74,16 @@ pub async fn find_by_id(id: i32) -> Result<Option<project::Model>> {
     Ok(project)
 }
 
+/// find_by_uuid finds a project by uuid
+pub async fn find_by_uuid(uuid: String) -> Result<Option<project::Model>> {
+    let db = DB.get().unwrap();
+    let project = project::Entity::find()
+        .filter(project::Column::Uuid.eq(uuid))
+        .one(db)
+        .await?;
+    Ok(project)
+}
+
 /// set_active sets a project to active
 pub async fn set_active(project_id: i32) -> Result<project::Model> {
     let db = DB.get().unwrap();
@@ -84,6 +94,20 @@ pub async fn set_active(project_id: i32) -> Result<project::Model> {
     let mut active_model: project::ActiveModel = project.into();
     active_model.updated_at = Set(chrono::Utc::now());
     active_model.status = Set(Status::Active.to_string());
+    let project = active_model.update(db).await?;
+    Ok(project)
+}
+
+/// set_inactive sets a project to inactive
+pub async fn set_inactive(project_id: i32) -> Result<project::Model> {
+    let db = DB.get().unwrap();
+    let project = project::Entity::find_by_id(project_id)
+        .one(db)
+        .await?
+        .unwrap();
+    let mut active_model: project::ActiveModel = project.into();
+    active_model.updated_at = Set(chrono::Utc::now());
+    active_model.status = Set(Status::InActive.to_string());
     let project = active_model.update(db).await?;
     Ok(project)
 }
@@ -163,4 +187,60 @@ pub async fn get_pagination(page: u64, page_size: u64) -> Result<(Vec<project::M
     let total_pages = pager.num_pages().await?;
     let total_items = pager.num_items().await?;
     Ok((projects, total_pages, total_items))
+}
+
+/// list_all_available lists all available projects
+pub async fn list_all_available() -> Result<Vec<project::Model>> {
+    let db = DB.get().unwrap();
+    let projects = project::Entity::find()
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt)
+        .all(db)
+        .await?;
+    Ok(projects)
+}
+
+/// list_all_available_with_page lists all available projects with pagination
+pub async fn list_all_available_with_page(
+    search: Option<String>,
+    page: u64,
+    page_size: u64,
+) -> Result<(Vec<project::Model>, u64, u64)> {
+    if page < 1 || page_size < 1 {
+        return Err(anyhow::anyhow!("page and page_size must be greater than 0"));
+    }
+    let db = DB.get().unwrap();
+    let mut query = project::Entity::find()
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt);
+    if let Some(search) = search {
+        query = query.filter(project::Column::Name.contains(search));
+    }
+    let pager = query.paginate(db, page_size);
+    let projects = pager.fetch_page(page - 1).await?;
+    let total_pages = pager.num_pages().await?;
+    let total_items = pager.num_items().await?;
+    Ok((projects, total_pages, total_items))
+}
+
+/// is_recent_updated checks if the project is recent updated
+pub async fn is_recent_updated() -> Result<bool> {
+    let db = DB.get().unwrap();
+    let project: Option<crate::Project> = project::Entity::find()
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt)
+        .one(db)
+        .await?;
+    if project.is_none() {
+        return Ok(false);
+    }
+    let project = project.unwrap();
+    let now = chrono::Utc::now();
+    let updated_at = project.updated_at;
+    let duration = now.signed_duration_since(updated_at);
+    let duration = duration.num_seconds();
+    if duration > 60 {
+        return Ok(false);
+    }
+    Ok(true)
 }

@@ -1,6 +1,7 @@
 use crate::settings::load_storage_settings;
 use anyhow::Result;
 use land_core::confdata::{EndpointConf, RouteConfItem};
+use land_dao::project;
 use lazy_static::lazy_static;
 use md5::{Digest, Md5};
 use tokio::sync::Mutex;
@@ -64,15 +65,30 @@ async fn should_generate() -> bool {
         Ok(flag) => flag,
         Err(e) => {
             error!("check recent updated error: {:?}", e);
+            return false;
+        }
+    };
+    let flag2 = land_dao::project::is_recent_updated().await;
+    match flag2 {
+        Ok(flag2) => flag2,
+        Err(e) => {
+            error!("check recent updated error: {:?}", e);
             false
         }
     }
 }
 
 async fn generate() -> Result<EndpointConf> {
+    // get all available projects
+    let projects = land_dao::project::list_all_available().await?;
+    let projects_map = projects
+        .into_iter()
+        .map(|p| (p.id, p))
+        .collect::<std::collections::HashMap<i32, land_dao::Project>>();
+
     // get all success deployments
     let deployments = land_dao::deployment::list_success().await?;
-    debug!("deployments: {:?}", deployments.len());
+    let deployments_len = deployments.len();
 
     // get storage settings
     let (typename, _, s3_config) = load_storage_settings().await?;
@@ -99,6 +115,15 @@ async fn generate() -> Result<EndpointConf> {
     // generate route confs
     let mut conf_items = Vec::new();
     for deployment in deployments {
+        let project = projects_map.get(&deployment.project_id);
+        if project.is_none() {
+            continue;
+        }
+        let project = project.unwrap();
+        if project.status == project::Status::InActive.to_string() {
+            continue;
+        }
+
         let conf_item = RouteConfItem::new(
             format!("{}.{}", deployment.domain, prod_domain),
             deployment.storage_path.clone(),
@@ -118,6 +143,11 @@ async fn generate() -> Result<EndpointConf> {
             conf_items.push(conf_item);
         }
     }
+    debug!(
+        "deployments: {}, items: {}",
+        deployments_len,
+        conf_items.len()
+    );
 
     // use items's json value to generate md5 hash
     let json_bytes = serde_json::to_vec(&conf_items)?;

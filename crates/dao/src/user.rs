@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     model::{
         user_info::{self, Model},
@@ -359,4 +361,21 @@ pub async fn reset_password(token_str: String) -> Result<(String, String)> {
     token_active_model.update(db).await?;
 
     Ok((password_value, email))
+}
+
+/// list_by_ids lists users by ids
+pub async fn list_by_ids(user_ids: Vec<i32>) -> Result<HashMap<i32, Model>> {
+    if user_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let db = DB.get().unwrap();
+    let users = user_info::Entity::find()
+        .filter(user_info::Column::Id.is_in(user_ids))
+        .all(db)
+        .await?;
+    let mut user_map = HashMap::new();
+    for user in users {
+        user_map.insert(user.id, user);
+    }
+    Ok(user_map)
 }

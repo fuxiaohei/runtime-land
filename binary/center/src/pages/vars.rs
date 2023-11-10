@@ -5,6 +5,7 @@ use chrono::Duration;
 use land_dao::deployment::{self, Status};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::ops::Add;
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct PageVars {
@@ -258,5 +259,117 @@ impl TokenVars {
             vars.push(token_vars);
         }
         (vars, new_token)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProjectAdminVars {
+    pub name: String,
+    pub language: String,
+    pub uuid: String,
+    pub deployments: usize,
+    pub is_prod: bool,
+    pub production_url: String,
+    pub production_label: String,
+    pub updated_timeago: String,
+    pub status_label: String,
+    pub status: String,
+    pub owner_name: String,
+    pub owner_email: String,
+    pub is_active: bool,
+}
+
+impl ProjectAdminVars {
+    pub async fn from_models(
+        projects: &Vec<land_dao::Project>,
+        counters: HashMap<i32, usize>,
+        users: HashMap<i32, land_dao::User>,
+    ) -> Result<Vec<ProjectAdminVars>> {
+        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let tago = timeago::Formatter::new();
+        let mut vars = vec![];
+        for project in projects {
+            let user = users.get(&project.owner_id);
+            if user.is_none() {
+                continue;
+            }
+            let user = user.unwrap();
+
+            let counter = counters.get(&project.id).unwrap_or(&0);
+            let duration = chrono::Utc::now()
+                .signed_duration_since(project.updated_at)
+                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
+
+            let mut project_vars = ProjectAdminVars {
+                name: project.name.clone(),
+                language: project.language.clone(),
+                uuid: project.uuid.clone(),
+                deployments: *counter,
+                production_url: "".to_string(),
+                production_label: "".to_string(),
+                updated_timeago: tago.convert(duration.to_std().unwrap()),
+                status_label: "running".to_string(),
+                status: project.status.clone(),
+                owner_name: user.nick_name.clone(),
+                owner_email: user.email.clone(),
+                is_prod: project.prod_deploy_id > 0,
+                is_active: project.status != Status::InActive.to_string(),
+            };
+            if project.prod_deploy_id > 0 {
+                project_vars.production_url =
+                    format!("{}://{}.{}", prod_protocol, project.name, prod_domain);
+                project_vars.production_label = format!("{}.{}", project.name, prod_domain)
+            } else {
+                project_vars.status_label = "develop".to_string();
+            }
+            if *counter == 0 {
+                project_vars.status_label = "empty".to_string();
+            }
+            vars.push(project_vars);
+        }
+        Ok(vars)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PaginationVars {
+    pub current: u64,
+    pub all: u64,
+    pub prev_url: String,
+    pub next_url: String,
+    pub links: Vec<PaginationLinkVars>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PaginationLinkVars {
+    pub url: String,
+    pub page: u64,
+    pub active: bool,
+}
+
+impl PaginationVars {
+    pub fn new(current: u64, all: u64, base_uri: &str) -> Self {
+        let sep = if base_uri.contains('?') { "&" } else { "?" };
+        let prev = if current > 1 { current - 1 } else { 1 };
+        let next = if current < all { current + 1 } else { all };
+        let prev_url = format!("{}{}page={}", base_uri, sep, prev);
+        let next_url = format!("{}{}page={}", base_uri, sep, next);
+        let mut links = vec![];
+        for i in 1..=all {
+            let url = format!("{}{}page={}", base_uri, sep, i);
+            let link = PaginationLinkVars {
+                url,
+                page: i,
+                active: i == current,
+            };
+            links.push(link);
+        }
+        Self {
+            current,
+            all,
+            prev_url,
+            next_url,
+            links,
+        }
     }
 }

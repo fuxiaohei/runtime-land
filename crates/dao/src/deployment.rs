@@ -181,6 +181,32 @@ pub async fn list_counter(owner_id: i32) -> Result<HashMap<i32, usize>> {
     Ok(map)
 }
 
+pub async fn list_counter_by_projects(project_ids: Vec<i32>) -> Result<HashMap<i32, usize>> {
+    if project_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let db = DB.get().unwrap();
+    let sql = format!(
+        r#"select count(id) as counter, project_id from deployment where project_id in ({}) and status != 'deleted' group by project_id"#,
+        project_ids
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join(",")
+    );
+    let values: Vec<JsonValue> =
+        JsonValue::find_by_statement(Statement::from_sql_and_values(DbBackend::MySql, sql, []))
+            .all(db)
+            .await?;
+    let mut map = HashMap::new();
+    for value in values {
+        let counter = value["counter"].as_i64().unwrap() as usize;
+        let project_id = value["project_id"].as_i64().unwrap() as i32;
+        map.insert(project_id, counter);
+    }
+    Ok(map)
+}
+
 /// find_by_id finds a deployment by id
 pub async fn find_by_id(owner_id: i32, id: i32) -> Result<Option<deployment::Model>> {
     let db = DB.get().unwrap();
