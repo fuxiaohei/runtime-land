@@ -75,6 +75,29 @@ rustup target add wasm32-wasi
 
 ./deploy/download-wasm-deps.sh
 
+build_tailwindcss() {
+    log_print 0 "Downloading tailwindcss cli"
+    local ext=""
+    if [[ "$OS" == "windows" ]]; then
+        ext=".exe"
+    fi
+    local arch_name="$ARCH"
+    # convert aarch64 to arm64
+    if [[ "$arch_name" == "aarch64" ]]; then
+        arch_name="arm64"
+    fi
+    local binaryname="tailwindcss$ext"
+    local downloadurl="https://github.com/tailwindlabs/tailwindcss/releases/download/v3.3.5/tailwindcss-$OS-$arch_name"
+    log_print 1 "Downloading tailwindcss cli: $downloadurl"
+    curl --progress-bar --show-error --location --fail $downloadurl --output "$binaryname"
+    chmod +x "$binaryname"
+    
+    log_print 0 "Build templates css"
+    ./"$binaryname" -c ./binary/center/templates/tailwind.config.js  -i ./binary/center/templates/css/input.css -o ./binary/center/templates/css/main.css --minify
+}
+
+build_tailwindcss
+
 log_print 0 "Build land-center..."
 cargo build --release -p land-center
 
