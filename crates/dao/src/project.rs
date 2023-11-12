@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{model::project, DB};
 use anyhow::Result;
 use rand::{thread_rng, Rng};
@@ -243,4 +245,18 @@ pub async fn is_recent_updated() -> Result<bool> {
         return Ok(false);
     }
     Ok(true)
+}
+
+/// list_by_ids lists projects by ids
+pub async fn list_by_ids(project_ids: Vec<i32>) -> Result<HashMap<i32, project::Model>> {
+    let db = DB.get().unwrap();
+    let projects = project::Entity::find()
+        .filter(project::Column::Id.is_in(project_ids))
+        .all(db)
+        .await?;
+    let mut map = HashMap::new();
+    for project in projects {
+        map.insert(project.id, project);
+    }
+    Ok(map)
 }

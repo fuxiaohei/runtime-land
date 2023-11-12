@@ -1,10 +1,11 @@
 use super::auth::SessionUser;
-use super::vars::{PageVars, PaginationVars, UserVars};
+use super::vars::{DeployAdminVars, PageVars, PaginationVars, UserVars};
 use super::AppEngine;
 use crate::pages::vars::ProjectAdminVars;
 use axum::extract::{Path, Query};
 use axum::response::{IntoResponse, Redirect};
-use axum::Extension;
+use axum::{Extension, Form};
+use axum_csrf::CsrfToken;
 use axum_template::RenderHtml;
 use hyper::StatusCode;
 use land_dao::{deployment, project, user};
@@ -106,25 +107,104 @@ pub async fn handle_project_enable(Path(uuid): Path<String>) -> Result<Redirect,
 struct AdminDeploymentsVars {
     pub page: PageVars,
     pub user: UserVars,
+    pub pagination: PaginationVars,
+    pub search: String,
+    pub deploys_count: u64,
+    pub deploys: Vec<DeployAdminVars>,
+    pub csrf_token: String,
 }
 
 pub async fn render_deployments(
     engine: AppEngine,
     Extension(current_user): Extension<SessionUser>,
+    csrf_token: CsrfToken,
+    Query(query): Query<ProjectsQueryParams>,
 ) -> impl IntoResponse {
+    let csrf_token_value = csrf_token.authenticity_token().unwrap();
+    let page = query.page.unwrap_or(1);
+    let page_size = query.size.unwrap_or(20);
+    let (deployments, pages, alls) =
+        deployment::list_all_available_with_page(query.search.clone(), page, page_size)
+            .await
+            .unwrap();
+
+    let owner_ids: HashSet<i32> = deployments.iter().map(|p| p.owner_id).collect();
+    let owners = user::list_by_ids(owner_ids.into_iter().collect())
+        .await
+        .unwrap();
+
+    let project_ids: HashSet<i32> = deployments.iter().map(|p| p.project_id).collect();
+    let projects = project::list_by_ids(project_ids.into_iter().collect())
+        .await
+        .unwrap();
+
+    let deploy_vars = DeployAdminVars::from_models(&deployments, projects, owners)
+        .await
+        .unwrap();
+
     let page_vars = PageVars::new(
         "Admin - Deployments".to_string(),
         "/admin/deployments".to_string(),
     );
     let user_vars = UserVars::new(&current_user);
-    RenderHtml(
-        "admin/deployments.hbs",
-        engine,
-        AdminDeploymentsVars {
-            page: page_vars,
-            user: user_vars,
-        },
+    (
+        csrf_token,
+        RenderHtml(
+            "admin/deployments.hbs",
+            engine,
+            AdminDeploymentsVars {
+                page: page_vars,
+                user: user_vars,
+                pagination: PaginationVars::new(page, pages, "/admin/deployments"),
+                search: query.search.unwrap_or_default(),
+                deploys_count: alls,
+                deploys: deploy_vars,
+                csrf_token: csrf_token_value,
+            },
+        ),
     )
+        .into_response()
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HandleDeployParams {
+    pub csrf_token: String,
+    pub uuid: String,
+    pub owner_id: i32,
+    pub action: String,
+}
+
+pub async fn handle_deploy(
+    csrf_token: CsrfToken,
+    Form(payload): Form<HandleDeployParams>,
+) -> Result<Redirect, StatusCode> {
+    println!("verify:{:?}", csrf_token.verify(&payload.csrf_token));
+    if csrf_token.verify(&payload.csrf_token).is_err() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let deploy = match deployment::find_by_uuid(payload.owner_id, payload.uuid).await {
+        Ok(p) => {
+            if p.is_none() {
+                return Err(StatusCode::NOT_FOUND);
+            }
+            p.unwrap()
+        }
+        Err(_) => return Err(StatusCode::NOT_FOUND),
+    };
+    match payload.action.as_str() {
+        "enable" => {
+            deployment::enable(deploy.owner_id, deploy.uuid)
+                .await
+                .unwrap();
+        }
+        "disable" => {
+            deployment::disable(deploy.owner_id, deploy.uuid)
+                .await
+                .unwrap();
+        }
+        _ => {}
+    }
+    Ok(Redirect::to("/admin/deployments"))
 }
 
 #[derive(Debug, Serialize, Deserialize)]

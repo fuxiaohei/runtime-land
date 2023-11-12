@@ -9,6 +9,7 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { workspace = true }
 axum-template = { version = "1.0.0", features = ["handlebars"] }
+axum_csrf = { version = "0.7.2", features = ["layer"] }
 base64 = "0.21.5"
 chrono = { workspace = true }
 clap = { workspace = true }

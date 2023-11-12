@@ -373,3 +373,75 @@ impl PaginationVars {
         }
     }
 }
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DeployAdminVars {
+    pub domain: String,
+    pub uuid: String,
+    pub language: String,
+    pub project_name: String,
+    pub is_prod: bool,
+    pub visit_url: String,
+    pub visit_label: String,
+    pub updated_timeago: String,
+    pub status: String,
+    pub owner_name: String,
+    pub owner_email: String,
+    pub owner_id: i32,
+    pub is_active: bool,
+}
+
+impl DeployAdminVars {
+    pub async fn from_models(
+        deploys: &Vec<land_dao::Deployment>,
+        projects: HashMap<i32, land_dao::Project>,
+        users: HashMap<i32, land_dao::User>,
+    ) -> Result<Vec<DeployAdminVars>> {
+        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let tago = timeago::Formatter::new();
+        let mut vars = vec![];
+        for deploy in deploys {
+            let project = projects.get(&deploy.project_id);
+            if project.is_none() {
+                continue;
+            }
+            let project = project.unwrap();
+            let user = users.get(&project.owner_id);
+            if user.is_none() {
+                continue;
+            }
+            let user = user.unwrap();
+
+            let duration = chrono::Utc::now()
+                .signed_duration_since(deploy.updated_at)
+                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
+            let mut project_vars = DeployAdminVars {
+                domain: deploy.domain.clone(),
+                uuid: deploy.uuid.clone(),
+                language: project.language.clone(),
+                project_name: project.name.clone(),
+                visit_url: String::new(),
+                visit_label: String::new(),
+                updated_timeago: tago.convert(duration.to_std().unwrap()),
+                status: deploy.status.clone(),
+                owner_name: user.nick_name.clone(),
+                owner_email: user.email.clone(),
+                owner_id: user.id,
+                is_prod: project.prod_deploy_id == deploy.id,
+                is_active: deploy.status == Status::Active.to_string(),
+            };
+            if project_vars.is_active {
+                project_vars.visit_url =
+                    format!("{}://{}.{}", prod_protocol, deploy.domain, prod_domain);
+                project_vars.visit_label = format!("{}.{}", deploy.domain, prod_domain);
+                if project_vars.is_prod {
+                    project_vars.visit_url =
+                        format!("{}://{}.{}", prod_protocol, project.name, prod_domain);
+                    project_vars.visit_label = format!("{}.{}", project.name, prod_domain);
+                }
+            }
+            vars.push(project_vars);
+        }
+        Ok(vars)
+    }
+}

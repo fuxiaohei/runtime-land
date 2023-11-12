@@ -341,81 +341,108 @@
   @apply border-t border-gray-200 mt-6 pt-6;
 }
 
-#projects-table {
+#projects-table,
+#deploys-table {
   @apply w-full text-left text-zinc-600;
 }
 
-#projects-table thead {
+#projects-table thead,
+#deploys-table thead {
   @apply text-sm uppercase bg-zinc-50;
 }
 
 #projects-table thead th,
-#projects-table tbody td {
+#projects-table tbody td,
+#deploys-table thead th,
+#deploys-table tbody td {
   @apply p-4;
 }
 
 #projects-table td.lang {
-  @apply capitalize text-gray-400;
+  @apply capitalize text-gray-500;
 }
 
-#projects-table td.status {
+#projects-table td.status,
+#deploys-table td.status {
   @apply uppercase text-sm font-semibold;
 }
 
-#projects-table td.status.inactive {
+#projects-table td.status.inactive,
+#deploys-table td.status.inactive {
   @apply text-red-800;
 }
 
-#projects-table td.status.active {
+#projects-table td.status.active,
+#deploys-table td.status.active {
   @apply text-primary;
 }
 
-#projects-table td.name {
+#projects-table td.name,
+#deploys-table td.domain {
   @apply font-semibold;
 }
 
-#projects-table td .prod {
+#projects-table td .prod,
+#deploys-table td .prod {
   @apply text-white text-xs px-2 py-1 rounded-md bg-primary ml-2;
 }
 
-#projects-table td.ops {
+#projects-table td.ops,
+#deploys-table td.ops,
+#deploys-table td.updated,
+#deploys-table td.owner,
+#deploys-table td.project {
   @apply text-sm;
 }
 
-#projects-table td.ops a {
-  @apply mr-1;
+#deploys-table td.updated,
+#deploys-table td.owner,
+#deploys-table td.project {
+  @apply text-gray-500;
 }
 
-#projects-table td.ops .enable {
+#projects-table td.ops a,
+#deploys-table td.ops button {
+  @apply mr-1 text-sm;
+}
+
+#deploys-table td.ops form {
+  @apply inline-block;
+}
+
+#projects-table td.ops .enable,
+#deploys-table td.ops .enable {
   @apply text-green-700;
 }
-#projects-table td.ops .disable {
+#projects-table td.ops .disable,
+#deploys-table td.ops .disable {
   @apply text-red-700;
 }
-#projects-table td.ops svg {
+#projects-table td.ops svg,
+#deploys-table td.ops svg {
   @apply inline-block w-5 h-5;
 }
 
-#projects-pager {
+.projects-pager {
   @apply py-6 px-4 flex justify-center;
 }
 
-#projects-pager ul {
+.projects-pager ul {
   @apply inline-flex -space-x-px;
 }
 
-#projects-pager li a.page {
+.projects-pager li a.page {
   @apply flex items-center justify-center px-4 h-10 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700;
 }
 
-#projects-pager li a.page.active {
+.projects-pager li a.page.active {
   @apply text-white bg-primary border-primary;
 }
 
-#projects-pager li a.prev {
+.projects-pager li a.prev {
   @apply rounded-l-lg;
 }
 
-#projects-pager li a.next {
+.projects-pager li a.next {
   @apply rounded-r-lg;
 }

@@ -24,7 +24,12 @@ async fn sync_conf_loop(interval: u64) {
 
         let mut conf_values = CONF_VALUES.lock().await;
 
-        if !should_generate().await && conf_values.created_at > 0 {
+        let should_generate = should_generate().await;
+        if should_generate.is_err() {
+            error!("should generate error: {:?}", should_generate.err());
+            continue;
+        }
+        if !should_generate.unwrap() && conf_values.created_at > 0 {
             continue;
         }
 
@@ -59,23 +64,10 @@ pub fn run(interval: u64, runtime_node_interval: u64) {
     );
 }
 
-async fn should_generate() -> bool {
-    let flag = land_dao::deployment::is_recent_updated().await;
-    match flag {
-        Ok(flag) => flag,
-        Err(e) => {
-            error!("check recent updated error: {:?}", e);
-            return false;
-        }
-    };
-    let flag2 = land_dao::project::is_recent_updated().await;
-    match flag2 {
-        Ok(flag2) => flag2,
-        Err(e) => {
-            error!("check recent updated error: {:?}", e);
-            false
-        }
-    }
+async fn should_generate() -> Result<bool> {
+    let flag1 = land_dao::deployment::is_recent_updated().await?;
+    let flag2 = land_dao::project::is_recent_updated().await?;
+    Ok(flag1 || flag2)
 }
 
 async fn generate() -> Result<EndpointConf> {

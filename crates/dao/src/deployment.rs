@@ -5,8 +5,8 @@ use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::sea_query::Expr;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
-    QueryOrder, Set, Statement,
+    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue,
+    PaginatorTrait, QueryFilter, QueryOrder, Set, Statement,
 };
 use std::collections::HashMap;
 
@@ -323,4 +323,27 @@ pub async fn get_stats() -> Result<i32> {
     .await?;
     let counter = values[0]["counter"].as_i64().unwrap() as i32;
     Ok(counter)
+}
+
+/// list_all_available_with_page lists all available deployments with pagination
+pub async fn list_all_available_with_page(
+    search: Option<String>,
+    page: u64,
+    page_size: u64,
+) -> Result<(Vec<deployment::Model>, u64, u64)> {
+    if page < 1 || page_size < 1 {
+        return Err(anyhow::anyhow!("page and page_size must be greater than 0"));
+    }
+    let db = DB.get().unwrap();
+    let mut query = deployment::Entity::find()
+        .filter(deployment::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(deployment::Column::UpdatedAt);
+    if let Some(search) = search {
+        query = query.filter(deployment::Column::Domain.contains(search));
+    }
+    let pager = query.paginate(db, page_size);
+    let deployments = pager.fetch_page(page - 1).await?;
+    let total_pages = pager.num_pages().await?;
+    let total_items = pager.num_items().await?;
+    Ok((deployments, total_pages, total_items))
 }

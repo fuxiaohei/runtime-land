@@ -7,6 +7,7 @@ use axum::{
     routing::{any, get, post},
     Router,
 };
+use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
 use handlebars::Handlebars;
 use hyper::StatusCode;
@@ -23,6 +24,7 @@ pub type AppEngine = Engine<Handlebars<'static>>;
 
 pub fn router() -> Router {
     let hbs = init_templates().unwrap();
+    let config = CsrfConfig::default();
     Router::new()
         .route("/projects", get(projects::render))
         .route("/projects/:name", get(projects::render_single))
@@ -53,11 +55,15 @@ pub fn router() -> Router {
             "/admin/projects/:uuid/enable",
             get(admin::handle_project_enable),
         )
-        .route("/admin/deployments", get(admin::render_deployments))
+        .route(
+            "/admin/deployments",
+            get(admin::render_deployments).post(admin::handle_deploy),
+        )
         .route("/admin/users", get(admin::render_users))
         .route("/admin/endpoints", get(admin::render_endpoints))
         .route("/static/*path", get(render_static))
         .route("/*path", any(render_notfound))
+        .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))
         .route_layer(middleware::from_fn(auth::session_auth_middleware))
 }

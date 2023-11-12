@@ -86,6 +86,10 @@ build_tailwindcss() {
     if [[ "$arch_name" == "aarch64" ]]; then
         arch_name="arm64"
     fi
+    # convert x86_64 to x64
+    if [[ "$arch_name" == "x86_64" ]]; then
+        arch_name="x64"
+    fi
     local binaryname="tailwindcss$ext"
     local downloadurl="https://github.com/tailwindlabs/tailwindcss/releases/download/v3.3.5/tailwindcss-$OS-$arch_name"
     log_print 1 "Downloading tailwindcss cli: $downloadurl"
