@@ -341,85 +341,76 @@
   @apply border-t border-gray-200 mt-6 pt-6;
 }
 
-#projects-table,
-#deploys-table {
+.projects-table {
   @apply w-full text-left text-zinc-600;
 }
 
-#projects-table thead,
-#deploys-table thead {
+.projects-table thead {
   @apply text-sm uppercase bg-zinc-50;
 }
 
-#projects-table thead th,
-#projects-table tbody td,
-#deploys-table thead th,
-#deploys-table tbody td {
+.projects-table thead th,
+.projects-table tbody td {
   @apply p-4;
 }
 
-#projects-table td.lang {
-  @apply capitalize text-gray-500;
+.projects-table td.lang {
+  @apply capitalize text-gray-400;
 }
 
-#projects-table td.status,
-#deploys-table td.status {
+.projects-table td.status {
   @apply uppercase text-sm font-semibold;
 }
 
-#projects-table td.status.inactive,
-#deploys-table td.status.inactive {
+.projects-table td.status.inactive {
   @apply text-red-800;
 }
 
-#projects-table td.status.active,
-#deploys-table td.status.active {
-  @apply text-primary;
+.projects-table td.status.active {
+  @apply text-green-700;
 }
 
-#projects-table td.name,
-#deploys-table td.domain {
+.projects-table td.status.pending {
+  @apply text-gray-400;
+}
+
+.projects-table td.name,
+.projects-table td.domain {
   @apply font-semibold;
 }
 
-#projects-table td .prod,
-#deploys-table td .prod {
+.projects-table td .prod {
   @apply text-white text-xs px-2 py-1 rounded-md bg-primary ml-2;
 }
 
-#projects-table td.ops,
-#deploys-table td.ops,
-#deploys-table td.updated,
-#deploys-table td.owner,
-#deploys-table td.project {
+.projects-table td.ops,
+.projects-table td.updated,
+.projects-table td.owner,
+.projects-table td.project {
   @apply text-sm;
 }
 
-#deploys-table td.updated,
-#deploys-table td.owner,
-#deploys-table td.project {
+.projects-table td.project {
   @apply text-gray-500;
 }
 
-#projects-table td.ops a,
-#deploys-table td.ops button {
+.projects-table td.ops button {
   @apply mr-1 text-sm;
 }
 
-#deploys-table td.ops form {
+.projects-table td.ops form {
   @apply inline-block;
 }
 
-#projects-table td.ops .enable,
-#deploys-table td.ops .enable {
+.projects-table td.ops .enable {
   @apply text-green-700;
 }
-#projects-table td.ops .disable,
-#deploys-table td.ops .disable {
+
+.projects-table td.ops .disable {
   @apply text-red-700;
 }
-#projects-table td.ops svg,
-#deploys-table td.ops svg {
+
+.projects-table td.ops svg {
   @apply inline-block w-5 h-5;
 }
 

@@ -2,7 +2,7 @@ use super::auth::SessionUser;
 use super::vars::{DeployAdminVars, PageVars, PaginationVars, UserVars};
 use super::AppEngine;
 use crate::pages::vars::ProjectAdminVars;
-use axum::extract::{Path, Query};
+use axum::extract::Query;
 use axum::response::{IntoResponse, Redirect};
 use axum::{Extension, Form};
 use axum_csrf::CsrfToken;
@@ -11,6 +11,7 @@ use hyper::StatusCode;
 use land_dao::{deployment, project, user};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use tracing::{info, warn};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct AdminProjectVars {
@@ -20,6 +21,7 @@ struct AdminProjectVars {
     pub projects: Vec<ProjectAdminVars>,
     pub pagination: PaginationVars,
     pub search: String,
+    pub csrf_token: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,9 +33,11 @@ pub struct ProjectsQueryParams {
 
 pub async fn render_projects(
     engine: AppEngine,
+    csrf_token: CsrfToken,
     Extension(current_user): Extension<SessionUser>,
     Query(query): Query<ProjectsQueryParams>,
 ) -> impl IntoResponse {
+    let csrf_token_value = csrf_token.authenticity_token().unwrap();
     let page = query.page.unwrap_or(1);
     let page_size = query.size.unwrap_or(20);
     let (projects, pages, alls) =
@@ -61,45 +65,70 @@ pub async fn render_projects(
         .unwrap();
     let pagination_vars = PaginationVars::new(page, pages, "/admin/projects");
 
-    RenderHtml(
-        "admin/projects.hbs",
-        engine,
-        AdminProjectVars {
-            page: page_vars,
-            user: user_vars,
-            project_count: alls,
-            projects: project_vars,
-            pagination: pagination_vars,
-            search: query.search.unwrap_or_default(),
-        },
+    (
+        csrf_token,
+        RenderHtml(
+            "admin/projects.hbs",
+            engine,
+            AdminProjectVars {
+                page: page_vars,
+                user: user_vars,
+                project_count: alls,
+                projects: project_vars,
+                pagination: pagination_vars,
+                search: query.search.unwrap_or_default(),
+                csrf_token: csrf_token_value,
+            },
+        ),
     )
+        .into_response()
 }
 
-pub async fn handle_project_disable(Path(uuid): Path<String>) -> Result<Redirect, StatusCode> {
-    let project = match project::find_by_uuid(uuid).await {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HandleProjectParams {
+    pub csrf_token: String,
+    pub uuid: String,
+    pub owner_id: i32,
+    pub action: String,
+    pub name: String,
+}
+
+pub async fn handle_project(
+    csrf_token: CsrfToken,
+    Form(payload): Form<HandleProjectParams>,
+) -> Result<Redirect, StatusCode> {
+    let action = payload.action.as_str();
+    let name = payload.name.as_str();
+    let span = tracing::info_span!("handle_project", action, name);
+    let _enter = span.enter();
+
+    if csrf_token.verify(&payload.csrf_token).is_err() {
+        warn!("csrf token verify failed");
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let project = match project::find_by_uuid(payload.uuid, payload.owner_id).await {
         Ok(p) => {
             if p.is_none() {
+                warn!("project not found");
                 return Err(StatusCode::NOT_FOUND);
             }
             p.unwrap()
         }
-        Err(_) => return Err(StatusCode::NOT_FOUND),
-    };
-    project::set_inactive(project.id).await.unwrap();
-    Ok(Redirect::to("/admin/projects"))
-}
-
-pub async fn handle_project_enable(Path(uuid): Path<String>) -> Result<Redirect, StatusCode> {
-    let project = match project::find_by_uuid(uuid).await {
-        Ok(p) => {
-            if p.is_none() {
-                return Err(StatusCode::NOT_FOUND);
-            }
-            p.unwrap()
+        Err(err) => {
+            warn!("project found error, err:{}", err);
+            return Err(StatusCode::NOT_FOUND);
         }
-        Err(_) => return Err(StatusCode::NOT_FOUND),
     };
-    project::set_active(project.id).await.unwrap();
+    match payload.action.as_str() {
+        "enable" => {
+            project::set_active(project.id).await.unwrap();
+        }
+        "disable" => {
+            project::set_inactive(project.id).await.unwrap();
+        }
+        _ => {}
+    }
+    info!("project action success");
     Ok(Redirect::to("/admin/projects"))
 }
 
@@ -166,30 +195,33 @@ pub async fn render_deployments(
         .into_response()
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HandleDeployParams {
-    pub csrf_token: String,
-    pub uuid: String,
-    pub owner_id: i32,
-    pub action: String,
-}
+type HandleDeployParams = HandleProjectParams;
 
 pub async fn handle_deploy(
     csrf_token: CsrfToken,
     Form(payload): Form<HandleDeployParams>,
 ) -> Result<Redirect, StatusCode> {
-    println!("verify:{:?}", csrf_token.verify(&payload.csrf_token));
+    let action = payload.action.as_str();
+    let name = payload.name.as_str();
+    let span = tracing::info_span!("handle_deploy", action, name);
+    let _enter = span.enter();
+    
     if csrf_token.verify(&payload.csrf_token).is_err() {
+        warn!("csrf token verify failed");
         return Err(StatusCode::BAD_REQUEST);
     }
     let deploy = match deployment::find_by_uuid(payload.owner_id, payload.uuid).await {
         Ok(p) => {
             if p.is_none() {
+                warn!("deployment not found");
                 return Err(StatusCode::NOT_FOUND);
             }
             p.unwrap()
         }
-        Err(_) => return Err(StatusCode::NOT_FOUND),
+        Err(err) => {
+            warn!("deployment found error,err:{}", err);
+            return Err(StatusCode::NOT_FOUND);
+        }
     };
     match payload.action.as_str() {
         "enable" => {
@@ -204,6 +236,7 @@ pub async fn handle_deploy(
         }
         _ => {}
     }
+    info!("deployment action success");
     Ok(Redirect::to("/admin/deployments"))
 }
 

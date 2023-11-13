@@ -77,10 +77,11 @@ pub async fn find_by_id(id: i32) -> Result<Option<project::Model>> {
 }
 
 /// find_by_uuid finds a project by uuid
-pub async fn find_by_uuid(uuid: String) -> Result<Option<project::Model>> {
+pub async fn find_by_uuid(uuid: String, owner_id: i32) -> Result<Option<project::Model>> {
     let db = DB.get().unwrap();
     let project = project::Entity::find()
         .filter(project::Column::Uuid.eq(uuid))
+        .filter(project::Column::OwnerId.eq(owner_id))
         .one(db)
         .await?;
     Ok(project)

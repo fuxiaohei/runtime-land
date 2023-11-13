@@ -276,6 +276,7 @@ pub struct ProjectAdminVars {
     pub status: String,
     pub owner_name: String,
     pub owner_email: String,
+    pub owner_id: i32,
     pub is_active: bool,
 }
 
@@ -312,6 +313,7 @@ impl ProjectAdminVars {
                 status: project.status.clone(),
                 owner_name: user.nick_name.clone(),
                 owner_email: user.email.clone(),
+                owner_id: user.id,
                 is_prod: project.prod_deploy_id > 0,
                 is_active: project.status != Status::InActive.to_string(),
             };

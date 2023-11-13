@@ -9,7 +9,8 @@
     {{> admin/navbar.hbs}}
     <main id="admin-main">
         <div id="project-top">
-            <h1>{{deploys_count}} Deployments</h1>
+            <h1 class="inline-block">{{deploys_count}} Deployments</h1>
+            <span class="inline-block ml-3 text-gray-500 uppercase"> - Page {{pagination.current}}</span>
         </div>
         <div id="project-searchbar">
             <form method="get">
@@ -29,7 +30,7 @@
             </form>
         </div>
         <div id="deploys-table-container">
-            <table id="deploys-table">
+            <table id="deploys-table" class="projects-table">
                 <thead>
                     <th>Name</th>
                     <th>Project</th>
@@ -47,11 +48,12 @@
                         <td class="status {{status}}">{{status}}</td>
                         <td class="updated">{{updated_timeago}}</td>
                         <td class="ops">
-                            {{#if is_active}}
                             <form method="post" action="/admin/deployments">
                                 <input type="hidden" name="uuid" value="{{uuid}}" />
                                 <input type="hidden" name="owner_id" value="{{owner_id}}" />
                                 <input type="hidden" name="csrf_token" value="{{../csrf_token}}" />
+                                <input type="hidden" name="name" value="{{domain}}">
+                                {{#if is_active}}
                                 <input type="hidden" name="action" value="disable">
                                 <button class="disable" type="submit" title="disable">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -60,12 +62,7 @@
                                             d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </button>
-                            </form>
-                            {{else}}
-                            <form method="post" action="/admin/deployments">
-                                <input type="hidden" name="uuid" value="{{uuid}}" />
-                                <input type="hidden" name="owner_id" value="{{owner_id}}" />
-                                <input type="hidden" name="csrf_token" value="{{../csrf_token}}" />
+                                {{else}}
                                 <input type="hidden" name="action" value="enable">
                                 <button class="enable" type="submit" title="enable">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -74,8 +71,9 @@
                                             d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </button>
+                                {{/if}}
                             </form>
-                            {{/if}}
+
                             {{#if is_active}}
                             <a href="{{visit_url}}" title="visit" target="_blank">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
