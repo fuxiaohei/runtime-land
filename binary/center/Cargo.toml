@@ -39,6 +39,6 @@ serde_json = { workspace = true }
 time = { workspace = true }
 timeago = { workspace = true }
 tokio = { workspace = true }
-tower-http = { version = "0.4.3", features = ["cors", "trace"] }
+tower-http = { version = "0.4.3", features = ["cors", "trace", "fs"] }
 tracing = { workspace = true }
 validator = { version = "0.16.1", features = ["derive"] }

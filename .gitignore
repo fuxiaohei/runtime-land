@@ -43,7 +43,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Local demo testing
+# Local demo testing or binary tools
 demo/
 ipinfo.json
 edge-conf.json
@@ -55,3 +55,6 @@ wasm-opt.tar.gz
 wasm-opt-bin/
 wizer.tar.xz
 wizer-bin/
+tailwindcss
+tailwindcss.exe
+static/

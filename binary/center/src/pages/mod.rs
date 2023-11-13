@@ -12,6 +12,7 @@ use axum_template::engine::Engine;
 use handlebars::Handlebars;
 use hyper::StatusCode;
 use mime_guess::mime;
+use tower_http::services::ServeDir;
 use tracing::debug;
 
 mod account;
@@ -25,7 +26,7 @@ pub type AppEngine = Engine<Handlebars<'static>>;
 pub fn router() -> Router {
     let hbs = init_templates().unwrap();
     let config = CsrfConfig::default();
-    Router::new()
+    let mut router = Router::new()
         .route("/projects", get(projects::render))
         .route("/projects/:name", get(projects::render_single))
         .route("/projects/:name/settings", post(projects::handle_rename))
@@ -61,8 +62,14 @@ pub fn router() -> Router {
         )
         .route("/admin/users", get(admin::render_users))
         .route("/admin/endpoints", get(admin::render_endpoints))
-        .route("/static/*path", get(render_static))
-        .route("/*path", any(render_notfound))
+        .route("/*path", any(render_notfound));
+    if cfg!(debug_assertions) {
+        router = router.route("/static/*path", get(render_static));
+    } else {
+        router = router.nest_service("/static", ServeDir::new("static"))
+    }
+
+    router
         .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))
         .route_layer(middleware::from_fn(auth::session_auth_middleware))
