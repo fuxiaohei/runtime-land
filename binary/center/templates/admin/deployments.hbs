@@ -90,17 +90,21 @@
             </table>
             <nav id="deploys-pager" class="projects-pager">
                 <ul>
+                    {{#if pagination.has_prev}}
                     <li>
                         <a href="{{pagination.prev_url}}" class="page prev">Previous</a>
                     </li>
+                    {{/if}}
                     {{#each pagination.links}}
                     <li>
                         <a href="{{url}}" class="page {{#if active}}active{{/if}}">{{page}}</a>
                     </li>
                     {{/each}}
+                    {{#if pagination.has_next}}
                     <li>
                         <a href="{{pagination.next_url}}" class="page next">Next</a>
                     </li>
+                    {{/if}}
                 </ul>
             </nav>
         </div>

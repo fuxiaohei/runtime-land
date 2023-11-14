@@ -48,16 +48,27 @@
                     </div>
                 </div>
                 {{else}}
+                {{#if project.is_inactive}}
+                <div class="deployment-status inactive">
+                    <h3>InActive</h3>
+                    <p class="desc">Your project is inactive. Please concact administrator to activate it.</p>
+                </div>
+                {{else}}
                 <div class="deployment-status develop">
                     <h3>Development</h3>
                     <p class="desc">This project is in Development. Deploy to Production to make it public with proper
                         domain.</p>
                 </div>
                 {{/if}}
+                {{/if}}
 
                 <div class="deployment-lists">
                     <h3>All Deployments</h3>
+                    {{#if project.is_inactive}}
+                    <p class="desc">Your project is inactive. Deployments operations are unaffective.</p>
+                    {{else}}
                     <p class="desc">All deployments for this project.</p>
+                    {{/if}}
                     {{#if deployments}}
                     <ul id="deployment-list">
                         {{#each deployments}}

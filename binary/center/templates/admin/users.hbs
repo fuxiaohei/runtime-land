@@ -9,7 +9,8 @@
     {{> admin/navbar.hbs}}
     <main id="admin-main">
         <div id="project-top">
-            <h1>{{project_count}} Deployments</h1>
+            <h1 class="inline-block">{{user_count}} Users</h1>
+            <span class="inline-block ml-3 text-gray-500 uppercase"> - Page {{pagination.current}}</span>
         </div>
         <div id="project-searchbar">
             <form method="get">
@@ -29,7 +30,51 @@
             </form>
         </div>
         <div id="projects-table-container">
-            users
+            <table id="users-table" class="projects-table">
+                <thead>
+                    <tr>
+                        <th>NickName</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Oauth</th>
+                        <th>Proj/Dp</th>
+                        <th>Ops</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each users}}
+                    <tr>
+                        <td class="name">{{nick_name}}</td>
+                        <td class="email">{{email}}</td>
+                        <td class="role {{role}}">{{role}}</td>
+                        <td class="status {{status}}">{{status}}</td>
+                        <td class="oauth">{{oauth}}</td>
+                        <td class="proj-dep">{{projects_count}}/{{deployments_count}}</td>
+                        <td class="ops">ops</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <nav id="deploys-pager" class="projects-pager">
+                <ul>
+                    {{#if pagination.has_prev}}
+                    <li>
+                        <a href="{{pagination.prev_url}}" class="page prev">Previous</a>
+                    </li>
+                    {{/if}}
+                    {{#each pagination.links}}
+                    <li>
+                        <a href="{{url}}" class="page {{#if active}}active{{/if}}">{{page}}</a>
+                    </li>
+                    {{/each}}
+                    {{#if pagination.has_next}}
+                    <li>
+                        <a href="{{pagination.next_url}}" class="page next">Next</a>
+                    </li>
+                    {{/if}}
+                </ul>
+            </nav>
         </div>
     </main>
     {{> partials/footer.hbs}}

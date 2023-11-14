@@ -1,5 +1,5 @@
 use super::auth::SessionUser;
-use super::vars::{DeployAdminVars, PageVars, PaginationVars, UserVars};
+use super::vars::{DeployAdminVars, PageVars, PaginationVars, UserAdminVars, UserVars};
 use super::AppEngine;
 use crate::pages::vars::ProjectAdminVars;
 use axum::extract::Query;
@@ -205,7 +205,7 @@ pub async fn handle_deploy(
     let name = payload.name.as_str();
     let span = tracing::info_span!("handle_deploy", action, name);
     let _enter = span.enter();
-    
+
     if csrf_token.verify(&payload.csrf_token).is_err() {
         warn!("csrf token verify failed");
         return Err(StatusCode::BAD_REQUEST);
@@ -244,12 +244,32 @@ pub async fn handle_deploy(
 struct AdminUsersVars {
     pub page: PageVars,
     pub user: UserVars,
+    pub user_count: u64,
+    pub users: Vec<UserAdminVars>,
+    pub pagination: PaginationVars,
 }
 
 pub async fn render_users(
     engine: AppEngine,
     Extension(current_user): Extension<SessionUser>,
+    Query(query): Query<ProjectsQueryParams>,
 ) -> impl IntoResponse {
+    let page = query.page.unwrap_or(1);
+    let page_size = query.size.unwrap_or(20);
+    let (users, pages, alls) = user::list_with_page(query.search.clone(), page, page_size)
+        .await
+        .unwrap();
+
+    let user_ids: Vec<i32> = users.iter().map(|u| u.id).collect();
+    let deploys_counts = deployment::list_counter_by_owners(user_ids.clone())
+        .await
+        .unwrap();
+    let projects_counts = project::list_counter_by_owners(user_ids).await.unwrap();
+
+    let users_vars = UserAdminVars::from_models(&users, projects_counts, deploys_counts)
+        .await
+        .unwrap();
+
     let page_vars = PageVars::new("Admin - Users".to_string(), "/admin/users".to_string());
     let user_vars = UserVars::new(&current_user);
     RenderHtml(
@@ -258,6 +278,9 @@ pub async fn render_users(
         AdminUsersVars {
             page: page_vars,
             user: user_vars,
+            user_count: alls,
+            users: users_vars,
+            pagination: PaginationVars::new(page, pages, "/admin/users"),
         },
     )
 }

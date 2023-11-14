@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::{
     model::{
         user_info::{self, Model},
@@ -12,9 +10,10 @@ use gravatar::{Gravatar, Rating};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DbBackend, EntityTrait, FromQueryResult, JsonValue, QueryFilter,
-    Set, Statement,
+    ActiveModelTrait, ColumnTrait, Condition, DbBackend, EntityTrait, FromQueryResult, JsonValue,
+    PaginatorTrait, QueryFilter, QueryOrder, Set, Statement,
 };
+use std::collections::HashMap;
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -378,4 +377,28 @@ pub async fn list_by_ids(user_ids: Vec<i32>) -> Result<HashMap<i32, Model>> {
         user_map.insert(user.id, user);
     }
     Ok(user_map)
+}
+
+/// list_with_page lists users with pagination
+pub async fn list_with_page(
+    search: Option<String>,
+    page: u64,
+    page_size: u64,
+) -> Result<(Vec<Model>, u64, u64)> {
+    let db = DB.get().unwrap();
+    let mut query = user_info::Entity::find()
+        .filter(user_info::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(user_info::Column::UpdatedAt);
+    if let Some(search) = search {
+        query = query.filter(
+            Condition::any()
+                .add(user_info::Column::NickName.contains(search.clone()))
+                .add(user_info::Column::Email.contains(search)),
+        );
+    }
+    let pager = query.paginate(db, page_size);
+    let users = pager.fetch_page(page - 1).await?;
+    let total_pages = pager.num_pages().await?;
+    let total_items = pager.num_items().await?;
+    Ok((users, total_pages, total_items))
 }

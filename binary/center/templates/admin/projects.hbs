@@ -43,10 +43,10 @@
                 <tbody>
                     {{#each projects}}
                     <tr>
-                        <td class="name">{{name}}</td>
+                        <td class="name">{{name}} {{#if is_prod}}<span class="prod">prod</span>{{/if}}</td>
                         <td class="lang">{{language}}</td>
                         <td class="owner">{{owner_name}}</td>
-                        <td>{{deployments}} {{#if is_prod}}<span class="prod">prod</span>{{/if}}</td>
+                        <td>{{deployments}}</td>
                         <td class="status {{status}}">{{status}}</td>
                         <td class="updated">{{updated_timeago}}</td>
                         <td class="ops">
@@ -91,17 +91,21 @@
             </table>
             <nav id="projects-pager" class="projects-pager">
                 <ul>
+                    {{#if pagination.has_prev}}
                     <li>
                         <a href="{{pagination.prev_url}}" class="page prev">Previous</a>
                     </li>
+                    {{/if}}
                     {{#each pagination.links}}
                     <li>
                         <a href="{{url}}" class="page {{#if active}}active{{/if}}">{{page}}</a>
                     </li>
                     {{/each}}
+                    {{#if pagination.has_next}}
                     <li>
                         <a href="{{pagination.next_url}}" class="page next">Next</a>
                     </li>
+                    {{/if}}
                 </ul>
             </nav>
         </div>

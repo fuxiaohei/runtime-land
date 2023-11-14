@@ -59,6 +59,7 @@ pub struct ProjectVars {
     pub status_label: String,
     pub prod_domain: String,
     pub prod_protocol: String,
+    pub is_inactive: bool,
 }
 
 impl ProjectVars {
@@ -79,6 +80,7 @@ impl ProjectVars {
             status_label: "".to_string(),
             prod_domain: prod_domain.clone(),
             prod_protocol: prod_protocol.clone(),
+            is_inactive: project.status == Status::InActive.to_string(),
         };
         if project.prod_deploy_id > 0 {
             project_vars.production_url =
@@ -91,6 +93,14 @@ impl ProjectVars {
                 format!("{}://{}.{}", prod_protocol, deployment.domain, prod_domain);
             project_vars.deployment_label = format!("{}.{}", deployment.domain, prod_domain);
         }
+
+        // if project is inactive, no production url
+        if project_vars.is_inactive {
+            project_vars.status_label = "inactive".to_string();
+            project_vars.production_url = "".to_string();
+            project_vars.production_label = "".to_string();
+        }
+
         Ok(project_vars)
     }
 
@@ -117,6 +127,7 @@ impl ProjectVars {
                 status_label: "running".to_string(),
                 prod_domain: prod_domain.clone(),
                 prod_protocol: prod_protocol.clone(),
+                is_inactive: project.status == Status::InActive.to_string(),
             };
             if project.prod_deploy_id > 0 {
                 project_vars.production_url =
@@ -128,6 +139,14 @@ impl ProjectVars {
             if *counter == 0 {
                 project_vars.status_label = "empty".to_string();
             }
+
+            // if project is inactive, no production url
+            if project_vars.is_inactive {
+                project_vars.status_label = "inactive".to_string();
+                project_vars.production_url = "".to_string();
+                project_vars.production_label = "".to_string();
+            }
+
             vars.push(project_vars);
         }
         Ok(vars)
@@ -340,6 +359,8 @@ pub struct PaginationVars {
     pub prev_url: String,
     pub next_url: String,
     pub links: Vec<PaginationLinkVars>,
+    pub has_prev: bool,
+    pub has_next: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -372,6 +393,8 @@ impl PaginationVars {
             prev_url,
             next_url,
             links,
+            has_prev: current > 1,
+            has_next: current < all,
         }
     }
 }
@@ -443,6 +466,50 @@ impl DeployAdminVars {
                 }
             }
             vars.push(project_vars);
+        }
+        Ok(vars)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct UserAdminVars {
+    pub id: i32,
+    pub nick_name: String,
+    pub email: String,
+    pub avatar: String,
+    pub role: String,
+    pub status: String,
+    pub oauth: String,
+    pub created_timeago: String,
+    pub projects_count: i32,
+    pub deployments_count: i32,
+}
+
+impl UserAdminVars {
+    pub async fn from_models(
+        users: &Vec<land_dao::User>,
+        project_counters: HashMap<i32, usize>,
+        deploy_counters: HashMap<i32, usize>,
+    ) -> Result<Vec<UserAdminVars>> {
+        let tago = timeago::Formatter::new();
+        let mut vars = vec![];
+        for user in users {
+            let duration = chrono::Utc::now()
+                .signed_duration_since(user.created_at)
+                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
+            let user_vars = UserAdminVars {
+                id: user.id,
+                nick_name: user.nick_name.clone(),
+                email: user.email.clone(),
+                avatar: user.avatar.clone(),
+                role: user.role.clone(),
+                status: user.status.clone(),
+                oauth: user.oauth_social.clone(),
+                created_timeago: tago.convert(duration.to_std().unwrap()),
+                projects_count: *project_counters.get(&user.id).unwrap_or(&0) as i32,
+                deployments_count: *deploy_counters.get(&user.id).unwrap_or(&0) as i32,
+            };
+            vars.push(user_vars);
         }
         Ok(vars)
     }

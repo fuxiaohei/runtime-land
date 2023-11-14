@@ -118,7 +118,7 @@
 }
 
 .project-card .action-button {
-  @apply px-3 py-2 rounded-lg capitalize;
+  @apply px-3 py-2 rounded-lg uppercase text-sm font-semibold;
 }
 
 .project-card .action-button.running {
@@ -126,11 +126,15 @@
 }
 
 .project-card .action-button.empty {
-  @apply text-gray-400;
+  @apply text-gray-500;
 }
 
 .project-card .action-button.develop {
-  @apply text-yellow-800;
+  @apply text-primary;
+}
+
+.project-card .action-button.inactive {
+  @apply text-red-800;
 }
 
 #footer {
@@ -187,6 +191,12 @@
 }
 #project-main .deployment-status.develop {
   @apply bg-slate-50;
+}
+#project-main .deployment-status.inactive {
+  @apply bg-rose-50;
+}
+#project-main .deployment-status.inactive h3 {
+  @apply text-red-700;
 }
 
 #project-main .deployment-status h3,
@@ -358,7 +368,8 @@
   @apply capitalize text-gray-400;
 }
 
-.projects-table td.status {
+.projects-table td.status,
+.projects-table td.role {
   @apply uppercase text-sm font-semibold;
 }
 
@@ -370,12 +381,14 @@
   @apply text-green-700;
 }
 
-.projects-table td.status.pending {
+.projects-table td.status.pending,
+.projects-table td.oauth {
   @apply text-gray-400;
 }
 
 .projects-table td.name,
-.projects-table td.domain {
+.projects-table td.domain,
+.projects-table td.proj-dep {
   @apply font-semibold;
 }
 
@@ -386,7 +399,11 @@
 .projects-table td.ops,
 .projects-table td.updated,
 .projects-table td.owner,
-.projects-table td.project {
+.projects-table td.project,
+.projects-table td.email,
+.projects-table td.role,
+.projects-table td.oauth,
+.projects-table td.proj-dep {
   @apply text-sm;
 }
 

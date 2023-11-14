@@ -261,3 +261,30 @@ pub async fn list_by_ids(project_ids: Vec<i32>) -> Result<HashMap<i32, project::
     }
     Ok(map)
 }
+
+/// list_counter_by_owners lists the counter of projects by owners
+pub async fn list_counter_by_owners(owner_ids: Vec<i32>) -> Result<HashMap<i32, usize>> {
+    if owner_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let db = DB.get().unwrap();
+    let sql = format!(
+        r#"select count(id) as counter, owner_id from project where owner_id in ({}) and status != 'deleted' group by owner_id"#,
+        owner_ids
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join(",")
+    );
+    let values: Vec<JsonValue> =
+        JsonValue::find_by_statement(Statement::from_sql_and_values(DbBackend::MySql, sql, []))
+            .all(db)
+            .await?;
+    let mut map = HashMap::new();
+    for value in values {
+        let counter = value["counter"].as_i64().unwrap() as usize;
+        let owner_id = value["owner_id"].as_i64().unwrap() as i32;
+        map.insert(owner_id, counter);
+    }
+    Ok(map)
+}

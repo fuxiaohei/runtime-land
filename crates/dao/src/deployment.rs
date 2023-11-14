@@ -181,6 +181,7 @@ pub async fn list_counter(owner_id: i32) -> Result<HashMap<i32, usize>> {
     Ok(map)
 }
 
+/// list_counter_by_projects lists the counter of deployments by projects
 pub async fn list_counter_by_projects(project_ids: Vec<i32>) -> Result<HashMap<i32, usize>> {
     if project_ids.is_empty() {
         return Ok(HashMap::new());
@@ -203,6 +204,33 @@ pub async fn list_counter_by_projects(project_ids: Vec<i32>) -> Result<HashMap<i
         let counter = value["counter"].as_i64().unwrap() as usize;
         let project_id = value["project_id"].as_i64().unwrap() as i32;
         map.insert(project_id, counter);
+    }
+    Ok(map)
+}
+
+/// list_counter_by_owners lists the counter of deployments by owners
+pub async fn list_counter_by_owners(owner_ids: Vec<i32>) -> Result<HashMap<i32, usize>> {
+    if owner_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let db = DB.get().unwrap();
+    let sql = format!(
+        r#"select count(id) as counter, owner_id from deployment where owner_id in ({}) and status != 'deleted' group by owner_id"#,
+        owner_ids
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>()
+            .join(",")
+    );
+    let values: Vec<JsonValue> =
+        JsonValue::find_by_statement(Statement::from_sql_and_values(DbBackend::MySql, sql, []))
+            .all(db)
+            .await?;
+    let mut map = HashMap::new();
+    for value in values {
+        let counter = value["counter"].as_i64().unwrap() as usize;
+        let owner_id = value["owner_id"].as_i64().unwrap() as i32;
+        map.insert(owner_id, counter);
     }
     Ok(map)
 }
