@@ -12,6 +12,8 @@ mod s3;
 pub use s3::reload_global as reload_s3_global;
 pub use s3::Config as S3Config;
 
+pub mod dao;
+
 /// GLOBAL is the global storage operator
 pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
     let mut builder = Memory::default();

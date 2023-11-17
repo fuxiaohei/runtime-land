@@ -514,3 +514,67 @@ impl UserAdminVars {
         Ok(vars)
     }
 }
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct RuntimeNodeVars {
+    pub name: String,
+    pub status: String,
+    pub ip: String,
+    pub city: String,
+    pub region: String,
+    pub country: String,
+    pub updated_timeago: String,
+}
+
+impl RuntimeNodeVars {
+    pub fn from_models(nodes: &Vec<land_dao::RuntimeNode>) -> Vec<RuntimeNodeVars> {
+        let tago = timeago::Formatter::new();
+        let mut vars = vec![];
+        for node in nodes {
+            let duration = chrono::Utc::now()
+                .signed_duration_since(node.updated_at)
+                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
+            let node_vars = RuntimeNodeVars {
+                name: node.name.clone(),
+                status: node.status.clone(),
+                ip: node.ip.clone(),
+                city: node.city.clone(),
+                region: node.region.clone(),
+                country: node.country.clone(),
+                updated_timeago: tago.convert(duration.to_std().unwrap()),
+            };
+            vars.push(node_vars);
+        }
+        vars
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct StorageVars {
+    pub storage_type: String,
+    pub fs_path: String,
+    pub s3_endpoint: String,
+    pub s3_bucket: String,
+    pub s3_region: String,
+    pub s3_access_key: String,
+    pub s3_secret_key: String,
+    pub s3_root_path: String,
+    pub s3_bucket_basepath: String,
+}
+
+impl StorageVars {
+    pub async fn load() -> anyhow::Result<StorageVars> {
+        let (storage_type, fs, s3) = land_storage::dao::load().await?;
+        Ok(StorageVars {
+            storage_type,
+            fs_path: fs.path,
+            s3_endpoint: s3.endpoint,
+            s3_bucket: s3.bucket,
+            s3_region: s3.region,
+            s3_access_key: s3.access_key_id,
+            s3_secret_key: s3.secret_access_key,
+            s3_root_path: s3.root_path,
+            s3_bucket_basepath: s3.bucket_basepath,
+        })
+    }
+}

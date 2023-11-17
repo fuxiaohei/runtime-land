@@ -53,17 +53,23 @@ impl From<RuntimeNodeInfo> for runtime_node::Model {
 
 /// get_all_map gets all runtime node info as hashmap
 pub async fn get_all_map() -> Result<HashMap<String, RuntimeNodeInfo>> {
-    let db = DB.get().unwrap();
-    let nodes = runtime_node::Entity::find()
-        .order_by_desc(runtime_node::Column::UpdatedAt)
-        .all(db)
-        .await?;
+    let nodes = list_all().await?;
     let mut result = HashMap::new();
     for node in nodes {
         let info: RuntimeNodeInfo = node.into();
         result.insert(info.region_ip(), info);
     }
     Ok(result)
+}
+
+/// list_all lists all runtime nodes
+pub async fn list_all() -> Result<Vec<runtime_node::Model>> {
+    let db = DB.get().unwrap();
+    let nodes = runtime_node::Entity::find()
+        .order_by_desc(runtime_node::Column::UpdatedAt)
+        .all(db)
+        .await?;
+    Ok(nodes)
 }
 
 /// create creates a runtime node

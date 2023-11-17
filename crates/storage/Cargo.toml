@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 envconfig = { workspace = true }
+land-dao = { workspace = true }
 once_cell = { workspace = true }
 opendal = { workspace = true }
 serde = { workspace = true }

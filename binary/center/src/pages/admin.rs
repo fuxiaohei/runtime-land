@@ -1,5 +1,8 @@
 use super::auth::SessionUser;
-use super::vars::{DeployAdminVars, PageVars, PaginationVars, UserAdminVars, UserVars};
+use super::vars::{
+    DeployAdminVars, PageVars, PaginationVars, RuntimeNodeVars, StorageVars, UserAdminVars,
+    UserVars,
+};
 use super::AppEngine;
 use crate::pages::vars::ProjectAdminVars;
 use axum::extract::Query;
@@ -289,23 +292,54 @@ pub async fn render_users(
 struct AdminEndpointsVars {
     pub page: PageVars,
     pub user: UserVars,
+    pub node_count: u64,
+    pub nodes: Vec<RuntimeNodeVars>,
 }
 
-pub async fn render_endpoints(
+pub async fn render_runtime_nodes(
     engine: AppEngine,
     Extension(current_user): Extension<SessionUser>,
 ) -> impl IntoResponse {
     let page_vars = PageVars::new(
-        "Admin - Endpoints".to_string(),
-        "/admin/endpoints".to_string(),
+        "Runtime Nodes | Admin ".to_string(),
+        "/admin/runtime-nodes".to_string(),
     );
     let user_vars = UserVars::new(&current_user);
+    let nodes = land_dao::runtime_node::list_all().await.unwrap();
+    let node_vars = RuntimeNodeVars::from_models(&nodes);
     RenderHtml(
-        "admin/endpoints.hbs",
+        "admin/runtime_nodes.hbs",
         engine,
         AdminEndpointsVars {
             page: page_vars,
             user: user_vars,
+            node_count: nodes.len() as u64,
+            nodes: node_vars,
+        },
+    )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AdminStorageVars {
+    pub page: PageVars,
+    pub user: UserVars,
+    pub storage: StorageVars,
+}
+
+pub async fn render_storage(
+    engine: AppEngine,
+    Extension(current_user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    let page_vars = PageVars::new("Storage | Admin ".to_string(), "/admin/storage".to_string());
+    let user_vars = UserVars::new(&current_user);
+    let storage_vars = StorageVars::load().await.unwrap();
+    RenderHtml(
+        "admin/storage.hbs",
+        engine,
+        AdminStorageVars {
+            page: page_vars,
+            user: user_vars,
+            storage: storage_vars,
         },
     )
 }

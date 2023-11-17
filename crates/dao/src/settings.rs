@@ -10,6 +10,7 @@ pub enum Key {
     ProductionProtocol,
     StorageType,
     S3Storage,
+    FsStorage,
     LocalStorage,
     EmailSmtp,
 }

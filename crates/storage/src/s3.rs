@@ -6,15 +6,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Envconfig, Serialize, Deserialize, Debug)]
 pub struct Config {
     #[envconfig(from = "S3_ENDPOINT")]
-    endpoint: String,
+    pub endpoint: String,
     #[envconfig(from = "S3_BUCKET")]
-    bucket: String,
+    pub bucket: String,
     #[envconfig(from = "S3_REGION", default = "auto")]
-    region: String,
+    pub region: String,
     #[envconfig(from = "S3_ACCESS_KEY_ID")]
-    access_key_id: String,
+    pub access_key_id: String,
     #[envconfig(from = "S3_SECRET_ACCESS_KEY")]
-    secret_access_key: String,
+    pub secret_access_key: String,
     #[envconfig(from = "S3_ROOT_PATH", default = "/wasm-bin")]
     pub root_path: String,
     #[envconfig(from = "S3_BUCKET_BASEPATH")]

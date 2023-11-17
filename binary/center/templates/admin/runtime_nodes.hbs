@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<head>
+    {{> partials/meta.hbs}}
+</head>
+
+<body>
+    {{> admin/navbar.hbs}}
+    <main id="admin-main">
+        <div id="project-top">
+            <h1>{{node_count}} Endpoints</h1>
+        </div>
+        <div id="projects-table-container">
+            <table id="runtime-nodes-table" class="projects-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each nodes}}
+                    <tr>
+                        <td class="name">{{name}}</td>
+                        <td class="loc">{{ip}} / {{city}} / {{region}} / {{country}}</td>
+                        <td class="status {{status}}">{{status}}</td>
+                        <td class="updated">{{updated_timeago}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

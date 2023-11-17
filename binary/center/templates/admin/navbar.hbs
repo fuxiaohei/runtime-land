@@ -7,11 +7,66 @@
                 <sup class="px-2 text-red-800">admin</sup>
             </a>
             <ul id="top-navbar-ul" class="admin">
-                <li><a href="/admin/projects" class="item">Projects</a></li>
-                <li><a href="/admin/deployments" class="item">Deployments</a></li>
-                <li><a href="/admin/users" class="item">Users</a></li>
-                <li><a href="/admin/storage" class="item">Storage</a></li>
-                <li><a href="/admin/endpoints" class="item">Endpoints</a></li>
+                <li>
+                    <button class="item" data-dropdown-toggle="admin-projects-dropdown-nav">Projects
+                        <svg class="w-2.5 h-2.5 ms-2.5 inline-block" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 4 4 4-4" />
+                        </svg>
+                    </button>
+                    <div id="admin-projects-dropdown-nav" class="hidden ui-dropdown">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+                            <li>
+                                <a href="/admin/projects" class="drop-item">Projects</a>
+                            </li>
+                            <li>
+                                <a href="/admin/deployments" class="drop-item">Deployments</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button class="item" data-dropdown-toggle="admin-user-dropdown-nav">Users
+                        <svg class="w-2.5 h-2.5 ms-2.5 inline-block" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 4 4 4-4" />
+                        </svg>
+                    </button>
+                    <div id="admin-user-dropdown-nav" class="hidden ui-dropdown">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+                            <li>
+                                <a href="/admin/users" class="drop-item">Users</a>
+                            </li>
+                            <li>
+                                <a href="/admin/deploy-tokens" class="drop-item">Deploy Tokens</a>
+                            </li>
+                            <li>
+                                <a href="/admin/endpoint-tokens" class="drop-item">Endpoint Tokens</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button class="item" data-dropdown-toggle="admin-res-dropdown-nav">Resources
+                        <svg class="w-2.5 h-2.5 ms-2.5 inline-block" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 4 4 4-4" />
+                        </svg>
+                    </button>
+                    <div id="admin-res-dropdown-nav" class="hidden ui-dropdown">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+                            <li>
+                                <a href="/admin/storage" class="drop-item">Storage</a>
+                            </li>
+                            <li>
+                                <a href="/admin/runtime-nodes" class="drop-item">Endpoints</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
                 <li>
                     <a href="/projects" class="item">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

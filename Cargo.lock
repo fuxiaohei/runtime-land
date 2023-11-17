@@ -2523,6 +2523,7 @@ version = "0.1.8-beta.3"
 dependencies = [
  "anyhow",
  "envconfig",
+ "land-dao",
  "once_cell",
  "opendal",
  "serde",

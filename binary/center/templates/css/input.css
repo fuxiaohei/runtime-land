@@ -24,8 +24,12 @@
 #top-nav-user-avatar {
   @apply w-8 h-8 rounded-full;
 }
-#top-nav-user-dropdown {
+#top-nav-user-dropdown,
+.ui-dropdown {
   @apply z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-md border dark:bg-gray-700 dark:divide-gray-600;
+}
+.ui-dropdown {
+  @apply w-40;
 }
 #top-navbar {
   @apply items-center justify-between w-full md:flex md:w-auto md:order-1;
@@ -48,7 +52,8 @@
 #top-nav-user-dropdown .email {
   @apply block text-sm  text-gray-500 truncate dark:text-gray-400;
 }
-#top-nav-user-dropdown .item {
+#top-nav-user-dropdown .item,
+.ui-dropdown .drop-item {
   @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white;
 }
 #main {
@@ -347,7 +352,8 @@
   @apply px-3 py-2 rounded-lg text-white bg-green-600 hover:bg-green-800 duration-200;
 }
 
-#projects-table-container {
+#projects-table-container,
+.settings-main-container {
   @apply border-t border-gray-200 mt-6 pt-6;
 }
 
@@ -373,11 +379,13 @@
   @apply uppercase text-sm font-semibold;
 }
 
-.projects-table td.status.inactive {
+.projects-table td.status.inactive,
+.projects-table td.status.offline {
   @apply text-red-800;
 }
 
-.projects-table td.status.active {
+.projects-table td.status.active,
+.projects-table td.status.online {
   @apply text-green-700;
 }
 
@@ -403,11 +411,13 @@
 .projects-table td.email,
 .projects-table td.role,
 .projects-table td.oauth,
-.projects-table td.proj-dep {
+.projects-table td.proj-dep,
+.projects-table td.loc {
   @apply text-sm;
 }
 
-.projects-table td.project {
+.projects-table td.project,
+.projects-table td.loc {
   @apply text-gray-500;
 }
 
@@ -453,4 +463,37 @@
 
 .projects-pager li a.next {
   @apply rounded-r-lg;
+}
+
+.ui-form select,
+.ui-form .input {
+  @apply bg-gray-50 border border-gray-300 rounded-md focus:ring-primary focus:border-primary block w-full p-2.5;
+}
+
+.ui-form label {
+  @apply block mb-4 font-medium;
+}
+
+.ui-form .helper-text {
+  @apply mt-2 text-sm text-gray-500;
+}
+
+.ui-form .btn {
+  @apply px-3 py-2 rounded-lg text-white bg-primary hover:bg-sky-700 duration-200;
+}
+
+.ui-tab-ul {
+  @apply flex flex-wrap -mb-px text-sm font-medium text-center;
+}
+
+.ui-tab-button {
+  @apply inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-900 hover:border-gray-900;
+}
+
+.ui-tab-panel {
+  @apply py-4;
+}
+
+#storage-form-button {
+  @apply w-32;
 }

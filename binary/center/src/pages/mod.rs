@@ -9,7 +9,7 @@ use axum::{
 };
 use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
-use handlebars::Handlebars;
+use handlebars::{handlebars_helper, Handlebars};
 use hyper::StatusCode;
 use mime_guess::mime;
 use tower_http::services::ServeDir;
@@ -56,7 +56,8 @@ pub fn router() -> Router {
             get(admin::render_deployments).post(admin::handle_deploy),
         )
         .route("/admin/users", get(admin::render_users))
-        .route("/admin/endpoints", get(admin::render_endpoints))
+        .route("/admin/runtime-nodes", get(admin::render_runtime_nodes))
+        .route("/admin/storage", get(admin::render_storage))
         .route("/*path", any(render_notfound));
     if cfg!(debug_assertions) {
         router = router.route("/static/*path", get(render_static));
@@ -95,8 +96,12 @@ async fn render_static(Path(path): Path<String>) -> Response<Body> {
         .unwrap()
 }
 
+// add handlebars_helper to handle if value is equal args, return "selected" for Option element
+handlebars_helper!(selected: |x: str, y: str| if x == y { "selected" } else { "" });
+
 fn init_templates() -> Result<Handlebars<'static>> {
     let mut hbs = Handlebars::new();
+    hbs.register_helper("selected", Box::new(selected));
     load_template_from_assets(&mut hbs);
     Ok(hbs)
 }

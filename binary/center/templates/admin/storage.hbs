@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+
+<head>
+    {{> partials/meta.hbs}}
+</head>
+
+<body>
+    {{> admin/navbar.hbs}}
+    <main id="admin-main">
+        <div id="project-top">
+            <h1>Storage</h1>
+        </div>
+        <div class="settings-main-container">
+            <form class="ui-form" action="/admin/storage" method="post" id="settings-storage-form">
+                <div class="mb-6">
+                    <label for="storage-type">Storage Type</label>
+                    <select name="storage_type" id="storage-type">
+                        <option value="fs" {{selected "fs" storage.storage_type}}>File System</option>
+                        <option value="s3" {{selected "s3" storage.storage_type}}>AWS S3 Like</option>
+                    </select>
+                </div>
+                <div class="mb-6 border-b border-gray-200">
+                    <ul class="ui-tab-ul" id="storage-form-tab" data-tabs-toggle="#storage-form-tab-content"
+                        role="tablist">
+                        <li class="me-2" role="presentation">
+                            <button class="ui-tab-button" id="storage-fs-btn" data-tabs-target="#storage-fs-tab"
+                                type="button" role="tab" aria-controls="storage-fs-tab" aria-selected="false">File
+                                System</button>
+                        </li>
+                        <li class="me-2" role="presentation">
+                            <button class="ui-tab-button" id="storage-s3-btn" data-tabs-target="#storage-s3-tab"
+                                type="button" role="tab" aria-controls="storage-fs-tab" aria-selected="false">AWS S3
+                                Like</button>
+                        </li>
+                    </ul>
+                </div>
+                <div id="storage-form-tab-content">
+                    <div class="hidden ui-tab-panel" id="storage-fs-tab" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="mb-6">
+                            <label for="fs-path">File Path</label>
+                            <input type="text" class="input" name="fs_path" id="fs-path" value="{{storage.fs_path}}">
+                            <p class="helper-text">Absolute path to the storage directory. This should be writable by
+                                your web server.</p>
+                        </div>
+                    </div>
+                    <div class="hidden ui-tab-panel" id="storage-s3-tab" role="tabpanel"
+                        aria-labelledby="dashboard-tab">
+                        <div class="mb-6">
+                            <label for="s3-endpoint">Endpoint</label>
+                            <input type="text" class="input" name="s3_endpoint" id="s3-endpoint"
+                                value="{{storage.s3_endpoint}}">
+                            <p class="helper-text">The endpoint of the S3 compatible storage.</p>
+                        </div>
+                        <div class="mb-6 space-x-4 flex justify-between">
+                            <div class="w-1/2">
+                                <label for="s3-bucket">Bucket</label>
+                                <input type="text" class="input" name="s3_bucket" id="s3-bucket"
+                                    value="{{storage.s3_bucket}}">
+                                <p class="helper-text">The bucket of the S3 compatible storage.</p>
+                            </div>
+                            <div class="w-1/2">
+                                <label for="s3-region">Region</label>
+                                <input type="text" class="input" name="s3_region" id="s3-region"
+                                    value="{{storage.s3_region}}">
+                                <p class="helper-text">The region of the S3 compatible storage.</p>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="s3-access-key">Access Key</label>
+                            <input type="text" class="input" name="s3_access_key" id="s3-access-key"
+                                value="{{storage.s3_access_key}}">
+                            <p class="helper-text">The access key of the S3 compatible storage.</p>
+                        </div>
+                        <div class="mb-6">
+                            <label for="s3-secret-key">Secret Key</label>
+                            <input type="text" class="input" name="s3_secret_key" id="s3-secret-key"
+                                value="{{storage.s3_secret_key}}">
+                            <p class="helper-text">The secret key of the S3 compatible storage.</p>
+                        </div>
+                        <div class="mb-6 space-x-4 flex justify-between">
+                            <div>
+                                <label for="s3-root-path">Root Path</label>
+                                <input type="text" class="input" name="s3_root_path" id="s3-root-path"
+                                    value="{{storage.s3_root_path}}">
+                                <p class="helper-text">The root path to save file in bucket of the S3 compatible
+                                    storage.</p>
+                            </div>
+                            <div>
+                                <label for="bucket-basepath">Bucket Basepath</label>
+                                <input type="text" class="input" name="s3_bucket_basepath" id="bucket-basepath"
+                                    value="{{storage.s3_bucket_basepath}}">
+                                <p class="helper-text">The url basepath to visit the bucket of the S3 compatible
+                                    storage.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" id="storage-form-button" class="btn">Save</button>
+            </form>
+        </div>
+
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>
