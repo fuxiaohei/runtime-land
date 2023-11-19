@@ -320,7 +320,7 @@ pub async fn render_runtime_nodes(
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct AdminStorageVars {
+pub struct AdminStorageVars {
     pub page: PageVars,
     pub user: UserVars,
     pub storage: StorageVars,
@@ -328,18 +328,51 @@ struct AdminStorageVars {
 
 pub async fn render_storage(
     engine: AppEngine,
+    csrf_token: CsrfToken,
     Extension(current_user): Extension<SessionUser>,
 ) -> impl IntoResponse {
+    let csrf_token_value = csrf_token.authenticity_token().unwrap();
     let page_vars = PageVars::new("Storage | Admin ".to_string(), "/admin/storage".to_string());
     let user_vars = UserVars::new(&current_user);
-    let storage_vars = StorageVars::load().await.unwrap();
-    RenderHtml(
-        "admin/storage.hbs",
-        engine,
-        AdminStorageVars {
-            page: page_vars,
-            user: user_vars,
-            storage: storage_vars,
-        },
+    let mut storage_vars = StorageVars::load().await.unwrap();
+    storage_vars.csrf_token = csrf_token_value.clone();
+    (
+        csrf_token,
+        RenderHtml(
+            "admin/storage.hbs",
+            engine,
+            AdminStorageVars {
+                page: page_vars,
+                user: user_vars,
+                storage: storage_vars,
+            },
+        ),
     )
+        .into_response()
+}
+
+pub async fn handle_storage(
+    csrf_token: CsrfToken,
+    Form(payload): Form<StorageVars>,
+) -> Result<Redirect, StatusCode> {
+    let span = tracing::info_span!("handle_storage");
+    let _enter = span.enter();
+
+    if csrf_token.verify(&payload.csrf_token).is_err() {
+        warn!("csrf token verify failed");
+        return Err(StatusCode::BAD_REQUEST);
+    }
+
+    let (storage_type, fs, s3) = payload.to_model();
+
+    // save configs
+    fs.save_db().await.unwrap();
+    s3.save_db().await.unwrap();
+    // save storage type
+    land_storage::dao::save_storage_type(storage_type.clone())
+        .await
+        .unwrap();
+
+    info!("update success, storage_type:{}", storage_type);
+    Ok(Redirect::to("/admin/storage"))
 }

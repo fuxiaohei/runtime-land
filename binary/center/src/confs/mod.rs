@@ -1,6 +1,5 @@
-use crate::settings::load_storage_settings;
 use anyhow::Result;
-use land_core::confdata::{EndpointConf, RouteConfItem};
+use land_core::confdata::{self, EndpointConf, RouteConfItem};
 use land_dao::project;
 use lazy_static::lazy_static;
 use md5::{Digest, Md5};
@@ -83,7 +82,7 @@ async fn generate() -> Result<EndpointConf> {
     let deployments_len = deployments.len();
 
     // get storage settings
-    let (typename, _, s3_config) = load_storage_settings().await?;
+    let (typename, _, s3_config) = land_storage::dao::load().await?;
 
     // provide build download url function
     let build_download_url = |path: &str| -> String {
@@ -101,8 +100,7 @@ async fn generate() -> Result<EndpointConf> {
     };
 
     // generate confs
-    let d = crate::settings::DOMAIN.lock().await;
-    let prod_domain = d.domain.clone();
+    let (prod_domain, _) = confdata::get_domain().await;
 
     // generate route confs
     let mut conf_items = Vec::new();

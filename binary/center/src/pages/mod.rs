@@ -57,7 +57,10 @@ pub fn router() -> Router {
         )
         .route("/admin/users", get(admin::render_users))
         .route("/admin/runtime-nodes", get(admin::render_runtime_nodes))
-        .route("/admin/storage", get(admin::render_storage))
+        .route(
+            "/admin/storage",
+            get(admin::render_storage).post(admin::handle_storage),
+        )
         .route("/*path", any(render_notfound));
     if cfg!(debug_assertions) {
         router = router.route("/static/*path", get(render_static));

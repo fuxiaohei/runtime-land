@@ -1,13 +1,13 @@
 use anyhow::Result;
-use envconfig::Envconfig;
+use land_dao::settings;
 use opendal::services::Fs;
 use opendal::Operator;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::info;
 
-#[derive(Envconfig, Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    #[envconfig(from = "FS_PATH", default = "/tmp/runtime-land-data")]
     pub path: String,
 }
 
@@ -19,9 +19,14 @@ impl Default for Config {
     }
 }
 
-pub async fn build_from_env() -> Result<Operator> {
-    let cfg = Config::init_from_env()?;
-    build(&cfg).await
+impl Config {
+    pub async fn save_db(&self) -> Result<()> {
+        let key = settings::Key::FsStorage.to_string();
+        let content = serde_json::to_string(self)?;
+        let values: HashMap<String, String> = vec![(key.clone(), content)].into_iter().collect();
+        settings::update_maps(values).await?;
+        Ok(())
+    }
 }
 
 /// create creates the local storage

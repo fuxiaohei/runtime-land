@@ -1,7 +1,9 @@
 use anyhow::Result;
 use envconfig::Envconfig;
+use land_dao::settings;
 use opendal::{services::S3, Operator};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Envconfig, Serialize, Deserialize, Debug)]
 pub struct Config {
@@ -59,14 +61,16 @@ impl Config {
         }
         Ok(())
     }
+    pub async fn save_db(&self) -> Result<()> {
+        let s3_key = settings::Key::S3Storage.to_string();
+        let content = serde_json::to_string(self)?;
+        let values: HashMap<String, String> = vec![(s3_key.clone(), content)].into_iter().collect();
+        settings::update_maps(values).await?;
+        Ok(())
+    }
 }
 
-pub async fn init() -> Result<Operator> {
-    let cfg = Config::new()?;
-    create(&cfg).await
-}
-
-pub async fn create(cfg: &Config) -> Result<Operator> {
+async fn create(cfg: &Config) -> Result<Operator> {
     cfg.validate()?;
     let mut builder = S3::default();
     builder.root(&cfg.root_path);

@@ -1,5 +1,5 @@
-use crate::settings;
 use anyhow::Result;
+use land_core::confdata;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use validator::Validate;
@@ -18,7 +18,7 @@ impl ProjectOverview {
         counters: HashMap<i32, usize>,
         user_id: i32,
     ) -> Result<Vec<ProjectOverview>> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let mut project_overviews = Vec::new();
         for project in projects {
             let counter = counters.get(&project.id).unwrap_or(&0);
@@ -53,7 +53,7 @@ impl ProjectOverview {
     }
 
     pub async fn from_model(project: &land_dao::Project) -> Result<ProjectOverview> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let project_response = ProjectResponse::from_model(project, &prod_domain);
         let mut overview = ProjectOverview {
             deployments_count: 0,

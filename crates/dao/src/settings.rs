@@ -114,3 +114,34 @@ pub async fn update_email_setting(email: &EmailStmp) -> Result<()> {
     let values: HashMap<String, String> = vec![(key.clone(), value)].into_iter().collect();
     update_maps(values).await
 }
+
+/// get_domain_protocol gets production domain and protocol
+pub async fn get_domain_protocol() -> Result<(String, String)> {
+    let keys = vec![
+        Key::ProductionDomain.to_string(),
+        Key::ProductionProtocol.to_string(),
+    ];
+    let settings_map = list_maps(keys).await?;
+
+    let default_domain_value = "runtime.127-0-0-1.nip.io".to_string();
+    let domain_value = settings_map
+        .get(&Key::ProductionDomain.to_string())
+        .unwrap_or(&default_domain_value);
+
+    let default_protocol_value = "http".to_string();
+    let protocol_value = settings_map
+        .get(&Key::ProductionProtocol.to_string())
+        .unwrap_or(&default_protocol_value);
+    Ok((domain_value.clone(), protocol_value.clone()))
+}
+
+/// save_domain_protocol saves production domain and protocol
+pub async fn save_domain_protocol(domain: String, protocol: String) -> Result<()> {
+    let map_values: HashMap<String, String> = vec![
+        (Key::ProductionDomain.to_string(), domain.clone()),
+        (Key::ProductionProtocol.to_string(), protocol.clone()),
+    ]
+    .into_iter()
+    .collect();
+    update_maps(map_values).await
+}

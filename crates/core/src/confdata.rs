@@ -1,6 +1,8 @@
 use md5::{Digest, Md5};
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use tokio::sync::Mutex;
 
 /// RouteConfItem is config item for one project deployment route
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -146,6 +148,26 @@ pub struct RuntimeRecvData {
 pub struct DomainSetting {
     pub domain: String,
     pub protocol: String,
+}
+
+static DOMAIN_SETTING: Lazy<Mutex<DomainSetting>> = Lazy::new(|| {
+    Mutex::new(DomainSetting {
+        domain: "".to_string(),
+        protocol: "".to_string(),
+    })
+});
+
+/// set_domain sets the domain to access the function
+pub async fn set_domain(domain: String, protocol: String) {
+    let mut d = DOMAIN_SETTING.lock().await;
+    d.domain = domain;
+    d.protocol = protocol;
+}
+
+/// get_domain gets the domain to access the function
+pub async fn get_domain() -> (String, String) {
+    let d = DOMAIN_SETTING.lock().await;
+    (d.domain.clone(), d.protocol.clone())
 }
 
 #[cfg(test)]

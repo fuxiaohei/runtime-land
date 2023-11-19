@@ -1,8 +1,9 @@
 use super::auth::SessionUser;
-use crate::settings;
 use anyhow::Result;
 use chrono::Duration;
+use land_core::confdata;
 use land_dao::deployment::{self, Status};
+use land_storage::{FsConfig, S3Config};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Add;
@@ -64,7 +65,7 @@ pub struct ProjectVars {
 
 impl ProjectVars {
     pub async fn from_model(project: &land_dao::Project) -> Result<ProjectVars> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let tago = timeago::Formatter::new();
         let duration = chrono::Utc::now().signed_duration_since(project.updated_at);
         let mut project_vars = ProjectVars {
@@ -108,7 +109,7 @@ impl ProjectVars {
         projects: &Vec<land_dao::Project>,
         counters: HashMap<i32, usize>,
     ) -> Result<Vec<ProjectVars>> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let tago = timeago::Formatter::new();
         let mut vars = vec![];
         for project in projects {
@@ -171,7 +172,7 @@ impl DeploymentVars {
     pub async fn from_models(
         deployments: &Vec<land_dao::Deployment>,
     ) -> Result<Vec<DeploymentVars>> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let tago = timeago::Formatter::new();
         let mut vars = vec![];
         for deployment in deployments {
@@ -305,7 +306,7 @@ impl ProjectAdminVars {
         counters: HashMap<i32, usize>,
         users: HashMap<i32, land_dao::User>,
     ) -> Result<Vec<ProjectAdminVars>> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let tago = timeago::Formatter::new();
         let mut vars = vec![];
         for project in projects {
@@ -422,7 +423,7 @@ impl DeployAdminVars {
         projects: HashMap<i32, land_dao::Project>,
         users: HashMap<i32, land_dao::User>,
     ) -> Result<Vec<DeployAdminVars>> {
-        let (prod_domain, prod_protocol) = settings::get_domains().await;
+        let (prod_domain, prod_protocol) = confdata::get_domain().await;
         let tago = timeago::Formatter::new();
         let mut vars = vec![];
         for deploy in deploys {
@@ -560,6 +561,7 @@ pub struct StorageVars {
     pub s3_secret_key: String,
     pub s3_root_path: String,
     pub s3_bucket_basepath: String,
+    pub csrf_token: String, // use for form submit
 }
 
 impl StorageVars {
@@ -575,6 +577,22 @@ impl StorageVars {
             s3_secret_key: s3.secret_access_key,
             s3_root_path: s3.root_path,
             s3_bucket_basepath: s3.bucket_basepath,
+            csrf_token: "".to_string(),
         })
+    }
+    pub fn to_model(&self) -> (String, FsConfig, S3Config) {
+        let fs = FsConfig {
+            path: self.fs_path.clone(),
+        };
+        let s3 = S3Config {
+            endpoint: self.s3_endpoint.clone(),
+            bucket: self.s3_bucket.clone(),
+            region: self.s3_region.clone(),
+            access_key_id: self.s3_access_key.clone(),
+            secret_access_key: self.s3_secret_key.clone(),
+            root_path: self.s3_root_path.clone(),
+            bucket_basepath: self.s3_bucket_basepath.clone(),
+        };
+        (self.storage_type.clone(), fs, s3)
     }
 }

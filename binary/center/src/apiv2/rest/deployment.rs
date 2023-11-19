@@ -1,9 +1,10 @@
 use super::params::{CreateDeployRequest, DeploymentResponse, UpdateDeployRequest};
 use super::SessionUser;
-use crate::{apiv2::RouteError, settings};
+use crate::apiv2::RouteError;
 use anyhow::Result;
 use axum::{Extension, Json};
 use hyper::StatusCode;
+use land_core::confdata;
 use land_dao::{deployment, project, Deployment, Project};
 use tracing::{debug_span, info, warn, Instrument};
 use validator::Validate;
@@ -103,7 +104,7 @@ pub async fn create_handler(
         payload.deploy_content_type,
     )
     .await?;
-    let (prod_domain, prod_protocol) = settings::get_domains().await;
+    let (prod_domain, prod_protocol) = confdata::get_domain().await;
 
     Ok((
         StatusCode::OK,
@@ -127,7 +128,7 @@ pub async fn update_handler(
                 "publish success, deployment_name:{}, deployment_uuid:{}",
                 deployment.domain, deployment.uuid,
             );
-            let (prod_domain, prod_protocol) = settings::get_domains().await;
+            let (prod_domain, prod_protocol) = confdata::get_domain().await;
             Ok((
                 StatusCode::OK,
                 Json(DeploymentResponse::from_model(
@@ -143,7 +144,7 @@ pub async fn update_handler(
                 "enable success, deployment_name:{}, deployment_uuid:{}",
                 deployment.domain, deployment.uuid,
             );
-            let (prod_domain, prod_protocol) = settings::get_domains().await;
+            let (prod_domain, prod_protocol) = confdata::get_domain().await;
             Ok((
                 StatusCode::OK,
                 Json(DeploymentResponse::from_model(
@@ -159,7 +160,7 @@ pub async fn update_handler(
                 "disable success, deployment_name:{}, deployment_uuid:{}",
                 deployment.domain, deployment.uuid,
             );
-            let (prod_domain, prod_protocol) = settings::get_domains().await;
+            let (prod_domain, prod_protocol) = confdata::get_domain().await;
             Ok((
                 StatusCode::OK,
                 Json(DeploymentResponse::from_model(

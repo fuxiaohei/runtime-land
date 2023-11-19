@@ -1,8 +1,9 @@
 use super::params::{CreateProjectRequest, ProjectOverview, ProjectRenameRequest, ProjectResponse};
 use super::SessionUser;
-use crate::{apiv2::RouteError, settings};
+use crate::apiv2::RouteError;
 use axum::{extract::Path, Extension, Json};
 use hyper::StatusCode;
+use land_core::confdata;
 use land_dao::{deployment, project};
 use tracing::info;
 use validator::Validate;
@@ -59,7 +60,7 @@ pub async fn create_handler(
         );
     }
 
-    let (prod_domain, _) = settings::get_domains().await;
+    let (prod_domain, _) = confdata::get_domain().await;
     let project_response = ProjectResponse::from_model(&project, &prod_domain);
     Ok((StatusCode::OK, Json(project_response)))
 }

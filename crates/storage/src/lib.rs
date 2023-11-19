@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use once_cell::sync::Lazy;
 use opendal::services::Memory;
 use opendal::Operator;
@@ -21,30 +21,6 @@ pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
     let op = Operator::new(builder).unwrap().finish();
     Mutex::new(op)
 });
-
-/// init_from_type init storage from type
-#[tracing::instrument(name = "[STORAGE]")]
-pub async fn init_from_type(typename: &str) -> Result<()> {
-    let op = build_operator(typename).await?;
-    let mut global = crate::GLOBAL.lock().await;
-    *global = op;
-    Ok(())
-}
-
-/// build_operator returns the storage operator
-pub async fn build_operator(type_name: &str) -> Result<Operator> {
-    match type_name {
-        "fs" => {
-            let op = fs::build_from_env().await?;
-            Ok(op)
-        }
-        "s3" => {
-            let op = s3::init().await?;
-            Ok(op)
-        }
-        _ => Err(anyhow!("unknown storage type: {}", type_name)),
-    }
-}
 
 /// write_global writes the content to the global storage
 pub async fn write(name: &str, content: Vec<u8>) -> Result<()> {
