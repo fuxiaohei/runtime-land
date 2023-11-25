@@ -3,7 +3,9 @@ use anyhow::{Ok, Result};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 use sea_orm::prelude::Expr;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Set,
+};
 use std::ops::Add;
 
 #[derive(strum::Display)]
@@ -183,4 +185,22 @@ pub async fn remove_by_value(token_value: &str) -> Result<()> {
     token_active_model.status = Set(Status::Deleted.to_string());
     token_active_model.update(db).await?;
     Ok(())
+}
+
+/// list_with_page lists tokens with page
+pub async fn list_with_page(
+    created_by: CreatedByCases,
+    page: u64,
+    page_size: u64,
+) -> Result<(Vec<user_token::Model>, u64, u64)> {
+    let db = DB.get().unwrap();
+    let pager = user_token::Entity::find()
+        .filter(user_token::Column::CreatedBy.eq(created_by.to_string()))
+        .filter(user_token::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(user_token::Column::UpdatedAt)
+        .paginate(db, page_size);
+    let tokens = pager.fetch_page(page - 1).await?;
+    let total_pages = pager.num_pages().await?;
+    let total_items = pager.num_items().await?;
+    Ok((tokens, total_pages, total_items))
 }

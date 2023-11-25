@@ -1,6 +1,6 @@
 use super::auth::SessionUser;
 use anyhow::Result;
-use chrono::Duration;
+use chrono::{DateTime, Duration, Utc};
 use land_core::confdata;
 use land_dao::deployment::{self, Status};
 use land_storage::{FsConfig, S3Config};
@@ -206,6 +206,17 @@ pub struct TokenVars {
     pub value: String,
 }
 
+pub fn format_time(t: DateTime<Utc>) -> String {
+    // if t > now, format future
+    let duration = t.signed_duration_since(chrono::Utc::now());
+    if duration.num_seconds() > 0 {
+        return format_future(duration);
+    }
+    let duration = chrono::Utc::now().signed_duration_since(t);
+    let tago = timeago::Formatter::new();
+    tago.convert(duration.to_std().unwrap())
+}
+
 fn format_future(duration: Duration) -> String {
     let days = duration.num_days();
     if days > 30 {
@@ -283,77 +294,6 @@ impl TokenVars {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ProjectAdminVars {
-    pub name: String,
-    pub language: String,
-    pub uuid: String,
-    pub deployments: usize,
-    pub is_prod: bool,
-    pub production_url: String,
-    pub production_label: String,
-    pub updated_timeago: String,
-    pub status_label: String,
-    pub status: String,
-    pub owner_name: String,
-    pub owner_email: String,
-    pub owner_id: i32,
-    pub is_active: bool,
-}
-
-impl ProjectAdminVars {
-    pub async fn from_models(
-        projects: &Vec<land_dao::Project>,
-        counters: HashMap<i32, usize>,
-        users: HashMap<i32, land_dao::User>,
-    ) -> Result<Vec<ProjectAdminVars>> {
-        let (prod_domain, prod_protocol) = confdata::get_domain().await;
-        let tago = timeago::Formatter::new();
-        let mut vars = vec![];
-        for project in projects {
-            let user = users.get(&project.owner_id);
-            if user.is_none() {
-                continue;
-            }
-            let user = user.unwrap();
-
-            let counter = counters.get(&project.id).unwrap_or(&0);
-            let duration = chrono::Utc::now()
-                .signed_duration_since(project.updated_at)
-                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
-
-            let mut project_vars = ProjectAdminVars {
-                name: project.name.clone(),
-                language: project.language.clone(),
-                uuid: project.uuid.clone(),
-                deployments: *counter,
-                production_url: "".to_string(),
-                production_label: "".to_string(),
-                updated_timeago: tago.convert(duration.to_std().unwrap()),
-                status_label: "running".to_string(),
-                status: project.status.clone(),
-                owner_name: user.nick_name.clone(),
-                owner_email: user.email.clone(),
-                owner_id: user.id,
-                is_prod: project.prod_deploy_id > 0,
-                is_active: project.status != Status::InActive.to_string(),
-            };
-            if project.prod_deploy_id > 0 {
-                project_vars.production_url =
-                    format!("{}://{}.{}", prod_protocol, project.name, prod_domain);
-                project_vars.production_label = format!("{}.{}", project.name, prod_domain)
-            } else {
-                project_vars.status_label = "develop".to_string();
-            }
-            if *counter == 0 {
-                project_vars.status_label = "empty".to_string();
-            }
-            vars.push(project_vars);
-        }
-        Ok(vars)
-    }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PaginationVars {
     pub current: u64,
     pub all: u64,
@@ -397,78 +337,6 @@ impl PaginationVars {
             has_prev: current > 1,
             has_next: current < all,
         }
-    }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct DeployAdminVars {
-    pub domain: String,
-    pub uuid: String,
-    pub language: String,
-    pub project_name: String,
-    pub is_prod: bool,
-    pub visit_url: String,
-    pub visit_label: String,
-    pub updated_timeago: String,
-    pub status: String,
-    pub owner_name: String,
-    pub owner_email: String,
-    pub owner_id: i32,
-    pub is_active: bool,
-}
-
-impl DeployAdminVars {
-    pub async fn from_models(
-        deploys: &Vec<land_dao::Deployment>,
-        projects: HashMap<i32, land_dao::Project>,
-        users: HashMap<i32, land_dao::User>,
-    ) -> Result<Vec<DeployAdminVars>> {
-        let (prod_domain, prod_protocol) = confdata::get_domain().await;
-        let tago = timeago::Formatter::new();
-        let mut vars = vec![];
-        for deploy in deploys {
-            let project = projects.get(&deploy.project_id);
-            if project.is_none() {
-                continue;
-            }
-            let project = project.unwrap();
-            let user = users.get(&project.owner_id);
-            if user.is_none() {
-                continue;
-            }
-            let user = user.unwrap();
-
-            let duration = chrono::Utc::now()
-                .signed_duration_since(deploy.updated_at)
-                .add(Duration::seconds(2)); // if duation is zero after updated right now, tago.convert fails
-            let mut project_vars = DeployAdminVars {
-                domain: deploy.domain.clone(),
-                uuid: deploy.uuid.clone(),
-                language: project.language.clone(),
-                project_name: project.name.clone(),
-                visit_url: String::new(),
-                visit_label: String::new(),
-                updated_timeago: tago.convert(duration.to_std().unwrap()),
-                status: deploy.status.clone(),
-                owner_name: user.nick_name.clone(),
-                owner_email: user.email.clone(),
-                owner_id: user.id,
-                is_prod: project.prod_deploy_id == deploy.id,
-                is_active: deploy.status == Status::Active.to_string(),
-            };
-            if project_vars.is_active {
-                project_vars.visit_url =
-                    format!("{}://{}.{}", prod_protocol, deploy.domain, prod_domain);
-                project_vars.visit_label = format!("{}.{}", deploy.domain, prod_domain);
-                if project_vars.is_prod {
-                    project_vars.visit_url =
-                        format!("{}://{}.{}", prod_protocol, project.name, prod_domain);
-                    project_vars.visit_label = format!("{}.{}", project.name, prod_domain);
-                }
-            }
-            vars.push(project_vars);
-        }
-        Ok(vars)
     }
 }
 
@@ -594,5 +462,23 @@ impl StorageVars {
             bucket_basepath: self.s3_bucket_basepath.clone(),
         };
         (self.storage_type.clone(), fs, s3)
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DomainVars {
+    pub domain: String,
+    pub protocol: String,
+    pub csrf_token: String,
+}
+
+impl DomainVars {
+    pub async fn load() -> DomainVars {
+        let (domain, protocol) = land_core::confdata::get_domain().await;
+        DomainVars {
+            domain,
+            protocol,
+            csrf_token: String::new(),
+        }
     }
 }

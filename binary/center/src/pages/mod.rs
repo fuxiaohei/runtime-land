@@ -17,6 +17,10 @@ use tracing::debug;
 
 mod account;
 mod admin;
+mod admin_deploy_tokens;
+mod admin_deployments;
+mod admin_projects;
+mod admin_settings;
 mod auth;
 mod projects;
 mod vars;
@@ -49,18 +53,26 @@ pub fn router() -> Router {
         )
         .route(
             "/admin/projects",
-            get(admin::render_projects).post(admin::handle_project),
+            get(admin_projects::render).post(admin_projects::handle),
         )
         .route(
             "/admin/deployments",
-            get(admin::render_deployments).post(admin::handle_deploy),
+            get(admin_deployments::render).post(admin_deployments::handle),
         )
         .route("/admin/users", get(admin::render_users))
-        .route("/admin/runtime-nodes", get(admin::render_runtime_nodes))
+        .route(
+            "/admin/runtime-nodes",
+            get(admin_settings::render_runtime_nodes),
+        )
         .route(
             "/admin/storage",
-            get(admin::render_storage).post(admin::handle_storage),
+            get(admin_settings::render_storage).post(admin_settings::handle_storage),
         )
+        .route(
+            "/admin/domains",
+            get(admin_settings::render_domains).post(admin_settings::handle_domains),
+        )
+        .route("/admin/deploy-tokens", get(admin_deploy_tokens::render))
         .route("/*path", any(render_notfound));
     if cfg!(debug_assertions) {
         router = router.route("/static/*path", get(render_static));

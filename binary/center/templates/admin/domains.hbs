@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+
+<head>
+    {{> partials/meta.hbs}}
+</head>
+
+<body>
+    {{> admin/navbar.hbs}}
+    <main id="admin-main">
+        <div id="project-top">
+            <h1>Domains</h1>
+        </div>
+        <div class="settings-main-container">
+            <form class="ui-form" action="/admin/domains" method="post" id="settings-domains-form">
+                <div class="mb-6">
+                    <label for="domain">Domain</label>
+                    <input type="text" class="input" name="domain" id="domain" value="{{domains.domain}}">
+                    <p class="helper-text">The domain suffix to be used for all projects.</p>
+                </div>
+                <div class="mb-6">
+                    <label for="protocol">Protocol</label>
+                    <select name="protocol" id="protocol">
+                        <option value="https" {{selected "https" domains.protocol}}>HTTPS</option>
+                        <option value="http" {{selected "http" domains.protocol}}>HTTP</option>
+                    </select>
+                </div>
+                <input type="hidden" value="{{domains.csrf_token}}" name="csrf_token" />
+                <button type="submit" id="domain-form-button" class="btn">Save</button>
+            </form>
+        </div>
+
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

@@ -494,6 +494,7 @@
   @apply py-4;
 }
 
-#storage-form-button {
+#storage-form-button,
+#domain-form-button {
   @apply w-32;
 }
