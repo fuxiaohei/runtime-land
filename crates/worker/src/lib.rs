@@ -1,11 +1,12 @@
 use anyhow::Result;
-use context::Context;
 use hyper::body::Incoming;
 use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
 
 mod context;
 mod hostcall;
+
+pub use context::Context;
 
 fn create_config() -> Config {
     let mut config = Config::new();

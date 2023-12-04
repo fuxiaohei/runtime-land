@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 
 mod commands;
 
@@ -14,6 +14,10 @@ async fn main() {
 #[derive(Parser, Debug)]
 #[clap(author, version)]
 #[clap(disable_version_flag = true)] // handled manually
+#[clap(
+    name = "land-cli",
+    about = concat!("land-cli ", env!("CARGO_PKG_VERSION")),
+)]
 struct CliArgs {
     /// Print version info and exit.
     #[clap(short = 'V', long)]
@@ -58,8 +62,8 @@ impl CliArgs {
         match output.cmd {
             Some(SubCommands::Init(init)) => init.run().await,
             None => {
-                eprintln!("No subcommand specified");
-                Ok(())
+                CliArgs::command().print_long_help()?;
+                std::process::exit(2);
             }
         }
     }

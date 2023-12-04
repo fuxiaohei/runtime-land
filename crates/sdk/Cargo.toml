@@ -1,5 +1,5 @@
 [package]
-name = "land-compiler"
+name = "land-sdk"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -10,6 +10,11 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
-wit-bindgen-core = { workspace = true }
-wit-bindgen-rust = { workspace = true }
-wit-component = { workspace = true }
+http = { workspace = true }
+land-sdk-macro = { workspace = true }
+lazy_static = { workspace = true }
+matchit = "0.7.3"
+wit-bindgen = { workspace = true }
+
+[lib]
+doctest = false

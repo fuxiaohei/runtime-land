@@ -9,6 +9,7 @@ fn main() {
 
     copy_wit_to_worker();
     build_wit_guest_code();
+    copy_guest_code_to_sdk();
 }
 
 fn copy_wit_to_worker() {
@@ -65,5 +66,19 @@ fn build_wit_guest_code() {
             let target_rs = wit_dir.join(Path::new(name));
             std::fs::write(target_rs, content).unwrap();
         }
+    }
+}
+
+fn copy_guest_code_to_sdk() {
+    let wit_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("wit");
+    let expects = [
+        ("http_handler.rs", "crates/sdk-macro/src/http_handler.rs"),
+        ("http_service.rs", "crates/sdk/src/http_service.rs"),
+    ];
+    // copy expects
+    for (source, target) in expects.iter() {
+        let source_path = wit_dir.join(Path::new(source));
+        let target_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(target);
+        std::fs::copy(source_path, target_path).unwrap();
     }
 }
