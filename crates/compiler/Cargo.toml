@@ -1,0 +1,15 @@
+[package]
+name = "land-compiler"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+wit-bindgen-core = { workspace = true }
+wit-bindgen-rust = { workspace = true }
+wit-component = { workspace = true }
+anyhow = { workspace = true }

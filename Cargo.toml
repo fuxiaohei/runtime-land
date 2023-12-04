@@ -1,0 +1,53 @@
+[package]
+name = "land-cli"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license-file = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+publish = false
+autoexamples = false
+readme = "README.md"
+documentation = { workspace = true }
+description = "Runtime Land is a runtime for serverless functions based on WebAssembly"
+
+[dependencies]
+land-common = { workspace = true }
+anyhow = { workspace = true }
+clap = { version = "4.4.10", features = ["derive"] }
+tokio = { version = "1.34.0", features = ["full"] }
+tracing = { workspace = true }
+
+[build-dependencies]
+land-compiler = { workspace = true }
+
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+authors = ["fuxiaohei <fudong0797@gmail.com>"]
+license-file = "LICENSE"
+repository = "https://github.com/fuxiaohei/runtime-land"
+homepage = "https://runtime.land"
+documentation = "https://runtime.land/docs"
+
+[workspace]
+members = ["crates/common", "crates/worker", "crates/compiler"]
+
+[workspace.dependencies]
+land-common = { path = "crates/common" }
+land-compiler = { path = "crates/compiler" }
+land-worker = { path = "crates/worker" }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = [
+    "time",
+    "local-time",
+    "env-filter"
+] }
+wasmtime = { version = "15.0.1", features = ["component-model", "async"] }
+wasmtime-wasi = "15.0.1"
+hyper = { version = "1.0.1", features = ["full"] }
+wit-bindgen-core = "0.15.0"
+wit-bindgen-rust = "0.15.0"
+wit-component = "0.19.0"
+anyhow = "1.0.75"

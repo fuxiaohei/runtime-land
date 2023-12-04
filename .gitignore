@@ -43,18 +43,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Local demo testing or binary tools
-demo/
-ipinfo.json
-edge-conf.json
-_dist/
-integration-test.tar.gz
-templates-wasm.tar.gz
-templates-wasm/
-wasm-opt.tar.gz
-wasm-opt-bin/
-wizer.tar.xz
-wizer-bin/
-tailwindcss
-tailwindcss.exe
-static/
+# Added by cargo
+/target
+/wit/*.rs

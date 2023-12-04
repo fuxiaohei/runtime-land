@@ -1,0 +1,25 @@
+[package]
+name = "land-common"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+chrono = "0.4.31"
+lazy_static = "1.4.0"
+time = "0.3.30"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[build-dependencies]
+vergen = { version = "8.2.6", features = [
+    "build",
+    "cargo",
+    "git",
+    "rustc",
+    "gitcl"
+] }

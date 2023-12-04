@@ -1,0 +1,16 @@
+[package]
+name = "land-worker"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[dependencies]
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }
+hyper = { workspace = true }
+async-trait = "0.1.74"
+anyhow = { workspace = true }
