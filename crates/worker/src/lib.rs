@@ -1,12 +1,15 @@
 use anyhow::Result;
-use hyper::body::Incoming;
+use axum_core::body::Body;
 use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
 
 mod context;
 mod hostcall;
+mod body;
 
 pub use context::Context;
+pub use hostcall::Request as WasmRequest;
+pub use hostcall::Response as WasmResponse;
 
 fn create_config() -> Config {
     let mut config = Config::new();
@@ -77,7 +80,7 @@ impl Worker {
         &self,
         req: hostcall::Request,
         context: Context,
-    ) -> Result<(hostcall::Response, Incoming)> {
+    ) -> Result<(hostcall::Response, Body)> {
         // create store
         let mut store = Store::new(&self.engine, context);
 

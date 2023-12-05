@@ -1,0 +1,14 @@
+[package]
+name = "land-runner"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license-file = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+documentation = { workspace = true }
+
+[dependencies]
+land-worker-server = { workspace = true }
+tokio = { workspace = true }
+land-common = { workspace = true }

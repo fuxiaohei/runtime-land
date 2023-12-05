@@ -9,6 +9,8 @@ interface body {
         invalid-handle,
         /// The body is only readable
         read-only,
+        /// The body is reading ended
+        read-ended,
         /// The body read failed
         read-failed(string),
         /// The body write failed

@@ -1,5 +1,5 @@
 use super::hostcall::HttpContext;
-use hyper::body::Incoming;
+use axum_core::body::Body;
 use wasmtime_wasi::preview2::{Table, WasiCtx, WasiCtxBuilder, WasiView};
 
 pub struct Context {
@@ -47,7 +47,12 @@ impl Context {
     }
 
     /// take body
-    pub fn take_body(&mut self, handle: u32) -> Option<Incoming> {
+    pub fn take_body(&mut self, handle: u32) -> Option<Body> {
         self.http_ctx.take_body(handle)
+    }
+
+    /// set body
+    pub fn set_incoming_body(&mut self, body: Body) -> u32 {
+        self.http_ctx.set_incoming_body(body)
     }
 }

@@ -65,6 +65,7 @@ impl Body {
         let resp = body::write(self.body_handle, data);
         Ok(resp.unwrap())
     }
+    
     pub fn write_str(&self, data: &str) -> Result<u64> {
         if !self.is_streaming {
             return Err(anyhow::anyhow!("body is not writable"));
@@ -80,7 +81,7 @@ impl Body {
 
 impl From<&[u8]> for Body {
     fn from(s: &[u8]) -> Self {
-        let body_handle = body::new_stream().unwrap();
+        let body_handle = body::new_static().unwrap();
         body::write(body_handle, s).unwrap();
         Body::from_handle(body_handle)
     }
@@ -88,7 +89,7 @@ impl From<&[u8]> for Body {
 
 impl From<&str> for Body {
     fn from(s: &str) -> Self {
-        let body_handle = body::new_stream().unwrap();
+        let body_handle = body::new_static().unwrap();
         body::write(body_handle, s.as_bytes()).unwrap();
         Body::from_handle(body_handle)
     }
@@ -96,7 +97,7 @@ impl From<&str> for Body {
 
 impl From<String> for Body {
     fn from(s: String) -> Self {
-        let body_handle = body::new_stream().unwrap();
+        let body_handle = body::new_static().unwrap();
         body::write(body_handle, s.as_bytes()).unwrap();
         Body::from_handle(body_handle)
     }
@@ -104,7 +105,7 @@ impl From<String> for Body {
 
 impl From<Vec<u8>> for Body {
     fn from(v: Vec<u8>) -> Self {
-        let body_handle = body::new_stream().unwrap();
+        let body_handle = body::new_static().unwrap();
         body::write(body_handle, v.as_slice()).unwrap();
         Body::from_handle(body_handle)
     }
