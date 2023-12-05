@@ -112,7 +112,7 @@ pub async fn wasm_caller_handler(
     let mut context = Context::new(req_id);
     let req_id = context.req_id();
     let body = req.into_body();
-    let body_handle = context.set_body(body);
+    let body_handle = context.set_body(0, body); // 0 means creating new body handle
     let wasm_req = WasmRequest {
         method: method.to_string(),
         uri,

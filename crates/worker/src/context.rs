@@ -52,7 +52,7 @@ impl Context {
     }
 
     /// set body
-    pub fn set_incoming_body(&mut self, body: Body) -> u32 {
-        self.http_ctx.set_incoming_body(body)
+    pub fn set_body(&mut self, handle: u32, body: Body) -> u32 {
+        self.http_ctx.set_body(handle, body)
     }
 }

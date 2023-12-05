@@ -5,7 +5,6 @@ use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConf
 
 mod context;
 mod hostcall;
-mod body;
 
 pub use context::Context;
 pub use hostcall::Request as WasmRequest;

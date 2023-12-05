@@ -5,33 +5,33 @@ use anyhow::Result;
 pub struct Body {
     /// The handle to the body
     body_handle: BodyHandle,
-    /// Whether the body is streaming or not,
+    /// Whether the body is is_writable or not,
     /// if it is not streaming, it means that the body is fully loaded in memory and not writable
-    is_streaming: bool,
+    is_writable: bool,
 }
 
 impl std::fmt::Debug for Body {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Body")
             .field("body_handle", &self.body_handle)
-            .field("is_streaming", &self.is_streaming)
+            .field("is_writable", &self.is_writable)
             .finish()
     }
 }
 
 impl Body {
     pub fn empty() -> Self {
-        let body_handle = body::new_static().unwrap();
+        let body_handle = body::new().unwrap();
         Body {
             body_handle,
-            is_streaming: false,
+            is_writable: false,
         }
     }
 
     pub fn from_handle(body_handle: u32) -> Self {
         Self {
             body_handle,
-            is_streaming: false,
+            is_writable: false,
         }
     }
     pub fn body_handle(&self) -> u32 {
@@ -42,12 +42,12 @@ impl Body {
         let body_handle = body::new_stream().unwrap();
         Body {
             body_handle,
-            is_streaming: true,
+            is_writable: true,
         }
     }
 
-    pub fn read(&self, _size: u64) -> Result<(Vec<u8>, bool)> {
-        let resp = body::read(self.body_handle);
+    pub fn read(&self, size: u32) -> Result<(Vec<u8>, bool)> {
+        let resp = body::read(self.body_handle, size);
         Ok(resp.unwrap())
     }
 
@@ -59,29 +59,29 @@ impl Body {
     }
 
     pub fn write(&self, data: &[u8]) -> Result<u64> {
-        if !self.is_streaming {
+        if !self.is_writable {
             return Err(anyhow::anyhow!("body is not writable"));
         }
         let resp = body::write(self.body_handle, data);
         Ok(resp.unwrap())
     }
-    
+
     pub fn write_str(&self, data: &str) -> Result<u64> {
-        if !self.is_streaming {
+        if !self.is_writable {
             return Err(anyhow::anyhow!("body is not writable"));
         }
         let resp = body::write(self.body_handle, data.as_bytes());
         Ok(resp.unwrap())
     }
 
-    pub fn is_streaming(&self) -> bool {
-        self.is_streaming
+    pub fn is_writable(&self) -> bool {
+        self.is_writable
     }
 }
 
 impl From<&[u8]> for Body {
     fn from(s: &[u8]) -> Self {
-        let body_handle = body::new_static().unwrap();
+        let body_handle = body::new().unwrap();
         body::write(body_handle, s).unwrap();
         Body::from_handle(body_handle)
     }
@@ -89,7 +89,7 @@ impl From<&[u8]> for Body {
 
 impl From<&str> for Body {
     fn from(s: &str) -> Self {
-        let body_handle = body::new_static().unwrap();
+        let body_handle = body::new().unwrap();
         body::write(body_handle, s.as_bytes()).unwrap();
         Body::from_handle(body_handle)
     }
@@ -97,7 +97,7 @@ impl From<&str> for Body {
 
 impl From<String> for Body {
     fn from(s: String) -> Self {
-        let body_handle = body::new_static().unwrap();
+        let body_handle = body::new().unwrap();
         body::write(body_handle, s.as_bytes()).unwrap();
         Body::from_handle(body_handle)
     }
@@ -105,7 +105,7 @@ impl From<String> for Body {
 
 impl From<Vec<u8>> for Body {
     fn from(v: Vec<u8>) -> Self {
-        let body_handle = body::new_static().unwrap();
+        let body_handle = body::new().unwrap();
         body::write(body_handle, v.as_slice()).unwrap();
         Body::from_handle(body_handle)
     }
