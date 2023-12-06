@@ -9,12 +9,14 @@ interface body {
         invalid-handle,
         /// The body is only readable
         read-only,
-        /// The body is reading ended
-        read-ended,
+        /// The body is reading closed
+        read-closed,
         /// The body read failed
         read-failed(string),
         /// The body write failed
         write-failed(string),
+        /// The body is writing closed
+        write-closed,
     }
 
     /// Read http body bytes with size and eof flag

@@ -27,10 +27,10 @@ impl Host for HttpContext {
     }
 
     async fn new(&mut self) -> wasmtime::Result<Result<BodyHandle, BodyError>> {
-        return Ok(Err(BodyError::InvalidHandle));
+        return Ok(Ok(self.new_body()));
     }
 
     async fn new_stream(&mut self) -> wasmtime::Result<Result<BodyHandle, BodyError>> {
-        return Ok(Err(BodyError::InvalidHandle));
+        return Ok(Ok(self.new_body_stream()));
     }
 }
