@@ -1,0 +1,12 @@
+land_manifest_version = "0.2.0"
+
+[project]
+name = "http-rust"
+version = "0.1.0"
+language = "rust"
+authors = []
+description = ""
+
+[build]
+command = "cargo build --release --target wasm32-wasi"
+target = "target/wasm32-wasi/release/http_rust.wasm"

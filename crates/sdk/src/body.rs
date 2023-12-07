@@ -58,6 +58,10 @@ impl Body {
         }
     }
 
+    pub fn to_bytes(&self) -> Result<Vec<u8>> {
+        self.read_all()
+    }
+
     pub fn write(&self, data: &[u8]) -> Result<u64> {
         if !self.is_writable {
             return Err(anyhow::anyhow!("body is not writable"));

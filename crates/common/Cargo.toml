@@ -14,6 +14,8 @@ lazy_static = { workspace = true }
 time = "0.3.30"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+toml = { workspace = true }
 
 [build-dependencies]
 vergen = { version = "8.2.6", features = [

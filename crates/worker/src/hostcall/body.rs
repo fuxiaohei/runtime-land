@@ -20,10 +20,10 @@ impl Host for HttpContext {
 
     async fn write(
         &mut self,
-        _handle: BodyHandle,
-        _data: Vec<u8>,
+        handle: BodyHandle,
+        data: Vec<u8>,
     ) -> wasmtime::Result<Result<u64, BodyError>> {
-        return Ok(Err(BodyError::InvalidHandle));
+        Ok(self.write_body(handle, data).await)
     }
 
     async fn new(&mut self) -> wasmtime::Result<Result<BodyHandle, BodyError>> {

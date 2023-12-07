@@ -4,6 +4,7 @@ use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig, Store};
 
 mod context;
+mod fetchimpl;
 mod hostcall;
 
 pub use context::Context;

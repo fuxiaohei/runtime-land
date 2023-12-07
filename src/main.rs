@@ -1,6 +1,7 @@
 use clap::{CommandFactory, Parser};
 
-mod commands;
+mod cmds;
+mod embed;
 
 #[tokio::main]
 async fn main() {
@@ -28,7 +29,7 @@ struct CliArgs {
 
 #[derive(Parser, Debug)]
 enum SubCommands {
-    Init(commands::Init),
+    New(cmds::New),
 }
 
 #[derive(Parser, Debug)]
@@ -60,7 +61,7 @@ impl CliArgs {
         output.init_logging();
 
         match output.cmd {
-            Some(SubCommands::Init(init)) => init.run().await,
+            Some(SubCommands::New(n)) => n.run().await,
             None => {
                 CliArgs::command().print_long_help()?;
                 std::process::exit(2);

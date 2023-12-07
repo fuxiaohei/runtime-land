@@ -15,7 +15,11 @@ description = "Runtime Land is a runtime for serverless functions based on WebAs
 [dependencies]
 anyhow = { workspace = true }
 clap = { version = "4.4.10", features = ["derive"] }
+color-print = "0.3.5"
+inquire = "0.6.2"
 land-common = { workspace = true }
+regex = "1.10.2"
+rust-embed = "8.0.0"
 tokio = { workspace = true }
 tracing = { workspace = true }
 
@@ -33,13 +37,14 @@ documentation = "https://runtime.land/docs"
 
 [workspace]
 members = [
+    "binary/runner",
     "crates/common",
     "crates/compiler",
     "crates/sdk",
     "crates/sdk-macro",
     "crates/worker",
     "crates/worker-server",
-    "binary/runner",
+    "tests/sdk-demo",
 ]
 
 [workspace.dependencies]
@@ -48,6 +53,7 @@ land-compiler = { path = "crates/compiler" }
 land-worker = { path = "crates/worker" }
 land-sdk-macro = { path = "crates/sdk-macro" }
 land-worker-server = { path = "crates/worker-server" }
+land-sdk = { path = "crates/sdk" }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = [
     "time",
@@ -71,3 +77,5 @@ axum-core = "0.4.1"
 futures-util = "0.3.29"
 http-body = "1.0.0"
 http-body-util = "0.1.0"
+serde = { version = "1.0.193", features = ["derive"] }
+toml = "0.8.8"

@@ -1,5 +1,5 @@
 [package]
-name = "land-runner"
+name = "sdk-demo"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -9,6 +9,10 @@ homepage = { workspace = true }
 documentation = { workspace = true }
 
 [dependencies]
-land-common = { workspace = true }
-land-worker-server = { workspace = true }
-tokio = { workspace = true }
+anyhow = "1.0.75"
+http = "1.0.0"
+land-sdk = { workspace = true }
+wit-bindgen = "0.16.0"
+
+[lib]
+crate-type = ["cdylib"]

@@ -38,11 +38,16 @@ impl HttpContext {
     }
 
     pub fn take_body(&mut self, handle: u32) -> Option<Body> {
+        self.set_sender_closed(handle);
+        self.body_map.remove(&handle)
+    }
+
+    fn set_sender_closed(&mut self, handle: u32) {
         if self.body_sender_map.contains_key(&handle) {
             let sender = self.body_sender_map.remove(&handle).unwrap();
             let _ = sender.finish();
         }
-        self.body_map.remove(&handle)
+        self.body_sender_closed.insert(handle, true);
     }
 
     pub fn set_body(&mut self, mut handle: u32, body: Body) -> u32 {
@@ -118,12 +123,9 @@ impl HttpContext {
     }
 
     pub async fn read_body_all(&mut self, handle: u32) -> Result<Vec<u8>, BodyError> {
-        if self.body_sender_map.contains_key(&handle) {
-            // make sure sender is dropped after read all
-            let sender = self.body_sender_map.remove(&handle).unwrap();
-            sender.finish()?;
-            self.body_sender_closed.insert(handle, true);
-        }
+        // after read all, the body sender should be write closed
+        self.set_sender_closed(handle);
+
         let mut prev_buffer = self.body_buffer_map.remove(&handle).unwrap_or_default();
         loop {
             let (chunk, flag) = self.read_body(handle, usize::MAX as u32).await?;

@@ -43,7 +43,7 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         use exports::land::http::incoming;
 
-        struct HttpImpl;
+        struct WorkerHttpImpl;
 
         impl TryFrom<incoming::Request> for Request {
             type Error = anyhow::Error;
@@ -82,7 +82,7 @@ pub fn http_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        impl incoming::Guest for HttpImpl {
+        impl incoming::Guest for WorkerHttpImpl {
             fn handle_request(req: incoming::Request) -> incoming::Response {
                 #func
 

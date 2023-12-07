@@ -9,16 +9,16 @@ homepage = { workspace = true }
 documentation = { workspace = true }
 
 [dependencies]
-moka = { version = "0.12.1", features = ["sync"] }
+anyhow = { workspace = true }
+axum = { workspace = true }
 land-worker = { workspace = true }
 lazy_static = { workspace = true }
-anyhow = { workspace = true }
-tokio = { workspace = true }
-tracing = { workspace = true }
+moka = { version = "0.12.1", features = ["sync"] }
+once_cell = "1.18.0"
 opendal = { version = "0.42.0", default-features = false, features = [
     "services-fs",
 ] }
-once_cell = "1.18.0"
-axum = { workspace = true }
+tokio = { workspace = true }
 tower-http = { version = "0.5.0", features = ["timeout"] }
+tracing = { workspace = true }
 uuid = { version = "1.6.1", features = ["v4"] }

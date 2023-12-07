@@ -1,0 +1,13 @@
+[package]
+name = "http-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+http = "1.0.0"
+land-sdk = {{sdk_version}}
+wit-bindgen = "0.16.0"
+
+[lib]
+crate-type = ["cdylib"]
