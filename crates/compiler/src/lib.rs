@@ -1,8 +1,14 @@
 use anyhow::{anyhow, Result};
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use wit_bindgen_core::wit_parser::Resolve;
 use wit_bindgen_core::{Files, WorldGenerator};
+
+mod build;
+pub use build::build_command;
+
+mod component;
+pub use component::convert as generate_component;
 
 /// GuestGeneratorType is the type of the guest generator.
 pub enum GuestGeneratorType {
@@ -61,4 +67,27 @@ pub fn generate_guest(
         );
     }
     Ok(output_maps)
+}
+
+pub fn find_cmd(cmd: &str) -> Result<PathBuf> {
+    let c = match which::which(cmd) {
+        Ok(c) => c,
+        Err(_) => {
+            // find wasm-opt binary in current exe directroy ./wasm-opt-bin/wasm
+            let exe_path = std::env::current_exe()?;
+            let file = exe_path
+                .parent()
+                .unwrap()
+                .join(format!("{}-bin/{}", cmd, cmd));
+
+            #[cfg(target_os = "windows")]
+            let file = file.with_extension("exe");
+
+            if file.exists() {
+                return Ok(file);
+            }
+            return Err(anyhow!("cannot find '{}' binary", cmd));
+        }
+    };
+    Ok(c)
 }

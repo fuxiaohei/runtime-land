@@ -10,6 +10,7 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+which = "5.0.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }
 wit-component = { workspace = true }

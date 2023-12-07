@@ -1,12 +1,11 @@
+use crate::embed::TemplateAssets;
 use clap::Args;
 use color_print::cprintln;
 use inquire::validator::Validation;
 use inquire::{CustomUserError, Select, Text};
 use regex::Regex;
 
-use crate::embed::TemplateAssets;
-
-/// Command Init
+/// Command New
 #[derive(Args, Debug)]
 pub struct New {
     /// The name of the new project
@@ -147,7 +146,9 @@ fn create_project(name: &str, template: &str, desc: &str) -> anyhow::Result<()> 
         let content = std::str::from_utf8(&file.data).unwrap().to_string();
         match basename.to_str().unwrap() {
             "Cargo.toml.txt" => handle_cargo_toml(name, template, &target, content).unwrap(),
-            "land.toml" => handle_land_toml(name, template, &target, desc, content).unwrap(),
+            land_common::MANIFEST_FILE => {
+                handle_land_toml(name, template, &target, desc, content).unwrap()
+            }
             _ => {
                 let parent_dir = std::path::Path::new(&target).parent().unwrap();
                 if !parent_dir.exists() {

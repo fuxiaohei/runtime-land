@@ -1,3 +1,4 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 pub const MANIFEST_VERSION: &str = "0.2.0";
@@ -43,14 +44,28 @@ impl MetaData {
             },
         }
     }
+
+    /// Parse metadata from string
+    pub fn from_string(toml_str: &str) -> Result<Self> {
+        toml::from_str(toml_str).map_err(|e| anyhow::anyhow!(e))
+    }
+
+    /// Read metadata from file
+    pub fn from_file(path: &str) -> Result<Self> {
+        if !std::path::Path::new(path).exists() {
+            return Err(anyhow::anyhow!("Metadata file '{}' not found!", path));
+        }
+        let toml_str = std::fs::read_to_string(path)?;
+        Self::from_string(&toml_str)
+    }
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::MetaData;
 
     #[test]
-    fn test_metadata_toml(){
+    fn test_metadata_toml() {
         let metadata = MetaData::new_for_rust();
         let toml = toml::to_string(&metadata).unwrap();
         println!("{}", toml);

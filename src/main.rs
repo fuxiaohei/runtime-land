@@ -1,4 +1,5 @@
 use clap::{CommandFactory, Parser};
+use color_print::cprintln;
 
 mod cmds;
 mod embed;
@@ -7,7 +8,7 @@ mod embed;
 async fn main() {
     let args = CliArgs::parse();
     if let Err(e) = args.execute().await {
-        eprintln!("Error: {}", e);
+        cprintln!("<red>{}</>", e);
         std::process::exit(1);
     }
 }
@@ -30,6 +31,7 @@ struct CliArgs {
 #[derive(Parser, Debug)]
 enum SubCommands {
     New(cmds::New),
+    Build(cmds::Build),
 }
 
 #[derive(Parser, Debug)]
@@ -62,6 +64,7 @@ impl CliArgs {
 
         match output.cmd {
             Some(SubCommands::New(n)) => n.run().await,
+            Some(SubCommands::Build(b)) => b.run().await,
             None => {
                 CliArgs::command().print_long_help()?;
                 std::process::exit(2);

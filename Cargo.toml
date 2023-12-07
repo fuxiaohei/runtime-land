@@ -15,9 +15,10 @@ description = "Runtime Land is a runtime for serverless functions based on WebAs
 [dependencies]
 anyhow = { workspace = true }
 clap = { version = "4.4.10", features = ["derive"] }
-color-print = "0.3.5"
+color-print = { workspace = true }
 inquire = "0.6.2"
 land-common = { workspace = true }
+land-compiler = { workspace = true }
 regex = "1.10.2"
 rust-embed = "8.0.0"
 tokio = { workspace = true }
@@ -79,3 +80,4 @@ http-body = "1.0.0"
 http-body-util = "0.1.0"
 serde = { version = "1.0.193", features = ["derive"] }
 toml = "0.8.8"
+color-print = "0.3.5"

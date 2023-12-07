@@ -46,3 +46,6 @@ Temporary Items
 # Added by cargo
 /target
 /wit/*.rs
+
+# local testing
+/demo
