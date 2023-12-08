@@ -1,0 +1,15 @@
+[package]
+name = "land-api-server"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license-file = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+documentation = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

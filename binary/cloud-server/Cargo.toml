@@ -1,0 +1,18 @@
+[package]
+name = "land-cloud-server"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license-file = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+documentation = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+color-print = { workspace = true }
+land-api-server = { workspace = true }
+land-common = { workspace = true }
+land-dblayer = { workspace = true }
+tokio = { workspace = true }

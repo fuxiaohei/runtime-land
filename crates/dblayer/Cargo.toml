@@ -1,0 +1,19 @@
+[package]
+name = "land-dblayer"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+license-file = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+documentation = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+once_cell = { workspace = true }
+sea-orm = { version = "0.12.8", features = [
+    "sqlx-mysql",
+    "runtime-tokio-rustls"
+] }
+tracing = { workspace = true }

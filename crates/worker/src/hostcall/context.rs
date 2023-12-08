@@ -176,6 +176,7 @@ impl HttpContext {
     }
 }
 
+#[derive(Debug)]
 pub enum FinishMessage {
     Finished,
     _Abort,
@@ -227,6 +228,7 @@ impl http_body::Body for ChannelBodyImpl {
     }
 }
 
+#[derive(Debug)]
 pub struct Sender {
     pub writer: mpsc::Sender<Bytes>,
     finish_sender: Option<FinishSender>,
