@@ -18,7 +18,7 @@ fn create_config() -> Config {
 
     // SIMD support requires SSE3 and SSSE3 on x86_64.
     // in docker container, it will cause error
-    config.wasm_simd(false);
+    // config.wasm_simd(false);
 
     // const MB: usize = 1 << 20;
     // let mut pooling_allocation_config = PoolingAllocationConfig::default();

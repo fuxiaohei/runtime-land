@@ -1410,6 +1410,7 @@ dependencies = [
  "inquire",
  "land-common",
  "land-compiler",
+ "land-worker-server",
  "regex",
  "rust-embed",
  "tokio",

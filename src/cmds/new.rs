@@ -15,21 +15,17 @@ pub struct New {
     /// The template from which to create the new project
     #[clap(short = 't', long = "template", value_parser = validate_template)]
     pub template: Option<String>,
+
+    /// The description of the new project
+    #[clap(short = 'd', long = "desc")]
+    pub desc: Option<String>,
 }
 
 impl New {
     pub async fn run(&self) -> Result<(), anyhow::Error> {
         let name = get_project_name(self.name.clone());
         let template = get_template_name(self.template.clone());
-        let desc = match Text::new("Enter a description for your project (Optional):").prompt() {
-            Ok(desc) => desc,
-            Err(_err) => {
-                // eprintln!("invalid project description: {}", err);
-                std::process::exit(1);
-            }
-        };
-
-        println!("name: {}, template: {}, desc: {}", name, template, desc);
+        let desc = get_desc(self.desc.clone());
         create_project(&name, &template, &desc)?;
         Ok(())
     }
@@ -120,6 +116,19 @@ fn get_template_name(name: Option<String>) -> String {
         Ok(template) => template.name,
         Err(_err) => {
             //eprintln!("invalid template name: {}", err);
+            std::process::exit(1);
+        }
+    }
+}
+
+fn get_desc(desc: Option<String>) -> String {
+    if let Some(desc) = desc {
+        return desc;
+    }
+    match Text::new("Enter a description for your project (Optional):").prompt() {
+        Ok(desc) => desc,
+        Err(_err) => {
+            // eprintln!("invalid project description: {}", err);
             std::process::exit(1);
         }
     }

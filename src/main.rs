@@ -32,6 +32,7 @@ struct CliArgs {
 enum SubCommands {
     New(cmds::New),
     Build(cmds::Build),
+    Up(cmds::Up),
 }
 
 #[derive(Parser, Debug)]
@@ -65,6 +66,7 @@ impl CliArgs {
         match output.cmd {
             Some(SubCommands::New(n)) => n.run().await,
             Some(SubCommands::Build(b)) => b.run().await,
+            Some(SubCommands::Up(u)) => u.run().await,
             None => {
                 CliArgs::command().print_long_help()?;
                 std::process::exit(2);

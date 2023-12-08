@@ -17,6 +17,7 @@ mod fs;
 mod pool;
 
 static DEFAULT_WASM: OnceCell<String> = OnceCell::new();
+static ENDPOINT_NAME: OnceCell<String> = OnceCell::new();
 
 async fn default_handler(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
@@ -48,7 +49,7 @@ async fn default_handler(
         let _enter = span.enter();
         let mut builder = Response::builder().status(StatusCode::NOT_FOUND);
         builder = builder.header("x-request-id", req_id);
-        builder = builder.header("x-served-by", "abc");
+        builder = builder.header("x-served-by", ENDPOINT_NAME.get().unwrap());
         let elapsed = st.elapsed().as_micros();
         warn!(
             status = 404,
@@ -66,7 +67,7 @@ async fn default_handler(
             let e = result.err().unwrap();
             let mut builder = Response::builder().status(StatusCode::INTERNAL_SERVER_ERROR);
             builder = builder.header("x-request-id", req_id);
-            builder = builder.header("x-served-by", "abc");
+            builder = builder.header("x-served-by", ENDPOINT_NAME.get().unwrap());
             let elapsed = st.elapsed().as_micros();
             warn!(
                 status = 500,
@@ -139,7 +140,7 @@ pub async fn wasm_caller_handler(
     if builder.headers_ref().unwrap().get("x-request-id").is_none() {
         builder = builder.header("x-request-id", req_id.clone());
     }
-    builder = builder.header("x-served-by", "abc");
+    builder = builder.header("x-served-by", ENDPOINT_NAME.get().unwrap());
     Ok(builder.body(wasm_resp_body).unwrap())
 }
 
@@ -162,6 +163,7 @@ pub struct Opts {
     pub addr: SocketAddr,
     pub dir: String,
     pub default_wasm: String,
+    pub endpoint_name: String,
 }
 
 impl Default for Opts {
@@ -170,6 +172,7 @@ impl Default for Opts {
             addr: "127.0.0.1:10000".parse().unwrap(),
             dir: "/tmp/land".to_string(),
             default_wasm: "".to_string(),
+            endpoint_name: "localhost".to_string(),
         }
     }
 }
@@ -179,9 +182,22 @@ pub async fn run(opts: Opts) -> Result<()> {
     // init local fs to read wasm files
     fs::init_fs(&opts.dir)?;
 
+    // set endpoint name
+    ENDPOINT_NAME.set(opts.endpoint_name).unwrap();
+
     // set default wasm, can be empty
     DEFAULT_WASM.set(opts.default_wasm).unwrap();
+    try_load_default_wasm().await?;
 
     // start server
     start_server(opts.addr).await
+}
+
+pub async fn try_load_default_wasm() -> Result<()> {
+    let default_wasm = DEFAULT_WASM.get().unwrap();
+    if default_wasm.is_empty() {
+        return Ok(());
+    }
+    let _ = pool::prepare_worker(default_wasm).await?;
+    Ok(())
 }

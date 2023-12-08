@@ -19,6 +19,7 @@ color-print = { workspace = true }
 inquire = "0.6.2"
 land-common = { workspace = true }
 land-compiler = { workspace = true }
+land-worker-server = { workspace = true }
 regex = "1.10.2"
 rust-embed = "8.0.0"
 tokio = { workspace = true }
