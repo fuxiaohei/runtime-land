@@ -33,9 +33,9 @@ interface types{
     }
 
     // HTTP errors returned by the runtime.
-    enum request-error {
+    variant request-error {
         // The request failed due to a network error.
-        network-error,
+        network-error(string),
         // The request failed due to a timeout.
         timeout,
         // The request failed due to a invalid url.
@@ -45,16 +45,14 @@ interface types{
         // The request failed due to over requests limit.
         too-many-requests,
         // The request failed due to invalid request 
-        invalid-request,
+        invalid-request(string),
     }
 
     // Fetch redirect policy
     enum redirect-policy {
         // Follow redirects.
         follow,
-        // Do not follow redirects.
-        error,
-        // Follow redirects, but do not follow redirects to cross-origin destinations.
+        // Do not follow redirects. User handles the 3xx response.
         manual,
     }
 

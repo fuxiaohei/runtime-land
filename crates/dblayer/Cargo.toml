@@ -16,4 +16,6 @@ sea-orm = { version = "0.12.8", features = [
     "sqlx-mysql",
     "runtime-tokio-rustls"
 ] }
+sea-orm-migration = "0.12.6"
 tracing = { workspace = true }
+async-trait = { workspace = true }

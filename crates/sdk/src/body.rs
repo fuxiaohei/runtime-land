@@ -22,6 +22,7 @@ impl std::fmt::Debug for Body {
 impl Body {
     pub fn empty() -> Self {
         let body_handle = body::new().unwrap();
+        body::write(body_handle, "".as_bytes()).unwrap();
         Body {
             body_handle,
             is_writable: false,
