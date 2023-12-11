@@ -10,6 +10,8 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+land-common = { workspace = true }
+tracing = { workspace = true }
 which = "5.0.0"
 wit-bindgen-core = { workspace = true }
 wit-bindgen-rust = { workspace = true }

@@ -92,7 +92,6 @@ impl http_body::Body for OutgoingResponseBody {
         match self.inner.read(&mut buf) {
             Ok(0) => Poll::Ready(None),
             Ok(n) => {
-                println!("read {} bytes", n);
                 buf.truncate(n);
                 Poll::Ready(Some(Ok(Frame::data(Bytes::from(buf)))))
             }

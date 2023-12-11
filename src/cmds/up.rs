@@ -9,10 +9,19 @@ pub struct Up {
     pub address: Option<String>,
 }
 
+fn get_target_path(metadata: &MetaData) -> String {
+    let target = metadata.build.target.clone();
+    if metadata.project.language == "javascript" || metadata.project.language == "js" {
+        return land_common::js_real_target_path(&target);
+    }
+    target
+}
+
 impl Up {
     pub async fn run(&self) -> Result<(), anyhow::Error> {
         let metadata = MetaData::from_file(MANIFEST_FILE)?;
-        let target = std::path::Path::new(&metadata.build.target);
+        let target_str = get_target_path(&metadata);
+        let target = std::path::Path::new(&target_str);
         if !target.exists() {
             return Err(anyhow::anyhow!(
                 "Fail to load Wasm target '{}'!",
@@ -25,7 +34,7 @@ impl Up {
         let server_opts = Opts {
             addr: self.address.clone().unwrap().parse().unwrap(),
             dir: current_dir.to_str().unwrap().to_string(),
-            default_wasm: metadata.build.target,
+            default_wasm: target_str,
             endpoint_name: "land-cli".to_string(),
         };
         land_worker_server::run(server_opts).await?;

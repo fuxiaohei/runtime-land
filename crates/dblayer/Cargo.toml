@@ -10,12 +10,12 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+async-trait = { workspace = true }
 clap = { workspace = true }
 once_cell = { workspace = true }
-sea-orm = { version = "0.12.8", features = [
+sea-orm = { version = "0.12.9", features = [
     "sqlx-mysql",
     "runtime-tokio-rustls"
 ] }
 sea-orm-migration = "0.12.6"
 tracing = { workspace = true }
-async-trait = { workspace = true }

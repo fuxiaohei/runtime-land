@@ -1,0 +1,12 @@
+land_manifest_version = "0.2.0"
+
+[project]
+name = "http-js"
+version = "0.1.0"
+language = "javascript"
+authors = []
+description = ""
+
+[build]
+command = ""
+target = "src/index.js"
