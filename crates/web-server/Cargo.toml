@@ -1,5 +1,5 @@
 [package]
-name = "land-cloud-server"
+name = "land-web-server"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -10,12 +10,6 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
-clap = { workspace = true }
-color-print = { workspace = true }
-land-api-server = { workspace = true }
-land-web-server = { workspace = true }
-land-common = { workspace = true }
-land-dblayer = { workspace = true }
-tokio = { workspace = true }
 axum = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }

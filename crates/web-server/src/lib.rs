@@ -12,7 +12,7 @@ async fn root() -> &'static str {
 
 /// router returns api server router
 pub fn router() -> Router {
-    Router::new().route("/api/v2/", get(root))
+    Router::new().route("/", get(root))
 }
 
 /// run starts api server

@@ -1,7 +1,11 @@
 use anyhow::Result;
+use axum::Router;
 use clap::Parser;
 use color_print::cprintln;
 use land_dblayer::DBArgs;
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
+use tracing::info;
 
 #[derive(Parser, Debug)]
 struct OutputArgs {
@@ -56,11 +60,22 @@ impl Args {
         // connect db
         db_args.connect().await?;
 
-        // start api server
-        land_api_server::run(address.parse().unwrap()).await?;
+        // merge router api and website api
+        let router = Router::new()
+            .merge(land_web_server::router())
+            .merge(land_api_server::router());
+
+        start_server(address.parse().unwrap(), router).await?;
 
         Ok(())
     }
+}
+
+pub async fn start_server(addr: SocketAddr, app: Router) -> Result<()> {
+    info!("Starting on {}", addr);
+    let listener = TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app).await?;
+    Ok(())
 }
 
 #[tokio::main]

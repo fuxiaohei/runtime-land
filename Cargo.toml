@@ -50,6 +50,7 @@ members = [
     "crates/sdk-macro",
     "crates/worker",
     "crates/worker-server",
+    "crates/web-server",
     "tests/sdk-demo",
 ]
 
@@ -60,6 +61,7 @@ land-worker = { path = "crates/worker" }
 land-sdk-macro = { path = "crates/sdk-macro" }
 land-worker-server = { path = "crates/worker-server" }
 land-api-server = { path = "crates/api-server" }
+land-web-server = { path = "crates/web-server" }
 land-sdk = { path = "crates/sdk" }
 land-dblayer = { path = "crates/dblayer" }
 tracing = "0.1.40"

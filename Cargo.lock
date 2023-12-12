@@ -1789,12 +1789,15 @@ name = "land-cloud-server"
 version = "0.2.0"
 dependencies = [
  "anyhow",
+ "axum",
  "clap",
  "color-print",
  "land-api-server",
  "land-common",
  "land-dblayer",
+ "land-web-server",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -1867,6 +1870,16 @@ dependencies = [
  "http 1.0.0",
  "quote",
  "syn 2.0.40",
+]
+
+[[package]]
+name = "land-web-server"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
