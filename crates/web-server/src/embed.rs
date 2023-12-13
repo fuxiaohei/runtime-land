@@ -1,0 +1,28 @@
+use anyhow::Result;
+use rust_embed::RustEmbed;
+use tracing::debug;
+
+#[derive(RustEmbed)]
+#[folder = "./templates"]
+#[include = "*.hbs"]
+#[include = "*.html"]
+#[include = "*.css"]
+#[include = "*.js"]
+#[include = "*.png"]
+pub struct TemplatesAssets;
+
+/// extract_assets extracts all assets to the statis directory.
+pub fn extract_assets(dir: &str) -> Result<()> {
+    TemplatesAssets::iter().for_each(|file| {
+        let filepath = file.to_string();
+
+        let content = TemplatesAssets::get(&filepath).unwrap().data;
+        let mut path = std::path::PathBuf::from(dir);
+        path.push(filepath);
+        debug!("extract asset: {:?}", path);
+
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(path, content).unwrap();
+    });
+    Ok(())
+}

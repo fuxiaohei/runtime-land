@@ -60,9 +60,13 @@ impl Args {
         // connect db
         db_args.connect().await?;
 
+        // extract assets
+        let assets_dir = "assets";
+        land_web_server::extract_assets(assets_dir)?;
+
         // merge router api and website api
         let router = Router::new()
-            .merge(land_web_server::router())
+            .merge(land_web_server::router(assets_dir)?)
             .merge(land_api_server::router());
 
         start_server(address.parse().unwrap(), router).await?;

@@ -11,5 +11,9 @@ documentation = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
+axum-template = { version = "2.0.0", features = ["handlebars"] }
+handlebars = "4.5.0"
+rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+walkdir = "2.4.0"

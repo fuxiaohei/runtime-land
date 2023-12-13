@@ -21,7 +21,7 @@ land-common = { workspace = true }
 land-compiler = { workspace = true }
 land-worker-server = { workspace = true }
 regex = "1.10.2"
-rust-embed = "8.1.0"
+rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = "2.5.0"
@@ -48,9 +48,9 @@ members = [
     "crates/dblayer",
     "crates/sdk",
     "crates/sdk-macro",
+    "crates/web-server",
     "crates/worker",
     "crates/worker-server",
-    "crates/web-server",
     "tests/sdk-demo",
 ]
 
@@ -93,3 +93,4 @@ color-print = "0.3.5"
 clap = { version = "4.4.11", features = ["derive", "env"] }
 once_cell = "1.19.0"
 async-trait = "0.1.74"
+rust-embed = { version = "8.1.0", features = ["include-exclude"] }

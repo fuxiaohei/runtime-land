@@ -10,12 +10,12 @@ documentation = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+axum = { workspace = true }
 clap = { workspace = true }
 color-print = { workspace = true }
 land-api-server = { workspace = true }
-land-web-server = { workspace = true }
 land-common = { workspace = true }
 land-dblayer = { workspace = true }
+land-web-server = { workspace = true }
 tokio = { workspace = true }
-axum = { workspace = true }
 tracing = { workspace = true }
