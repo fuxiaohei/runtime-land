@@ -6,6 +6,7 @@ use axum_template::RenderHtml;
 use handlebars::{handlebars_helper, Handlebars};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
 use tracing::{debug, info};
 use walkdir::WalkDir;
 
@@ -22,9 +23,11 @@ async fn root(engine: RenderEngine) -> impl IntoResponse {
 
 /// router returns api server router
 pub fn router(assets_dir: &str) -> Result<Router> {
+    let static_assets_dir = format!("{}/static", assets_dir);
     let hbs = init_templates(assets_dir)?;
     let rt = Router::new()
-        .route("/", get(root))
+        .route("/projects", get(root))
+        .nest_service("/static", ServeDir::new(static_assets_dir))
         .with_state(Engine::from(hbs));
     Ok(rt)
 }

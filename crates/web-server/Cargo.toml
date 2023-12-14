@@ -17,3 +17,4 @@ rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 walkdir = "2.4.0"
+tower-http = { workspace = true }
