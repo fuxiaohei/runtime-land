@@ -11,8 +11,10 @@ enum UserInfo {
     Status,
     Role,
     Uuid,
+    Password,
+    PasswordSalt,
     CreatedBy,
-    OauthProvider,
+    OauthSocial,
     OauthUserId,
     CreatedAt,
     UpdatedAt,
@@ -44,6 +46,16 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
+                        ColumnDef::new(UserInfo::Password)
+                            .string_len(128)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(UserInfo::PasswordSalt)
+                            .string_len(128)
+                            .not_null(),
+                    )
+                    .col(
                         ColumnDef::new(UserInfo::DisplayName)
                             .string_len(64)
                             .not_null(),
@@ -67,7 +79,7 @@ impl MigrationTrait for Migration {
                             .string_len(24)
                             .not_null(),
                     )
-                    .col(ColumnDef::new(UserInfo::OauthProvider).string_len(24))
+                    .col(ColumnDef::new(UserInfo::OauthSocial).string_len(32))
                     .col(ColumnDef::new(UserInfo::OauthUserId).string_len(256))
                     .col(
                         ColumnDef::new(UserInfo::CreatedAt)

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::Router;
+use axum::{middleware, Router};
 use axum::{response::IntoResponse, routing::get};
 use axum_template::engine::Engine;
 use axum_template::RenderHtml;
@@ -13,12 +13,14 @@ use walkdir::WalkDir;
 mod embed;
 pub use embed::extract_assets;
 
+mod sign;
+
 // RenderEngine is the template engine for axum_template
 pub type RenderEngine = Engine<Handlebars<'static>>;
 
 // basic handler that responds with a static string
 async fn root(engine: RenderEngine) -> impl IntoResponse {
-    RenderHtml("index.hbs", engine, &{})
+    RenderHtml("projects.hbs", engine, &{})
 }
 
 /// router returns api server router
@@ -26,9 +28,12 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     let static_assets_dir = format!("{}/static", assets_dir);
     let hbs = init_templates(assets_dir)?;
     let rt = Router::new()
+        .route("/sign-in", get(sign::signin))
+        .route("/sign-callback/*path", get(sign::signcallback))
         .route("/projects", get(root))
         .nest_service("/static", ServeDir::new(static_assets_dir))
-        .with_state(Engine::from(hbs));
+        .with_state(Engine::from(hbs))
+        .route_layer(middleware::from_fn(sign::auth));
     Ok(rt)
 }
 

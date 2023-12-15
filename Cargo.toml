@@ -88,6 +88,7 @@ futures-util = "0.3.29"
 http-body = "1.0.0"
 http-body-util = "0.1.0"
 serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
 toml = "0.8.8"
 color-print = "0.3.5"
 clap = { version = "4.4.11", features = ["derive", "env"] }
@@ -95,3 +96,15 @@ once_cell = "1.19.0"
 async-trait = "0.1.74"
 rust-embed = { version = "8.1.0", features = ["include-exclude"] }
 tower-http = { version = "0.5.0", features = ["timeout", "cors", "fs"] }
+axum-extra = { version = "0.9.0", features = ["cookie"] }
+base64 = "0.21.5"
+reqwest = { version = "0.11.22", default-features = false, features = [
+    "stream",
+    "rustls-tls",
+    "blocking",
+    "json",
+    "multipart",
+] }
+time = "0.3.30"
+chrono = "0.4.31"
+uuid = { version = "1.6.1", features = ["v4"] }

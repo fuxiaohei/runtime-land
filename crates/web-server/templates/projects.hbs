@@ -2,53 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Projects | Runtime.land</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/zephyr/bootstrap.min.css"
-        integrity="sha256-4za34rddlwJtbMt3AYgpCzIkGmakYFrse4mXkQmqkYk=" crossorigin="anonymous">
+    {{> partials/head.hbs}}
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg py-3 bg-light fs-5 border-bottom" data-bs-theme="light">
-        <div class="container">
-            <a class="navbar-brand" href="/projects">
-                <img src="/static/img/logo-v2.png" width="32" height="32" class="me-2" />
-                Runtime.land
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
-                aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarColor03">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/projects">Projects
-                            <span class="visually-hidden">(current)</span>
-                        </a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <div class="dropdown text-end">
-                        <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle show"
-                            data-bs-toggle="dropdown" aria-expanded="true">
-                            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
-                                class="rounded-circle">
-                        </a>
-                        <ul class="dropdown-menu text-small mt-2 dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">New project...</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Sign out</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {{> partials/nav.hbs}}
 
     <header class="py-4 border-bottom">
         <div class="container d-flex flex-wrap justify-content-between">
@@ -121,9 +79,7 @@
             </ul>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+    {{> partials/footer.hbs}}
 </body>
 
 </html>
