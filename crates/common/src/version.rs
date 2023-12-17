@@ -5,7 +5,7 @@ lazy_static! {
     pub static ref FULL_VERSION: String = build_fullinfo();
 }
 
-fn build_info() -> String {
+pub fn build_info() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 

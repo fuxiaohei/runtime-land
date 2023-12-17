@@ -59,7 +59,8 @@
                 window.Clerk.openSignIn(signInComponent, {
                     appearance: {
                         baseTheme: "dark"
-                    }
+                    },
+                    redirectUrl: "/projects",
                 });
 
                 // update sign-in button to open sign-in panel
@@ -75,7 +76,8 @@
             await window.Clerk.openSignIn({
                 appearance: {
                     baseTheme: "dark"
-                }
+                },
+                redirectUrl: "/projects",
             });
         }
     </script>

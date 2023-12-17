@@ -1,27 +1,30 @@
 use anyhow::Result;
+use axum::extract::MatchedPath;
+use axum::http::Request;
+use axum::response::{Redirect, Response};
+use axum::routing::any;
 use axum::{middleware, Router};
 use axum::{response::IntoResponse, routing::get};
 use axum_template::engine::Engine;
-use axum_template::RenderHtml;
 use handlebars::{handlebars_helper, Handlebars};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
+use std::time::Duration;
 use tokio::net::TcpListener;
+use tower_http::classify::ServerErrorsFailureClass;
 use tower_http::services::ServeDir;
-use tracing::{debug, info};
+use tower_http::trace::TraceLayer;
+use tracing::{debug, info, info_span, warn, Span};
 use walkdir::WalkDir;
 
 mod embed;
 pub use embed::extract_assets;
 
+mod projects;
 mod sign;
 
 // RenderEngine is the template engine for axum_template
 pub type RenderEngine = Engine<Handlebars<'static>>;
-
-// basic handler that responds with a static string
-async fn root(engine: RenderEngine) -> impl IntoResponse {
-    RenderHtml("projects.hbs", engine, &{})
-}
 
 /// router returns api server router
 pub fn router(assets_dir: &str) -> Result<Router> {
@@ -30,11 +33,48 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     let rt = Router::new()
         .route("/sign-in", get(sign::signin))
         .route("/sign-callback/*path", get(sign::signcallback))
-        .route("/projects", get(root))
+        .route("/projects", get(projects::index))
         .nest_service("/static", ServeDir::new(static_assets_dir))
+        .route("/*path", any(default_handler))
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(|request: &Request<_>| {
+                    // Log the matched route's path (with placeholders not filled in).
+                    let matched_path = request
+                        .extensions()
+                        .get::<MatchedPath>()
+                        .map(MatchedPath::as_str);
+                    let uri = request.uri().to_string();
+
+                    info_span!(
+                        "http",
+                        method = ?request.method(),
+                        uri = %uri,
+                        matched_path,
+                        cost = tracing::field::Empty,
+                        status = tracing::field::Empty,
+                    )
+                })
+                .on_response(|response: &Response, latency: Duration, span: &Span| {
+                    span.record("cost", latency.as_millis());
+                    span.record("status", response.status().as_u16());
+                    info!("success")
+                })
+                .on_failure(
+                    |error: ServerErrorsFailureClass, latency: Duration, span: &Span| {
+                        span.record("cost", latency.as_millis());
+                        warn!("failure, {}", error)
+                    },
+                ),
+        )
         .with_state(Engine::from(hbs))
         .route_layer(middleware::from_fn(sign::auth));
     Ok(rt)
+}
+
+/// default_handler is the default handler for all routes
+pub async fn default_handler() -> impl IntoResponse {
+    Redirect::permanent("/projects")
 }
 
 /// run starts api server
@@ -71,4 +111,24 @@ fn init_templates(dir: &str) -> Result<Handlebars<'static>> {
         }
     }
     Ok(hbs)
+}
+
+/// PageVars is the common variables for all pages
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct PageVars {
+    pub title: String,
+    pub base_uri: String,
+    pub version: String,
+    pub build_time: String,
+}
+
+impl PageVars {
+    pub fn new(title: &str, base_uri: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            base_uri: base_uri.to_string(),
+            version: land_common::build_info(),
+            build_time: chrono::Utc::now().to_rfc3339(),
+        }
+    }
 }

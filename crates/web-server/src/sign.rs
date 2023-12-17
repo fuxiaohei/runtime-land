@@ -154,7 +154,7 @@ async fn create_session_token(req: &SignCallbackRequest) -> anyhow::Result<Strin
     Ok(token.value)
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct SessionUser {
     pub id: i32,
     pub name: String,

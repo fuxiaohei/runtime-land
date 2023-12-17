@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::Router;
+use axum::{routing::any, Router};
 use clap::Parser;
 use color_print::cprintln;
 use land_dblayer::DBArgs;
@@ -66,6 +66,7 @@ impl Args {
 
         // merge router api and website api
         let router = Router::new()
+            .route("/", any(land_web_server::default_handler))
             .merge(land_web_server::router(assets_dir)?)
             .merge(land_api_server::router());
 
