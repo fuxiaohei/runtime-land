@@ -2081,6 +2081,7 @@ dependencies = [
  "rand",
  "sea-orm",
  "sea-orm-migration",
+ "serde",
  "strum",
  "tracing",
  "uuid",

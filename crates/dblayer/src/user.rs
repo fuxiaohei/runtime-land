@@ -160,3 +160,19 @@ pub async fn find_token_by_name(owner_id: i32, name: &str) -> Result<Option<user
         .map_err(|e| anyhow::anyhow!(e))?;
     Ok(token)
 }
+
+/// list_tokens_by_owner lists tokens by owner
+pub async fn list_tokens_by_owner(
+    owner_id: i32,
+    created_by: TokenCreatedByCases,
+) -> Result<Vec<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let tokens = user_token::Entity::find()
+        .filter(user_token::Column::OwnerId.eq(owner_id))
+        .filter(user_token::Column::CreatedBy.eq(created_by.to_string()))
+        .filter(user_token::Column::Status.eq(Status::Active.to_string()))
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(tokens)
+}

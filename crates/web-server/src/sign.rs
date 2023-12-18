@@ -173,6 +173,9 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
     if path.starts_with("/sign-") || path.starts_with("/static/") {
         return Ok(next.run(request).await);
     }
+    
+    let span = tracing::info_span!("auth-middleware", path);
+    let _enter = span.enter();
 
     let headers = request.headers();
     let jar = CookieJar::from_headers(headers);
