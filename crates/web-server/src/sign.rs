@@ -132,6 +132,7 @@ async fn create_session_token(req: &SignCallbackRequest) -> anyhow::Result<Strin
         debug!("user not exist, create new user, email: {}", req.user_email);
         let user2 = land_dblayer::user::create(
             &req.user_name,
+            &req.user_full_name,
             &req.user_email,
             &req.user_image_url,
             &req.user_id,

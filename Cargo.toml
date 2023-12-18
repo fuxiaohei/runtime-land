@@ -20,7 +20,7 @@ inquire = "0.6.2"
 land-common = { workspace = true }
 land-compiler = { workspace = true }
 land-worker-server = { workspace = true }
-regex = "1.10.2"
+regex = { workspace = true }
 rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
@@ -113,3 +113,4 @@ reqwest = { version = "0.11.22", default-features = false, features = [
 time = "0.3.30"
 chrono = "0.4.31"
 uuid = { version = "1.6.1", features = ["v4"] }
+regex = "1.10.2"

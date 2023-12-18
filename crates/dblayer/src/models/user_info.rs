@@ -11,6 +11,7 @@ pub struct Model {
     pub uuid: String,
     pub password: String,
     pub password_salt: String,
+    pub name: String,
     pub display_name: String,
     #[sea_orm(unique)]
     pub email: String,

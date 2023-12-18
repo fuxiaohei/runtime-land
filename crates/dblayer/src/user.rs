@@ -29,6 +29,7 @@ pub enum CreatedByCases {
 #[strum(serialize_all = "lowercase")]
 pub enum TokenCreatedByCases {
     Session,
+    AccessToken,
 }
 
 /// find_by_oauth finds a user by oauth user id
@@ -54,6 +55,7 @@ pub async fn find_by_id(id: i32) -> Result<Option<user_info::Model>> {
 
 /// create creates a new user
 pub async fn create(
+    name: &str,
     display_name: &str,
     email: &str,
     avatar: &str,
@@ -82,6 +84,7 @@ pub async fn create(
     let user_model = user_info::Model {
         id: 0,
         email: email.to_string(),
+        name: name.to_string(),
         phone: None,
         uuid: uuid::Uuid::new_v4().to_string(),
         password,
@@ -140,6 +143,18 @@ pub async fn find_token_by_value(value: &str) -> Result<Option<user_token::Model
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()
         .filter(user_token::Column::Value.eq(value))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(token)
+}
+
+/// find_token_by_name finds a token by name
+pub async fn find_token_by_name(owner_id: i32, name: &str) -> Result<Option<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::Name.eq(name))
+        .filter(user_token::Column::OwnerId.eq(owner_id))
         .one(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;

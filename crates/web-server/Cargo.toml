@@ -13,10 +13,14 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { workspace = true }
 axum-template = { version = "2.0.0", features = ["handlebars"] }
+axum_csrf = { version = "0.9.0", features = ["layer"] }
 base64 = { workspace = true }
 chrono = { workspace = true }
 handlebars = "4.5.0"
+land-common = { workspace = true }
 land-dblayer = { workspace = true }
+lazy_static = { workspace = true }
+regex = { workspace = true }
 reqwest = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
@@ -25,5 +29,5 @@ time = { workspace = true }
 tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }
+validator = { version = "0.16.1", features = ["derive"] }
 walkdir = "2.4.0"
-land-common = { workspace = true }

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+
+    <header class="py-4 border-bottom">
+        <div class="container d-flex flex-wrap justify-content-between">
+            <span class="fs-3">
+                <span class="fw-bold">Account Settings</span>
+            </span>
+            <div>
+                <button type="button" class="btn btn-light disabled">Free Plan</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="width: 720px;">
+            <div class="card bg-secondary my-4">
+                <div class="card-header">Personal Info</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{user.name}}</h4>
+                    <p class="card-text">{{user.email}}</p>
+                </div>
+            </div>
+            <div class="card bg-secondary mb-4">
+                <div class="card-header">Personal Access Tokens</div>
+                <div class="card-body">
+                    <p class="card-text">Tokens enable you to access the Runtime.land API and using land-cli. You can
+                        create multiple tokens
+                        to allow various applications to access your account.</p>
+                    <p class="card-text">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#create-token-modal">
+                            <i class="bi bi-plus-lg me-2"></i>Create Token
+                        </button>
+                    </p>
+                </div>
+                <div class="modal fade" id="create-token-modal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add a Token</h5>
+                            </div>
+                            <div class="modal-body d-none" id="new-token-modal-body">
+                                <div class="form-group">
+                                    <label class="form-label my-3">Your New Token</label>
+                                    <div class="form-group">
+                                        <p>
+                                            <strong>Please copy the details below</strong> before closing this window -
+                                            they won't be shown again.
+                                        </p>
+                                        <div class="input-group mb-3">
+                                            <button class="btn btn-outline-success" id="new-token-clipboard-btn"
+                                                data-clipboard-target="#new-token-value"><i
+                                                    class="bi bi-clipboard"></i></button>
+                                            <input class="form-control border-success" id="new-token-value" type="text"
+                                                readonly="" />
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-success"
+                                            onclick="window.location.reload()">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <form action="/settings/token" method="post" id="create-token-form">
+                                <div class="modal-body">
+                                    <p>Choose a name that describes your token's purpose:</p>
+                                    <div class="form-group">
+                                        <input type="text" name="name" class="form-control mb-3" required
+                                            aria-describedby="tokenHelp"
+                                            placeholder="Enter token name, At least 3 chars">
+                                    </div>
+                                    <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+                                    <p class="text-danger d-none" id="new-token-error"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Create Token</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    {{> partials/footer.hbs}}
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"
+        integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
+    <script>
+        /// add code to submit create-token-form async
+        const createTokenForm = document.getElementById('create-token-form');
+        createTokenForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(createTokenForm);
+            const response = await fetch(createTokenForm.action, {
+                method: 'POST',
+                body: new URLSearchParams(formData),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                const newTokenValue = document.getElementById('new-token-value');
+                newTokenValue.value = data.value;
+                const newTokenModalBody = document.getElementById('new-token-modal-body');
+                newTokenModalBody.classList.remove('d-none');
+                const createTokenForm = document.getElementById('create-token-form');
+                createTokenForm.classList.add('d-none');
+            } else {
+                const data = await response.text();
+                const newTokenError = document.getElementById('new-token-error');
+                newTokenError.classList.remove('d-none');
+                newTokenError.innerText = 'Error: ' + data;
+            }
+        });
+        // add clipboard event
+        const clipboard = new ClipboardJS("#new-token-clipboard-btn");
+        clipboard.on('success', function (e) {
+            const newTokenClipboardBtn = document.getElementById('new-token-clipboard-btn');
+            newTokenClipboardBtn.innerHTML = '<i class="bi bi-clipboard-check"></i>';
+        });
+    </script>
+</body>
+
+</html>

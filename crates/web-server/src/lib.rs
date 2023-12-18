@@ -1,11 +1,13 @@
 use anyhow::Result;
 use axum::extract::MatchedPath;
-use axum::http::Request;
+use axum::http::{Request, StatusCode};
 use axum::response::{Redirect, Response};
-use axum::routing::any;
+use axum::routing::{any, post};
 use axum::{middleware, Router};
 use axum::{response::IntoResponse, routing::get};
+use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
+use axum_template::RenderHtml;
 use handlebars::{handlebars_helper, Handlebars};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
@@ -20,7 +22,9 @@ use walkdir::WalkDir;
 mod embed;
 pub use embed::extract_assets;
 
+mod admin;
 mod projects;
+mod settings;
 mod sign;
 
 // RenderEngine is the template engine for axum_template
@@ -30,12 +34,15 @@ pub type RenderEngine = Engine<Handlebars<'static>>;
 pub fn router(assets_dir: &str) -> Result<Router> {
     let static_assets_dir = format!("{}/static", assets_dir);
     let hbs = init_templates(assets_dir)?;
+    let config = CsrfConfig::default();
     let rt = Router::new()
         .route("/sign-in", get(sign::signin))
         .route("/sign-callback/*path", get(sign::signcallback))
         .route("/projects", get(projects::index))
+        .route("/settings", get(settings::index))
+        .route("/settings/token", post(settings::create_token))
         .nest_service("/static", ServeDir::new(static_assets_dir))
-        .route("/*path", any(default_handler))
+        .route("/*path", any(not_found))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<_>| {
@@ -67,6 +74,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
                     },
                 ),
         )
+        .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))
         .route_layer(middleware::from_fn(sign::auth));
     Ok(rt)
@@ -75,6 +83,22 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 /// default_handler is the default handler for all routes
 pub async fn default_handler() -> impl IntoResponse {
     Redirect::permanent("/projects")
+}
+
+/// not_found is the handler for 404
+async fn not_found(engine: RenderEngine) -> impl IntoResponse {
+    #[derive(Debug, Serialize, Deserialize)]
+    struct Vars {
+        pub page: PageVars,
+    }
+
+    RenderHtml(
+        "page_not_found.hbs",
+        engine,
+        Vars {
+            page: PageVars::new("Page Not Found", ""),
+        },
+    )
 }
 
 /// run starts api server
@@ -130,5 +154,26 @@ impl PageVars {
             version: land_common::build_info(),
             build_time: chrono::Utc::now().to_rfc3339(),
         }
+    }
+}
+
+// Make our own error that wraps `anyhow::Error`.
+struct AppError(StatusCode, anyhow::Error);
+
+// Tell axum how to convert `AppError` into a response.
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        (self.0, self.1.to_string()).into_response()
+    }
+}
+
+// This enables using `?` on functions that return `Result<_, anyhow::Error>` to turn them into
+// `Result<_, AppError>`. That way you don't need to do that manually.
+impl<E> From<E> for AppError
+where
+    E: Into<anyhow::Error>,
+{
+    fn from(err: E) -> Self {
+        Self(StatusCode::INTERNAL_SERVER_ERROR, err.into())
     }
 }

@@ -4,6 +4,7 @@ use sea_orm_migration::prelude::*;
 enum UserInfo {
     Table,
     Id,
+    Name,
     DisplayName,
     Email,
     AvatarURL,
@@ -55,6 +56,7 @@ impl MigrationTrait for Migration {
                             .string_len(128)
                             .not_null(),
                     )
+                    .col(ColumnDef::new(UserInfo::Name).string_len(64).not_null())
                     .col(
                         ColumnDef::new(UserInfo::DisplayName)
                             .string_len(64)
