@@ -8,7 +8,7 @@ use axum_template::RenderHtml;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use validator::Validate;
 
 /// index is the handler for /settings
@@ -16,16 +16,27 @@ pub async fn index(
     engine: RenderEngine,
     csrf_token: CsrfToken,
     Extension(user): Extension<SessionUser>,
-) -> impl IntoResponse {
+) -> Result<impl IntoResponse, AppError> {
     #[derive(Debug, Serialize, Deserialize)]
     struct Vars {
         pub page: PageVars,
         pub user: SessionUser,
         pub csrf_token: String,
+        pub tokens: Vec<land_dblayer::models::user_token::Model>,
     }
 
     let csrf_token_value = csrf_token.authenticity_token().unwrap();
-    (
+    let tokens = land_dblayer::user::list_tokens_by_owner(
+        user.id,
+        land_dblayer::user::TokenCreatedByCases::AccessToken,
+    )
+    .await?;
+    debug!(
+        "list_tokens_by_owner, tokens: {:?}, user: {:?}",
+        tokens.len(),
+        user.id
+    );
+    Ok((
         csrf_token,
         RenderHtml(
             "settings.hbs",
@@ -34,10 +45,11 @@ pub async fn index(
                 page: PageVars::new("Settings", "/settings"),
                 user,
                 csrf_token: csrf_token_value,
+                tokens,
             },
         ),
     )
-        .into_response()
+        .into_response())
 }
 
 lazy_static! {

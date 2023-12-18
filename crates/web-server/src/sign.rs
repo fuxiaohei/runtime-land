@@ -173,30 +173,33 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
     if path.starts_with("/sign-") || path.starts_with("/static/") {
         return Ok(next.run(request).await);
     }
-    
-    let span = tracing::info_span!("auth-middleware", path);
-    let _enter = span.enter();
 
-    let headers = request.headers();
-    let jar = CookieJar::from_headers(headers);
-    let session_id = jar
-        .get("__runtime_land_session")
-        .map(|c| c.value())
-        .unwrap_or_default();
-    let clerk_session = jar.get("__session").map(|c| c.value()).unwrap_or_default();
-    if session_id.is_empty() || clerk_session.is_empty() {
-        error!("auth-middleware: clerk_session or session_id is empty");
-        return Ok(Redirect::to("/sign-in").into_response());
-    };
-    let session_user = match validate_session(session_id).await {
-        Ok(v) => v,
-        Err(e) => {
-            error!("auth-middleware: {}", e);
+    {
+        let span = tracing::info_span!("auth-middleware", path);
+        let _enter = span.enter();
+
+        let headers = request.headers();
+        let jar = CookieJar::from_headers(headers);
+        let session_id = jar
+            .get("__runtime_land_session")
+            .map(|c| c.value())
+            .unwrap_or_default();
+        let clerk_session = jar.get("__session").map(|c| c.value()).unwrap_or_default();
+        if session_id.is_empty() || clerk_session.is_empty() {
+            error!("auth-middleware: clerk_session or session_id is empty");
             return Ok(Redirect::to("/sign-in").into_response());
-        }
-    };
-    debug!("auth-middleware: session_user: {:?}", session_user);
-    request.extensions_mut().insert(session_user);
+        };
+        let session_user = match validate_session(session_id).await {
+            Ok(v) => v,
+            Err(e) => {
+                error!("auth-middleware: {}", e);
+                return Ok(Redirect::to("/sign-in").into_response());
+            }
+        };
+        debug!("auth-middleware: session_user: {:?}", session_user);
+        request.extensions_mut().insert(session_user);
+    }
+    
     Ok(next.run(request).await)
 }
 

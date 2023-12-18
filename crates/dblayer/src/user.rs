@@ -2,7 +2,7 @@ use crate::models::{user_info, user_token};
 use crate::DB;
 use anyhow::Result;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 use std::ops::Add;
 
 #[derive(strum::Display)]
@@ -171,6 +171,7 @@ pub async fn list_tokens_by_owner(
         .filter(user_token::Column::OwnerId.eq(owner_id))
         .filter(user_token::Column::CreatedBy.eq(created_by.to_string()))
         .filter(user_token::Column::Status.eq(Status::Active.to_string()))
+        .order_by_desc(user_token::Column::CreatedAt)
         .all(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;

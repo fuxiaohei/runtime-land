@@ -34,6 +34,18 @@
                     <p class="card-text">Tokens enable you to access the Runtime.land API and using land-cli. You can
                         create multiple tokens
                         to allow various applications to access your account.</p>
+                    <ul class="list-group list-group-flush shadow-none mb-4">
+                        {{#each tokens}}
+                        <li class="list-group-item list-group-item-action px-3 py-2 d-flex justify-content-between">
+                            <div><strong>{{name}}</strong></div>
+                            <div>
+                                <small class="text-body-tertiary">Created At {{created_at}}</small>
+                                <button type="button" class="btn btn-outline-dark btn-sm ms-2"
+                                    style="margin:1px;padding:1px"><i class="bi bi-x"></i></button>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </ul>
                     <p class="card-text">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#create-token-modal">
