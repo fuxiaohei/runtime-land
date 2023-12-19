@@ -2,7 +2,7 @@ use crate::models::{user_info, user_token};
 use crate::DB;
 use anyhow::Result;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
 use std::ops::Add;
 
 #[derive(strum::Display)]
@@ -159,6 +159,25 @@ pub async fn find_token_by_name(owner_id: i32, name: &str) -> Result<Option<user
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
     Ok(token)
+}
+
+/// delete_token deletes a token by id
+pub async fn delete_token(token_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find_by_id(token_id)
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    if let Some(t) = token {
+        let now = chrono::Utc::now();
+        let name = format!("deleted_{}", t.name);
+        let mut token_active_model: user_token::ActiveModel = t.into();
+        token_active_model.status = Set(Status::Deleted.to_string());
+        token_active_model.deleted_at = Set(Some(now));
+        token_active_model.name = Set(name);
+        token_active_model.update(db).await?;
+    }
+    Ok(())
 }
 
 /// list_tokens_by_owner lists tokens by owner

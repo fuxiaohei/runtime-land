@@ -16,7 +16,7 @@ use tokio::net::TcpListener;
 use tower_http::classify::ServerErrorsFailureClass;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use tracing::{debug, info, info_span, warn, Span};
+use tracing::{debug, error, info, info_span, warn, Span};
 use walkdir::WalkDir;
 
 mod embed;
@@ -40,7 +40,10 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-callback/*path", get(sign::signcallback))
         .route("/projects", get(projects::index))
         .route("/settings", get(settings::index))
-        .route("/settings/token", post(settings::create_token))
+        .route(
+            "/settings/token",
+            post(settings::create_token).delete(settings::delete_token),
+        )
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route("/*path", any(not_found))
         .layer(
@@ -65,12 +68,16 @@ pub fn router(assets_dir: &str) -> Result<Router> {
                 .on_response(|response: &Response, latency: Duration, span: &Span| {
                     span.record("cost", latency.as_millis());
                     span.record("status", response.status().as_u16());
-                    info!("success")
+                    if response.status().is_success() {
+                        info!("success")
+                    } else {
+                        warn!("failure")
+                    }
                 })
                 .on_failure(
                     |error: ServerErrorsFailureClass, latency: Duration, span: &Span| {
                         span.record("cost", latency.as_millis());
-                        warn!("failure, {}", error)
+                        error!("error, {}", error)
                     },
                 ),
         )

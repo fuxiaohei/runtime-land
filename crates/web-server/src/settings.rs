@@ -102,3 +102,33 @@ pub async fn create_token(
         value: token.value,
     }))
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteTokenRequest {
+    pub token_id: i32,
+    pub token_name: String,
+}
+
+/// delete_token is the handler for /settings/token in DELETE method
+pub async fn delete_token(
+    Extension(user): Extension<SessionUser>,
+    Json(payload): Json<DeleteTokenRequest>,
+) -> Result<String, AppError> {
+    println!("payload: {:?}", payload);
+    let token = land_dblayer::user::find_token_by_name(user.id, &payload.token_name).await?;
+    if token.is_none() {
+        warn!("token is not exist, name: {}", payload.token_name);
+        return Err(anyhow!("token is not exist").into());
+    }
+    if let Some(t) = token {
+        if t.id != payload.token_id {
+            warn!(
+                "token id is not match, id: {}, name: {}",
+                payload.token_id, payload.token_name
+            );
+            return Err(anyhow!("token id is not match").into());
+        }
+    }
+    land_dblayer::user::delete_token(payload.token_id).await?;
+    Ok("ok".to_string())
+}

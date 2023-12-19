@@ -39,9 +39,11 @@
                         <li class="list-group-item list-group-item-action px-3 py-2 d-flex justify-content-between">
                             <div><strong>{{name}}</strong></div>
                             <div>
-                                <small class="text-body-tertiary">Created At {{created_at}}</small>
-                                <button type="button" class="btn btn-outline-dark btn-sm ms-2"
-                                    style="margin:1px;padding:1px"><i class="bi bi-x"></i></button>
+                                <small class="text-body-tertiary">Created At <span
+                                        data-x-time="{{created_at}}">{{created_at}}</span></small>
+                                <button type="button" data-x-token-del-id="{{id}}" data-x-token-del-name="{{name}}"
+                                    class="btn btn-outline-dark btn-sm ms-2" style="margin:1px;padding:1px"><i
+                                        class="bi bi-x"></i></button>
                             </div>
                         </li>
                         {{/each}}
@@ -137,6 +139,38 @@
         clipboard.on('success', function (e) {
             const newTokenClipboardBtn = document.getElementById('new-token-clipboard-btn');
             newTokenClipboardBtn.innerHTML = '<i class="bi bi-clipboard-check"></i>';
+        });
+        // convert data-x-time to local time string
+        const xTimeElements = document.querySelectorAll('[data-x-time]');
+        xTimeElements.forEach((element) => {
+            const xTime = element.getAttribute('data-x-time');
+            const date = new Date(xTime);
+            element.innerText = date.toLocaleString();
+        });
+        // click data-x-token-del-id button, try to delete token
+        const tokenDelBtns = document.querySelectorAll('[data-x-token-del-id]');
+        tokenDelBtns.forEach((element) => {
+            element.addEventListener('click', async (e) => {
+                // add confirm check
+                if (!confirm('Are you sure to delete this token?')) {
+                    return;
+                }
+                const tokenDelId = element.getAttribute('data-x-token-del-id');
+                const tokenDelName = element.getAttribute('data-x-token-del-name');
+                const response = await fetch('/settings/token', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token_id: parseInt(tokenDelId), token_name: tokenDelName }),
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.text() || response.statusText;
+                    alert('Error: ' + data);
+                }
+            });
         });
     </script>
 </body>
