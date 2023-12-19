@@ -30,6 +30,7 @@ pub enum CreatedByCases {
 pub enum TokenCreatedByCases {
     Session,
     AccessToken,
+    CliAccess,
 }
 
 /// find_by_oauth finds a user by oauth user id
@@ -143,6 +144,7 @@ pub async fn find_token_by_value(value: &str) -> Result<Option<user_token::Model
     let db = DB.get().unwrap();
     let token = user_token::Entity::find()
         .filter(user_token::Column::Value.eq(value))
+        .filter(user_token::Column::Status.eq(Status::Active.to_string()))
         .one(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
@@ -155,6 +157,7 @@ pub async fn find_token_by_name(owner_id: i32, name: &str) -> Result<Option<user
     let token = user_token::Entity::find()
         .filter(user_token::Column::Name.eq(name))
         .filter(user_token::Column::OwnerId.eq(owner_id))
+        .filter(user_token::Column::Status.eq(Status::Active.to_string()))
         .one(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
@@ -169,6 +172,10 @@ pub async fn delete_token(token_id: i32) -> Result<()> {
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
     if let Some(t) = token {
+        // already deleted ?
+        if t.status == Status::Deleted.to_string() {
+            return Ok(());
+        }
         let now = chrono::Utc::now();
         let name = format!("deleted_{}", t.name);
         let mut token_active_model: user_token::ActiveModel = t.into();

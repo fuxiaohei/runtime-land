@@ -16,14 +16,18 @@ description = "Runtime Land is a runtime for serverless functions based on WebAs
 anyhow = { workspace = true }
 clap = { workspace = true }
 color-print = { workspace = true }
+dirs = "5.0.1"
 inquire = "0.6.2"
 land-common = { workspace = true }
 land-compiler = { workspace = true }
 land-worker-server = { workspace = true }
 regex = { workspace = true }
 rust-embed = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+ureq = { workspace = true }
 url = "2.5.0"
 
 [build-dependencies]
@@ -114,3 +118,4 @@ time = "0.3.30"
 chrono = "0.4.31"
 uuid = { version = "1.6.1", features = ["v4"] }
 regex = "1.10.2"
+ureq = { version = "2.9.1", features = ["http-crate", "json"] }
