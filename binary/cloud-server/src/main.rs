@@ -60,6 +60,9 @@ impl Args {
         // connect db
         db_args.connect().await?;
 
+        // init preset data
+        land_dblayer::settings::init().await?;
+
         // extract assets
         let assets_dir = "assets";
         land_web_server::extract_assets(assets_dir)?;

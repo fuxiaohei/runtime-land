@@ -35,6 +35,11 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     let static_assets_dir = format!("{}/static", assets_dir);
     let hbs = init_templates(assets_dir)?;
     let config = CsrfConfig::default();
+
+    let admin_rt = Router::new()
+        .route("/dashboard", get(admin::dashboard))
+        .route("/storage", get(admin::storage));
+
     let rt = Router::new()
         .route("/sign-in", get(sign::signin))
         .route("/sign-callback/*path", get(sign::signcallback))
@@ -44,6 +49,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
             "/settings/token",
             post(settings::create_token).delete(settings::delete_token),
         )
+        .nest("/admin", admin_rt)
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route("/*path", any(not_found))
         .layer(

@@ -196,10 +196,19 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
                 return Ok(Redirect::to("/sign-in").into_response());
             }
         };
+
+        // if admin pages, need check user role
+        if path.starts_with("/admin") {
+            if !session_user.is_admin {
+                error!("auth-middleware: user is not admin");
+                return Ok(Redirect::to("/sign-in").into_response());
+            }
+        }
+        
         debug!("auth-middleware: session_user: {:?}", session_user);
         request.extensions_mut().insert(session_user);
     }
-    
+
     Ok(next.run(request).await)
 }
 
