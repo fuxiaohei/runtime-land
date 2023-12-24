@@ -10,3 +10,4 @@ description = ""
 [build]
 command = ""
 target = "src/index.js"
+src_files = ["src/", "package.json", "package-lock.json"]

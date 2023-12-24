@@ -38,7 +38,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 
     let admin_rt = Router::new()
         .route("/dashboard", get(admin::dashboard))
-        .route("/storage", get(admin::storage));
+        .route("/storage", get(admin::storage).post(admin::storage_update));
 
     let rt = Router::new()
         .route("/sign-in", get(sign::signin))
@@ -76,8 +76,12 @@ pub fn router(assets_dir: &str) -> Result<Router> {
                     span.record("status", response.status().as_u16());
                     if response.status().is_success() {
                         info!("success")
-                    } else {
+                    } else if response.status().is_server_error()
+                        || response.status().is_client_error()
+                    {
                         warn!("failure")
+                    } else {
+                        info!("30x")
                     }
                 })
                 .on_failure(

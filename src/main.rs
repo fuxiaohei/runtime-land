@@ -34,6 +34,7 @@ enum SubCommands {
     Build(cmds::Build),
     Up(cmds::Up),
     Login(cmds::Login),
+    Deploy(cmds::Deploy),
 }
 
 #[derive(Parser, Debug)]
@@ -69,6 +70,7 @@ impl CliArgs {
             Some(SubCommands::Build(b)) => b.run().await,
             Some(SubCommands::Up(u)) => u.run().await,
             Some(SubCommands::Login(l)) => l.run().await,
+            Some(SubCommands::Deploy(d)) => d.run().await,
             None => {
                 CliArgs::command().print_long_help()?;
                 std::process::exit(2);

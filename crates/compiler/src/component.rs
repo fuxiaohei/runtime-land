@@ -93,6 +93,7 @@ fn convert_inner(path: &str, target: &str) -> Result<()> {
     let output = target.replace(".wasm", ".component.wasm");
     std::fs::write(&output, component)?;
     std::fs::rename(&output, path)?;
+    debug!("convert success, from {} to {}", target, path);
     Ok(())
 }
 

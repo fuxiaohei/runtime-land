@@ -48,3 +48,30 @@ pub async fn login(Path(token): Path<String>) -> Result<Json<LoginResponse>, App
     debug!("login success, resp: {:?}", resp);
     Ok(Json(resp))
 }
+
+/// DeployRequest is the request for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployRequest {
+    pub metadata: land_common::MetaData,
+    pub bundle: Vec<u8>,
+    pub user_token: String,
+    pub user_uuid: String,
+}
+
+pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<LoginResponse>, AppError> {
+    // validate user_token
+    let token = land_dblayer::user::find_token_by_value(&payload.user_token).await?;
+    if token.is_none() {
+        warn!("token is not exist, value: {}", payload.user_token);
+        return Err(anyhow!("token is not exist").into());
+    }
+    let token = token.unwrap();
+    if token.created_by != land_dblayer::user::TokenCreatedByCases::CliAccess.to_string() {
+        warn!("token is not cli-access, value: {}", payload.user_token);
+        return Err(anyhow!("token is not cli-access").into());
+    }
+
+    println!("deploying...,payload: {:?}", payload);
+
+    return Err(anyhow!("not implemented").into());
+}

@@ -17,6 +17,7 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 color-print = { workspace = true }
 dirs = "5.0.1"
+flate2 = "1.0.28"
 inquire = "0.6.2"
 land-common = { workspace = true }
 land-compiler = { workspace = true }
@@ -25,10 +26,12 @@ regex = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tar = "0.4.40"
 tokio = { workspace = true }
 tracing = { workspace = true }
 ureq = { workspace = true }
 url = "2.5.0"
+walkdir = { workspace = true }
 
 [build-dependencies]
 land-compiler = { workspace = true }
@@ -119,3 +122,4 @@ chrono = "0.4.31"
 uuid = { version = "1.6.1", features = ["v4"] }
 regex = "1.10.2"
 ureq = { version = "2.9.1", features = ["http-crate", "json"] }
+walkdir = "2.4.0"

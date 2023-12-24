@@ -1,5 +1,5 @@
-use crate::{sign::SessionUser, PageVars, RenderEngine};
-use axum::{response::IntoResponse, Extension};
+use crate::{sign::SessionUser, AppError, PageVars, RenderEngine};
+use axum::{response::IntoResponse, Extension, Form};
 use axum_template::RenderHtml;
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +22,29 @@ pub async fn dashboard(
             user,
         },
     )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StorageUpdateForm {
+    /*
+        current: fs
+    fs_path: /tmp/runtime-land-data/
+    r2_endpoint: http://r2.local
+    r2_bucket: runtime-land
+    r2_region: auto
+    r2_access_key: access_key
+    r2_secret_key: secret_key
+    r2_base_path: runtime-land-data
+    r2_url: */
+    pub current: String,
+    pub fs_path: String,
+    pub r2_endpoint: String,
+    pub r2_bucket: String,
+    pub r2_region: String,
+    pub r2_access_key: String,
+    pub r2_secret_key: String,
+    pub r2_base_path: String,
+    pub r2_url: String,
 }
 
 /// storage is the handler for /admin/storage
@@ -51,4 +74,28 @@ pub async fn storage(
             storage,
         },
     )
+}
+
+/// storage_update is the handler for POST /admin/storage
+pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<String, AppError> {
+    let fs_storage = land_dblayer::settings::FsStorage {
+        directory: form.fs_path,
+    };
+    let r2_storage = land_dblayer::settings::R2Storage {
+        endpoint: form.r2_endpoint,
+        bucket: form.r2_bucket,
+        region: form.r2_region,
+        access_key: form.r2_access_key,
+        secret_key: form.r2_secret_key,
+        base_path: form.r2_base_path,
+        url: Some(form.r2_url),
+    };
+    let storage = land_dblayer::settings::Storage {
+        current: form.current,
+        fs: fs_storage,
+        r2: r2_storage,
+    };
+    let value = serde_json::to_string(&storage)?;
+    land_dblayer::settings::set("storage", &value).await?;
+    Ok("ok".to_string())
 }

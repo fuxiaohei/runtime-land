@@ -1,4 +1,4 @@
-use crate::RenderEngine;
+use crate::{PageVars, RenderEngine};
 use anyhow::Result;
 use axum::extract::{Path, Request};
 use axum::http::StatusCode;
@@ -14,7 +14,17 @@ use serde::{Deserialize, Serialize};
 use tracing::{debug, error, instrument};
 
 pub async fn signin(engine: RenderEngine) -> impl IntoResponse {
-    RenderHtml("sign-in.hbs", engine, &{})
+    #[derive(Debug, Serialize, Deserialize)]
+    struct Vars {
+        pub page: PageVars,
+    }
+    RenderHtml(
+        "sign-in.hbs",
+        engine,
+        Vars {
+            page: PageVars::new("Sign In", "/sign-in"),
+        },
+    )
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -204,7 +214,7 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
                 return Ok(Redirect::to("/sign-in").into_response());
             }
         }
-        
+
         debug!("auth-middleware: session_user: {:?}", session_user);
         request.extensions_mut().insert(session_user);
     }

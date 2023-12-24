@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub const MANIFEST_VERSION: &str = "0.2.0";
 pub const MANIFEST_FILE: &str = "land.toml";
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MetaData {
     #[serde(rename = "land_manifest_version")]
     pub manifest_version: String,
@@ -12,7 +12,7 @@ pub struct MetaData {
     pub build: BuildMetaData,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug,Serialize, Deserialize)]
 pub struct ProjectMetaData {
     pub name: String,
     pub version: String,
@@ -21,10 +21,11 @@ pub struct ProjectMetaData {
     pub description: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug,Serialize, Deserialize)]
 pub struct BuildMetaData {
     pub command: String,
     pub target: String,
+    pub src_files: Vec<String>,
 }
 
 impl MetaData {
@@ -41,6 +42,10 @@ impl MetaData {
             build: BuildMetaData {
                 command: "cargo build --release".to_string(),
                 target: "target/wasm32-wasi/release/".to_string(),
+                src_files: vec!["src/", "Cargo.toml", "Cargo.lock"]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             },
         }
     }
@@ -58,6 +63,10 @@ impl MetaData {
             build: BuildMetaData {
                 command: "".to_string(),
                 target: "dist/".to_string(),
+                src_files: vec!["src/", "package.json", "package-lock.json"]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             },
         }
     }

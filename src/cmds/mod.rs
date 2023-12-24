@@ -9,3 +9,6 @@ pub use up::Up;
 
 mod login;
 pub use login::Login;
+
+mod deploy;
+pub use deploy::Deploy;

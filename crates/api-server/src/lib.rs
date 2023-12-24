@@ -1,24 +1,62 @@
 use anyhow::Result;
+use axum::extract::{MatchedPath, Request};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::post;
 use axum::Router;
 use std::net::SocketAddr;
+use std::time::Duration;
 use tokio::net::TcpListener;
-use tracing::info;
+use tower_http::classify::ServerErrorsFailureClass;
+use tower_http::trace::TraceLayer;
+use tracing::{error, info, info_span, warn, Span};
 
 mod cli;
-
-// basic handler that responds with a static string
-async fn root() -> &'static str {
-    "Hello, World!"
-}
 
 /// router returns api server router
 pub fn router() -> Router {
     let router = Router::new()
-        .route("/", get(root))
-        .route("/cli/login/*token", post(cli::login));
+        .route("/cli/login/*token", post(cli::login))
+        .route("/cli/deploy", post(cli::deploy))
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(|request: &Request<_>| {
+                    // Log the matched route's path (with placeholders not filled in).
+                    let matched_path = request
+                        .extensions()
+                        .get::<MatchedPath>()
+                        .map(MatchedPath::as_str);
+                    let uri = request.uri().to_string();
+
+                    info_span!(
+                        "api/v2",
+                        method = ?request.method(),
+                        uri = %uri,
+                        matched_path,
+                        cost = tracing::field::Empty,
+                        status = tracing::field::Empty,
+                    )
+                })
+                .on_response(|response: &Response, latency: Duration, span: &Span| {
+                    span.record("cost", latency.as_millis());
+                    span.record("status", response.status().as_u16());
+                    if response.status().is_success() {
+                        info!("success")
+                    } else if response.status().is_server_error()
+                        || response.status().is_client_error()
+                    {
+                        warn!("failure")
+                    } else {
+                        info!("30x")
+                    }
+                })
+                .on_failure(
+                    |error: ServerErrorsFailureClass, latency: Duration, span: &Span| {
+                        span.record("cost", latency.as_millis());
+                        error!("error, {}", error)
+                    },
+                ),
+        );
     Router::new().nest("/api/v2", router)
 }
 
