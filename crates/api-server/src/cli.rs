@@ -2,7 +2,7 @@ use crate::AppError;
 use anyhow::anyhow;
 use axum::{extract::Path, Json};
 use serde::{Deserialize, Serialize};
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 /// LoginResponse is the response for /cli/login
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,11 +54,19 @@ pub async fn login(Path(token): Path<String>) -> Result<Json<LoginResponse>, App
 pub struct DeployRequest {
     pub metadata: land_common::MetaData,
     pub bundle: Vec<u8>,
+    pub bundle_md5: String,
     pub user_token: String,
     pub user_uuid: String,
 }
 
-pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<LoginResponse>, AppError> {
+/// DeployResponse is the response for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployResponse {
+    pub visit_url: String,
+    pub deploy_uuid: String,
+}
+
+pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployResponse>, AppError> {
     // validate user_token
     let token = land_dblayer::user::find_token_by_value(&payload.user_token).await?;
     if token.is_none() {
@@ -85,7 +93,39 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<LoginResp
     }
     let project = project.unwrap();
 
-    println!("deploying...,create or find project: {:?}", project);
-
-    Err(anyhow!("not implemented").into())
+    // get project testing deployment
+    let deploy = land_dblayer::deployment::find_by_project(
+        project.id,
+        land_dblayer::deployment::DeploymentType::Testing,
+    )
+    .await?;
+    let mut trace_uuid = String::new();
+    let mut old_deploy_id = 0;
+    if deploy.is_some() {
+        let deploy = deploy.unwrap();
+        trace_uuid = deploy.trace_uuid;
+        old_deploy_id = deploy.id;
+    }
+    // create new deployment and set old deployment to replaced
+    let new_deploy = land_dblayer::deployment::create(
+        project.id,
+        token.owner_id,
+        &project.name,
+        &trace_uuid,
+        &payload.bundle_md5,
+    )
+    .await?;
+    if old_deploy_id > 0 {
+        land_dblayer::deployment::set_replaced(old_deploy_id).await?;
+    }
+    let (domain_suffix, domain_protocol) = land_dblayer::settings::get_domain_settings().await?;
+    let resp = DeployResponse {
+        visit_url: format!(
+            "{}://{}.{}",
+            domain_protocol, new_deploy.name, domain_suffix
+        ),
+        deploy_uuid: new_deploy.trace_uuid,
+    };
+    info!("deploy success, resp: {:?}", resp);
+    Ok(Json(resp))
 }

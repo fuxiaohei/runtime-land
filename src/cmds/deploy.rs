@@ -53,6 +53,7 @@ impl Deploy {
         );
         let req = DeployRequest {
             metadata,
+            bundle_md5: format!("{:x}", md5::compute(&bundle)),
             bundle,
             user_token: config.user_token,
             user_uuid: config.user_uuid,
@@ -64,13 +65,13 @@ impl Deploy {
             .send_json(serde_json::to_value(req)?);
 
         if resp.is_err() {
-            cprintln!("<bright-red,bold>Error: {}</>", resp.err().unwrap(),);
+            cprintln!("<bright-red,bold>Upload error: {}</>", resp.err().unwrap(),);
             return Err(anyhow::anyhow!("Deploy failed!"));
         }
 
         let resp = resp.unwrap();
         if resp.status() != 200 {
-            cprintln!("<bright-red,bold>Error: {}</>", resp.into_string().unwrap());
+            cprintln!("<bright-red,bold>Response error: {}</>", resp.into_string().unwrap());
             return Err(anyhow::anyhow!("Deploy failed!"));
         }
 
@@ -123,6 +124,7 @@ fn pack_file(mut files: Vec<String>, target_path: &str, output_path: &str) -> Re
 pub struct DeployRequest {
     pub metadata: MetaData,
     pub bundle: Vec<u8>,
+    pub bundle_md5: String,
     pub user_token: String,
     pub user_uuid: String,
 }

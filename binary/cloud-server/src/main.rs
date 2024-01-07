@@ -61,6 +61,7 @@ impl Args {
         db_args.connect().await?;
 
         // init preset data
+        land_dblayer::settings::init_settings().await?;
         land_dblayer::storage::init_storage().await?;
 
         // extract assets

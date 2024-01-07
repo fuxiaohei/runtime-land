@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod project_deployment;
 pub mod project_info;
 pub mod settings;
 pub mod user_info;

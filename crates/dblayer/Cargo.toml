@@ -14,8 +14,8 @@ async-trait = { workspace = true }
 bcrypt = "0.15.0"
 chrono = { workspace = true }
 clap = { workspace = true }
-once_cell = { workspace = true }
 land-common = { workspace = true }
+once_cell = { workspace = true }
 rand = "0.8.5"
 sea-orm = { version = "0.12.10", features = [
     "sqlx-mysql",

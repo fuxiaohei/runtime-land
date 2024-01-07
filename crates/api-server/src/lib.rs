@@ -7,9 +7,8 @@ use axum::Router;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::net::TcpListener;
-use tower_http::classify::ServerErrorsFailureClass;
 use tower_http::trace::TraceLayer;
-use tracing::{error, info, info_span, warn, Span};
+use tracing::{info, info_span, warn, Span};
 
 mod cli;
 
@@ -45,17 +44,11 @@ pub fn router() -> Router {
                     } else if response.status().is_server_error()
                         || response.status().is_client_error()
                     {
-                        warn!("failure")
+                        warn!("failure, status: {:?}", response.status(),)
                     } else {
                         info!("30x")
                     }
-                })
-                .on_failure(
-                    |error: ServerErrorsFailureClass, latency: Duration, span: &Span| {
-                        span.record("cost", latency.as_millis());
-                        error!("error, {}", error)
-                    },
-                ),
+                }),
         );
     Router::new().nest("/api/v2", router)
 }
@@ -72,11 +65,13 @@ pub async fn run(addr: SocketAddr) -> Result<()> {
 }
 
 // Make our own error that wraps `anyhow::Error`.
+#[derive(Debug)]
 struct AppError(StatusCode, anyhow::Error);
 
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
+        println!("AppError: {:?}", self);
         (self.0, self.1.to_string()).into_response()
     }
 }

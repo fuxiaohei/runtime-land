@@ -7,10 +7,12 @@ enum ProjectDeployment {
     OwnerId,
     ProjectId,
     StoragePath,
+    StorageMd5,
     Specification,
     Name,
-    ProdStatus,
     TraceUuid,
+    ProdStatus,
+    DeployStatus,
     Status,
     CreatedAt,
     UpdatedAt,
@@ -56,6 +58,11 @@ impl MigrationTrait for Migration {
                             .not_null(),
                     )
                     .col(
+                        ColumnDef::new(ProjectDeployment::StorageMd5)
+                            .string_len(256)
+                            .not_null(),
+                    )
+                    .col(
                         ColumnDef::new(ProjectDeployment::Specification)
                             .text()
                             .not_null(),
@@ -63,6 +70,11 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(ProjectDeployment::TraceUuid)
                             .string_len(64)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::DeployStatus)
+                            .string_len(12)
                             .not_null(),
                     )
                     .col(
@@ -116,7 +128,6 @@ impl MigrationTrait for Migration {
                     .name("idx-project-deployment-owner-id")
                     .table(ProjectDeployment::Table)
                     .col(ProjectDeployment::OwnerId)
-                    .unique()
                     .to_owned(),
             )
             .await?;
@@ -128,7 +139,6 @@ impl MigrationTrait for Migration {
                     .name("idx-project-deployment-project-id")
                     .table(ProjectDeployment::Table)
                     .col(ProjectDeployment::ProjectId)
-                    .unique()
                     .to_owned(),
             )
             .await?;
@@ -140,6 +150,17 @@ impl MigrationTrait for Migration {
                     .name("idx-project-deployment-status")
                     .table(ProjectDeployment::Table)
                     .col(ProjectDeployment::Status)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-deploy-status")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::DeployStatus)
                     .to_owned(),
             )
             .await?;

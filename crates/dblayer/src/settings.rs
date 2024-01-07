@@ -3,6 +3,26 @@ use crate::DB;
 use anyhow::Result;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, Set};
 
+/// init_settings initializes default settings
+pub async fn init_settings() -> Result<()> {
+    let item = get("domain_suffix").await?;
+    if item.is_none() {
+        set("domain_suffix", "runtime.lol").await?;
+    }
+    let item = get("domain_protocol").await?;
+    if item.is_none() {
+        set("domain_protocol", "http").await?;
+    }
+    Ok(())
+}
+
+/// get_domain_settings returns domain suffix and protocol
+pub async fn get_domain_settings() -> Result<(String, String)> {
+    let suffix = get("domain_suffix").await?.unwrap().value;
+    let protocol = get("domain_protocol").await?.unwrap().value;
+    Ok((suffix, protocol))
+}
+
 pub async fn get(name: &str) -> Result<Option<settings::Model>> {
     let db = DB.get().unwrap();
     let item = settings::Entity::find()
