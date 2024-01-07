@@ -13,9 +13,9 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 land-worker = { workspace = true }
 lazy_static = { workspace = true }
-moka = { version = "0.12.1", features = ["sync"] }
+moka = { version = "0.12.2", features = ["sync"] }
 once_cell = { workspace = true }
-opendal = { version = "0.43.0", default-features = false, features = [
+opendal = { version = "0.44.0", default-features = false, features = [
     "services-fs",
 ] }
 tokio = { workspace = true }

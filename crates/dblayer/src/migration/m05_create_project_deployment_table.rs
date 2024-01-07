@@ -1,0 +1,175 @@
+use sea_orm_migration::prelude::*;
+
+#[derive(Iden)]
+enum ProjectDeployment {
+    Table,
+    Id,
+    OwnerId,
+    ProjectId,
+    StoragePath,
+    Specification,
+    Name,
+    ProdStatus,
+    TraceUuid,
+    Status,
+    CreatedAt,
+    UpdatedAt,
+    DeletedAt,
+}
+
+#[derive(DeriveMigrationName)]
+pub struct Migration;
+
+#[async_trait::async_trait]
+impl MigrationTrait for Migration {
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .create_table(
+                Table::create()
+                    .table(ProjectDeployment::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(ProjectDeployment::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::OwnerId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::ProjectId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::Name)
+                            .string_len(128)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::StoragePath)
+                            .string_len(256)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::Specification)
+                            .text()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::TraceUuid)
+                            .string_len(64)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::Status)
+                            .string_len(12)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::ProdStatus)
+                            .string_len(12)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::CreatedAt)
+                            .timestamp()
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_string())
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::UpdatedAt)
+                            .timestamp()
+                            .extra(
+                                "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP".to_string(),
+                            )
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::DeletedAt)
+                            .timestamp()
+                            .null(),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-name")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::Name)
+                    .unique()
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-owner-id")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::OwnerId)
+                    .unique()
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-project-id")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::ProjectId)
+                    .unique()
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-status")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::Status)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-prod-status")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::ProdStatus)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx-project-deployment-trace-uuid")
+                    .table(ProjectDeployment::Table)
+                    .col(ProjectDeployment::TraceUuid)
+                    .to_owned(),
+            )
+            .await?;
+
+        Ok(())
+    }
+
+    async fn down(&self, _manager: &SchemaManager) -> Result<(), DbErr> {
+        Ok(())
+    }
+}

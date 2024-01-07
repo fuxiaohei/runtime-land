@@ -15,12 +15,13 @@ bcrypt = "0.15.0"
 chrono = { workspace = true }
 clap = { workspace = true }
 once_cell = { workspace = true }
+land-common = { workspace = true }
 rand = "0.8.5"
-sea-orm = { version = "0.12.9", features = [
+sea-orm = { version = "0.12.10", features = [
     "sqlx-mysql",
     "runtime-tokio-rustls"
 ] }
-sea-orm-migration = "0.12.6"
+sea-orm-migration = "0.12.10"
 serde = { workspace = true }
 serde_json = { workspace = true }
 strum = { version = "0.25.0", features = ["derive"] }

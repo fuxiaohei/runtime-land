@@ -11,8 +11,8 @@ documentation = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 http ={ workspace = true }
-quote = "1.0.33"
-syn = { version = "2.0.40", features = ["full"] }
+quote = "1.0.35"
+syn = { version = "2.0.48", features = ["full"] }
 
 [lib]
 proc-macro = true

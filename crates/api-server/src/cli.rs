@@ -71,7 +71,21 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<LoginResp
         return Err(anyhow!("token is not cli-access").into());
     }
 
-    println!("deploying...,payload: {:?}", payload);
+    // use meta data to create new project
+    let mut project =
+        land_dblayer::project::find_by_name(token.owner_id, &payload.metadata.project.name).await?;
+    if project.is_none() {
+        let p2 = land_dblayer::project::create(
+            token.owner_id,
+            &payload.metadata,
+            land_dblayer::project::CreatedByCases::LandCli,
+        )
+        .await?;
+        project = Some(p2);
+    }
+    let project = project.unwrap();
 
-    return Err(anyhow!("not implemented").into());
+    println!("deploying...,create or find project: {:?}", project);
+
+    Err(anyhow!("not implemented").into())
 }

@@ -56,14 +56,14 @@ pub async fn storage(
     struct Vars {
         pub page: PageVars,
         pub user: SessionUser,
-        pub storage: land_dblayer::settings::Storage,
+        pub storage: land_dblayer::storage::Storage,
     }
 
     let s = land_dblayer::settings::get("storage")
         .await
         .unwrap()
         .unwrap(); // it must be initialzed
-    let storage: land_dblayer::settings::Storage = serde_json::from_str(&s.value).unwrap();
+    let storage: land_dblayer::storage::Storage = serde_json::from_str(&s.value).unwrap();
 
     RenderHtml(
         "admin/storage.hbs",
@@ -78,10 +78,10 @@ pub async fn storage(
 
 /// storage_update is the handler for POST /admin/storage
 pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<String, AppError> {
-    let fs_storage = land_dblayer::settings::FsStorage {
+    let fs_storage = land_dblayer::storage::FsStorage {
         directory: form.fs_path,
     };
-    let r2_storage = land_dblayer::settings::R2Storage {
+    let r2_storage = land_dblayer::storage::R2Storage {
         endpoint: form.r2_endpoint,
         bucket: form.r2_bucket,
         region: form.r2_region,
@@ -90,7 +90,7 @@ pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<Strin
         base_path: form.r2_base_path,
         url: Some(form.r2_url),
     };
-    let storage = land_dblayer::settings::Storage {
+    let storage = land_dblayer::storage::Storage {
         current: form.current,
         fs: fs_storage,
         r2: r2_storage,

@@ -12,7 +12,7 @@ pub struct MetaData {
     pub build: BuildMetaData,
 }
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProjectMetaData {
     pub name: String,
     pub version: String,
@@ -21,7 +21,7 @@ pub struct ProjectMetaData {
     pub description: String,
 }
 
-#[derive(Debug,Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BuildMetaData {
     pub command: String,
     pub target: String,
@@ -42,7 +42,7 @@ impl MetaData {
             build: BuildMetaData {
                 command: "cargo build --release".to_string(),
                 target: "target/wasm32-wasi/release/".to_string(),
-                src_files: vec!["src/", "Cargo.toml", "Cargo.lock"]
+                src_files: ["src/", "Cargo.toml", "Cargo.lock"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect(),
@@ -63,7 +63,7 @@ impl MetaData {
             build: BuildMetaData {
                 command: "".to_string(),
                 target: "dist/".to_string(),
-                src_files: vec!["src/", "package.json", "package-lock.json"]
+                src_files: ["src/", "package.json", "package-lock.json"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect(),
