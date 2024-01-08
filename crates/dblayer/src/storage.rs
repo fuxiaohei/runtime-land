@@ -1,5 +1,9 @@
-use serde::{Deserialize, Serialize};
 use anyhow::Result;
+use once_cell::sync::Lazy;
+use opendal::services::{Fs, Memory, S3};
+use opendal::Operator;
+use serde::{Deserialize, Serialize};
+use tokio::sync::Mutex;
 use tracing::info;
 
 use crate::settings::{get, set};
@@ -18,6 +22,18 @@ impl Default for Storage {
             fs: FsStorage::default(),
             r2: R2Storage::default(),
         }
+    }
+}
+
+impl Storage {
+    pub fn build_url(&self, path: &str) -> Result<String> {
+        if self.current == "fs" {
+            return Ok(format!("file://{}", path));
+        }
+        if self.current == "r2" {
+            return Ok(format!("{}/{}", self.r2.url.as_ref().unwrap(), path));
+        }
+        Err(anyhow::anyhow!("unknown storage: {}", self.current))
     }
 }
 
@@ -59,6 +75,15 @@ impl Default for R2Storage {
     }
 }
 
+/// GLOBAL is the global storage operator
+pub static GLOBAL: Lazy<Mutex<Operator>> = Lazy::new(|| {
+    let mut builder = Memory::default();
+    builder.root("/tmp");
+    let op = Operator::new(builder).unwrap().finish();
+    Mutex::new(op)
+});
+
+/// init_storage init storage if not exist
 pub async fn init_storage() -> Result<()> {
     let item = get("storage").await?;
     if item.is_none() {
@@ -66,5 +91,55 @@ pub async fn init_storage() -> Result<()> {
         info!("init storage: {}", value);
         set("storage", &value).await?;
     }
+
+    // load storage as top static variable
+    reload_storage().await?;
     Ok(())
+}
+
+/// get_storage returns the current storage
+pub async fn get_storage() -> Result<Storage> {
+    let item = get("storage").await?;
+    let storage: Storage = serde_json::from_str(&item.unwrap().value)?;
+    Ok(storage)
+}
+
+pub async fn reload_storage() -> Result<()> {
+    let item = get("storage").await?;
+    let storage: Storage = serde_json::from_str(&item.unwrap().value)?;
+
+    // if storage is fs
+    if storage.current == "fs" {
+        let mut builder = Fs::default();
+        builder.root(&storage.fs.directory);
+        let op = Operator::new(builder).unwrap().finish();
+        let mut global = GLOBAL.lock().await;
+        *global = op;
+        info!("build global storage:fs, path:{:?}", storage.fs.directory);
+        return Ok(());
+    }
+
+    // if storage is r2
+    if storage.current == "r2" {
+        let mut builder = S3::default();
+        builder.root(&storage.r2.base_path);
+        builder.bucket(&storage.r2.bucket);
+        builder.endpoint(&storage.r2.endpoint);
+        builder.region(&storage.r2.region);
+        builder.batch_max_operations(300); // cloudflare R2 need < 700
+        builder.access_key_id(&storage.r2.access_key);
+        builder.secret_access_key(&storage.r2.secret_key);
+
+        let op: Operator = Operator::new(builder)?.finish();
+        let mut global = GLOBAL.lock().await;
+        *global = op;
+        info!(
+            "build global storage:r2, endpoint:{:?}",
+            storage.r2.endpoint
+        );
+        return Ok(());
+    }
+
+    // unknown storage
+    Err(anyhow::anyhow!("unknown storage: {}", storage.current))
 }

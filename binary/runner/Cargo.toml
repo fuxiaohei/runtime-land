@@ -9,6 +9,11 @@ homepage = { workspace = true }
 documentation = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+color-print = { workspace = true }
 land-common = { workspace = true }
 land-worker-server = { workspace = true }
 tokio = { workspace = true }
+tracing = { workspace = true }
+url = "2.5.0"

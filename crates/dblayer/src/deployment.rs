@@ -1,6 +1,7 @@
 use crate::{models::project_deployment, DB};
 use anyhow::Result;
 use rand::{distributions::Alphanumeric, Rng};
+use sea_orm::QueryOrder;
 use sea_orm::{sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
 
 #[derive(strum::Display)]
@@ -21,6 +22,7 @@ pub enum Status {
 #[strum(serialize_all = "lowercase")]
 pub enum DeployStatus {
     Deploying,
+    Failed,
 }
 
 pub async fn find_by_project(
@@ -94,4 +96,62 @@ pub async fn create(
     let project_active_model: project_deployment::ActiveModel = project.into();
     let project_model = project_active_model.insert(db).await?;
     Ok(project_model)
+}
+
+async fn set_deploy_status_internal(deploy_id: i32, deploy_status: DeployStatus) -> Result<()> {
+    let db = DB.get().unwrap();
+    project_deployment::Entity::update_many()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
+        .col_expr(
+            project_deployment::Column::DeployStatus,
+            Expr::value(deploy_status.to_string()),
+        )
+        .exec(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(())
+}
+
+pub async fn set_deploy_failed(deploy_id: i32) -> Result<()> {
+    set_deploy_status_internal(deploy_id, DeployStatus::Failed).await
+}
+
+pub async fn update_storage_path(deploy_id: i32, storage_path: &str) -> Result<()> {
+    let db = DB.get().unwrap();
+    project_deployment::Entity::update_many()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
+        .col_expr(
+            project_deployment::Column::StoragePath,
+            Expr::value(storage_path),
+        )
+        .exec(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(())
+}
+
+/// get_latest_updated returns all deployments updated in last `duration` seconds
+pub async fn get_latest_updated(duration: i64) -> Result<Vec<project_deployment::Model>> {
+    let db = DB.get().unwrap();
+    let now = chrono::Utc::now();
+    let now = now - chrono::Duration::seconds(duration);
+    let projects = project_deployment::Entity::find()
+        .filter(project_deployment::Column::UpdatedAt.gt(now))
+        .order_by_desc(project_deployment::Column::Id)
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(projects)
+}
+
+/// list_actives returns all active deployments
+pub async fn list_actives() -> Result<Vec<project_deployment::Model>> {
+    let db = DB.get().unwrap();
+    let projects = project_deployment::Entity::find()
+        .filter(project_deployment::Column::Status.eq(Status::Active.to_string()))
+        .order_by_desc(project_deployment::Column::Id)
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(projects)
 }

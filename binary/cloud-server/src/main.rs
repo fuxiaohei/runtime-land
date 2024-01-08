@@ -68,6 +68,9 @@ impl Args {
         let assets_dir = "assets";
         land_web_server::extract_assets(assets_dir)?;
 
+        // init confs generating loop for api-server
+        land_api_server::init_confs_loop()?;
+
         // merge router api and website api
         let router = Router::new()
             .route("/", any(land_web_server::default_handler))

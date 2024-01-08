@@ -44,7 +44,7 @@ impl Deploy {
 
         // read tar.gz file
         let bundle = std::fs::read(tmp_tar_gz)?;
-        debug!("bundle size: {}", bundle.len());
+        debug!("bundle size: {} KB", bundle.len() / 1024);
 
         // send deploy request
         let deploy_url = format!(
@@ -71,7 +71,10 @@ impl Deploy {
 
         let resp = resp.unwrap();
         if resp.status() != 200 {
-            cprintln!("<bright-red,bold>Response error: {}</>", resp.into_string().unwrap());
+            cprintln!(
+                "<bright-red,bold>Response error: {}</>",
+                resp.into_string().unwrap()
+            );
             return Err(anyhow::anyhow!("Deploy failed!"));
         }
 
@@ -96,10 +99,6 @@ fn pack_file(mut files: Vec<String>, target_path: &str, output_path: &str) -> Re
         // check file exists
         let fpath = std::path::Path::new(file);
         if !fpath.exists() {
-            cprintln!(
-                "<bright-red,bold>Warning</> file '{}' does not exist!",
-                file
-            );
             continue;
         }
         // assuming 'file' can be either a directory or a file

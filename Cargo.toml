@@ -111,13 +111,6 @@ tower-http = { version = "0.5.0", features = [
 ] }
 axum-extra = { version = "0.9.1", features = ["cookie"] }
 base64 = "0.21.5"
-reqwest = { version = "0.11.23", default-features = false, features = [
-    "stream",
-    "rustls-tls",
-    "blocking",
-    "json",
-    "multipart",
-] }
 time = "0.3.31"
 chrono = "0.4.31"
 uuid = { version = "1.6.1", features = ["v4"] }
@@ -125,3 +118,9 @@ regex = "1.10.2"
 ureq = { version = "2.9.1", features = ["http-crate", "json"] }
 walkdir = "2.4.0"
 md5 = "0.7.0"
+opendal = { version = "0.44.1", default-features = false, features = [
+    "services-fs",
+    "services-s3",
+    "services-memory",
+    "rustls",
+] }

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::extract::{MatchedPath, Request};
+use axum::extract::{DefaultBodyLimit, MatchedPath, Request};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
@@ -11,12 +11,18 @@ use tower_http::trace::TraceLayer;
 use tracing::{info, info_span, warn, Span};
 
 mod cli;
+mod runner;
+
+mod confs;
+pub use confs::init_loop as init_confs_loop;
 
 /// router returns api server router
 pub fn router() -> Router {
     let router = Router::new()
         .route("/cli/login/*token", post(cli::login))
         .route("/cli/deploy", post(cli::deploy))
+        .route("/runner/sync", post(runner::sync))
+        .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<_>| {

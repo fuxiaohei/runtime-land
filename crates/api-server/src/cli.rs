@@ -2,7 +2,7 @@ use crate::AppError;
 use anyhow::anyhow;
 use axum::{extract::Path, Json};
 use serde::{Deserialize, Serialize};
-use tracing::{debug, info, warn};
+use tracing::{debug, info, info_span, warn, Instrument};
 
 /// LoginResponse is the response for /cli/login
 #[derive(Debug, Serialize, Deserialize)]
@@ -67,6 +67,17 @@ pub struct DeployResponse {
 }
 
 pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployResponse>, AppError> {
+    // check md5
+    let check_md5 = format!("{:x}", md5::compute(&payload.bundle));
+    if check_md5 != payload.bundle_md5 {
+        warn!(
+            "bundle md5 not match, check_md5: {}, payload.bundle_md5: {}",
+            check_md5, payload.bundle_md5
+        );
+        return Err(anyhow!("bundle md5 not match").into());
+    }
+    debug!("bundle size: {} KB", payload.bundle.len() / 1024);
+
     // validate user_token
     let token = land_dblayer::user::find_token_by_value(&payload.user_token).await?;
     if token.is_none() {
@@ -92,6 +103,7 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
         project = Some(p2);
     }
     let project = project.unwrap();
+    debug!("find project: {:?}", project);
 
     // get project testing deployment
     let deploy = land_dblayer::deployment::find_by_project(
@@ -118,6 +130,36 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
     if old_deploy_id > 0 {
         land_dblayer::deployment::set_replaced(old_deploy_id).await?;
     }
+    debug!("create new_deploy: {:?}", new_deploy);
+
+    // build save storage path
+    let save_storage_path = format!("{}/{}.tar.gz", project.uuid, new_deploy.name);
+    debug!("save_storage_path: {:?}", save_storage_path);
+    // use tokio task to upload storage
+    tokio::spawn(async move {
+        let deploy_id = new_deploy.id;
+        let span = info_span!("upload-storage", path = &save_storage_path, deploy_id);
+        let global_storage = land_dblayer::storage::GLOBAL.lock().await;
+        let res = global_storage
+            .write(&save_storage_path, payload.bundle)
+            .instrument(span)
+            .await;
+        match res {
+            Ok(_) => {
+                info!("success");
+                land_dblayer::deployment::update_storage_path(deploy_id, &save_storage_path)
+                    .await
+                    .unwrap();
+            }
+            Err(e) => {
+                warn!("failed, err: {}", e);
+                land_dblayer::deployment::set_deploy_failed(deploy_id)
+                    .await
+                    .unwrap();
+            }
+        }
+    });
+
     let (domain_suffix, domain_protocol) = land_dblayer::settings::get_domain_settings().await?;
     let resp = DeployResponse {
         visit_url: format!(
@@ -126,6 +168,7 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
         ),
         deploy_uuid: new_deploy.trace_uuid,
     };
+
     info!("deploy success, resp: {:?}", resp);
     Ok(Json(resp))
 }

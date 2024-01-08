@@ -114,23 +114,28 @@ async fn clerk_verify_session(req: &SignCallbackRequest, session: String) -> any
     );
     let verify_data = ClerkVerifySessionRequest { token: session };
     debug!("clerk-verify-session: {}", verify_api);
-    let resp = reqwest::Client::new()
-        .post(verify_api)
-        .header(
-            "Authorization",
-            "Bearer sk_test_mTylRXqX3ds2ZWPo2P3amunjDypN7B7Q6hxqjdEEbD",
-        )
-        .json(&verify_data)
-        .send()
-        .await?;
-    if !resp.status().is_success() {
+
+    let user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36";
+    let req_agent = ureq::AgentBuilder::new()
+        .user_agent(user_agent)
+        .redirects(10)
+        .build();
+    let mut req = req_agent
+        .post(&verify_api)
+        .timeout(std::time::Duration::from_secs(10));
+    req = req.set(
+        "Authorization",
+        "Bearer sk_test_mTylRXqX3ds2ZWPo2P3amunjDypN7B7Q6hxqjdEEbD",
+    );
+    let resp = req.send_json(verify_data)?;
+    if resp.status() > 200{
         return Err(anyhow::anyhow!(
             "clerk-verify-session error: {}, {}",
             resp.status(),
-            resp.text().await?
+            resp.into_string()?
         ));
     }
-    let resp: ClerkVerifySessionResponse = resp.json().await?;
+    let resp: ClerkVerifySessionResponse = resp.into_json()?;
     debug!("clerk-verify-session-resp: {:?}", resp);
     Ok(())
 }
