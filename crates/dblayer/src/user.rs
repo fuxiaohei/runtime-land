@@ -31,6 +31,7 @@ pub enum TokenCreatedByCases {
     Session,
     AccessToken,
     CliAccess,
+    RunnerAccess,
 }
 
 /// find_by_oauth finds a user by oauth user id

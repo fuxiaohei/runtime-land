@@ -12,9 +12,11 @@ use tracing::{info, info_span, warn, Span};
 
 mod cli;
 mod runner;
+pub use runner::{SyncRequest, SyncResponse};
 
 mod confs;
 pub use confs::init_loop as init_confs_loop;
+pub use confs::ConfData;
 
 /// router returns api server router
 pub fn router() -> Router {
@@ -35,16 +37,16 @@ pub fn router() -> Router {
 
                     info_span!(
                         "api/v2",
-                        method = ?request.method(),
-                        uri = %uri,
-                        matched_path,
-                        cost = tracing::field::Empty,
-                        status = tracing::field::Empty,
+                        m = ?request.method(),
+                        u = %uri,
+                        mp = matched_path,
+                        t = tracing::field::Empty,
+                        s = tracing::field::Empty,
                     )
                 })
                 .on_response(|response: &Response, latency: Duration, span: &Span| {
-                    span.record("cost", latency.as_millis());
-                    span.record("status", response.status().as_u16());
+                    span.record("t", latency.as_millis());
+                    span.record("s", response.status().as_u16());
                     if response.status().is_success() {
                         info!("success")
                     } else if response.status().is_server_error()

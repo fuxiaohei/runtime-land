@@ -17,3 +17,7 @@ land-worker-server = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = "2.5.0"
+serde = { workspace = true }
+ureq = { workspace = true }
+land-api-server = { workspace = true }
+once_cell = { workspace = true }

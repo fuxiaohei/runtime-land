@@ -2,7 +2,8 @@ use anyhow::Result;
 use clap::Parser;
 use color_print::cprintln;
 use land_worker_server::Opts;
-use tracing::debug;
+
+mod confs;
 
 #[derive(Parser, Debug)]
 struct OutputArgs {
@@ -36,6 +37,9 @@ struct Args {
     /// The url of cloud server
     #[clap(long = "url", value_parser = validate_url,default_value("https://cloud.runtime.land"))]
     pub cloud_server_url: Option<String>,
+    /// The token of the runner
+    #[clap(long)]
+    pub token: String,
 }
 
 impl Args {
@@ -44,6 +48,7 @@ impl Args {
             version,
             output,
             cloud_server_url,
+            token,
         } = self;
         if version {
             land_common::print_version(env!("CARGO_PKG_NAME"), output.verbose);
@@ -51,7 +56,8 @@ impl Args {
         }
         output.init_logging();
 
-        debug!("cloud_server_url: {:?}", cloud_server_url);
+        // init confs loop
+        confs::init_loop(token, cloud_server_url.unwrap())?;
 
         let opts = Opts::default();
         land_worker_server::run(opts).await.unwrap();
