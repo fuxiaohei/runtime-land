@@ -7,6 +7,8 @@ enum ProjectDeployment {
     OwnerId,
     ProjectId,
     StoragePath,
+    StorageSize,
+    StorageContentType,
     StorageMd5,
     Specification,
     Name,
@@ -63,8 +65,18 @@ impl MigrationTrait for Migration {
                             .not_null(),
                     )
                     .col(
+                        ColumnDef::new(ProjectDeployment::StorageSize)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::StorageContentType)
+                            .string_len(128)
+                            .not_null(),
+                    )
+                    .col(
                         ColumnDef::new(ProjectDeployment::Specification)
-                            .text()
+                            .json()
                             .not_null(),
                     )
                     .col(

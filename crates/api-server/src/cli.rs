@@ -125,6 +125,8 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
         &project.name,
         &trace_uuid,
         &payload.bundle_md5,
+        payload.bundle.len() as i32,
+        "application/gzip",
     )
     .await?;
     if old_deploy_id > 0 {

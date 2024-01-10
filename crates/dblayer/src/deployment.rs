@@ -3,6 +3,7 @@ use anyhow::Result;
 use rand::{distributions::Alphanumeric, Rng};
 use sea_orm::QueryOrder;
 use sea_orm::{sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use serde::{Deserialize, Serialize};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -23,6 +24,25 @@ pub enum Status {
 pub enum DeployStatus {
     Deploying,
     Failed,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Specification {
+    cpu_time_limit: Option<i32>,
+    memory_limit: Option<i32>,
+    wall_time_limit: Option<i32>,
+    fetch_limit: Option<i32>,
+}
+
+impl Default for Specification {
+    fn default() -> Self {
+        Self {
+            cpu_time_limit: Some(100), // 100ms
+            memory_limit: Some(128),   // 128MB
+            wall_time_limit: Some(30), // 30 seconds
+            fetch_limit: Some(5),      // send 5 requests
+        }
+    }
 }
 
 pub async fn find_by_project(
@@ -64,6 +84,8 @@ pub async fn create(
     project_name: &str,
     trace_uuid: &str,
     storage_md5: &str,
+    storage_size: i32,
+    storage_content_type: &str,
 ) -> Result<project_deployment::Model> {
     let random_string = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -83,6 +105,8 @@ pub async fn create(
         owner_id,
         name: format!("{}-{}", project_name, random_string),
         storage_path: String::new(),
+        storage_size,
+        storage_content_type: storage_content_type.to_string(),
         storage_md5: storage_md5.to_string(),
         trace_uuid,
         prod_status: DeploymentType::Testing.to_string(),
@@ -91,7 +115,7 @@ pub async fn create(
         created_at: chrono::Utc::now(),
         updated_at: chrono::Utc::now(),
         deleted_at: None,
-        specification: String::new(),
+        specification: serde_json::to_value(Specification::default()).unwrap(),
     };
     let project_active_model: project_deployment::ActiveModel = project.into();
     let project_model = project_active_model.insert(db).await?;

@@ -19,7 +19,6 @@ pub fn init_loop() -> Result<()> {
 
 async fn loop_once() -> Result<()> {
     let span = tracing::info_span!("confs_loop");
-    let _enter = span.enter();
 
     let mut confs = CONFS.lock().await;
     // no confs, build it
@@ -65,9 +64,6 @@ pub static CONFS: Lazy<Mutex<ConfData>> = Lazy::new(|| {
 });
 
 async fn build_confs() -> Result<ConfData> {
-    let span = tracing::info_span!("build_confs");
-    let _enter = span.enter();
-
     let (domain_suffx, protocol) = land_dblayer::settings::get_domain_settings().await?;
     let storage = land_dblayer::storage::get_storage().await?;
 

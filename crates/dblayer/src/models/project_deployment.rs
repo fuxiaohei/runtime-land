@@ -14,8 +14,9 @@ pub struct Model {
     pub name: String,
     pub storage_path: String,
     pub storage_md5: String,
-    #[sea_orm(column_type = "Text")]
-    pub specification: String,
+    pub storage_size: i32,
+    pub storage_content_type: String,
+    pub specification: Json,
     pub trace_uuid: String,
     pub deploy_status: String,
     pub status: String,

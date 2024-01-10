@@ -8,14 +8,20 @@ pub mod land {
             #[doc(hidden)]
             #[cfg(target_arch = "wasm32")]
             static __FORCE_SECTION_REF: fn() = super::super::super::__link_section;
+            /// HTTP Status Codes
             pub type StatusCode = u16;
+            /// HTTP Request Methods, use uppercase
             pub type Method = wit_bindgen::rt::string::String;
+            /// HTTP Request Headers
             pub type Headers = wit_bindgen::rt::vec::Vec<(
                 wit_bindgen::rt::string::String,
                 wit_bindgen::rt::string::String,
             )>;
+            /// HTTP URI
             pub type Uri = wit_bindgen::rt::string::String;
+            /// HTTP Request Body
             pub type BodyHandle = u32;
+            /// HTTP Request
             #[derive(Clone)]
             pub struct Request {
                 pub method: Method,
@@ -33,6 +39,7 @@ pub mod land {
                         .finish()
                 }
             }
+            /// HTTP Response
             #[derive(Clone)]
             pub struct Response {
                 pub status: StatusCode,
@@ -48,13 +55,20 @@ pub mod land {
                         .finish()
                 }
             }
+            /// HTTP errors returned by the runtime.
             #[derive(Clone)]
             pub enum RequestError {
+                /// The request failed due to a network error.
                 NetworkError(wit_bindgen::rt::string::String),
+                /// The request failed due to a timeout.
                 Timeout,
+                /// The request failed due to a invalid url.
                 InvalidUrl,
+                /// The request failed due to a forbidden destination.
                 DestinationNotAllowed,
+                /// The request failed due to over requests limit.
                 TooManyRequests,
+                /// The request failed due to invalid request
                 InvalidRequest(wit_bindgen::rt::string::String),
             }
             impl ::core::fmt::Debug for RequestError {
@@ -88,10 +102,13 @@ pub mod land {
             }
 
             impl std::error::Error for RequestError {}
+            /// Fetch redirect policy
             #[repr(u8)]
             #[derive(Clone, Copy, Eq, PartialEq)]
             pub enum RedirectPolicy {
+                /// Follow redirects.
                 Follow,
+                /// Do not follow redirects. User handles the 3xx response.
                 Manual,
             }
             impl ::core::fmt::Debug for RedirectPolicy {
@@ -118,10 +135,13 @@ pub mod land {
                 }
             }
 
+            /// HTTP request option
             #[repr(C)]
             #[derive(Clone, Copy)]
             pub struct RequestOptions {
+                /// The request timeout in milliseconds.
                 pub timeout: u32,
+                /// Follow redirects.
                 pub redirect: RedirectPolicy,
             }
             impl ::core::fmt::Debug for RequestOptions {
@@ -300,6 +320,7 @@ pub mod exports {
                 };
                 use super::super::super::super::WorkerHttpImpl as _GuestImpl;
                 pub trait Guest {
+                    /// handle request function
                     fn handle_request(req: Request) -> Response;
                 }
 
