@@ -9,21 +9,21 @@ use tracing::{debug, info};
 #[derive(Args)]
 pub struct DBArgs {
     /// Database host
-    #[clap(long("db-host"), env("DB_HOST"), default_value("127.0.0.1"))]
+    #[clap(long("db-host"), env("MYSQL_HOST"), default_value("127.0.0.1"))]
     pub host: String,
     /// Database port
-    #[clap(long("db-port"), env("DB_PORT"), default_value("3306"))]
+    #[clap(long("db-port"), env("MYSQL_PORT"), default_value("3306"))]
     pub port: u16,
     /// Database user
-    #[clap(long("db-user"), env("DB_USER"), default_value("root"))]
+    #[clap(long("db-user"), env("MYSQL_USER"), default_value("root"))]
     pub user: String,
     /// Database password
-    #[clap(long("db-password"), env("DB_PASSWORD"), default_value(""))]
+    #[clap(long("db-password"), env("MYSQL_PASSWORD"), default_value(""))]
     pub password: String,
     /// Database name
     #[clap(
         long("db-database"),
-        env("DB_DATABASE"),
+        env("MYSQL_DATABASE"),
         default_value("land-cloud-db")
     )]
     pub database: String,

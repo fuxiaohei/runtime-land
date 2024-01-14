@@ -12,12 +12,12 @@ documentation = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 color-print = { workspace = true }
+land-api-server = { workspace = true }
 land-common = { workspace = true }
 land-worker-server = { workspace = true }
+once_cell = { workspace = true }
+serde = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-url = "2.5.0"
-serde = { workspace = true }
 ureq = { workspace = true }
-land-api-server = { workspace = true }
-once_cell = { workspace = true }
+url = { workspace = true }

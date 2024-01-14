@@ -37,7 +37,7 @@ struct Args {
     #[clap(flatten)]
     output: OutputArgs,
     /// Address to listen on.
-    #[clap(long, default_value("127.0.0.1:3040"))]
+    #[clap(long, default_value("0.0.0.0:3040"))]
     address: String,
     #[clap(flatten)]
     db_args: DBArgs,
