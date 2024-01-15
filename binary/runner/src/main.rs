@@ -40,6 +40,12 @@ struct Args {
     /// The token of the runner
     #[clap(long)]
     pub token: String,
+    /// Address to listen on.
+    #[clap(long, default_value("0.0.0.0:3050"))]
+    pub address: String,
+    /// confs server Address to listen on.
+    #[clap(long, default_value("0.0.0.0:3051"))]
+    pub confs_address: String,
 }
 
 impl Args {
@@ -49,6 +55,8 @@ impl Args {
             output,
             cloud_server_url,
             token,
+            address,
+            confs_address,
         } = self;
         if version {
             land_common::print_version(env!("CARGO_PKG_NAME"), output.verbose);
@@ -59,7 +67,15 @@ impl Args {
         // init confs loop
         confs::init_loop(token, cloud_server_url.unwrap())?;
 
-        let opts = Opts::default();
+        // start confs server
+        tokio::spawn(async move {
+            confs::start_server(confs_address.parse().unwrap())
+                .await
+                .unwrap();
+        });
+
+        let mut opts = Opts::default();
+        opts.addr = address.parse().unwrap();
         land_worker_server::run(opts).await.unwrap();
 
         Ok(())

@@ -2175,6 +2175,7 @@ name = "land-runner"
 version = "0.2.0"
 dependencies = [
  "anyhow",
+ "axum",
  "clap",
  "color-print",
  "land-api-server",
@@ -2183,6 +2184,7 @@ dependencies = [
  "once_cell",
  "serde",
  "tokio",
+ "toml 0.8.8",
  "tracing",
  "ureq",
  "url",
