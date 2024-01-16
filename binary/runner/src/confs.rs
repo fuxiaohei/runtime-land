@@ -54,7 +54,7 @@ async fn sync_once(token: String, cloud_url: String) -> Result<()> {
 
 async fn confs_traefik_handler() -> String {
     let traefik_confs = TRAEFIK_CONFS.lock().await;
-    toml::to_string(&*traefik_confs).unwrap()
+    serde_json::to_string(&*traefik_confs).unwrap()
 }
 
 pub async fn start_server(addr: SocketAddr) -> Result<()> {
@@ -86,8 +86,8 @@ pub struct HttpRouter {
 
 #[derive(Serialize, Deserialize)]
 pub struct HttpMiddlewareHeader {
-    #[serde(rename = "customResponseHeaders")]
-    pub custom_response_headers: HashMap<String, String>,
+    // #[serde(rename = "customResponseHeaders")]
+    // pub custom_response_headers: HashMap<String, String>,
     #[serde(rename = "customRequestHeaders")]
     pub custom_request_headers: HashMap<String, String>,
 }
@@ -99,8 +99,8 @@ pub struct HttpMiddlewareGroup {
 
 #[derive(Serialize, Deserialize)]
 pub struct HttpTraefikConfs {
-    pub services: HashMap<String, HttpServiceLoadBalancer>,
-    pub routers: HashMap<String, HttpRouter>,
+    // pub services: HashMap<String, HttpServiceLoadBalancer>,
+    // pub routers: HashMap<String, HttpRouter>,
     pub middlewares: HashMap<String, HttpMiddlewareGroup>,
 }
 
@@ -112,8 +112,8 @@ pub struct TraefikConfs {
 /// TRAEFIK_CONFS is the global traefik confs data
 static TRAEFIK_CONFS: Lazy<Mutex<TraefikConfs>> = Lazy::new(|| {
     let http_confs = HttpTraefikConfs {
-        services: HashMap::new(),
-        routers: HashMap::new(),
+        // services: HashMap::new(),
+        // routers: HashMap::new(),
         middlewares: HashMap::new(),
     };
     Mutex::new(TraefikConfs { http: http_confs })
@@ -121,13 +121,13 @@ static TRAEFIK_CONFS: Lazy<Mutex<TraefikConfs>> = Lazy::new(|| {
 
 pub async fn update_traefik_confs(confs: ConfData) {
     let mut traefik_confs = HttpTraefikConfs {
-        services: HashMap::new(),
-        routers: HashMap::new(),
+        // services: HashMap::new(),
+        // routers: HashMap::new(),
         middlewares: HashMap::new(),
     };
     for route in confs.routes {
         let mut headers = HttpMiddlewareHeader {
-            custom_response_headers: HashMap::new(),
+            // custom_response_headers: HashMap::new(),
             custom_request_headers: HashMap::new(),
         };
         headers
@@ -135,9 +135,9 @@ pub async fn update_traefik_confs(confs: ConfData) {
             .insert("x-land-uuid".to_string(), route.uuid.clone());
         headers
             .custom_request_headers
-            .insert("x-land-module".to_string(), route.resource_path.clone());
+            .insert("x-land-module".to_string(), route.module_path.clone());
         traefik_confs.middlewares.insert(
-            format!("middleware-{}", route.uuid),
+            format!("m-{}", route.uuid),
             HttpMiddlewareGroup { headers },
         );
     }

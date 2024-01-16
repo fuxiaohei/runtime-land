@@ -44,6 +44,7 @@ async fn loop_once() -> Result<()> {
 pub struct RouteItem {
     pub uuid: String,
     pub route: String,
+    pub module_path: String,
     pub resource_path: String,
     pub resource_md5: String,
 }
@@ -78,6 +79,7 @@ async fn build_confs() -> Result<ConfData> {
             route,
             resource_path: storage.build_url(&deploy.storage_path)?,
             resource_md5: deploy.storage_md5,
+            module_path: deploy.storage_path,
         };
         debug!("route_item: {:?}", route_item);
         routes.push(route_item);
