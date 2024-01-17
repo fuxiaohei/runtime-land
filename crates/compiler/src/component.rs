@@ -7,10 +7,16 @@ use std::{
 use tracing::debug;
 use wit_component::ComponentEncoder;
 
-pub fn convert(path: &str, lang: &str, js_engine: Option<String>) -> Result<()> {
+pub fn convert(
+    project_name: &str,
+    path: &str,
+    lang: &str,
+    js_engine: Option<String>,
+) -> Result<()> {
     if lang == "js" || lang == "javascript" {
         let js_wasm = compile_js(path, js_engine)?; // this wasm is optimized by wasm-opt
-        let output_path = land_common::js_real_target_path(path);
+        let _ = std::fs::create_dir_all("dist");
+        let output_path = format!("dist/{}.wasm", project_name);
         convert_inner(&output_path, &js_wasm)?;
         return Ok(());
     }
@@ -94,6 +100,8 @@ fn convert_inner(path: &str, target: &str) -> Result<()> {
     std::fs::write(&output, component)?;
     std::fs::rename(&output, path)?;
     debug!("convert success, from {} to {}", target, path);
+    // remove wizer.wasm
+    let _ = std::fs::remove_file(target);
     Ok(())
 }
 

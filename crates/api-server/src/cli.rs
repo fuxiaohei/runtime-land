@@ -129,38 +129,50 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
         "application/gzip",
     )
     .await?;
-    if old_deploy_id > 0 {
-        land_dblayer::deployment::set_replaced(old_deploy_id).await?;
-    }
-    debug!("create new_deploy: {:?}", new_deploy);
+
+    debug!(
+        "create new_deploy: {:?}, old_deploy:{:?}",
+        new_deploy, old_deploy_id
+    );
 
     // build save storage path
     let save_storage_path = format!("{}/{}.tar.gz", project.uuid, new_deploy.name);
     debug!("save_storage_path: {:?}", save_storage_path);
     // use tokio task to upload storage
-    tokio::spawn(async move {
-        let deploy_id = new_deploy.id;
-        let span = info_span!("upload-storage", path = &save_storage_path, deploy_id);
-        let global_storage = land_dblayer::storage::GLOBAL.lock().await;
-        let res = global_storage
-            .write(&save_storage_path, payload.bundle)
-            .instrument(span)
-            .await;
-        match res {
-            Ok(_) => {
-                info!("success");
-                land_dblayer::deployment::update_storage_path(deploy_id, &save_storage_path)
-                    .await
-                    .unwrap();
-            }
-            Err(e) => {
-                warn!("failed, err: {}", e);
-                land_dblayer::deployment::set_deploy_failed(deploy_id)
-                    .await
-                    .unwrap();
+    tokio::spawn(
+        async move {
+            let deploy_id = new_deploy.id;
+            let span = info_span!("upload-storage", path = &save_storage_path, deploy_id);
+            let global_storage = land_dblayer::storage::GLOBAL.lock().await;
+            let res = global_storage
+                .write(&save_storage_path, payload.bundle)
+                .instrument(span)
+                .await;
+            match res {
+                Ok(_) => {
+                    info!("success");
+                    land_dblayer::deployment::update_storage_path(deploy_id, &save_storage_path)
+                        .await
+                        .unwrap();
+                    land_dblayer::deployment::set_deploy_success(deploy_id)
+                        .await
+                        .unwrap();
+                    if old_deploy_id > 0 {
+                        land_dblayer::deployment::set_replaced(old_deploy_id)
+                            .await
+                            .unwrap();
+                    }
+                }
+                Err(e) => {
+                    warn!("failed, err: {}", e);
+                    land_dblayer::deployment::set_deploy_failed(deploy_id)
+                        .await
+                        .unwrap();
+                }
             }
         }
-    });
+        .instrument(info_span!("upload-storage")),
+    );
 
     let (domain_suffix, domain_protocol) = land_dblayer::settings::get_domain_settings().await?;
     let resp = DeployResponse {

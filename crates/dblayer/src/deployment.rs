@@ -16,6 +16,7 @@ pub enum DeploymentType {
 #[strum(serialize_all = "lowercase")]
 pub enum Status {
     Active,
+    Pending,
     Replaced,
 }
 
@@ -23,6 +24,7 @@ pub enum Status {
 #[strum(serialize_all = "lowercase")]
 pub enum DeployStatus {
     Deploying,
+    Success,
     Failed,
 }
 
@@ -111,7 +113,7 @@ pub async fn create(
         trace_uuid,
         prod_status: DeploymentType::Testing.to_string(),
         deploy_status: DeployStatus::Deploying.to_string(),
-        status: Status::Active.to_string(),
+        status: Status::Pending.to_string(), // default pending
         created_at: chrono::Utc::now(),
         updated_at: chrono::Utc::now(),
         deleted_at: None,
@@ -140,6 +142,21 @@ pub async fn set_deploy_failed(deploy_id: i32) -> Result<()> {
     set_deploy_status_internal(deploy_id, DeployStatus::Failed).await
 }
 
+pub async fn set_deploy_success(deploy_id: i32) -> Result<()> {
+    set_deploy_status_internal(deploy_id, DeployStatus::Success).await?;
+    let db = DB.get().unwrap();
+    project_deployment::Entity::update_many()
+        .filter(project_deployment::Column::Id.eq(deploy_id))
+        .col_expr(
+            project_deployment::Column::Status,
+            Expr::value(Status::Active.to_string()),
+        )
+        .exec(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(())
+}
+
 pub async fn update_storage_path(deploy_id: i32, storage_path: &str) -> Result<()> {
     let db = DB.get().unwrap();
     project_deployment::Entity::update_many()
@@ -161,6 +178,7 @@ pub async fn get_latest_updated(duration: i64) -> Result<Vec<project_deployment:
     let now = now - chrono::Duration::seconds(duration);
     let projects = project_deployment::Entity::find()
         .filter(project_deployment::Column::UpdatedAt.gt(now))
+        .filter(project_deployment::Column::Status.eq(Status::Active.to_string()))
         .order_by_desc(project_deployment::Column::Id)
         .all(db)
         .await

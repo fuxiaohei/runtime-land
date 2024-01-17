@@ -34,6 +34,7 @@ impl Build {
 
         // generate component
         land_compiler::generate_component(
+            &metadata.project.name,
             &metadata.build.target,
             &metadata.project.language,
             self.js_engine.clone(),

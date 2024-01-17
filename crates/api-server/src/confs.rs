@@ -23,6 +23,18 @@ async fn loop_once() -> Result<()> {
     let mut confs = CONFS.lock().await;
     // no confs, build it
     if confs.routes_md5.is_empty() {
+        debug!("loop-by-empty");
+        let new_confs = build_confs().instrument(span.clone()).await?;
+        *confs = new_confs;
+        return Ok(());
+    }
+
+    // check flag
+    let now_ts = chrono::Utc::now().timestamp();
+    let trigger_ts = land_dblayer::settings::get_confs_refresh_flag().await?;
+    if now_ts - trigger_ts <= 10 {
+        debug!("loop-by-trigger");
+        // if trigger_ts is less than 10 seconds, means need refresh
         let new_confs = build_confs().instrument(span.clone()).await?;
         *confs = new_confs;
         return Ok(());
@@ -33,6 +45,8 @@ async fn loop_once() -> Result<()> {
     if deploys.is_empty() {
         return Ok(());
     }
+
+    debug!("loop-by-deploys");
 
     let new_confs = build_confs().instrument(span.clone()).await?;
     *confs = new_confs;

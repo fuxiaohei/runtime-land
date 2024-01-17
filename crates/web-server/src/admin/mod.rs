@@ -24,6 +24,54 @@ pub async fn dashboard(
     )
 }
 
+/// settings is the handler for /admin/settings
+pub async fn settings(
+    engine: RenderEngine,
+    Extension(user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    #[derive(Debug, Serialize, Deserialize)]
+    struct Vars {
+        pub page: PageVars,
+        pub user: SessionUser,
+        pub storage: land_dblayer::storage::Storage,
+        pub prod_domain: String,
+        pub prod_protocol: String,
+    }
+
+    let (prod_domain, prod_protocol) = land_dblayer::settings::get_domain_settings().await.unwrap();
+
+    let s = land_dblayer::settings::get("storage")
+        .await
+        .unwrap()
+        .unwrap(); // it must be initialzed
+    let storage: land_dblayer::storage::Storage = serde_json::from_str(&s.value).unwrap();
+
+    RenderHtml(
+        "admin/settings.hbs",
+        engine,
+        Vars {
+            page: PageVars::new("Settings | Dashboard", "/admin/settings"),
+            user,
+            storage,
+            prod_domain,
+            prod_protocol,
+        },
+    )
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DomainUpdateForm {
+    pub domain: String,
+    pub protocol: String,
+}
+
+/// domain_update is the handler for POST /admin/domain
+pub async fn domain_update(Form(form): Form<DomainUpdateForm>) -> Result<String, AppError> {
+    land_dblayer::settings::set_domain_settings(form.domain, form.protocol).await?;
+    land_dblayer::settings::set_confs_refresh_flag().await?; // trigger refresh confs
+    Ok("ok".to_string())
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StorageUpdateForm {
     /*
@@ -47,35 +95,6 @@ pub struct StorageUpdateForm {
     pub r2_url: String,
 }
 
-/// storage is the handler for /admin/storage
-pub async fn storage(
-    engine: RenderEngine,
-    Extension(user): Extension<SessionUser>,
-) -> impl IntoResponse {
-    #[derive(Debug, Serialize, Deserialize)]
-    struct Vars {
-        pub page: PageVars,
-        pub user: SessionUser,
-        pub storage: land_dblayer::storage::Storage,
-    }
-
-    let s = land_dblayer::settings::get("storage")
-        .await
-        .unwrap()
-        .unwrap(); // it must be initialzed
-    let storage: land_dblayer::storage::Storage = serde_json::from_str(&s.value).unwrap();
-
-    RenderHtml(
-        "admin/storage.hbs",
-        engine,
-        Vars {
-            page: PageVars::new("Storage - Management", "/admin/storage"),
-            user,
-            storage,
-        },
-    )
-}
-
 /// storage_update is the handler for POST /admin/storage
 pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<String, AppError> {
     let fs_storage = land_dblayer::storage::FsStorage {
@@ -97,5 +116,6 @@ pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<Strin
     };
     let value = serde_json::to_string(&storage)?;
     land_dblayer::settings::set("storage", &value).await?;
+    land_dblayer::settings::set_confs_refresh_flag().await?; // trigger refresh confs
     Ok("ok".to_string())
 }

@@ -38,7 +38,9 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 
     let admin_rt = Router::new()
         .route("/dashboard", get(admin::dashboard))
-        .route("/storage", get(admin::storage).post(admin::storage_update));
+        .route("/settings", get(admin::settings))
+        .route("/storage", post(admin::storage_update))
+        .route("/domain", post(admin::domain_update));
 
     let rt = Router::new()
         .route("/sign-in", get(sign::signin))
@@ -109,13 +111,17 @@ async fn not_found(engine: RenderEngine) -> impl IntoResponse {
         pub page: PageVars,
     }
 
-    RenderHtml(
+    let mut response = RenderHtml(
         "page_not_found.hbs",
         engine,
         Vars {
             page: PageVars::new("Page Not Found", ""),
         },
     )
+    .into_response();
+    let status = response.status_mut();
+    *status = StatusCode::NOT_FOUND;
+    response
 }
 
 /// run starts api server

@@ -128,7 +128,7 @@ async fn clerk_verify_session(req: &SignCallbackRequest, session: String) -> any
         "Bearer sk_test_mTylRXqX3ds2ZWPo2P3amunjDypN7B7Q6hxqjdEEbD",
     );
     let resp = req.send_json(verify_data)?;
-    if resp.status() > 200{
+    if resp.status() > 200 {
         return Err(anyhow::anyhow!(
             "clerk-verify-session error: {}, {}",
             resp.status(),
@@ -208,14 +208,16 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
             Ok(v) => v,
             Err(e) => {
                 error!("auth-middleware: {}", e);
-                return Ok(Redirect::to("/sign-in").into_response());
+                let url = format!("/sign-in?redirect={}", path);
+                return Ok(Redirect::to(url.as_str()).into_response());
             }
         };
 
         // if admin pages, need check user role
         if path.starts_with("/admin") && !session_user.is_admin {
             error!("auth-middleware: user is not admin");
-            return Ok(Redirect::to("/sign-in").into_response());
+            let url = format!("/sign-in?redirect={}", path);
+            return Ok(Redirect::to(url.as_str()).into_response());
         }
 
         debug!("auth-middleware: session_user: {:?}", session_user);

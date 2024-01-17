@@ -74,8 +74,10 @@ impl Args {
                 .unwrap();
         });
 
-        let mut opts = Opts::default();
-        opts.addr = address.parse().unwrap();
+        let opts = Opts {
+            addr: address.parse().unwrap(),
+            ..Default::default()
+        };
         land_worker_server::run(opts).await.unwrap();
 
         Ok(())

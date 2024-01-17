@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/admin_nav.hbs}}
+
+    <header class="py-4 border-bottom">
+        <div class="container d-flex flex-wrap justify-content-between">
+            <span class="fs-3">
+                <span class="fw-bold">Settings</span>
+            </span>
+        </div>
+    </header>
+
+    <main>
+        <div class="container mb-4">
+            <div class="row">
+                <div class="col-5">
+                    <form action="/admin/domain" id="d-form" method="post" class="mt-3">
+                        <h4>Domains</h4>
+                        <div class="form-group">
+                            <label for="d-domain" class="form-label mt-4">Domain</label>
+                            <input type="text" name="domain" class="form-control" id="d-domain"
+                                aria-describedby="domain" placeholder="Enter domain" value="{{prod_domain}}" required>
+                            <small id="d-domain-help" class="form-text text-muted">This is the domain of your project
+                                access url</small>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="d-protocol" class="form-label mt-4">Protocol</label>
+                            <select name="protocol" class="form-select" id="d-protocol">
+                                <option value="http" {{selected prod_protocol 'http' }}>http</option>
+                                <option value="https" {{selected prod_protocol 'https' }}>https</option>
+                            </select>
+                            <small id="d-protocol-help" class="form-text text-muted">This is the protocol of your
+                                project access url</small>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                        <div id="d-alert-success" class="d-none alert mt-4 alert-success" role="alert">
+                            Domain settings saved successfully.
+                        </div>
+                        <div id="d-alert-fail" class="d-none alert alert-danger mt-4" role="alert">
+                            Domain settings saved failed.
+                        </div>
+                    </form>
+                </div>
+                <div class="col-6 offset-1">
+                    <form id="s-form" action="/admin/storage" class="mt-3" method="post">
+                        <h4>Storage</h4>
+                        <ul class="nav nav-tabs py-3" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#s-current" aria-selected="true"
+                                    role="tab">Current</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#s-fs" aria-selected="false" role="tab"
+                                    tabindex="-1">FileSystem</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="tab" href="#s-r2" aria-selected="false" role="tab"
+                                    tabindex="-1">Cloudflare R2</a>
+                            </li>
+                        </ul>
+                        <div id="s-tabls" class="tab-content mb-4">
+                            <div class="tab-pane fade active show" id="s-current" role="tabpanel">
+                                <div class="form-group">
+                                    <label for="s-current-value" class="form-label mt-4">Current Storage Type</label>
+                                    <select name="current" class="form-select" id="s-current-value">
+                                        <option value="fs" {{selected storage.current 'fs' }}>FileSystem</option>
+                                        <option value="r2" {{selected storage.current 'r2' }}>Cloudflare R2</option>
+                                    </select>
+                                    <small class="form-text text-muted">This is the current storage type.</small>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="s-fs" role="tabpanel">
+                                <div class="form-group">
+                                    <label for="s-fs-path" class="form-label mt-4">File Directory</label>
+                                    <input type="text" name="fs_path" class="form-control" id="s-fs-path"
+                                        aria-describedby="file-path" placeholder="Enter file directory"
+                                        value="{{storage.fs.directory}}" required>
+                                    <small id="s-fs-path-help" class="form-text text-muted">This is the directory where
+                                        files
+                                        will be stored. Absolute path is recommended.</small>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="s-r2">
+                                <div class="form-group">
+                                    <label for="s-r2-endpoint" class="form-label mt-4">Endpoint</label>
+                                    <input type="text" name="r2_endpoint" class="form-control" id="s-r2-endpoint"
+                                        aria-describedby="endpoint" placeholder="Type in your cloudflare r2 endpoint"
+                                        value="{{storage.r2.endpoint}}" required>
+                                    <small id="s-r2-endpoint-help" class="form-text text-muted">This is the endpoint of
+                                        your
+                                        cloudflare r2 storage.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-bucket" class="form-label mt-4">Bucket</label>
+                                    <input type="text" name="r2_bucket" class="form-control" id="s-r2-bucket"
+                                        aria-describedby="bucket-name"
+                                        placeholder="Type in your cloudflare r2 bucket name"
+                                        value="{{storage.r2.bucket}}" required>
+                                    <small id="s-r2-bucket-help" class="form-text text-muted">This is the bucket name of
+                                        your
+                                        cloudflare r2 storage.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-region" class="form-label mt-4">Region</label>
+                                    <input type="text" name="r2_region" class="form-control" id="s-r2-region"
+                                        aria-describedby="region" placeholder="Type in your cloudflare r2 region"
+                                        value="{{storage.r2.region}}" required>
+                                    <small id="s-r2-region-help" class="form-text text-muted">This is the region of your
+                                        cloudflare r2 storage. R2's default value is 'auto'.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-access-key" class="form-label mt-4">Access Key</label>
+                                    <input type="text" name="r2_access_key" class="form-control" id="s-r2-access-key"
+                                        aria-describedby="access-key"
+                                        placeholder="Type in your cloudflare r2 access key"
+                                        value="{{storage.r2.access_key}}" required>
+                                    <small id="s-r2-access-key-help" class="form-text text-muted">This is the access key
+                                        of your
+                                        cloudflare r2 storage.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-secret-key" class="form-label mt-4">Secret Key</label>
+                                    <input type="text" name="r2_secret_key" class="form-control" id="s-r2-secret-key"
+                                        aria-describedby="secret-key"
+                                        placeholder="Type in your cloudflare r2 secret key"
+                                        value="{{storage.r2.secret_key}}" required>
+                                    <small id="s-r2-secret-key-help" class="form-text text-muted">This is the secret key
+                                        of your
+                                        cloudflare r2 storage.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-basepath" class="form-label mt-4">Base Path</label>
+                                    <input type="text" name="r2_base_path" class="form-control" id="s-r2-basepath"
+                                        aria-describedby="base-path" placeholder="Type in your cloudflare r2 base path"
+                                        value="{{storage.r2.base_path}}" required>
+                                    <small id="s-r2-basepath-help" class="form-text text-muted">This is the base
+                                        path</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="s-r2-url" class="form-label mt-4">URL</label>
+                                    <input type="text" name="r2_url" class="form-control" id="s-r2-url"
+                                        aria-describedby="url" placeholder="Type in your cloudflare r2 url"
+                                        value="{{storage.r2.url}}">
+                                    <small id="s-r2-url-help" class="form-text text-muted">This is the url to access
+                                        your
+                                        cloudflare r2 bucket. If not set, it uses endpoint to generate the access
+                                        url.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                        <div id="s-alert-success" class="d-none alert mt-4 alert-success" role="alert">
+                            Storage settings saved successfully.
+                        </div>
+                        <div id="s-alert-fail" class="d-none alert alert-danger mt-4" role="alert">
+                            Storage settings saved failed.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    {{> partials/footer.hbs}}
+    <script>
+        function ajaxForm(selector, action, alert_prefix) {
+            const sform = document.getElementById(selector);
+            sform.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(sform);
+                const response = await fetch(action, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                });
+                if (response.ok) {
+                    document.getElementById(alert_prefix + '-alert-success').classList.remove('d-none');
+                    document.getElementById(alert_prefix + '-alert-fail').classList.add('d-none');
+                    setTimeout(() => {
+                        document.getElementById(alert_prefix + '-alert-success').classList.add('d-none');
+                    }, 3000);
+                } else {
+                    let text = await response.text() || response.statusText;
+                    document.getElementById(alert_prefix + '-alert-success').classList.add('d-none');
+                    document.getElementById(alert_prefix + '-alert-fail').classList.remove('d-none');
+                    document.getElementById(alert_prefix + '-alert-fail').innerText = "Error: " + text;
+                    setTimeout(() => {
+                        document.getElementById(alert_prefix + '-alert-fail').classList.add('d-none');
+                    }, 3000);
+                }
+            });
+        }
+        ajaxForm("s-form", "/admin/storage", "s");
+        ajaxForm("d-form", "/admin/domain", "d");
+    </script>
+</body>
+
+</html>

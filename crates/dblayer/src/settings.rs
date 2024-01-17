@@ -23,6 +23,31 @@ pub async fn get_domain_settings() -> Result<(String, String)> {
     Ok((suffix, protocol))
 }
 
+/// set_domain_settings sets domain suffix and protocol
+pub async fn set_domain_settings(suffix: String, protocol: String) -> Result<()> {
+    set("domain_suffix", suffix.as_str()).await?;
+    set("domain_protocol", protocol.as_str()).await?;
+    Ok(())
+}
+
+/// set_confs_refresh_flag sets confs_refresh_flag
+pub async fn set_confs_refresh_flag() -> Result<()> {
+    let now_ts = chrono::Utc::now().timestamp().to_string();
+    set("confs_refresh_flag", &now_ts).await?;
+    Ok(())
+}
+
+/// get_confs_refresh_flag returns confs_refresh_flag
+pub async fn get_confs_refresh_flag() -> Result<i64> {
+    let item = get("confs_refresh_flag").await?;
+    if item.is_none() {
+        return Ok(0);
+    }
+    let item = item.unwrap();
+    let flag = item.value.parse::<i64>()?;
+    Ok(flag)
+}
+
 pub async fn get(name: &str) -> Result<Option<settings::Model>> {
     let db = DB.get().unwrap();
     let item = settings::Entity::find()

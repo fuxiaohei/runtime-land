@@ -31,6 +31,14 @@ impl Storage {
             return Ok(format!("file://{}", path));
         }
         if self.current == "r2" {
+            if !self.r2.base_path.is_empty() {
+                return Ok(format!(
+                    "{}/{}/{}",
+                    self.r2.url.as_ref().unwrap(),
+                    self.r2.base_path,
+                    path
+                ));
+            }
             return Ok(format!("{}/{}", self.r2.url.as_ref().unwrap(), path));
         }
         Err(anyhow::anyhow!("unknown storage: {}", self.current))
