@@ -43,7 +43,7 @@
                                         data-x-time="{{created_at}}">{{created_at}}</span></small>
                                 <button type="button" data-x-token-del-id="{{id}}" data-x-token-del-name="{{name}}"
                                     class="btn btn-outline-dark btn-sm ms-2" style="margin:1px;padding:1px"><i
-                                        class="bi bi-x"></i></button>
+                                        class="bx bx-x"></i></button>
                             </div>
                         </li>
                         {{/each}}
@@ -51,7 +51,7 @@
                     <p class="card-text">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#create-token-modal">
-                            <i class="bi bi-plus-lg me-2"></i>Create Token
+                            <i class="bx bx-plus me-2"></i>Create Token
                         </button>
                     </p>
                 </div>
@@ -72,7 +72,7 @@
                                         <div class="input-group mb-3">
                                             <button class="btn btn-outline-success" id="new-token-clipboard-btn"
                                                 data-clipboard-target="#new-token-value"><i
-                                                    class="bi bi-clipboard"></i></button>
+                                                    class="bx bx-clipboard"></i></button>
                                             <input class="form-control border-success" id="new-token-value" type="text"
                                                 readonly="" />
                                         </div>
@@ -138,7 +138,7 @@
         const clipboard = new ClipboardJS("#new-token-clipboard-btn");
         clipboard.on('success', function (e) {
             const newTokenClipboardBtn = document.getElementById('new-token-clipboard-btn');
-            newTokenClipboardBtn.innerHTML = '<i class="bi bi-clipboard-check"></i>';
+            newTokenClipboardBtn.innerHTML = '<i class="bx bx-check"></i>';
         });
         // convert data-x-time to local time string
         const xTimeElements = document.querySelectorAll('[data-x-time]');

@@ -12,16 +12,16 @@
         <div class="container d-flex flex-wrap justify-content-between">
             <span class="fs-3">
                 <span class="fw-bold">Projects</span>
-                <span class="fs-6 ms-1">(12)</span>
+                <span class="fs-6 ms-1">({{projects_count}})</span>
             </span>
             <form class="col-12 col-lg-auto mb-3 mb-lg-0" role="search">
                 <div class="input-group">
                     <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
                     <a class="btn btn-outline-light" href="/projects" role="button">
-                        <i class="bi bi-search me-2"></i>Search
+                        <i class="bx bx-search-alt me-2"></i>Search
                     </a>
                     <a class="btn btn-primary" href="/new" role="button">
-                        <i class="bi bi-plus-square me-2"></i>New Project
+                        <i class="bx bx-layer-plus me-2"></i>New Project
                     </a>
                 </div>
             </form>
@@ -30,56 +30,46 @@
 
     <main>
         <div class="container">
-            <ul class="list-group list-group-flush shadow-none">
-                <li class="list-group-item pt-4 list-group-item-action">
-                    <a href="#"
+            <ul class="list-group list-group-flush shadow-none mt-4">
+                {{#each projects}}
+                <li class="list-group-item project-item pt-4 list-group-item-action" id="project-{{uuid}}"
+                    data-uuid="{{uuid}}">
+                    <div
                         class="d-block d-flex link-dark link-underline link-underline-opacity-0 flex-wrap justify-content-between">
                         <div class="d-flex justify-content-start">
-                            <div class="language">language-logo</div>
+                            <div class="language mt-2">
+                                {{#if (is_rust_project language)}}
+                                <?xml version="1.0" ?><svg fill="none" height="40" viewBox="0 0 15 15" width="40"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M1.99997 10.5H6.99997M2.49997 4.5H8.99997C9.8284 4.5 10.5 5.17157 10.5 6C10.5 6.82843 9.8284 7.5 8.99997 7.5H4.49997M4.49997 4.5V10.5M7.49997 7.5H8.49997C9.60454 7.5 10.5 8.39543 10.5 9.5C10.5 10.0523 10.9477 10.5 11.5 10.5H13M7.49997 0.5L8.84422 1.61046L10.5372 1.19322L11.2665 2.77696L12.9728 3.13557L12.9427 4.87891L14.3245 5.94235L13.541 7.5L14.3245 9.05765L12.9427 10.1211L12.9728 11.8644L11.2665 12.223L10.5372 13.8068L8.84422 13.3895L7.49997 14.5L6.15572 13.3895L4.46279 13.8068L3.73347 12.223L2.02715 11.8644L2.05722 10.1211L0.675476 9.05765L1.45897 7.5L0.675476 5.94235L2.05722 4.87891L2.02715 3.13557L3.73347 2.77696L4.46279 1.19322L6.15572 1.61046L7.49997 0.5Z"
+                                        stroke="#a42" stroke-linejoin="round" />
+                                </svg>
+                                {{/if}}
+                                {{#if (is_js_project language)}}
+                                <?xml version="1.0" ?><svg fill="none" height="40" viewBox="0 0 15 15" width="40"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12.5 8V7.83333C12.5 7.09695 11.903 6.5 11.1667 6.5H10C9.17157 6.5 8.5 7.17157 8.5 8C8.5 8.82843 9.17157 9.5 10 9.5H11C11.8284 9.5 12.5 10.1716 12.5 11C12.5 11.8284 11.8284 12.5 11 12.5H10C9.17157 12.5 8.5 11.8284 8.5 11M6.5 6V11C6.5 11.8284 5.82843 12.5 5 12.5C4.17157 12.5 3.5 11.8284 3.5 11M0.5 0.5H14.5V14.5H0.5V0.5Z"
+                                        stroke="#43853d" />
+                                </svg>
+                                {{/if}}
+                            </div>
                             <div class="ms-3">
-                                <h3 class="fs-3 text-body-emphasis">spin-hello</h3>
-                                <p>spin-hello-nvdhtzkm.fermyon.app</p>
+                                <h3 class="fs-3 text-body-emphasis">{{name}}</h3>
+                                {{#if prod_url}}
+                                <p><a class="text-body" href="{{prod_url}}" target="_blank">{{prod_domain}}</a></p>
+                                {{else}}
+                                <p><span class="text-body-tertiary">no production deployment</span></p>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="text-right">
-                            <span>Created on January 17th, 2023</span>
+                            <span class="text-body">{{updated_at}}</span>
                         </div>
-                    </a>
+                    </div>
                 </li>
-                <li class="list-group-item pt-4 list-group-item-action">
-                    <a href="#"
-                        class="d-block d-flex link-dark link-underline link-underline-opacity-0 flex-wrap justify-content-between">
-                        <div class="d-flex justify-content-start">
-                            <div class="language">language-logo</div>
-                            <div class="ms-3">
-                                <h3 class="fs-3 text-body-emphasis">spin-hello</h3>
-                                <p>spin-hello-nvdhtzkm.fermyon.app</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span>Created on January 17th, 2023</span>
-                        </div>
-                    </a>
-                </li>
-                <li class="list-group-item pt-4 list-group-item-action">
-                    <a href="#"
-                        class="d-block d-flex link-dark link-underline link-underline-opacity-0 flex-wrap justify-content-between">
-                        <div class="d-flex justify-content-start">
-                            <div class="language">language-logo</div>
-                            <div class="ms-3">
-                                <h3 class="fs-3 text-body-emphasis">spin-hello</h3>
-                                <p>spin-hello-nvdhtzkm.fermyon.app</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span>Created on January 17th, 2023</span>
-                        </div>
-                    </a>
-                </li>
-                <li class="list-group-item">A second item</li>
-                <li class="list-group-item">A third item</li>
-                <li class="list-group-item">A fourth item</li>
-                <li class="list-group-item">And a fifth one</li>
+                {{/each}}
             </ul>
         </div>
     </main>

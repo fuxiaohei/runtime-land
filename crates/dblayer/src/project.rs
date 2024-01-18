@@ -2,7 +2,7 @@ use crate::models::project_info;
 use crate::DB;
 use anyhow::Result;
 use land_common::MetaData;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -27,6 +27,19 @@ pub async fn find_by_name(owner_id: i32, name: &str) -> Result<Option<project_in
     Ok(project)
 }
 
+/// list_by_owner list projects by owner
+pub async fn list_by_owner(owner_id: i32) -> Result<Vec<project_info::Model>> {
+    let db = DB.get().unwrap();
+    let projects = project_info::Entity::find()
+        .filter(project_info::Column::OwnerId.eq(owner_id))
+        .filter(project_info::Column::Status.eq(Status::Active.to_string()))
+        .order_by_desc(project_info::Column::UpdatedAt)
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(projects)
+}
+
 pub async fn create(
     owner_id: i32,
     meta: &MetaData,
@@ -43,6 +56,7 @@ pub async fn create(
         name: meta.project.name.clone(),
         language: meta.project.language.clone(),
         status: Status::Active.to_string(),
+        prod_domain: String::new(),
         uuid: uuid::Uuid::new_v4().to_string(),
         description: meta.project.description.clone(),
         created_by: create_by.to_string(),

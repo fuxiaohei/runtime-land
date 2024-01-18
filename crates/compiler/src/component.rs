@@ -13,10 +13,12 @@ pub fn convert(
     lang: &str,
     js_engine: Option<String>,
 ) -> Result<()> {
+    // use dist as output dir
+    let _ = std::fs::create_dir_all("dist");
+    let output_path = format!("dist/{}.wasm", project_name);
+
     if lang == "js" || lang == "javascript" {
         let js_wasm = compile_js(path, js_engine)?; // this wasm is optimized by wasm-opt
-        let _ = std::fs::create_dir_all("dist");
-        let output_path = format!("dist/{}.wasm", project_name);
         convert_inner(&output_path, &js_wasm)?;
         return Ok(());
     }
@@ -24,7 +26,7 @@ pub fn convert(
     if let Some(opt_wasm) = optimize(path)? {
         target = opt_wasm;
     }
-    convert_inner(path, &target)
+    convert_inner(&output_path, &target)
 }
 
 fn compile_js(src_path: &str, js_engine: Option<String>) -> Result<String> {
@@ -132,5 +134,6 @@ pub fn optimize(path: &str) -> Result<Option<String>> {
         return Err(anyhow::anyhow!(err));
     }
     debug!("wasm-opt success, from {} to {}", path, target);
+    let _ = std::fs::remove_file(path);
     Ok(Some(target))
 }

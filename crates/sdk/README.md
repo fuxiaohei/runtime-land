@@ -13,7 +13,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.75"
+anyhow = "1.0.79"
 http = "0.2.9"
 land-sdk = "0.1.4"
 wit-bindgen = "0.13.0"

@@ -11,6 +11,7 @@ pub struct Model {
     pub owner_id: i32,
     pub name: String,
     pub language: String,
+    pub prod_domain: String,
     pub status: String,
     pub uuid: String,
     pub description: String,

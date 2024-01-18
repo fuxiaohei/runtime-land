@@ -55,6 +55,17 @@ pub async fn find_by_id(id: i32) -> Result<Option<user_info::Model>> {
     Ok(user)
 }
 
+/// find_by_uuid finds a user by uuid
+pub async fn find_by_uuid(uuid: &str) -> Result<Option<user_info::Model>> {
+    let db = DB.get().unwrap();
+    let user = user_info::Entity::find()
+        .filter(user_info::Column::Uuid.eq(uuid))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(user)
+}
+
 /// create creates a new user
 pub async fn create(
     name: &str,

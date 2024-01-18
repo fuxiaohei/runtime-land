@@ -124,13 +124,13 @@ pub async fn create(
     Ok(project_model)
 }
 
-async fn set_deploy_status_internal(deploy_id: i32, deploy_status: DeployStatus) -> Result<()> {
+pub async fn make_deploy_failed(deploy_id: i32) -> Result<()> {
     let db = DB.get().unwrap();
     project_deployment::Entity::update_many()
         .filter(project_deployment::Column::Id.eq(deploy_id))
         .col_expr(
             project_deployment::Column::DeployStatus,
-            Expr::value(deploy_status.to_string()),
+            Expr::value(DeployStatus::Failed.to_string()),
         )
         .exec(db)
         .await
@@ -138,15 +138,22 @@ async fn set_deploy_status_internal(deploy_id: i32, deploy_status: DeployStatus)
     Ok(())
 }
 
-pub async fn set_deploy_failed(deploy_id: i32) -> Result<()> {
-    set_deploy_status_internal(deploy_id, DeployStatus::Failed).await
-}
-
-pub async fn set_deploy_success(deploy_id: i32) -> Result<()> {
-    set_deploy_status_internal(deploy_id, DeployStatus::Success).await?;
+pub async fn make_deploy_success(
+    deploy_id: i32,
+    old_deploy_id: i32,
+    storage_path: &str,
+) -> Result<()> {
     let db = DB.get().unwrap();
     project_deployment::Entity::update_many()
         .filter(project_deployment::Column::Id.eq(deploy_id))
+        .col_expr(
+            project_deployment::Column::DeployStatus,
+            Expr::value(DeployStatus::Success.to_string()),
+        )
+        .col_expr(
+            project_deployment::Column::StoragePath,
+            Expr::value(storage_path),
+        )
         .col_expr(
             project_deployment::Column::Status,
             Expr::value(Status::Active.to_string()),
@@ -154,20 +161,9 @@ pub async fn set_deploy_success(deploy_id: i32) -> Result<()> {
         .exec(db)
         .await
         .map_err(|e| anyhow::anyhow!(e))?;
-    Ok(())
-}
-
-pub async fn update_storage_path(deploy_id: i32, storage_path: &str) -> Result<()> {
-    let db = DB.get().unwrap();
-    project_deployment::Entity::update_many()
-        .filter(project_deployment::Column::Id.eq(deploy_id))
-        .col_expr(
-            project_deployment::Column::StoragePath,
-            Expr::value(storage_path),
-        )
-        .exec(db)
-        .await
-        .map_err(|e| anyhow::anyhow!(e))?;
+    if old_deploy_id > 0 {
+        set_replaced(old_deploy_id).await?;
+    }
     Ok(())
 }
 

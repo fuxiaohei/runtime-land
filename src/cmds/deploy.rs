@@ -28,7 +28,6 @@ impl Deploy {
         let config = config.unwrap();
 
         let metadata = MetaData::from_file(MANIFEST_FILE)?;
-        let target_path = metadata.build.target.clone();
 
         // generate temp tar.gz file from os temp dir
         let tmp_tar_gz =
@@ -37,13 +36,11 @@ impl Deploy {
 
         // js project need add dist wasm file
         let mut src_files = metadata.build.src_files.clone();
-        if metadata.project.language == "js" || metadata.project.language == "javascript" {
-            let output_path = format!("dist/{}.wasm", metadata.project.name);
-            src_files.push(output_path);
-        }
+        let output_path = format!("dist/{}.wasm", metadata.project.name);
+        src_files.push(output_path);
 
         // pack files to tar.gz
-        pack_file(src_files, &target_path, tmp_tar_gz.to_str().unwrap())?;
+        pack_file(src_files, tmp_tar_gz.to_str().unwrap())?;
 
         // read tar.gz file
         let bundle = std::fs::read(tmp_tar_gz)?;
@@ -90,12 +87,12 @@ impl Deploy {
     }
 }
 
-fn pack_file(mut files: Vec<String>, target_path: &str, output_path: &str) -> Result<()> {
+fn pack_file(mut files: Vec<String>, output_path: &str) -> Result<()> {
     debug!("files: {:?}", files);
     // apppend MANIFEST_FILE
     files.push(MANIFEST_FILE.to_string());
     // append target file
-    files.push(target_path.to_string());
+    // files.push(target_path.to_string());
     let tar_gz = std::fs::File::create(output_path)?;
     let enc = GzEncoder::new(tar_gz, Compression::default());
     let mut tar = Builder::new(enc);

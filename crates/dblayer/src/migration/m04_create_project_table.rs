@@ -8,6 +8,7 @@ enum ProjectInfo {
     Name,
     Language,
     Uuid,
+    ProdDomain,
     Description,
     Status,
     CreatedBy,
@@ -50,6 +51,11 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(ProjectInfo::Uuid).string_len(64).not_null())
                     .col(
                         ColumnDef::new(ProjectInfo::Description)
+                            .string_len(256)
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectInfo::ProdDomain)
                             .string_len(256)
                             .not_null(),
                     )

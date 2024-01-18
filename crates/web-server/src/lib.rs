@@ -137,10 +137,14 @@ pub async fn run(addr: SocketAddr, assets_dir: &str) -> Result<()> {
 
 // add handlebars_helper to handle if value is equal args, return "selected" for Option element
 handlebars_helper!(selected: |x: str, y: str| if x == y { "selected" } else { "" });
+handlebars_helper!(is_js_project: |x: str| x.to_lowercase() == "js" || x.to_lowercase() == "javascript" );
+handlebars_helper!(is_rust_project: |x: str|  x.to_lowercase() == "rust" );
 
 fn init_templates(dir: &str) -> Result<Handlebars<'static>> {
     let mut hbs = Handlebars::new();
     hbs.register_helper("selected", Box::new(selected));
+    hbs.register_helper("is_js_project", Box::new(is_js_project));
+    hbs.register_helper("is_rust_project", Box::new(is_rust_project));
 
     for entry in WalkDir::new(dir) {
         let entry = entry?;
