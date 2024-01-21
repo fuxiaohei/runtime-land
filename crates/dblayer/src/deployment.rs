@@ -47,6 +47,17 @@ impl Default for Specification {
     }
 }
 
+/// find_by_id returns the deployment by id
+pub async fn find_by_id(id: i32) -> Result<Option<project_deployment::Model>> {
+    let db = DB.get().unwrap();
+    let project = project_deployment::Entity::find()
+        .filter(project_deployment::Column::Id.eq(id))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(project)
+}
+
 pub async fn find_by_project(
     project_id: i32,
     status: DeploymentType,

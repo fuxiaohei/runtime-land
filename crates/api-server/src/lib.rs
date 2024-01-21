@@ -23,6 +23,7 @@ pub fn router() -> Router {
     let router = Router::new()
         .route("/cli/login/*token", post(cli::login))
         .route("/cli/deploy", post(cli::deploy))
+        .route("/cli/deploy-check", post(cli::deploy_check))
         .route("/runner/sync", post(runner::sync))
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
         .layer(

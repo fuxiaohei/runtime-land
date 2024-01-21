@@ -56,6 +56,8 @@ async fn loop_once() -> Result<()> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RouteItem {
+    pub project_id: i32,
+    pub owner_id: i32,
     pub uuid: String,
     pub route: String,
     pub module_path: String,
@@ -89,6 +91,8 @@ async fn build_confs() -> Result<ConfData> {
     for deploy in deploys {
         let route = format!("{}://{}.{}/", protocol, deploy.name, domain_suffx);
         let route_item = RouteItem {
+            project_id: deploy.project_id,
+            owner_id: deploy.owner_id,
             uuid: deploy.trace_uuid,
             route,
             resource_path: storage.build_url(&deploy.storage_path)?,

@@ -51,40 +51,126 @@ impl Deploy {
             "{}/api/v2/cli/deploy",
             self.cloud_server_url.as_ref().unwrap()
         );
-        let req = DeployRequest {
+        let deploy_res1 = post_deploy(
+            bundle.clone(),
             metadata,
-            bundle_md5: format!("{:x}", md5::compute(&bundle)),
-            bundle,
-            user_token: config.user_token,
-            user_uuid: config.user_uuid,
-        };
-
-        // send request
-        let resp = ureq::post(&deploy_url)
-            .set("Content-Type", "application/json")
-            .send_json(serde_json::to_value(req)?);
-
-        if resp.is_err() {
-            cprintln!("<bright-red,bold>Upload error: {}</>", resp.err().unwrap(),);
-            return Err(anyhow::anyhow!("Deploy failed!"));
-        }
-
-        let resp = resp.unwrap();
-        if resp.status() != 200 {
+            config.user_token.clone(),
+            config.user_uuid.clone(),
+            deploy_url.clone(),
+        );
+        if deploy_res1.is_err() {
             cprintln!(
-                "<bright-red,bold>Response error: {}</>",
-                resp.into_string().unwrap()
+                "<bright-red,bold>Upload error: {}</>",
+                deploy_res1.err().unwrap(),
             );
             return Err(anyhow::anyhow!("Deploy failed!"));
-        }
+        };
 
-        cprintln!(
-            "<bright-cyan,bold>Deploy Success</> to <bright-cyan>{}</>.",
-            resp.into_string().unwrap()
+        cprintln!("Upload success!\nWaiting for deploy...");
+
+        // check deploy status
+        let check_url = format!(
+            "{}/api/v2/cli/deploy-check",
+            self.cloud_server_url.as_ref().unwrap(),
         );
+        let deploy_res1 = deploy_res1.unwrap();
+
+        // check deploy status for every 1 second
+        let mut time_counter = 0;
+        loop {
+            time_counter += 1;
+            if time_counter > 40 {
+                cprintln!("<bright-red,bold>Deploy timeout! Please check your network.</>");
+                return Err(anyhow::anyhow!("Deploy timeout!"));
+            }
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            let check_res = check_deploy(
+                check_url.clone(),
+                deploy_res1.deploy_id,
+                config.user_token.clone(),
+                config.user_uuid.clone(),
+            );
+            if check_res.is_err() {
+                cprintln!(
+                    "<bright-red,bold>Deploy failed! error: {}</>",
+                    check_res.err().unwrap(),
+                );
+                return Err(anyhow::anyhow!("Deploy failed!"));
+            }
+            let check_res = check_res.unwrap();
+            if check_res {
+                break;
+            }
+            cprintln!("Waiting for deploy...");
+            continue;
+        }
 
         Ok(())
     }
+}
+
+fn post_deploy(
+    bundle: Vec<u8>,
+    metadata: MetaData,
+    user_token: String,
+    user_uuid: String,
+    deploy_url: String,
+) -> Result<DeployResponse> {
+    let req = DeployRequest {
+        metadata,
+        bundle_md5: format!("{:x}", md5::compute(&bundle)),
+        bundle,
+        user_token,
+        user_uuid,
+    };
+
+    // send request
+    let resp = ureq::post(&deploy_url)
+        .set("Content-Type", "application/json")
+        .send_json(serde_json::to_value(req)?);
+
+    if resp.is_err() {
+        return Err(anyhow::anyhow!("bad response: {}", resp.err().unwrap()));
+    }
+    let resp = resp.unwrap();
+    if resp.status() != 200 {
+        return Err(anyhow::anyhow!("bad status code: {}", resp.status()));
+    }
+    let resp: DeployResponse = resp.into_json()?;
+    Ok(resp)
+}
+
+fn check_deploy(
+    check_url: String,
+    deploy_id: i32,
+    user_token: String,
+    user_uuid: String,
+) -> Result<bool> {
+    let req = DeployCheckRequest {
+        deploy_id,
+        user_token,
+        user_uuid,
+    };
+    let resp = ureq::post(&check_url)
+        .set("Content-Type", "application/json")
+        .send_json(serde_json::to_value(req)?);
+    if resp.is_err() {
+        return Err(anyhow::anyhow!("bad response: {}", resp.err().unwrap()));
+    }
+    let resp = resp.unwrap();
+    if resp.status() != 200 {
+        return Err(anyhow::anyhow!("bad status code: {}", resp.status()));
+    }
+    let check_res: DeployCheckResponse = resp.into_json()?;
+    debug!("check_res: {:?}", check_res);
+    if check_res.status == "success" {
+        cprintln!(
+            "<bright-green,bold>Deploy success! Visit url: \n\t{}</>",
+            check_res.visit_url
+        );
+        return Ok(true);
+    }
+    Ok(false)
 }
 
 fn pack_file(mut files: Vec<String>, output_path: &str) -> Result<()> {
@@ -131,7 +217,30 @@ pub struct DeployRequest {
     pub user_uuid: String,
 }
 
+/// DeployResponse is the response for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployResponse {
+    pub visit_url: String,
+    pub deploy_id: i32,
+}
+
 fn validate_url(url: &str) -> Result<String, String> {
     let _: url::Url = url.parse().map_err(|_| "invalid url".to_string())?;
     Ok(url.to_string())
+}
+
+/// DeployRequest is the request for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployCheckRequest {
+    pub deploy_id: i32,
+    pub user_token: String,
+    pub user_uuid: String,
+}
+
+/// DeployCheckResponse is the response for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployCheckResponse {
+    pub visit_url: String,
+    pub status: String,
+    pub deploy_uuid: String,
 }

@@ -66,17 +66,17 @@ async fn check_cli_token(user_token: &str, user_uuid: &str) -> anyhow::Result<us
     let token = user::find_token_by_value(user_token).await?;
     if token.is_none() {
         warn!("token is not exist, value: {}", user_token);
-        return Err(anyhow!("token is not exist").into());
+        return Err(anyhow!("token is not exist"));
     }
     let token = token.unwrap();
     if token.created_by != user::TokenCreatedByCases::CliAccess.to_string() {
         warn!("token is not cli-access, value: {}", user_token);
-        return Err(anyhow!("token is not cli-access").into());
+        return Err(anyhow!("token is not cli-access"));
     }
     let user = user::find_by_uuid(user_uuid).await?;
     if user.is_none() {
         warn!("user is not exist, uuid: {}", user_uuid);
-        return Err(anyhow!("user is not exist").into());
+        return Err(anyhow!("user is not exist"));
     }
     Ok(user.unwrap())
 }
@@ -85,7 +85,7 @@ async fn check_cli_token(user_token: &str, user_uuid: &str) -> anyhow::Result<us
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeployResponse {
     pub visit_url: String,
-    pub deploy_uuid: String,
+    pub deploy_id: i32,
 }
 
 pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployResponse>, AppError> {
@@ -101,27 +101,13 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
     debug!("bundle size: {} KB", payload.bundle.len() / 1024);
 
     // validate user_token
-    check_cli_token(&payload.user_token, &payload.user_uuid).await?;
-    let token = user::find_token_by_value(&payload.user_token).await?;
-    if token.is_none() {
-        warn!("token is not exist, value: {}", payload.user_token);
-        return Err(anyhow!("token is not exist").into());
-    }
-    let token = token.unwrap();
-    if token.created_by != user::TokenCreatedByCases::CliAccess.to_string() {
-        warn!("token is not cli-access, value: {}", payload.user_token);
-        return Err(anyhow!("token is not cli-access").into());
-    }
+    let user = check_cli_token(&payload.user_token, &payload.user_uuid).await?;
 
     // use meta data to create new project
-    let mut project = project::find_by_name(token.owner_id, &payload.metadata.project.name).await?;
+    let mut project = project::find_by_name(user.id, &payload.metadata.project.name).await?;
     if project.is_none() {
-        let p2 = project::create(
-            token.owner_id,
-            &payload.metadata,
-            project::CreatedByCases::LandCli,
-        )
-        .await?;
+        let p2 =
+            project::create(user.id, &payload.metadata, project::CreatedByCases::LandCli).await?;
         project = Some(p2);
     }
     let project = project.unwrap();
@@ -140,7 +126,7 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
     // create new deployment and set old deployment to replaced
     let new_deploy = deployment::create(
         project.id,
-        token.owner_id,
+        user.id,
         &project.name,
         &trace_uuid,
         &payload.bundle_md5,
@@ -189,7 +175,7 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
             "{}://{}.{}",
             domain_protocol, new_deploy.name, domain_suffix
         ),
-        deploy_uuid: new_deploy.trace_uuid,
+        deploy_id: new_deploy.id,
     };
 
     info!("deploy success, resp: {:?}", resp);
@@ -199,13 +185,45 @@ pub async fn deploy(Json(payload): Json<DeployRequest>) -> Result<Json<DeployRes
 /// DeployRequest is the request for /cli/deploy
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeployCheckRequest {
-    pub deploy_uuid: String,
+    pub deploy_id: i32,
     pub user_token: String,
     pub user_uuid: String,
 }
 
+/// DeployCheckResponse is the response for /cli/deploy
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeployCheckResponse {
+    pub visit_url: String,
+    pub status: String,
+    pub deploy_uuid: String,
+}
+
 pub async fn deploy_check(
     Json(payload): Json<DeployCheckRequest>,
-) -> Result<Json<DeployResponse>, AppError> {
-    Err(anyhow!("not implement").into())
+) -> Result<Json<DeployCheckResponse>, AppError> {
+    // validate user_token
+    let user = check_cli_token(&payload.user_token, &payload.user_uuid).await?;
+    let deploy = deployment::find_by_id(payload.deploy_id).await?;
+    if deploy.is_none() {
+        warn!("deploy is not exist, uuid: {}", payload.deploy_id);
+        return Err(anyhow!("deploy is not exist").into());
+    }
+    let deploy = deploy.unwrap();
+    if deploy.owner_id != user.id {
+        warn!(
+            "deploy owner_id not match, deploy.owner_id: {}, user.id: {}",
+            deploy.owner_id, user.id
+        );
+        return Err(anyhow!("deploy owner_id not match").into());
+    }
+
+    let (domain_suffix, domain_protocol) = land_dblayer::settings::get_domain_settings().await?;
+
+    let resp = DeployCheckResponse {
+        visit_url: format!("{}://{}.{}", domain_protocol, deploy.name, domain_suffix),
+        deploy_uuid: deploy.trace_uuid,
+        status: deploy.deploy_status,
+    };
+    info!("deploy check, resp: {:?}", resp);
+    Ok(Json(resp))
 }
