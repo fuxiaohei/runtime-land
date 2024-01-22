@@ -117,6 +117,7 @@ pub async fn create(
         project_id,
         owner_id,
         name: format!("{}-{}", project_name, random_string),
+        project_name: project_name.to_string(),
         storage_path: String::new(),
         storage_size,
         storage_content_type: storage_content_type.to_string(),

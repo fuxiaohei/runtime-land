@@ -1,4 +1,5 @@
 use anyhow::Result;
+use land_dblayer::{deployment, settings, storage};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
@@ -31,7 +32,7 @@ async fn loop_once() -> Result<()> {
 
     // check flag
     let now_ts = chrono::Utc::now().timestamp();
-    let trigger_ts = land_dblayer::settings::get_confs_refresh_flag().await?;
+    let trigger_ts = settings::get_confs_refresh_flag().await?;
     if now_ts - trigger_ts <= 10 {
         debug!("loop-by-trigger");
         // if trigger_ts is less than 10 seconds, means need refresh
@@ -40,7 +41,7 @@ async fn loop_once() -> Result<()> {
         return Ok(());
     }
 
-    let deploys = land_dblayer::deployment::get_latest_updated(10).await?;
+    let deploys = deployment::get_latest_updated(10).await?;
     // debug!("get_latest_updated: {:?}", deploys.len());
     if deploys.is_empty() {
         return Ok(());
@@ -57,6 +58,7 @@ async fn loop_once() -> Result<()> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RouteItem {
     pub project_id: i32,
+    pub project_name: String,
     pub owner_id: i32,
     pub uuid: String,
     pub route: String,
@@ -81,10 +83,10 @@ pub static CONFS: Lazy<Mutex<ConfData>> = Lazy::new(|| {
 });
 
 async fn build_confs() -> Result<ConfData> {
-    let (domain_suffx, protocol) = land_dblayer::settings::get_domain_settings().await?;
-    let storage = land_dblayer::storage::get_storage().await?;
+    let (domain_suffx, protocol) = settings::get_domain_settings().await?;
+    let storage = storage::get_storage().await?;
 
-    let deploys = land_dblayer::deployment::list_actives().await?;
+    let deploys = deployment::list_actives().await?;
     info!("list_actives: {:?}", deploys.len());
 
     let mut routes = vec![];
@@ -92,6 +94,7 @@ async fn build_confs() -> Result<ConfData> {
         let route = format!("{}://{}.{}/", protocol, deploy.name, domain_suffx);
         let route_item = RouteItem {
             project_id: deploy.project_id,
+            project_name: deploy.project_name,
             owner_id: deploy.owner_id,
             uuid: deploy.trace_uuid,
             route,

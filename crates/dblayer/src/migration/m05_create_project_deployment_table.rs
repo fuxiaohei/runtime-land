@@ -6,6 +6,7 @@ enum ProjectDeployment {
     Id,
     OwnerId,
     ProjectId,
+    ProjectName,
     StoragePath,
     StorageSize,
     StorageContentType,
@@ -47,6 +48,11 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(ProjectDeployment::ProjectId)
                             .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectDeployment::ProjectName)
+                            .string_len(128)
                             .not_null(),
                     )
                     .col(

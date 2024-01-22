@@ -30,6 +30,7 @@
 
     <main>
         <div class="container">
+            {{#if projects}}
             <ul class="list-group list-group-flush shadow-none mt-4">
                 {{#each projects}}
                 <li class="list-group-item project-item pt-4 list-group-item-action" id="project-{{uuid}}"
@@ -71,6 +72,11 @@
                 </li>
                 {{/each}}
             </ul>
+            {{else}}
+            <div class="no-projects container my-5 fw-bold" style="width: 720px;">
+                No projects found.
+            </div>
+            {{/if}}
         </div>
     </main>
     {{> partials/footer.hbs}}

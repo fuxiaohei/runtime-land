@@ -65,7 +65,7 @@ impl Args {
         output.init_logging();
 
         // init confs loop
-        confs::init_loop(token, cloud_server_url.unwrap())?;
+        confs::init_loop(token, cloud_server_url.unwrap(), address.clone())?;
 
         // start confs server
         tokio::spawn(async move {
