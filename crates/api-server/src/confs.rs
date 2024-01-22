@@ -41,14 +41,23 @@ async fn loop_once() -> Result<()> {
         return Ok(());
     }
 
+    // check outdate
+    // if no changes in 10 minutes, refresh it
+    if now_ts - confs.created_at > 600 {
+        debug!("loop-by-outdate");
+        let new_confs = build_confs().instrument(span.clone()).await?;
+        *confs = new_confs;
+        return Ok(());
+    }
+
+    // check latest updated
+    // if latest updates are in recent 10 seconds, refresh it
     let deploys = deployment::get_latest_updated(10).await?;
     // debug!("get_latest_updated: {:?}", deploys.len());
     if deploys.is_empty() {
         return Ok(());
     }
-
     debug!("loop-by-deploys");
-
     let new_confs = build_confs().instrument(span.clone()).await?;
     *confs = new_confs;
 
@@ -71,6 +80,7 @@ pub struct RouteItem {
 pub struct ConfData {
     pub routes_md5: String,
     pub routes: Vec<RouteItem>,
+    pub created_at: i64,
 }
 
 /// CONFS is the global confs data
@@ -78,6 +88,7 @@ pub static CONFS: Lazy<Mutex<ConfData>> = Lazy::new(|| {
     let op = ConfData {
         routes_md5: "".to_string(),
         routes: vec![],
+        created_at: 0,
     };
     Mutex::new(op)
 });
@@ -108,7 +119,12 @@ async fn build_confs() -> Result<ConfData> {
 
     let routes_json = serde_json::to_string(&routes)?;
     let routes_md5 = format!("{:x}", md5::compute(routes_json));
-    let current_confs = ConfData { routes_md5, routes };
+    let created_at = chrono::Utc::now().timestamp();
+    let current_confs = ConfData {
+        routes_md5,
+        routes,
+        created_at,
+    };
     info!("confs md5: {:?}", current_confs.routes_md5);
     Ok(current_confs)
 }

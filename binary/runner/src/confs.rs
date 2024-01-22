@@ -15,6 +15,7 @@ pub static CONFS: Lazy<Mutex<ConfData>> = Lazy::new(|| {
     let op = ConfData {
         routes_md5: "".to_string(),
         routes: vec![],
+        created_at: 0,
     };
     Mutex::new(op)
 });
