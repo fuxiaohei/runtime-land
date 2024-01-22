@@ -1574,7 +1574,7 @@ dependencies = [
  "aho-corasick",
  "bstr",
  "log",
- "regex-automata 0.4.3",
+ "regex-automata 0.4.4",
  "regex-syntax 0.8.2",
 ]
 
@@ -2468,9 +2468,9 @@ dependencies = [
 
 [[package]]
 name = "moka"
-version = "0.12.3"
+version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cebde309854872ea4fcaf4d7c870ad8d5873091c6bfb7ce91fd08ea648f20b0"
+checksum = "ad9dc9808102655926a6086abd0b9965ebefd4a39ef0d184f074c34ba5049ec6"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-epoch",
@@ -3117,13 +3117,13 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.10.2"
+version = "1.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "380b951a9c5e80ddfd6136919eef32310721aa4aacd4889a8d39124b026ab343"
+checksum = "b62dbe01f0b06f9d8dc7d49e05a0785f153b00b2c227856282f671e0318c9b15"
 dependencies = [
  "aho-corasick",
  "memchr",
- "regex-automata 0.4.3",
+ "regex-automata 0.4.4",
  "regex-syntax 0.8.2",
 ]
 
@@ -3138,9 +3138,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f804c7828047e88b2d32e2d7fe5a105da8ee3264f01902f796c8e067dc2483f"
+checksum = "3b7fa1134405e2ec9353fd416b17f8dacd46c473d7d3fd1cf202706a14eb792a"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -3514,9 +3514,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm"
-version = "0.12.11"
+version = "0.12.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59f66e2129991acd51fcad7b59da1edd862edca69773cc9a19cb17b967fae2fb"
+checksum = "0cbf88748872fa54192476d6d49d0775e208566a72656e267e45f6980b926c8d"
 dependencies = [
  "async-stream",
  "async-trait",
@@ -3542,9 +3542,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-cli"
-version = "0.12.11"
+version = "0.12.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "747f032e4abd58a6cacdb21275cc13448b4ff4b368f5f578ece465957ae7b417"
+checksum = "9f17eb697616be2f3e4ea3b468a44cfb6848750dec522fdef4caa44bf5a02beb"
 dependencies = [
  "chrono",
  "clap",
@@ -3559,9 +3559,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-macros"
-version = "0.12.11"
+version = "0.12.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b03da1864306242678ac3b6567e69f70dd1252a72742baa23a4d92d2d45da3fc"
+checksum = "e0dbc880d47aa53c6a572e39c99402c7fad59b50766e51e0b0fc1306510b0555"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -3573,9 +3573,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-migration"
-version = "0.12.11"
+version = "0.12.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "412643baf225b37ae1313c0344c10bff6ec1fae72cdec1c7b591cc7c833134d2"
+checksum = "e42807e13d38edd4cc1f9cbb370df898d43a9a143f6161dcdb8424a6de002def"
 dependencies = [
  "async-trait",
  "clap",
