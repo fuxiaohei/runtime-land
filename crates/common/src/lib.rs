@@ -1,6 +1,5 @@
 mod version;
-pub use version::print_version;
-pub use version::build_info;
+pub use version::{build_date, build_info, print_version};
 
 mod logging;
 pub use logging::init as init_logging;

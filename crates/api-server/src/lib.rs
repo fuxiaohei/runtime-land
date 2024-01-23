@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::extract::{DefaultBodyLimit, MatchedPath, Request};
+use axum::extract::{DefaultBodyLimit, Request};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
@@ -7,8 +7,9 @@ use axum::Router;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::net::TcpListener;
+use tower_http::classify::ServerErrorsFailureClass;
 use tower_http::trace::TraceLayer;
-use tracing::{info, info_span, warn, Span};
+use tracing::{error, info, info_span, Span};
 
 mod cli;
 mod runner;
@@ -29,18 +30,10 @@ pub fn router() -> Router {
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<_>| {
-                    // Log the matched route's path (with placeholders not filled in).
-                    let matched_path = request
-                        .extensions()
-                        .get::<MatchedPath>()
-                        .map(MatchedPath::as_str);
-                    let uri = request.uri().to_string();
-
                     info_span!(
                         "api/v2",
                         m = ?request.method(),
-                        u = %uri,
-                        mp = matched_path,
+                        u = % request.uri().to_string(),
                         t = tracing::field::Empty,
                         s = tracing::field::Empty,
                     )
@@ -48,16 +41,15 @@ pub fn router() -> Router {
                 .on_response(|response: &Response, latency: Duration, span: &Span| {
                     span.record("t", latency.as_millis());
                     span.record("s", response.status().as_u16());
-                    if response.status().is_success() {
-                        info!("success")
-                    } else if response.status().is_server_error()
-                        || response.status().is_client_error()
-                    {
-                        warn!("failure, status: {:?}", response.status(),)
-                    } else {
-                        info!("30x")
+                    if let Some(app_err) = response.extensions().get::<AppError>() {
+                        error!(error = ?app_err.1.to_string(), "failure");
+                        return;
                     }
-                }),
+                    info!("done");
+                })
+                .on_failure(
+                    |_error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| {},
+                ),
         );
     Router::new().nest("/api/v2", router)
 }
@@ -77,11 +69,19 @@ pub async fn run(addr: SocketAddr) -> Result<()> {
 #[derive(Debug)]
 struct AppError(StatusCode, anyhow::Error);
 
+impl Clone for AppError {
+    fn clone(&self) -> Self {
+        Self(self.0, anyhow::anyhow!(self.1.to_string()))
+    }
+}
+
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        println!("AppError: {:?}", self);
-        (self.0, self.1.to_string()).into_response()
+        let mut resp = (self.0, self.1.to_string()).into_response();
+        let exts = resp.extensions_mut();
+        exts.insert(self);
+        resp
     }
 }
 

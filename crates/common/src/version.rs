@@ -21,6 +21,10 @@ fn build_fullinfo() -> String {
     )
 }
 
+pub fn build_date() -> String {
+    env!("VERGEN_BUILD_TIMESTAMP").to_string()
+}
+
 /// print_version prints the version of the binary.
 pub fn print_version(binary: &str, verbose: bool) {
     if verbose {

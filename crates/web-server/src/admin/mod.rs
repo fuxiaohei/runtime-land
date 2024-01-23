@@ -119,3 +119,24 @@ pub async fn storage_update(Form(form): Form<StorageUpdateForm>) -> Result<Strin
     land_dblayer::settings::set_confs_refresh_flag().await?; // trigger refresh confs
     Ok("ok".to_string())
 }
+
+/// runners is the handler for /admin/runners
+pub async fn runners(
+    engine: RenderEngine,
+    Extension(user): Extension<SessionUser>,
+) -> impl IntoResponse {
+    #[derive(Debug, Serialize, Deserialize)]
+    struct Vars {
+        pub page: PageVars,
+        pub user: SessionUser,
+    }
+
+    RenderHtml(
+        "admin/runners.hbs",
+        engine,
+        Vars {
+            page: PageVars::new("Runners | Dashboard", "/admin/runners"),
+            user,
+        },
+    )
+}

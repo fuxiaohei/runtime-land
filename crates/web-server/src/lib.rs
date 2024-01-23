@@ -1,5 +1,4 @@
-use anyhow::Result;
-use axum::extract::MatchedPath;
+use anyhow::{anyhow, Result};
 use axum::http::{Request, StatusCode};
 use axum::response::{Redirect, Response};
 use axum::routing::{any, post};
@@ -16,7 +15,7 @@ use tokio::net::TcpListener;
 use tower_http::classify::ServerErrorsFailureClass;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
-use tracing::{debug, error, info, info_span, warn, Span};
+use tracing::{debug, error, info, info_span, Span};
 use walkdir::WalkDir;
 
 mod embed;
@@ -39,6 +38,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     let admin_rt = Router::new()
         .route("/dashboard", get(admin::dashboard))
         .route("/settings", get(admin::settings))
+        .route("/runners", get(admin::runners))
         .route("/storage", post(admin::storage_update))
         .route("/domain", post(admin::domain_update));
 
@@ -57,40 +57,25 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(|request: &Request<_>| {
-                    // Log the matched route's path (with placeholders not filled in).
-                    let matched_path = request
-                        .extensions()
-                        .get::<MatchedPath>()
-                        .map(MatchedPath::as_str);
-                    let uri = request.uri().to_string();
-
                     info_span!(
                         "http",
-                        method = ?request.method(),
-                        uri = %uri,
-                        matched_path,
-                        cost = tracing::field::Empty,
-                        status = tracing::field::Empty,
+                        m = ?request.method(),
+                        u = %request.uri().to_string(),
+                        t = tracing::field::Empty,
+                        s = tracing::field::Empty,
                     )
                 })
                 .on_response(|response: &Response, latency: Duration, span: &Span| {
-                    span.record("cost", latency.as_millis());
-                    span.record("status", response.status().as_u16());
-                    if response.status().is_success() {
-                        info!("success")
-                    } else if response.status().is_server_error()
-                        || response.status().is_client_error()
-                    {
-                        warn!("failure")
-                    } else {
-                        info!("30x")
+                    span.record("t", latency.as_micros());
+                    span.record("s", response.status().as_u16());
+                    if let Some(app_err) = response.extensions().get::<AppError>() {
+                        error!(error = ?app_err.1.to_string(), "failure");
+                        return;
                     }
+                    info!("done");
                 })
                 .on_failure(
-                    |error: ServerErrorsFailureClass, latency: Duration, span: &Span| {
-                        span.record("cost", latency.as_millis());
-                        error!("error, {}", error)
-                    },
+                    |_error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| {},
                 ),
         )
         .layer(CsrfLayer::new(config))
@@ -179,7 +164,7 @@ impl PageVars {
             title: title.to_string(),
             base_uri: base_uri.to_string(),
             version: land_common::build_info(),
-            build_time: chrono::Utc::now().to_rfc3339(),
+            build_time: land_common::build_date(),
         }
     }
 }
@@ -187,10 +172,19 @@ impl PageVars {
 // Make our own error that wraps `anyhow::Error`.
 struct AppError(StatusCode, anyhow::Error);
 
+impl Clone for AppError {
+    fn clone(&self) -> Self {
+        Self(self.0, anyhow!(self.1.to_string()))
+    }
+}
+
 // Tell axum how to convert `AppError` into a response.
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        (self.0, self.1.to_string()).into_response()
+        let mut resp = (self.0, self.1.to_string()).into_response();
+        let exts = resp.extensions_mut();
+        exts.insert(self);
+        resp
     }
 }
 
