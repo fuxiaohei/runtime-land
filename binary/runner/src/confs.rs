@@ -20,14 +20,30 @@ pub static CONFS: Lazy<Mutex<ConfData>> = Lazy::new(|| {
     Mutex::new(op)
 });
 
+struct RunnerSyncRequest {
+    token: String,
+    cloud_url: String,
+    local_url: String,
+    ipinfo: land_common::IpInfo,
+}
+
 pub fn init_loop(token: String, cloud_url: String, local_url: String) -> Result<()> {
     debug!("init_loop, url: {}", cloud_url);
 
+    let ipinfo = land_common::get_ip_info()?;
+    info!("ipinfo: {:?}", ipinfo);
+
     tokio::spawn(async move {
+        let req = RunnerSyncRequest {
+            token,
+            cloud_url,
+            local_url,
+            ipinfo,
+        };
         // run loop_once in background and every 1 second
         loop {
             tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-            if let Err(err) = sync_once(token.clone(), cloud_url.clone(), local_url.clone()).await {
+            if let Err(err) = sync_once(&req).await {
                 error!("confs loop_once error: {:?}", err);
             }
         }
@@ -36,18 +52,19 @@ pub fn init_loop(token: String, cloud_url: String, local_url: String) -> Result<
     Ok(())
 }
 
-async fn sync_once(token: String, cloud_url: String, local_url: String) -> Result<()> {
-    let url = format!("{}/api/v2/runner/sync", cloud_url);
+async fn sync_once(req: &RunnerSyncRequest) -> Result<()> {
+    let url = format!("{}/api/v2/runner/sync", req.cloud_url);
     let mut current_conf = CONFS.lock().await;
     let req_data = SyncRequest {
-        runner_token: token.to_string(),
+        runner_token: req.token.clone(),
         confs_md5: current_conf.routes_md5.clone(),
+        ipinfo: req.ipinfo.clone(),
     };
     let res: SyncResponse = ureq::post(&url).send_json(req_data)?.into_json()?;
     if res.is_modified {
         *current_conf = res.confs.unwrap();
         info!("sync_once, confs updated, md5: {}", current_conf.routes_md5);
-        update_traefik_confs(current_conf.clone(), local_url.clone()).await;
+        update_traefik_confs(current_conf.clone(), req.local_url.clone()).await;
     } else {
         debug!("sync_once, confs not modified");
     }

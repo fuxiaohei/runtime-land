@@ -9,6 +9,7 @@ use tracing::{debug, warn};
 pub struct SyncRequest {
     pub runner_token: String,
     pub confs_md5: String,
+    pub ipinfo: land_common::IpInfo,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

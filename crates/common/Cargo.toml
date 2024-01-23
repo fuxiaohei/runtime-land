@@ -17,6 +17,7 @@ time = { workspace = true }
 toml = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+ureq = { workspace = true }
 
 [build-dependencies]
 vergen = { version = "8.2.8", features = [
