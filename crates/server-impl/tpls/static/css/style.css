@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap");
+
+body,
+p,
+.btn,
+.alert {
+    font-family: Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+input.form-control {
+    border-color: var(--bs-border-color);
+}
+
+html[data-bs-theme='dark'] .input-group-text {
+    background-color: #333;
+    border-color: var(--bs-border-color);
+}
+
+html[data-bs-theme='dark'] .table>:not(caption)>*>* {
+    border-color: var(--bs-border-color);
+}
+
+.bs-theme-icon,
+.bs-theme-current-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.bs-theme-check {
+    opacity: 0;
+}
+
+.bs-theme-dropdown li button:hover .bs-theme-check {
+    opacity: 100;
+}
+
+#sign-in-btn .svg-clerk {
+    margin-left: .5rem;
+    margin-right: .2rem;
+}
+
+#settings-container,
+#project-single-container {
+    width: 800px;
+}
+
+#new-project-container {
+    width: 960px;
+}
+
+.template-svg svg {
+    width: 40px;
+    height: 40px;
+}
+
+.icon.project-js svg,
+.icon.project-rust svg {
+    width: 48px;
+    height: 48px;
+}
+
+.template-lists .btn-playground {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0.35rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.template-lists .btn-fork {
+    border-bottom-right-radius: 0.35rem;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.project-btn-link {
+    text-decoration: none;
+}
+
+.project-btn-link:hover {
+    text-decoration: underline;
+}
+
+.project-via,
+.project-updated {
+    font-size: 0.9rem;
+}
+
+.project-view-all {
+    border-style: dashed !important;
+}
+
+.project-item>a:hover {
+    border-color: #e0e3e7 !important;
+    background-color: #fdfdf2;
+}
+
+html[data-bs-theme='dark'] .project-item>a:hover {
+    border-color: #4f5152 !important;
+    background-color: #2d2d2d;
+}
+
+.project-single-nav .nav-link.active {
+    text-decoration: underline;
+    text-underline-offset: 0.4rem;
+}
+
+#project-list-table p.name>a {
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+#msg-toast {
+    width: 440px;
+}

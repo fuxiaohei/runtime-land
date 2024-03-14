@@ -1,0 +1,14 @@
+[package]
+name = "{{project_name}}"
+version = "0.1.0"
+edition = "2021"
+description = "{{description}}"
+
+[dependencies]
+anyhow = "1.0.80"
+http = "1.0.0"
+land-sdk = {{sdk_version}}
+wit-bindgen = "0.21.0"
+
+[lib]
+crate-type = ["cdylib"]

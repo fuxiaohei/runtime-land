@@ -1,0 +1,15 @@
+[package]
+name = "land-server"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+land-common = { workspace = true }
+land-core = { workspace = true }
+land-dao = { workspace = true }
+land-server-impl = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

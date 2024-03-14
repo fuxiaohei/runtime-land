@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main class="container text-center">
+        <div class="logo pt-5">
+            <img src="/static/img/logo-v2.png" alt="logo" class="p-2 border rounded bg-white"
+                style="margin-top:5%;width:120px;height:120px">
+        </div>
+        <h3 class="pt-5 text-body-secondary">Runtime.land</h3>
+        <div id="loading-spinner" class="spinner-border mt-5" style="width: 6rem; height: 6rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="pt-5 d-none" id="sign-in-btn-div">
+            <button class="btn btn-primary btn-lg px-4" id="sign-in-btn">Sign in via
+                {{> partials/svg_clerk.hbs}}Clerk.com</button>
+        </div>
+        <p class="pt-5 text-body-tertiary">@2023-2024 Runtime.land - All rights reserved.</p>
+        <div id="sign-in"></div>
+    </main>
+    <script>
+        let redirect_url = window.location.href;
+        const script = document.createElement('script');
+        script.setAttribute('data-clerk-publishable-key', `{{clerk.publishable_key}}`);
+        script.async = true;
+        script.src = `{{clerk.javascript_src}}`;
+        script.addEventListener('load', async function () {
+            await window.Clerk.load({
+                afterSignInUrl: redirect_url,
+                appearance: {
+                    baseTheme: 'dark'
+                },
+            });
+            if (window.Clerk.session && window.Clerk.user) {
+                console.log(window.Clerk.user)
+                // signed-in, redirect to /sign-callback
+                let verify_data = {
+                    session_id: window.Clerk.session.id,
+                    avatar_url: window.Clerk.user.imageUrl,
+                    first_name: window.Clerk.user.firstName,
+                    full_name: window.Clerk.user.fullName,
+                    user_name: window.Clerk.user.username,
+                    email: window.Clerk.user.primaryEmailAddress.emailAddress,
+                    origin_user_id: window.Clerk.user.id,
+                    origin_provider: "clerk@" + (window.Clerk.user.primaryEmailAddress.verification?.strategy || "unknown"),
+                    // redirect_to: redirect_to,
+                }
+                let data = encodeURIComponent(btoa(JSON.stringify(verify_data)));
+                window.location = "/sign-callback?v=" + data
+                return;
+            }
+
+            // if not sign-in, show sign-in button
+            document.getElementById('loading-spinner').classList.add('d-none');
+            document.getElementById('sign-in-btn-div').classList.remove('d-none');
+            const signInComponent = document.querySelector('#sign-in');
+            window.Clerk.openSignIn(signInComponent);
+        });
+        document.body.appendChild(script)
+        const btn = document.getElementById('sign-in-btn');
+        btn.addEventListener('click', () => {
+            const signInComponent = document.querySelector('#sign-in');
+            window.Clerk.openSignIn(signInComponent);
+        });
+    </script>
+
+</body>
+
+</html>

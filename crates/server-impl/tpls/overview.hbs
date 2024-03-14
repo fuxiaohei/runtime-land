@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div class="container d-flex justify-content-between py-4 border-bottom border-body-tertiary" id="hero">
+        <div class="hero-title">
+            <h3>{{user.name}}</h3>
+            <p class="fs-6 text-body-tertiary mb-0">
+                <span><i class="bx bx-envelope bx-icon me-2"></i>{{user.email}}</span>
+            </p>
+        </div>
+        <div class="hero-nav my-auto">
+            <a href="/new" class="btn btn-primary lh-lg"><i class='bx bx-plus me-2'></i>New Project</a>
+        </div>
+    </div>
+    <div class="container project-container py-3 border-bottom border-body-tertiary" id="projects">
+        <div>
+            <h6 class="mb-0">Recent Projects</h6>
+            <p class="small text-body-tertiary mb-0">Projects thats are ordered by the most recently updated.</p>
+        </div>
+        <div class="row g-4 py-4">
+            {{#each projects}}
+            <div class="col-4 project-item">
+                <a href="/projects/{{name}}"
+                    class="d-flex p-4 text-decoration-none text-body border rounded justify-content-between">
+                    <div class="left">
+                        <h5 class="name mb-1">{{name}}</h5>
+                        <p class="project-via created-by text-body-tertiary mb-3 small">via <span
+                                class="text-uppercase">{{created_by}}</span></p>
+                        <p class="link mb-1">
+                            <button
+                                class="project-btn-link text-body-secondary border-none btn btn-link p-0 text-start text-truncate"
+                                href="{{url}}">{{domain_full}}<i class='bx bx-link-external ms-1'></i></button>
+                        </p>
+                        <p class="project-updated text-body-tertiary mb-1 small">Update on <span
+                                data-x-timeago="{{updated_at}}">{{updated_at}}</span></p>
+                    </div>
+                    <div class="right">
+                        {{#if (is_js_project language)}}
+                        <div class="icon project-{{language}}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            data-bs-title="{{language}}">
+                            {{> partials/svg_js.hbs}}
+                        </div>
+                        {{/if}}
+                        {{#if (is_rust_project language)}}
+                        <div class="icon project-{{language}}" data-bs-toggle="tooltip" data-bs-placement="top"
+                            data-bs-title="{{language}}">
+                            {{> partials/svg_rust.hbs}}
+                        </div>
+                        {{/if}}
+                    </div>
+                </a>
+            </div>
+            {{/each}}
+            <div class="col-4 project-item">
+                <a href="/projects"
+                    class="d-flex p-4 text-decoration-none text-body border rounded justify-content-start align-items-center project-view-all">
+                    View all projects
+                    <i class='bx bxs-chevrons-right bx-icons ms-2'></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="container project-container py-4" id="traffic">
+        <div>
+            <h6 class="mb-0">Global Traffic</h6>
+            <p class="fs-6 text-body-tertiary mb-0">Aggregated all projects traffic in recently.</p>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

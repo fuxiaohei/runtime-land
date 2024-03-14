@@ -1,0 +1,29 @@
+<div class="d-flex justify-content-between pt-4 pb-3">
+    <div class="hero-title d-flex justify-content-start">
+        <div class="me-3 mt-2 project-single-svg">
+            {{#if (is_js_project project.language)}}
+            {{> partials/svg_js.hbs}}
+            {{/if}}
+            {{#if (is_rust_project project.language)}}
+            {{> partials/svg_rust.hbs}}
+            {{/if}}
+        </div>
+        <div>
+            <h4>{{project.name}}</h4>
+            <p class="text-body-tertiary mb-0 text-truncate" style="max-width: 25rem;">
+                <small>{{project.description}}</small>
+            </p>
+        </div>
+    </div>
+    <div class="hero-nav my-auto">
+        <div class="input-group">
+            {{#unless project.is_blank}}
+            <a href="{{project.url}}" target="_blank" class="btn btn-dark"><i
+                    class='bx bx-link-external me-2'></i>View</a>
+            {{/unless}}
+            {{#if project.is_editable}}
+            <a href="/playground/{{project.name}}" class="btn btn-info"><i class='bx bx-edit me-2'></i>Playground</a>
+            {{/if}}
+        </div>
+    </div>
+</div>

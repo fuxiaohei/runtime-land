@@ -1,0 +1,85 @@
+[workspace]
+members = [
+    "crates/common",
+    "crates/core",
+    "crates/dao",
+    "crates/sdk",
+    "crates/sdk-macro",
+    "crates/server-impl",
+    "crates/wit",
+    "crates/worker-impl",
+    "crates/worker-server",
+    "land-cli",
+    "land-server",
+    "land-worker",
+    "tests/rust-helloworld",
+]
+default-members = ["land-cli"]
+resolver = "2"
+
+[workspace.package]
+version = "0.4.0"
+edition = "2021"
+authors = ["fuxiaohei <fudong0797@gmail.com>"]
+
+[workspace.dependencies]
+anyhow = "1.0.80"
+async-trait = "0.1.77"
+axum = "0.7.4"
+base64 = "0.22.0"
+chrono = "0.4.35"
+clap = { version = "4.5.2", features = ["derive", "env"] }
+http = "1.1.0"
+land-common = { path = "crates/common" }
+land-core = { path = "crates/core" }
+land-dao = { path = "crates/dao" }
+land-sdk = { path = "crates/sdk" }
+land-sdk-macro = { path = "crates/sdk-macro" }
+land-server-impl = { path = "crates/server-impl" }
+land-wit = { path = "crates/wit" }
+land-worker-impl = { path = "crates/worker-impl" }
+land-worker-server = { path = "crates/worker-server" }
+lazy_static = "1.4.0"
+md5 = "0.7.0"
+once_cell = "1.19.0"
+opendal = { version = "0.45.0", default-features = false, features = [
+    "services-fs",
+    "services-s3",
+    "services-memory",
+    "rustls",
+] }
+rand = "0.8.5"
+reqwest = { version = "0.11.25", default-features = false, features = [
+    "stream",
+    "rustls-tls",
+    "blocking",
+    "json",
+    "multipart",
+] }
+rust-embed = { version = "8.3.0", features = [
+    "include-exclude",
+    "compression",
+] }
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"
+time = { version = "0.3.34", features = ["local-offset"] }
+tokio = { version = "1.36.0", features = ["full"] }
+toml = "0.8.10"
+tower-http = { version = "0.5.2", features = [
+    "timeout",
+    "cors",
+    "fs",
+    "trace",
+] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = [
+    "time",
+    "local-time",
+    "env-filter",
+] }
+uuid = { version = "1.7.0", features = ["v4"] }
+wit-bindgen = "0.21.0"
+wit-bindgen-core = "0.21.0"
+wit-bindgen-rust = "0.21.0"
+wit-component = "0.201.0"
+url = "2.5.0"

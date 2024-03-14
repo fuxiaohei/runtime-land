@@ -1,0 +1,13 @@
+land_manifest_version = "0.4.0"
+
+[project]
+name = "{{project_name}}"
+version = "0.1.0"
+language = "javascript"
+authors = []
+description = "{{description}}"
+
+[build]
+command = ""
+target = "src/index.js"
+# src_files = ["src/", "package.json", "package-lock.json"]

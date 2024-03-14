@@ -1,0 +1,14 @@
+[package]
+name = "rust-helloworld"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+http = { workspace = true }
+land-sdk = { workspace = true }
+wit-bindgen =  { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]

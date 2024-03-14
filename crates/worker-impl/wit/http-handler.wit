@@ -1,0 +1,5 @@
+package land:worker;
+
+world http-handler {
+    export land:http/incoming;
+}

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="settings-container" class="container mx-auto">
+        <div class="d-flex justify-content-between py-4 border-bottom border-body-tertiary" id="hero">
+            <div class="hero-title">
+                <h3>{{user.name}}</h3>
+                <p class="fs-6 text-body-tertiary mb-0">
+                    <span><i class="bx bx-envelope bx-icon me-2"></i>{{user.email}}</span>
+                    <span class="ms-3 badge rounded bg-secondary">Starter</span>
+                </p>
+            </div>
+        </div>
+        <div class="py-4">
+            <div>
+                <h6 class="mb-0">Access Tokens</h6>
+                <p class="fs-6 text-body-tertiary mb-0">Access tokens are used to authenticate with the Command line
+                    tool
+                    <span class="badge bg-info p-2">land-cli</span>
+                </p>
+            </div>
+            <div class="card border-secondary-subtle mt-3">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {{#each tokens}}
+                        <li
+                            class="list-group-item py-3 token-list-item d-flex align-items-center justify-content-between">
+                            <div class="token-meta lh-lg">
+                                <p class="mb-0"><span><i class='bx bx-key bx-icon me-2'></i> <strong>{{name}}</strong>
+                                    </span>
+                                    <span class="text-body-secondary ms-2"><small>Use at <span
+                                                data-x-timeago="{{updated_at}}">{{updated_at}}</span></small></span>
+                                </p>
+                                {{#if is_new}}
+                                <p class="mb-0"><span id="token-{{id}}-value">{{value}}</span>
+                                    <button data-x-id="{{id}}" class="btn btn-link token-value-copy-btn"><i
+                                            class='bx bx-copy bx-icon ms-2'></i></button>
+                                </p>
+                                {{/if}}
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-danger btn-sm token-del-btn" data-bs-toggle="modal"
+                                    data-bs-target="#delete-token-{{id}}-modal">
+                                    <i class='bx bx-trash bx-icon'></i>
+                                </button>
+                                <div class="modal fade" id="delete-token-{{id}}-modal" tabindex="-1"
+                                    aria-labelledby="create-token-modal" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5">Delete token</h1>
+                                            </div>
+                                            <form method="post" action="/settings/delete-token">
+                                                <div class="modal-body text-start">
+                                                    <p>Enter the token's name <strong>{{name}}</strong></p>
+                                                    <input class="form-control" type="text" name="name"
+                                                        placeholder="The name of the token" required>
+                                                    <input type="hidden" name="csrf" value="{{../csrf_token}}">
+                                                    <input type="hidden" name="id" value="{{id}}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Delete</button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {{/each}}
+                        <li class="list-group-item text-end pt-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#create-token-modal"><i class="bx bx-plus bx-icon me-2"></i>Create New
+                                Token</button>
+                            <div class="modal fade" id="create-token-modal" tabindex="-1"
+                                aria-labelledby="create-token-modal" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5">Create new token</h1>
+                                        </div>
+                                        <form method="post" action="/settings/create-token">
+                                            <div class="modal-body text-start">
+                                                <p>Enter the description of the new access token.</p>
+                                                <input class="form-control" type="text" name="name"
+                                                    placeholder="What is this token for?" required>
+                                                <input type="hidden" name="csrf" value="{{csrf_token}}">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Create</button>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="py-4 border-top">
+            <div>
+                <h6 class="mb-0">Disable Account</h6>
+                <p class="text-body-tertiary mb-0">You can delete your account and all your data from
+                    Runtime.land.<br />
+                    <strong class="text-danger">The action is unrecoverable.</strong>
+                </p>
+                </p>
+            </div>
+            <div>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#disable-account-modal"><i
+                        class='bx bx-user-x bx-icon me-2'></i>Disable Account</button>
+                <div class="modal fade" id="disable-account-modal" tabindex="-1" aria-labelledby="disable-account-modal"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5">Disable Account</h1>
+                            </div>
+                            <form method="post" action="/settings/disable-account">
+                                <div class="modal-body">
+                                    <p>You are about to disable your account. Your all projects and data will be
+                                        disabled
+                                        and
+                                        you will not be able to recover them...</p>
+                                    <div class="alert alert-danger">
+                                        <strong>Be careful!</strong> This action is irreversible.
+                                    </div>
+                                    <p>Type your name to confirm:</p>
+                                    <input class="form-control" type="text" placeholder="type in your name" required>
+                                    <input type="hidden" name="csrf" value="{{csrf_token}}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Confirm</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll(".token-value-copy-btn").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                let uuid = btn.getAttribute("data-x-id");
+                let valueText = document.getElementById("token-" + uuid + "-value").innerText.trim();
+                navigator.clipboard.writeText(valueText);
+                let icon = btn.querySelector(".bx-copy");
+                if (icon) {
+                    icon.classList.remove("bx-copy");
+                    icon.classList.add("bx-check");
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

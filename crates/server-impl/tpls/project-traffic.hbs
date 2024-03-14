@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="project-single-container" class="container mx-auto">
+        {{> partials/project_header.hbs}}
+        <nav class="project-single-nav nav">
+            <a class="nav-link" href="/projects/{{project.name}}">Overview</a>
+            <a class="nav-link active" href="/projects/{{project.name}}/traffic">Traffic</a>
+            <a class="nav-link" href="/projects/{{project.name}}/settings">Settings</a>
+        </nav>
+        <div class="pb-4">
+            <div class="card m-3">
+                <div class="card-body">
+                    Traffic
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

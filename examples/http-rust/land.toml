@@ -1,0 +1,13 @@
+land_manifest_version = "0.4.0"
+
+[project]
+name = "{{project_name}}"
+version = "0.1.0"
+language = "rust"
+authors = []
+description = "{{description}}"
+
+[build]
+command = "cargo build --release --target wasm32-wasi"
+target = "target/wasm32-wasi/release/{{project_wasm}}.wasm"
+# src_files = ["src/", "Cargo.toml", "Cargo.lock"]

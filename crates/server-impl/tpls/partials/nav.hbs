@@ -1,0 +1,77 @@
+<header class="container-fluid bg-body-tertiary p-3 border-bottom">
+    <div class="container d-flex justify-content-between">
+        <div class="nav-left d-flex justify-content-start align-items-center">
+            <h1 class="h5 mb-0" id="nav-brand">
+                <a class="text-decoration-none text-body-emphasis" href="/">
+                    <img src="/static/img/logo-v2.png" width="40" height="40"
+                        class="me-2 p-1 border border-body-tertiary rounded bg-white" />
+                    Runtime.land</a>
+            </h1>
+            <ul class="nav nav-pills ms-4 text-uppercase">
+                <li class="nav-item">
+                    <a class="nav-link h5 mb-0 {{is_nav_active 'overview' page.nav}}" href="/overview">Overview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link h5 mb-0 {{is_nav_active 'projects' page.nav}}" href="/projects">Projects</a>
+                </li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <ul class="nav d-flex align-items-center">
+                <li class="nav-item">
+                    <div class="d-flex align-items-center dropdown me-3">
+                        <button class="btn btn-link p-0 text-decoration-none dropdown-toggle d-flex align-items-center"
+                            id="bd-user" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                            data-bs-display="static">
+                            <img src="{{user.gravatar}}" width="40" height="40" class="rounded-circle me-2"
+                                title="{{user.name}}" />
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-user"
+                            style="--bs-dropdown-min-width: 11rem;">
+                            <li class="text-center">
+                                <img src="{{user.gravatar}}" width="88" height="88" class="rounded mt-3"
+                                    title="{{user.name}}" />
+                                <p class="text-body-emphasis fw-bold py-3">{{user.name}}</p>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="/settings"><i
+                                        class='bx bx-cog me-2 bx-icon'></i>Settings</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="/sign-out"><i
+                                        class="bx bx-log-out me-2 bx-icon"></i>Sign
+                                    out</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <div class="d-flex align-items-center dropdown color-modes">
+                        <button class="btn btn-link px-0 text-decoration-none d-flex align-items-center" id="bd-theme"
+                            type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor"
+                                class="bs-theme-current-icon bs-theme-current-icon-light text-body d-none me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor"
+                                class="bs-theme-current-icon bs-theme-current-icon-dark text-secondary d-none me-2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</header>

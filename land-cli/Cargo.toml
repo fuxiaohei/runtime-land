@@ -1,0 +1,19 @@
+[package]
+name = "land-cli"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+color-print = "0.3.5"
+inquire = "0.7.1"
+land-common = { workspace = true }
+land-core = { workspace = true }
+land-wit = { workspace = true }
+land-worker-server = { workspace = true }
+regex = "1.10.3"
+rust-embed = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

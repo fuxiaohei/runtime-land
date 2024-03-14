@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="project-list-container" class="container mx-auto">
+        <div class="container d-flex justify-content-between py-4 border-bottom border-body-tertiary">
+            <div class="hero-title">
+                <h3>Projects Overview</h3>
+                <p class="fs-6 text-body-tertiary mb-0">Explore all active projects in account.</p>
+            </div>
+            <div class="hero-nav my-auto">
+                <a href="/new" class="btn btn-primary lh-lg"><i class='bx bx-plus me-2'></i>New Project</a>
+            </div>
+        </div>
+        <div class="container project-container py-3" id="project-list">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="left">
+                    <h6 class="mb-0">Projects</h6>
+                    <p class="fs-6 text-body-tertiary mb-0">All projects in your account.</p>
+                </div>
+                <div class="right">
+                    <form action="/projects" method="get">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" name="search" placeholder="Search by domain or name"
+                                value="{{search}}" required>
+                            <button class="btn btn-outline-secondary" type="submit"><i
+                                    class='bx bx-search-alt mx-2'></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <table class="table mt-3" id="project-list-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Lang</th>
+                        <th scope="col">Access URL</th>
+                        <th scope="col">Traffic</th>
+                        <th scope="col">Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each projects}}
+                    <tr>
+                        <th scope="row">
+                            <p class="name mb-1">
+                                <a href="/projects/{{name}}" class="text-body">{{name}}</a>
+                            </p>
+                            <p class="meta mb-1 small text-body-tertiary fw-light">via <span
+                                    class="text-uppercase">{{created_by}}</span></p>
+                        </th>
+                        <td><span class="text-uppercase text-body-tertiary">{{language}}</span></td>
+                        <td>
+                            <a class="link" href="{{url}}" target="_blank">{{domain_full}}</a>
+                        </td>
+                        <td></td>
+                        <td>
+                            <span class="text-body-tertiary" data-x-timeago="{{updated_at}}">{{updated_at}}</span>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

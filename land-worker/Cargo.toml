@@ -1,0 +1,15 @@
+[package]
+name = "land-worker"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+land-common = { workspace = true }
+land-core = { workspace = true }
+land-worker-server = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }

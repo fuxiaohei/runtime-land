@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+    <link title="light" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css">
+    <link title="dark" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css"
+        disabled="disabled">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="new-project-container" class="container mx-auto">
+        <div
+            class="container d-flex justify-content-between py-4 border-bottom border-body-tertiary new-project-container">
+            <div class="hero-title">
+                <h3>Create a project</h3>
+                <p class="fs-6 text-body-tertiary mb-0">
+                    To get started, choose a template below or create an empty project.
+                </p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row g-4 py-4">
+                <div class="col-6">
+                    <h6 class="mb-1">Start from a template</h6>
+                    <p class="text-body-tertiary mb-0 small">
+                        Choose a template based on your favorite language and framework
+                    </p>
+                    <div class="template-lists">
+                        <div class="card mt-3">
+                            <div class="card-body d-flex justify-content-between">
+                                <div class="template-name">
+                                    <h6 class="card-title">HTTP-JavaScript</h6>
+                                    <p class="text-body-tertiary mb-1 small">
+                                        A simple HTTP router that shows Hello World written in JavaScript.
+                                    </p>
+                                </div>
+                                <div class="template-svg ms-2">
+                                    {{> partials/svg_js.hbs}}
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <a href="/new/playground/http-javascript" class="btn btn-primary btn-playground"><i
+                                        class='bx bxs-edit me-2'></i>Edit Playground</a>
+                                <button type="button" class="btn btn-dark disabled btn-fork"><i
+                                        class='bx bx-git-repo-forked me-2'></i>Fork on Github</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h6 class="mb-1">Create an empty project</h6>
+                    <p class="text-body-tertiary mb-0 small">
+                        Initialize a blank project, and add code later with <span class="text-primary">land-cli</span>.
+                    </p>
+                    <p class="mt-2">
+                        <a href="/new/blank" class="btn btn-light rounded-2">Create blank project</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>

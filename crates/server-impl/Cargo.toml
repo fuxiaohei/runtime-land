@@ -1,0 +1,29 @@
+[package]
+name = "land-server-impl"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+axum-extra = { version = "0.9.2", features = ["cookie"] }
+axum-template = { version = "2.2.0", features = ["handlebars"] }
+axum_csrf = { version = "0.9.0", features = ["layer"] }
+base64 = { workspace = true }
+chrono = { workspace = true }
+handlebars = "5.1.0"
+land-common = { workspace = true }
+land-core = { workspace = true }
+land-dao = { workspace = true }
+once_cell = { workspace = true }
+reqwest = { workspace = true }
+rust-embed = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+walkdir = "2.5.0"
+uuid = { workspace = true }

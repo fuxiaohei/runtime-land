@@ -1,0 +1,24 @@
+[package]
+name = "land-worker-impl"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+axum = { workspace = true }
+futures-util = "0.3.30"
+http-body = "1.0.0"
+http-body-util = "0.1.0"
+lazy_static = { workspace = true }
+moka = { version = "0.12.5", features = ["sync"] }
+once_cell = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+wasmtime = { version = "18.0.2", features = ["component-model", "async"] }
+wasmtime-wasi = "18.0.2"
+
+[build-dependencies]
+land-wit = { workspace = true }

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="project-single-container" class="container mx-auto">
+        {{> partials/project_header.hbs}}
+        <nav class="project-single-nav nav">
+            <a class="nav-link" href="/projects/{{project.name}}">Overview</a>
+            <a class="nav-link" href="/projects/{{project.name}}/traffic">Traffic</a>
+            <a class="nav-link active" href="/projects/{{project.name}}/settings">Settings</a>
+        </nav>
+        <div class="m-3">
+            <div class="settings-name-container border-top pt-3">
+                <h6 class="mb-0">Project Name</h6>
+                <p class="text-body-tertiary mb-0 mt-1 small">The name of the project</p>
+                <form action="/projects/{{project.name}}/settings" id="settings-name-form" method="post">
+                    <div class="input-group my-3">
+                        <input data-x-old="{{project.domain}}" type="text" name="domain" class="form-control"
+                            value="{{project.domain}}">
+                        <input type="hidden" name="csrf" value="{{csrf_token}}">
+                        <span class="input-group-text">.{{domain}}</span>
+                    </div>
+                    <button id="settings-name-btn" class="btn btn-primary rounded-2" disabled>Save</button>
+                </form>
+            </div>
+            <div class="settings-delete-container border-top mt-3 py-3">
+                <h6 class="mb-0">Delete Project</h6>
+                <p class="text-body-tertiary mb-3 mt-1 small">Delete <strong>{{project.name}}</strong> and its all data.
+                    <span>This action is irreversible.</span>
+                </p>
+                <button id="settings-delete-btn" class="btn btn-danger rounded-2" data-bs-toggle="modal"
+                    data-bs-target="#delete-project-modal">Delete</button>
+                <div class="modal fade" id="delete-project-modal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5">Disable Project</h1>
+                            </div>
+                            <form id="delete-form" method="post" action="/projects/{{project.name}}/delete">
+                                <div class="modal-body">
+                                    <p>You are about to delete <strong>{{project.name}}</strong> and all its data.</p>
+                                    <div class="alert alert-danger">
+                                        <strong>Be careful!</strong> This action is irreversible.
+                                    </div>
+                                    <p>Type your project name to confirm:</p>
+                                    <input id="delete-form-input" data-x-old="{{project.name}}"
+                                        class="form-control mb-3" name="name" type="text"
+                                        placeholder="type in your project name" required>
+                                    <input type="hidden" name="csrf" value="{{csrf_token}}">
+                                    <p id="delete-help-text" class="d-none help-text text-danger">Project name is not
+                                        matched.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button id="delete-btn" type="submit" class="btn btn-danger"
+                                        disabled>Delete</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll("#settings-name-form input[data-x-old]").forEach((input) => {
+            input.addEventListener("input", (e) => {
+                const btn = document.getElementById("settings-name-btn");
+                const old = e.target.getAttribute("data-x-old");
+                if (e.target.value !== old) {
+                    btn.removeAttribute("disabled");
+                } else {
+                    btn.setAttribute("disabled", "disabled");
+                }
+            });
+        });
+        document.getElementById("delete-form-input").addEventListener("input", (e) => {
+            const old = e.target.getAttribute("data-x-old");
+            const btn = document.getElementById("delete-btn");
+            const helpText = document.getElementById("delete-help-text");
+            if (e.target.value !== old) {
+                helpText.classList.remove("d-none");
+                btn.setAttribute("disabled", "disabled");
+            } else {
+                helpText.classList.add("d-none");
+                btn.removeAttribute("disabled");
+            }
+        });
+    </script>
+</body>
+
+</html>

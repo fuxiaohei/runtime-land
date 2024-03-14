@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+    <link title="light" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css">
+    <link title="dark" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css"
+        disabled="disabled">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+</head>
+
+<body>
+    {{> partials/nav.hbs}}
+    <div id="project-single-container" class="container mx-auto">
+        {{> partials/project_header.hbs}}
+        <nav class="project-single-nav nav">
+            <a class="nav-link active" href="/projects/{{project.name}}">Overview</a>
+            <a class="nav-link" href="/projects/{{project.name}}/traffic">Traffic</a>
+            <a class="nav-link" href="/projects/{{project.name}}/settings">Settings</a>
+        </nav>
+        {{#if project.is_blank}}
+        <div class="pb-4">
+            <div class="card m-3">
+                <div class="card-body">
+                    <p>Deploy from the command line.</p>
+                    <a class="btn btn-success" href="#">Docs</a>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        {{#if project.source}}
+        <div class="project-source pb-4">
+            <div class="card m-3">
+                <div class="card-header">
+                    <small class="text-body-tertiary">Edit on <span
+                            data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span></small>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-{{project.language}}">{{project.source}}</code></pre>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+    </div>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>

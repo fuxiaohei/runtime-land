@@ -1,0 +1,13 @@
+[package]
+name = "land-sdk"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+http = { workspace = true }
+land-sdk-macro = { workspace = true }
+lazy_static = { workspace = true }
+matchit = "0.7.3"
+wit-bindgen = { workspace = true }

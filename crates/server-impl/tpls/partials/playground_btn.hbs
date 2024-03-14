@@ -1,0 +1,10 @@
+<button id="main-btn" data-x-status="{{project.deploy_status}}" class="btn btn-primary text-uppercase">
+    <div class="waiting-status d-none">
+        <div class="spinner-grow spinner-grow-sm me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div><span class="msg-text">{{project.deploy_status}}</span>
+    </div>
+    <div class="submit-status">
+        <span class="ok-text">Save & Deploy</span>
+    </div>
+</button>
