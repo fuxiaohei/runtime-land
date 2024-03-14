@@ -1,11 +1,19 @@
 use crate::{not_modified_response, ServerError};
 use axum::{response::IntoResponse, Json};
-use land_core::{background, workerinfo::sync::SyncRequest};
+use land_common::ip;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeploysResponse {
     pub data: land_kernel::cron::ConfData,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SyncRequest {
+    pub ip: ip::Info,
+    pub checksum: String,
+    pub deploys: HashMap<String, String>,
 }
 
 /// deploys returns the current deploys data.
@@ -17,10 +25,13 @@ pub async fn deploys() -> Result<Json<DeploysResponse>, ServerError> {
 
 /// deploys_post is the endpoint for worker to post the sync data.
 pub async fn deploys_post(Json(j): Json<SyncRequest>) -> Result<impl IntoResponse, ServerError> {
-    println!("deploys_post: {:?}", j);
     // handle deploy result
     if !j.deploys.is_empty() {
-        let _ = background::send_updater_task(j.ip.ip.clone(), j.deploys.clone()).await;
+        let ip = j.ip.ip.clone();
+        let data = j.deploys.clone();
+        tokio::spawn(async move {
+            land_kernel::tasks::refresh_deploy_results(ip, data).await;
+        });
     }
     // refresh online status
     let hostname = j.ip.hostname.clone().unwrap_or_default();

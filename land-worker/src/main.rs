@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
     // get local ip data
     agent::ip::init().await?;
     // run worker-agent role
-    agent::run(args.cloud_server_url, args.token).await?;
+    agent::run(args.cloud_server_url, args.token, args.dir.clone()).await?;
 
     let opts = land_worker_server::Opts {
         addr: args.address.parse()?,

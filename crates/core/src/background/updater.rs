@@ -47,6 +47,7 @@ async fn handle_task(task: &Task) {
             task.ip.clone(),
             task_id.to_string(),
             result_status.clone(),
+            String::new(),
         )
         .await
         {

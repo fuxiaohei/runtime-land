@@ -31,6 +31,7 @@ pub async fn create(
         status: Status::Pending.to_string(),
         created_at: now,
         updated_at: now,
+        message: String::new(),
     };
     let mut active_model = m.into_active_model();
     active_model.id = Default::default();
@@ -39,13 +40,19 @@ pub async fn create(
 }
 
 /// update_pending updates the status of a deploy task
-pub async fn update_pending(ip: String, task_id: String, status: Status) -> Result<()> {
+pub async fn update_pending(
+    ip: String,
+    task_id: String,
+    status: Status,
+    message: String,
+) -> Result<()> {
     deploy_task::Entity::update_many()
         .filter(deploy_task::Column::Ip.eq(ip))
         .filter(deploy_task::Column::TaskId.eq(task_id))
         .filter(deploy_task::Column::Status.eq(Status::Pending.to_string())) // only change pending records
         .col_expr(deploy_task::Column::Status, Expr::value(status.to_string()))
         .col_expr(deploy_task::Column::UpdatedAt, Expr::value(now_time()))
+        .col_expr(deploy_task::Column::Message, Expr::value(message))
         .exec(DB.get().unwrap())
         .await?;
     Ok(())

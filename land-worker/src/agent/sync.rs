@@ -28,13 +28,19 @@ static DATA: Lazy<Mutex<ConfData>> = Lazy::new(|| {
     })
 });
 
+/// get returns the global data
+pub async fn get() -> ConfData {
+    let data = DATA.lock().await;
+    data.clone()
+}
+
 /// start starts the sync loop
-pub async fn start(interval: u64, addr: String, token: String) {
+pub async fn start(interval: u64, addr: String, token: String, dir: String) {
     tokio::spawn(async move {
         let mut ticker = tokio::time::interval(tokio::time::Duration::from_secs(interval));
         loop {
             ticker.tick().await;
-            match sync(addr.clone(), token.clone()).await {
+            match sync(addr.clone(), token.clone(), dir.clone()).await {
                 Ok(_) => {}
                 Err(e) => tracing::warn!("Loop error: {:?}", e),
             }
@@ -43,13 +49,13 @@ pub async fn start(interval: u64, addr: String, token: String) {
 }
 
 #[instrument("[SYNC]", skip_all)]
-async fn sync(addr: String, token: String) -> Result<()> {
+async fn sync(addr: String, token: String, dir: String) -> Result<()> {
     let url = format!("{}/api/worker/v1/deploys", addr);
     let mut data = DATA.lock().await;
     let req = Request {
         ip: super::ip::get().await,
         checksum: data.checksum.clone(),
-        deploys: HashMap::new(),
+        deploys: super::traefik::get_res().await,
     };
     let client = reqwest::Client::new();
     let resp = client
@@ -71,5 +77,10 @@ async fn sync(addr: String, token: String) -> Result<()> {
     let value: Response = resp.json().await?;
     *data = value.data;
     info!("Sync success, checksum: {}", data.checksum);
+
+    tokio::spawn(async move {
+        super::traefik::build(dir).await;
+    });
+
     Ok(())
 }

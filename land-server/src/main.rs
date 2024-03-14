@@ -42,7 +42,10 @@ async fn main() -> Result<()> {
     land_dao::storage::init_defatuls().await?;
 
     // start crons
-    land_kernel::cron::start(land_kernel::cron::Options { gen_deploys: 1 });
+    land_kernel::cron::start(land_kernel::cron::Options {
+        gen_deploys: 1,
+        review_tasks: 1,
+    });
     land_kernel::tasks::init().await?;
 
     // Start server

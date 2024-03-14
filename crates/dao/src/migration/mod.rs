@@ -8,6 +8,7 @@ mod m05_create_playground_table;
 mod m06_create_deployment_table;
 mod m07_create_worker_table;
 mod m08_create_deploy_task_table;
+mod m09_alter_deploy_task_table;
 
 pub struct Migrator;
 
@@ -23,6 +24,7 @@ impl MigratorTrait for Migrator {
             Box::new(m06_create_deployment_table::Migration),
             Box::new(m07_create_worker_table::Migration),
             Box::new(m08_create_deploy_task_table::Migration),
+            Box::new(m09_alter_deploy_task_table::Migration),
         ]
     }
 }
