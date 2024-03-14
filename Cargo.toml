@@ -3,6 +3,7 @@ members = [
     "crates/common",
     "crates/core",
     "crates/dao",
+    "crates/kernel",
     "crates/sdk",
     "crates/sdk-macro",
     "crates/server-impl",
@@ -33,6 +34,7 @@ http = "1.1.0"
 land-common = { path = "crates/common" }
 land-core = { path = "crates/core" }
 land-dao = { path = "crates/dao" }
+land-kernel = { path = "crates/kernel" }
 land-sdk = { path = "crates/sdk" }
 land-sdk-macro = { path = "crates/sdk-macro" }
 land-server-impl = { path = "crates/server-impl" }

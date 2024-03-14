@@ -2091,6 +2091,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonwebtoken"
+version = "9.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c7ea04a7c5c055c175f189b6dc6ba036fd62306b58c66c9f6389036c503a3f4"
+dependencies = [
+ "base64 0.21.7",
+ "js-sys",
+ "pem",
+ "ring",
+ "serde",
+ "serde_json",
+ "simple_asn1",
+]
+
+[[package]]
 name = "land-cli"
 version = "0.4.0"
 dependencies = [
@@ -2169,6 +2184,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "land-kernel"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "jsonwebtoken",
+ "land-dao",
+ "land-wit",
+ "md5",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tempdir",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "land-sdk"
 version = "0.4.0"
 dependencies = [
@@ -2199,6 +2234,7 @@ dependencies = [
  "land-common",
  "land-core",
  "land-dao",
+ "land-kernel",
  "land-server-impl",
  "tokio",
  "tracing",
@@ -2219,6 +2255,7 @@ dependencies = [
  "land-common",
  "land-core",
  "land-dao",
+ "land-kernel",
  "once_cell",
  "reqwest",
  "rust-embed",
@@ -2250,9 +2287,14 @@ version = "0.4.0"
 dependencies = [
  "anyhow",
  "clap",
+ "hostname",
  "land-common",
  "land-core",
+ "land-kernel",
  "land-worker-server",
+ "once_cell",
+ "reqwest",
+ "serde",
  "tokio",
  "tracing",
  "url",
@@ -2786,6 +2828,16 @@ name = "paste"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
+
+[[package]]
+name = "pem"
+version = "3.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b8fcc794035347fb64beda2d3b462595dd2753e3f268d89c5aae77e8cf2c310"
+dependencies = [
+ "base64 0.21.7",
+ "serde",
+]
 
 [[package]]
 name = "pem-rfc7468"
@@ -3960,6 +4012,18 @@ name = "simdutf8"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f27f6278552951f1f2b8cf9da965d10969b2efdea95a6ec47987ab46edfe263a"
+
+[[package]]
+name = "simple_asn1"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adc4e5204eb1910f40f9cfa375f6f05b68c3abac4b6fd879c8ff5e7ae8a0a085"
+dependencies = [
+ "num-bigint",
+ "num-traits",
+ "thiserror",
+ "time",
+]
 
 [[package]]
 name = "skeptic"

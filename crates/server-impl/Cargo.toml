@@ -16,6 +16,7 @@ handlebars = "5.1.0"
 land-common = { workspace = true }
 land-core = { workspace = true }
 land-dao = { workspace = true }
+land-kernel = { workspace = true }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 rust-embed = { workspace = true }
@@ -25,5 +26,5 @@ time = { workspace = true }
 tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }
-walkdir = "2.5.0"
 uuid = { workspace = true }
+walkdir = "2.5.0"

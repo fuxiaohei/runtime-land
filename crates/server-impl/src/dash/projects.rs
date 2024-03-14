@@ -3,7 +3,7 @@ use axum::Form;
 use axum::{extract::Path, response::IntoResponse, Extension};
 use axum_csrf::CsrfToken;
 use axum_template::RenderHtml;
-use land_dao::{playground, project, settings};
+use land_dao::{project, settings};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
@@ -106,19 +106,8 @@ pub async fn single(
         user: SessionUser,
         project: ProjectVar,
     }
-    let project_value = project::get_by_name(name, Some(user.id)).await?;
-    if project_value.is_none() {
-        return Err(ServerError::not_found("Project not found"));
-    }
-    let project_value = project_value.unwrap();
-
-    // if the project is created by playground, then get the source from playground
-    let mut playgrond: Option<land_dao::models::playground::Model> = None;
-    if project_value.created_by == land_dao::project::CreatedBy::Playground.to_string() {
-        playgrond = playground::get_by_project(user.id, project_value.id).await?;
-    }
-    info!("Project single: {:?}", project_value);
-    let project = ProjectVar::new(&project_value, playgrond.as_ref()).await?;
+    let (p, py) = land_kernel::project::show_single(name, user.id).await?;
+    let project = ProjectVar::new(&p, py.as_ref()).await?;
 
     let title = format!("{} - Project", project.name);
     let base_uri = format!("/projects/{}", project.name);
@@ -252,11 +241,7 @@ pub async fn post_delete(
     if name != form.name {
         return Err(ServerError::bad_request("Project name not matched"));
     }
-    let project = project::get_by_name(name, Some(user.id)).await?;
-    if project.is_none() {
-        return Err(ServerError::not_found("Project not found"));
-    }
-    info!("Delete project: {:?}", project);
-    project::delete(user.id, project.unwrap().id).await?;
+    info!("Delete project: {:?}", name);
+    land_kernel::project::delete(user.id, name).await?;
     Ok(redirect_response("/overview"))
 }

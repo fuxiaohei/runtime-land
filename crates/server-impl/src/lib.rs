@@ -20,6 +20,9 @@ mod worker;
 /// start starts the server
 #[instrument("[SVR]", skip_all)]
 pub async fn start(assets_dir: &str, addr: SocketAddr) -> Result<()> {
+    // init clerk env
+    land_kernel::auth::init_clerk_env().await?;
+
     let dash_app = dash::router(assets_dir)?;
     let app = Router::new()
         .merge(dash_app)
@@ -127,7 +130,7 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
         // ignore static assets log
         return Ok(next.run(request).await);
     }
-    if path.starts_with("/api/worker/v1/deploys"){
+    if path.starts_with("/api/worker/v1/deploys") {
         // high sequence url
         return Ok(next.run(request).await);
     }

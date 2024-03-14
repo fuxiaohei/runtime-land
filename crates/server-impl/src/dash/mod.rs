@@ -30,9 +30,6 @@ pub async fn index() -> impl IntoResponse {
 
 /// router returns the router for the dashboard
 pub fn router(assets_dir: &str) -> Result<Router> {
-    // init clerk env
-    auth::init_clerk_env()?;
-
     // extract all assets to the static directory
     tpls::extract(assets_dir)?;
 

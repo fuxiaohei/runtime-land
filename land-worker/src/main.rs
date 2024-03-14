@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Result};
 use clap::Parser;
 use land_common::{tracing::FlagArgs, version};
-use land_core::workerinfo::sync;
+
+mod agent;
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
@@ -43,17 +44,9 @@ async fn main() -> Result<()> {
     }
 
     // get local ip data
-    land_core::ip::init().await?;
-    // sync confs loop
-    let target_file = format!("{}/traefik.yaml", args.dir);
-    let opts = sync::Opts {
-        cloud_server_addr: args.cloud_server_url.clone(),
-        token: args.token.clone(),
-        data_dir: args.dir.clone(),
-        conf_file: target_file.clone(),
-        server_addr: args.address.clone(),
-    };
-    sync::run_loop(1, opts);
+    agent::ip::init().await?;
+    // run worker-agent role
+    agent::run(args.cloud_server_url, args.token).await?;
 
     let opts = land_worker_server::Opts {
         addr: args.address.parse()?,

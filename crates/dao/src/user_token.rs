@@ -134,6 +134,15 @@ pub async fn remove(token_id: i32) -> Result<()> {
     Ok(())
 }
 
+/// remove_session removes a session token
+pub async fn remove_session(value: &str) -> Result<()> {
+    let token = get_by_value(value, Some(Usage::Session)).await?;
+    if let Some(token) = token {
+        remove(token.id).await?;
+    }
+    Ok(())
+}
+
 /// is_new checks if a token is new
 pub async fn is_new(id: i32) -> bool {
     let creating_map = CREATED_TOKENS.lock().await;

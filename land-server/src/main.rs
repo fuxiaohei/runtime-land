@@ -41,10 +41,9 @@ async fn main() -> Result<()> {
     land_dao::settings::init_defaults().await?;
     land_dao::storage::init_defatuls().await?;
 
-    // init core background tasks
-    land_core::background::init();
-    // generate gateway confs in every 60 seconds
-    land_core::gateway::generate_loop(1);
+    // start crons
+    land_kernel::cron::start(land_kernel::cron::Options { gen_deploys: 1 });
+    land_kernel::tasks::init().await?;
 
     // Start server
     land_server_impl::start("./assets", args.address.parse().unwrap()).await?;

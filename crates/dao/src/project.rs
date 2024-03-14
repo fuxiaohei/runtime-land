@@ -196,7 +196,7 @@ pub async fn delete(user_id: i32, project_id: i32) -> Result<()> {
         .await?;
 
     // delete playground
-    super::playground::delete_by_project(user_id, project_id).await?;
+    // super::playground::delete_by_project(user_id, project_id).await?;
 
     Ok(())
 }
