@@ -10,15 +10,15 @@ async-trait = { workspace = true }
 axum = { workspace = true }
 futures-util = "0.3.30"
 http-body = "1.0.0"
-http-body-util = "0.1.0"
+http-body-util = "0.1.1"
 lazy_static = { workspace = true }
 moka = { version = "0.12.5", features = ["sync"] }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-wasmtime = { version = "18.0.2", features = ["component-model", "async"] }
-wasmtime-wasi = "18.0.2"
+wasmtime = { version = "18.0.3", features = ["component-model", "async"] }
+wasmtime-wasi = "18.0.3"
 
 [build-dependencies]
 land-wit = { workspace = true }
