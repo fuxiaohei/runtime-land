@@ -55,7 +55,7 @@ async fn sync(addr: String, token: String, dir: String) -> Result<()> {
     let req = Request {
         ip: super::ip::get().await,
         checksum: data.checksum.clone(),
-        deploys: super::traefik::get_res().await,
+        deploys: super::deploys::get_res().await,
     };
     let client = reqwest::Client::new();
     let resp = client
@@ -79,7 +79,7 @@ async fn sync(addr: String, token: String, dir: String) -> Result<()> {
     info!("Sync success, checksum: {}", data.checksum);
 
     tokio::spawn(async move {
-        super::traefik::build(dir).await;
+        super::deploys::build(dir).await;
     });
 
     Ok(())

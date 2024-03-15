@@ -1,59 +1,102 @@
 use anyhow::Result;
-use once_cell::sync::Lazy;
+use land_kernel::cron::ConfData;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tokio::sync::Mutex;
-use tracing::{debug, info};
 
-/// DeployRes is a type to store deployment result
-pub type DeployRes = HashMap<String, String>;
-
-/// DEPLOY_RES is a global variable to store deployment result
-pub static DEPLOY_RES: Lazy<Mutex<DeployRes>> = Lazy::new(|| Mutex::new(HashMap::new()));
-
-/// get_res returns the global deployment result
-pub async fn get_res() -> DeployRes {
-    DEPLOY_RES.lock().await.clone()
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ServiceLoadBalancerServer {
+    pub url: String,
 }
 
-pub async fn build(dir: String) {
-    let data = super::sync::get().await;
-    let mut deploys = DEPLOY_RES.lock().await;
-    for item in data.items {
-        if item.status == "success" {
-            // if status is success, remove from deploys
-            if deploys.contains_key(&item.key) {
-                info!("Remove by success:{}", item.key);
-                deploys.remove(&item.key);
-            }
-            continue;
-        }
-        let wasm_file = format!("{}/{}", dir, item.path);
-        // if wasm_file not exist, download from item.down_url
-        if !std::path::Path::new(&wasm_file).exists() {
-            match download_item(item.dl_url, wasm_file).await {
-                Ok(_) => {
-                    info!("Downloaded: {}", item.key);
-                    deploys.insert(item.key, "ok".to_string());
-                }
-                Err(e) => {
-                    info!("Download error:{:?}", e);
-                    deploys.insert(item.key, format!("error:{}", e));
-                }
-            }
-        } else {
-            debug!("Already exist:{}", item.key);
-            deploys.insert(item.key, "ok".to_string());
-        }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ServiceLoadBalancer {
+    pub servers: Vec<ServiceLoadBalancerServer>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Service {
+    #[serde(rename = "loadBalancer")]
+    pub load_balancer: ServiceLoadBalancer,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Router {
+    // #[serde(rename = "entryPoints")]
+    // pub entry_points: Vec<String>,
+    pub middlewares: Vec<String>,
+    pub service: String,
+    pub rule: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MiddlewareHeader {
+    // #[serde(rename = "customResponseHeaders")]
+    // pub custom_response_headers: HashMap<String, String>,
+    #[serde(rename = "customRequestHeaders")]
+    pub custom_request_headers: HashMap<String, String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MiddlewareGroup {
+    pub headers: MiddlewareHeader,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HttpTraefikConfs {
+    pub services: HashMap<String, Service>,
+    pub middlewares: HashMap<String, MiddlewareGroup>,
+    pub routers: HashMap<String, Router>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TraefikConfs {
+    pub http: HttpTraefikConfs,
+}
+
+/// build traefik configuration from ConfData
+pub fn build(data: &ConfData) -> Result<TraefikConfs> {
+    let mut traefik_confs = HttpTraefikConfs {
+        services: HashMap::new(),
+        routers: HashMap::new(),
+        middlewares: HashMap::new(),
+    };
+    let svc = std::env::var("LAND_SERVICE_NAME").unwrap_or_else(|_| "runtimeland-foo".to_string());
+    for item in data.items.iter() {
+        let mut headers = MiddlewareHeader {
+            custom_request_headers: HashMap::new(),
+        };
+        // check filepath exist
+        headers
+            .custom_request_headers
+            .insert("x-land-module".to_string(), item.path.to_string());
+        headers
+            .custom_request_headers
+            .insert("x-land-user-id".to_string(), item.user_id.to_string());
+        headers
+            .custom_request_headers
+            .insert("x-land-project-id".to_string(), item.project_id.to_string());
+        traefik_confs
+            .middlewares
+            .insert(format!("m-{}", item.key), MiddlewareGroup { headers });
+
+        let router = Router {
+            middlewares: vec![format!("m-{}", item.key)],
+            service: svc.clone(),
+            rule: format!("Host(`{}`)", item.domain),
+        };
+        traefik_confs
+            .routers
+            .insert(format!("r-{}", item.key), router);
     }
+
+    Ok(TraefikConfs {
+        http: traefik_confs,
+    })
 }
 
-async fn download_item(url: String, target: String) -> Result<()> {
-    let resp = reqwest::get(&url).await?;
-    let bytes = resp.bytes().await?;
-    let bytes_len = bytes.len();
-    let dir = std::path::Path::new(&target).parent().unwrap();
-    std::fs::create_dir_all(dir)?;
-    std::fs::write(&target, bytes)?;
-    info!("Downloaded:{}, size:{}", target, bytes_len);
-    Ok(())
+/// build_yaml will build traefik configuration and convert it to yaml
+pub async fn build_data_yaml(data: &ConfData) -> Result<String> {
+    let confs = build(data)?;
+    let content = serde_yaml::to_string(&confs)?;
+    Ok(content)
 }

@@ -2295,6 +2295,7 @@ dependencies = [
  "once_cell",
  "reqwest",
  "serde",
+ "serde_yaml",
  "tokio",
  "tracing",
  "url",

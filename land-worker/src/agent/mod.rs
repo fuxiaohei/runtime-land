@@ -2,7 +2,8 @@ use anyhow::Result;
 
 pub mod ip;
 pub mod sync;
-pub mod traefik;
+pub mod deploys;
+mod traefik;
 
 /// run is agent runner
 pub async fn run(addr: String, token: String, dir: String) -> Result<()> {
