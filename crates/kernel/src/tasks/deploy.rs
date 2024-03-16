@@ -42,10 +42,10 @@ pub async fn init() -> Result<()> {
 pub async fn handle_task(t: DeployTask) -> Result<()> {
     if t.playground_id > 0 {
         let (p, py) = prepare_data(&t).await?;
+        // create task-id and subtasks
+        let task_id = create_tasks(t.deploy_id, t.project_id).await?;
         // compile and upload playground to storage
         let upload_res = compile_and_upload_playground(p, py).await?;
-        // upload done, create task-id and subtasks
-        let task_id = create_tasks(t.deploy_id, t.project_id).await?;
         // update deployment to deploying
         let info = StorageInfo {
             path: upload_res.path,
