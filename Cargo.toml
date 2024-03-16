@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "crates/common",
-    "crates/core",
     "crates/dao",
     "crates/kernel",
     "crates/sdk",
@@ -31,7 +30,6 @@ chrono = "0.4.35"
 clap = { version = "4.5.2", features = ["derive", "env"] }
 http = "1.1.0"
 land-common = { path = "crates/common" }
-land-core = { path = "crates/core" }
 land-dao = { path = "crates/dao" }
 land-kernel = { path = "crates/kernel" }
 land-sdk = { path = "crates/sdk" }

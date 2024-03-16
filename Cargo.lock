@@ -2104,7 +2104,7 @@ dependencies = [
  "color-print",
  "inquire",
  "land-common",
- "land-core",
+ "land-kernel",
  "land-wit",
  "land-worker-server",
  "regex",
@@ -2126,27 +2126,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "vergen",
-]
-
-[[package]]
-name = "land-core"
-version = "0.4.0"
-dependencies = [
- "anyhow",
- "chrono",
- "hostname",
- "land-dao",
- "land-wit",
- "md5",
- "once_cell",
- "reqwest",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempdir",
- "tokio",
- "tracing",
- "uuid",
 ]
 
 [[package]]
@@ -2229,7 +2208,6 @@ dependencies = [
  "clap",
  "handlebars",
  "land-common",
- "land-core",
  "land-dao",
  "land-kernel",
  "rust-embed",
@@ -2262,7 +2240,6 @@ dependencies = [
  "clap",
  "hostname",
  "land-common",
- "land-core",
  "land-kernel",
  "land-worker-server",
  "once_cell",

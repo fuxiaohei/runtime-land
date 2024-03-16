@@ -97,38 +97,11 @@ async fn compile_and_upload_playground(
     let target_wasm = dir.path().join(format!("{}_{}.wasm", pl.project_id, pl.id));
 
     // 2. compile js source to wasm
-    build_js(source_js.to_str().unwrap(), target_wasm.to_str().unwrap())?;
+    crate::builder::componentize_js(source_js.to_str().unwrap(), target_wasm.to_str().unwrap())?;
     debug!("Compile success");
 
     // 3. upload to r2
     upload_wasm(target_wasm.to_str().unwrap().to_string(), p.domain, p.uuid).await
-}
-
-/// js compile to js to wasm component
-fn build_js(src: &str, target: &str) -> Result<()> {
-    // compile js to wizer
-    land_wit::compile_js(src, target, None)?;
-    compile_js(target)
-}
-
-/// compile wasm to wasm component
-fn compile_js(target: &str) -> Result<()> {
-    // use wasm-opt to optimize wasm if wasm-opt exists
-    if let Some(op) = land_wit::optimize(target)? {
-        std::fs::rename(op, target)?;
-    }
-
-    // encode wasm module to component
-    land_wit::encode_component(target, target)?;
-
-    // check target exists
-    if !std::path::Path::new(target).exists() {
-        return Err(anyhow::anyhow!(
-            "Build target '{}' does not exist!",
-            &target,
-        ));
-    }
-    Ok(())
 }
 
 struct UploadResult {

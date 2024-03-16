@@ -1,14 +1,14 @@
 use anyhow::Result;
 
-/// js compile to js to wasm component
-pub fn js(src: &str, target: &str) -> Result<()> {
+/// componentize_js compile to js to wasm component
+pub fn componentize_js(src: &str, target: &str) -> Result<()> {
     // compile js to wizer
     land_wit::compile_js(src, target, None)?;
-    compile(target)
+    componentize_wasm(target)
 }
 
-/// compile wasm to wasm component
-pub fn compile(target: &str) -> Result<()> {
+/// componentize_wasm compile wasm to wasm component
+pub fn componentize_wasm(target: &str) -> Result<()> {
     // use wasm-opt to optimize wasm if wasm-opt exists
     if let Some(op) = land_wit::optimize(target)? {
         std::fs::rename(op, target)?;

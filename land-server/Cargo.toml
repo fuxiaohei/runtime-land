@@ -15,7 +15,6 @@ chrono = { workspace = true }
 clap = { workspace = true }
 handlebars = "5.1.0"
 land-common = { workspace = true }
-land-core = { workspace = true }
 land-dao = { workspace = true }
 land-kernel = { workspace = true }
 rust-embed = { workspace = true }

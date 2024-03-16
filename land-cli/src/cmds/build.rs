@@ -46,7 +46,7 @@ pub fn build_internal(metadata: &manifest::Data) -> Result<()> {
     let target = metadata.build.target.clone();
     if metadata.project.language == "javascript" {
         let wasm_target = metadata.wasm_target();
-        return land_core::build::js(&target, &wasm_target);
+        return land_kernel::builder::componentize_js(&target, &wasm_target);
     }
-    land_core::build::compile(&target)
+    land_kernel::builder::componentize_wasm(&target)
 }
