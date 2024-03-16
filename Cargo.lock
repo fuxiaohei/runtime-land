@@ -2220,34 +2220,18 @@ name = "land-server"
 version = "0.4.0"
 dependencies = [
  "anyhow",
- "clap",
- "land-common",
- "land-core",
- "land-dao",
- "land-kernel",
- "land-server-impl",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "land-server-impl"
-version = "0.4.0"
-dependencies = [
- "anyhow",
  "axum",
  "axum-extra",
  "axum-template",
  "axum_csrf",
  "base64 0.22.0",
  "chrono",
+ "clap",
  "handlebars",
  "land-common",
  "land-core",
  "land-dao",
  "land-kernel",
- "once_cell",
- "reqwest",
  "rust-embed",
  "serde",
  "serde_json",
@@ -2255,7 +2239,6 @@ dependencies = [
  "tokio",
  "tower-http",
  "tracing",
- "uuid",
  "walkdir",
 ]
 

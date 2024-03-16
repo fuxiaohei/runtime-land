@@ -23,7 +23,7 @@ pub async fn init() -> Result<()> {
             match handle_task(t).await {
                 Ok(_) => (),
                 Err(e) => {
-                    warn!("send_deploy_task error: {:?}", e);
+                    warn!(dp_id = deploy_id, "Send_deploy_task error: {:?}", e);
                     let _ = deployment::mark_status(
                         deploy_id,
                         deployment::DeployStatus::Failed,
@@ -173,7 +173,7 @@ async fn create_tasks(deploy_id: i32, project_id: i32) -> Result<String> {
 
     let living_workers = land_dao::worker::list_online().await?;
     if living_workers.is_empty() {
-        return Err(anyhow!("No living workers"));
+        return Err(anyhow!("no living workers"));
     }
     for worker in living_workers {
         let _ = land_dao::deploy_task::create(

@@ -6,7 +6,6 @@ members = [
     "crates/kernel",
     "crates/sdk",
     "crates/sdk-macro",
-    "crates/server-impl",
     "crates/wit",
     "crates/worker-impl",
     "crates/worker-server",
@@ -37,7 +36,6 @@ land-dao = { path = "crates/dao" }
 land-kernel = { path = "crates/kernel" }
 land-sdk = { path = "crates/sdk" }
 land-sdk-macro = { path = "crates/sdk-macro" }
-land-server-impl = { path = "crates/server-impl" }
 land-wit = { path = "crates/wit" }
 land-worker-impl = { path = "crates/worker-impl" }
 land-worker-server = { path = "crates/worker-server" }

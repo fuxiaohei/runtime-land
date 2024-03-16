@@ -1,6 +1,6 @@
 use crate::{models::worker, now_time, DB};
 use anyhow::Result;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
+use sea_orm::{sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -17,6 +17,19 @@ pub async fn list_online() -> Result<Vec<worker::Model>> {
         .all(db)
         .await?;
     Ok(workers)
+}
+
+/// set_offline set worker offline by id
+pub async fn set_offline(id: i32) -> Result<()> {
+    worker::Entity::update_many()
+        .filter(worker::Column::Id.eq(id))
+        .col_expr(
+            worker::Column::Status,
+            Expr::value(Status::Offline.to_string()),
+        )
+        .exec(DB.get().unwrap())
+        .await?;
+    Ok(())
 }
 
 /// update worker info. If not exist, create a new one.

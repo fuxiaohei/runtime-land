@@ -1,3 +1,5 @@
+use super::auth::SessionUser;
+use crate::server::{redirect_response, tpls::TemplateEngine, PageVars, ServerError};
 use axum::{response::IntoResponse, Extension, Form};
 use axum_csrf::CsrfToken;
 use axum_template::RenderHtml;
@@ -5,9 +7,6 @@ use chrono::NaiveDateTime;
 use land_dao::user_token;
 use serde::{Deserialize, Serialize};
 use tracing::info;
-
-use super::auth::SessionUser;
-use crate::{redirect_response, tpls::TemplateEngine, PageVars, ServerError};
 
 #[derive(Serialize)]
 struct TokenVar {

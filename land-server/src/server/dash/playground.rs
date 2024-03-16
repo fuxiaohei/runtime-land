@@ -1,5 +1,5 @@
 use super::auth::SessionUser;
-use crate::{redirect_response, tpls::TemplateEngine, PageVars, ServerError};
+use crate::server::{redirect_response, tpls::TemplateEngine, PageVars, ServerError};
 use axum::{extract::Path, response::IntoResponse, Extension, Form, Json};
 use axum_template::RenderHtml;
 use base64::{engine::general_purpose, Engine};

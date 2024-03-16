@@ -1,3 +1,5 @@
+use super::auth::SessionUser;
+use crate::server::{tpls::TemplateEngine, PageVars, ServerError};
 use axum::{response::IntoResponse, Extension};
 use axum_template::RenderHtml;
 use chrono::NaiveDateTime;
@@ -7,9 +9,6 @@ use land_dao::{
 };
 use serde::Serialize;
 use tracing::info;
-
-use super::auth::SessionUser;
-use crate::{tpls::TemplateEngine, PageVars, ServerError};
 
 #[derive(Debug, Serialize)]
 pub struct ProjectVar {

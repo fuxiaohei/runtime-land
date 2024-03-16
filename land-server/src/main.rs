@@ -3,6 +3,8 @@ use clap::Parser;
 use land_common::{tracing::FlagArgs, version};
 use land_dao::DBArgs;
 
+mod server;
+
 #[derive(Parser, Debug)]
 #[clap(author, version)]
 #[clap(disable_version_flag = true)] // handled manually
@@ -45,11 +47,12 @@ async fn main() -> Result<()> {
     land_kernel::cron::start(land_kernel::cron::Options {
         gen_deploys: 1,
         review_tasks: 1,
+        livings_worker: 1,
     });
     land_kernel::tasks::init().await?;
 
     // Start server
-    land_server_impl::start("./assets", args.address.parse().unwrap()).await?;
+    server::start("./assets", args.address.parse().unwrap()).await?;
 
     Ok(())
 }

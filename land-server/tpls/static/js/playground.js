@@ -55,7 +55,7 @@ async function handleCheck() {
     window.deployStatus = "";
     setInterval(async function () {
         if (window.deployStatus == "waiting") {
-            // await handleCheck();
+            await handleCheck();
         }
     }, 1000)
 })();
