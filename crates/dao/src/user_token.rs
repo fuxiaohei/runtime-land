@@ -15,7 +15,7 @@ pub enum Status {
     Deleted,
 }
 
-#[derive(strum::Display, PartialEq)]
+#[derive(strum::Display, PartialEq, strum::EnumString)]
 #[strum(serialize_all = "lowercase")]
 pub enum Usage {
     Session, // web page session token

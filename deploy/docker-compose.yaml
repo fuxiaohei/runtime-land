@@ -8,7 +8,7 @@ services:
   proxy:
     platform: linux/amd64
     image: traefik:v3.0
-    command: --api.insecure=true --providers.docker=true --providers.docker.exposedByDefault=false --accesslog=true
+    command: --api.insecure=true --providers.docker=true --providers.docker.exposedByDefault=false --accesslog=true --providers.file.filename=/data/runtime-land/traefik.yaml
     restart: always
     ports:
       - "80:80"
@@ -25,6 +25,7 @@ services:
     environment:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
       - LAND_SERVICE_NAME=land-worker
+      - LAND_DATA_DIR=/data/runtime-land
     ports:
       - "8866:8866"
     networks:

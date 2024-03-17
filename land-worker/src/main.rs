@@ -27,7 +27,7 @@ struct Args {
     #[clap(long, env = "LAND_DATA_DIR", default_value = "./data/land")]
     dir: String,
     /// The url of cloud server
-    #[clap(long = "url",env = "LAND_SERVER_URL", value_parser = validate_url,default_value("https://cc.runtime.land"))]
+    #[clap(long = "url",env = "LAND_SERVER_URL", value_parser = validate_url,default_value("https://rtland-dev.zeabur.app"))]
     pub cloud_server_url: String,
 }
 

@@ -75,9 +75,10 @@ pub async fn cron() {
         return;
     }
     info!(
-        "Done, cost:{:?}ms, checksum:{}",
+        "Done, cost:{:?}ms, checksum:{}, items:{}",
         start_time.elapsed().as_millis(),
-        data.checksum
+        data.checksum,
+        data.items.len(),
     );
 
     *old = data;

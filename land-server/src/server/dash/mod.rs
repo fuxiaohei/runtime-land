@@ -66,6 +66,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/playground/:name/check", get(playground::check))
         .route("/settings", get(settings::index))
         .route("/settings/create-token", post(settings::create_token))
+        .route("/settings/manage", get(settings::manage))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))

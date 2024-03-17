@@ -165,6 +165,13 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         gravatar: user.gravatar,
         is_admin: user.role == user_info::Role::Admin.to_string(),
     };
+
+    // /settings/manage need admin role
+    if path.starts_with("/settings/manage") && !session_user.is_admin {
+        warn!(path = path, "Session is not admin: {}", session_value);
+        return Ok(redirect_response("/overview").into_response());
+    }
+
     // debug!(path = path, "Session is valid: {}", session_value);
     request.extensions_mut().insert(session_user);
     Ok(next.run(request).await)

@@ -2,10 +2,9 @@ use super::auth::SessionUser;
 use crate::server::{tpls::TemplateEngine, PageVars, ServerError};
 use axum::{response::IntoResponse, Extension};
 use axum_template::RenderHtml;
-use chrono::NaiveDateTime;
 use land_dao::{
     project::{self, CreatedBy},
-    settings,
+    settings, DateTimeUTC,
 };
 use serde::Serialize;
 use tracing::info;
@@ -19,7 +18,7 @@ pub struct ProjectVar {
     pub url: String,
     pub language: String,
     pub created_by: String,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: DateTimeUTC,
     pub source: String,
     pub is_editable: bool,
     pub is_blank: bool,
@@ -41,7 +40,7 @@ impl ProjectVar {
                 is_editable: p.created_by == CreatedBy::Playground.to_string(),
                 is_blank: p.created_by == CreatedBy::Blank.to_string(),
                 created_by: p.created_by,
-                updated_at: p.updated_at,
+                updated_at: p.updated_at.and_utc(),
                 description: p.description,
                 source: String::new(), // for list show, source is not needed
             })
@@ -58,7 +57,7 @@ impl ProjectVar {
             domain_full: format!("{}.{}", project.domain, domain),
             url: format!("{}://{}.{}", protocol, project.domain, domain),
             language: project.language.clone(),
-            updated_at: project.updated_at,
+            updated_at: project.updated_at.and_utc(),
             description: project.description.clone(),
             source: String::new(),
             created_by: project.created_by.clone(),

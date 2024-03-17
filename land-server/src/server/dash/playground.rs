@@ -3,11 +3,10 @@ use crate::server::{redirect_response, tpls::TemplateEngine, PageVars, ServerErr
 use axum::{extract::Path, response::IntoResponse, Extension, Form, Json};
 use axum_template::RenderHtml;
 use base64::{engine::general_purpose, Engine};
-use chrono::NaiveDateTime;
 use land_dao::{
     deployment,
     project::{self, Language},
-    settings,
+    settings, DateTimeUTC,
 };
 use serde::{Deserialize, Serialize};
 
@@ -20,7 +19,7 @@ struct PlaygroundVar {
     pub url: String,
     pub language: String,
     pub source: String,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: DateTimeUTC,
     pub deploy_status: String,
 }
 
@@ -36,7 +35,7 @@ impl PlaygroundVar {
             domain_full: format!("{}.{}", project.domain, domain),
             url: format!("{}://{}.{}", protocol, project.domain, domain),
             language: project.language.clone(),
-            updated_at: playground.created_at,
+            updated_at: playground.created_at.and_utc(),
             description: project.description.clone(),
             source: playground.source.clone(),
             deploy_status: String::new(),

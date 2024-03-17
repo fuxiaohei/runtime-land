@@ -14,6 +14,11 @@
                 <li class="nav-item">
                     <a class="nav-link h5 mb-0 {{is_nav_active 'projects' page.nav}}" href="/projects">Projects</a>
                 </li>
+                {{#if user.is_admin}}
+                <li class="nav-item">
+                    <a class="nav-link h5 mb-0 {{is_nav_active 'manage' page.nav}}" href="/settings/manage">Manage</a>
+                </li>
+                {{/if}}
             </ul>
         </div>
         <div class="nav-right">
@@ -43,6 +48,15 @@
                             <li>
                                 <hr class="dropdown-divider" />
                             </li>
+                            {{#if user.is_admin}}
+                            <li>
+                                <a class="dropdown-item py-2" href="/settings/manage"><i
+                                        class='bx bx-ghost me-2 bx-icon'></i>Manage</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            {{/if}}
                             <li>
                                 <a class="dropdown-item py-2" href="/sign-out"><i
                                         class="bx bx-log-out me-2 bx-icon"></i>Sign
