@@ -135,12 +135,57 @@
                         </div>
                     </div>
                 </div>
+                <div class="py-4">
+                    <div class="card border-secondary-subtle">
+                        <div class="card-header">
+                            <h6 class="mb-1 mt-2">Domains</h6>
+                            <p class="text-body-tertiary mb-0 small">Project domain suffix and protocol.</p>
+                        </div>
+                        <div class="card-body">
+                            <form action="/settings/update-domain" method="post">
+                                <div class="input-group mb-3">
+                                    <select class="form-select" id="protocol-select" data-x-value="{{protocol}}"
+                                        name="protocol">
+                                        <option value="http">http</option>
+                                        <option value="https">https</option>
+                                    </select>
+                                    <label class="input-group-text ps-2 pe-0">://</label>
+                                    <span class="input-group-text ps-0 pe-2">{project.domain}.</span>
+                                    <input required name="domain" type="text" class="form-control" value="{{domain}}" />
+                                    <input type="hidden" name="csrf" value="{{csrf_token}}">
+                                </div>
+                                <div class="input-group mb-1 text-end justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Save Domains</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="py-4">
+                    <div class="card border-secondary-subtle">
+                        <div class="card-header">
+                            <h6 class="mb-1 mt-2">Storage</h6>
+                            <p class="text-body-tertiary mb-0 small">Storage settings for WebAssembly modules</p>
+                        </div>
+                        <div class="card-body">
+                            <form action="/settings/update-storage" method="post">
+                                <textarea class="form-control mb-3" name="storage" rows="6">{{storage}}</textarea>
+                                <input type="hidden" name="csrf" value="{{csrf_token}}">
+                                <div class="input-group mb-1 text-end justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Save Storage</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
     {{> partials/footer.hbs}}
     <script type="text/javascript">
+        let s = document.getElementById("protocol-select");
+        s.value = s.getAttribute("data-x-value");
         document.querySelectorAll(".token-value-copy-btn").forEach((btn) => {
             btn.addEventListener("click", (e) => {
                 let uuid = btn.getAttribute("data-x-id");

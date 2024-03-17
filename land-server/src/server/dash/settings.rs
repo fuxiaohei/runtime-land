@@ -115,6 +115,9 @@ pub async fn manage(
         tokens: Vec<TokenVar>,
         token_usage: String,
         workers: Vec<WorkerVar>,
+        domain: String,
+        protocol: String,
+        storage: String,
     }
     let csrf_token = csrf.authenticity_token()?;
     let token_values = user_token::list_by_user(user.id, Some(user_token::Usage::Worker)).await?;
@@ -144,6 +147,15 @@ pub async fn manage(
         });
     }
 
+    // domain, protocol
+    let (domain, protocol) = land_dao::settings::get_domain_settings().await?;
+    let storage_setting = land_dao::settings::get("storage").await?;
+    let storage_content = if let Some(m) = storage_setting {
+        m.value
+    } else {
+        "unknown".to_string()
+    };
+
     Ok((
         csrf,
         RenderHtml(
@@ -156,8 +168,54 @@ pub async fn manage(
                 tokens,
                 token_usage: Usage::Worker.to_string(),
                 workers,
+                domain,
+                protocol,
+                storage: storage_content,
             },
         ),
     )
         .into_response())
+}
+
+#[derive(Deserialize)]
+pub struct UpdateDomainForm {
+    protocol: String,
+    domain: String,
+    csrf: String,
+}
+
+/// update_domain is a handler for POST /settings/update-domain
+pub async fn update_domain(
+    csrf: CsrfToken,
+    Extension(user): Extension<SessionUser>,
+    Form(form): Form<UpdateDomainForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    if !user.is_admin {
+        return Err(ServerError::forbidden("Permission denied"));
+    }
+    csrf.verify(&form.csrf)?;
+    info!("Update domain settings: {},{}", form.protocol, form.domain);
+    land_dao::settings::set_domain_settings(form.domain, form.protocol).await?;
+    Ok(redirect_response("/settings/manage"))
+}
+
+#[derive(Deserialize)]
+pub struct UpdateStorageForm {
+    storage: String,
+    csrf: String,
+}
+
+/// update_storage is a handler for POST /settings/update-storage
+pub async fn update_storage(
+    csrf: CsrfToken,
+    Extension(user): Extension<SessionUser>,
+    Form(form): Form<UpdateStorageForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    if !user.is_admin {
+        return Err(ServerError::forbidden("Permission denied"));
+    }
+    csrf.verify(&form.csrf)?;
+    info!("Update storage: {}", form.storage);
+    land_dao::settings::set("storage", &form.storage).await?;
+    Ok(redirect_response("/settings/manage"))
 }

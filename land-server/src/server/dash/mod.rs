@@ -67,6 +67,8 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/settings", get(settings::index))
         .route("/settings/create-token", post(settings::create_token))
         .route("/settings/manage", get(settings::manage))
+        .route("/settings/update-domain", post(settings::update_domain))
+        .route("/settings/update-storage", post(settings::update_storage))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))

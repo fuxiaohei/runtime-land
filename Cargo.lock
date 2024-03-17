@@ -512,9 +512,9 @@ dependencies = [
 
 [[package]]
 name = "brotli"
-version = "3.4.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "516074a47ef4bce09577a3b379392300159ce5b1ba2e501ff1c819950066100f"
+checksum = "d640d25bc63c50fb1f0b545ffd80207d2e10a4c965530809b40ba3386825c391"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -2103,7 +2103,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2121,7 +2121,7 @@ dependencies = [
 
 [[package]]
 name = "land-common"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2136,7 +2136,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2160,7 +2160,7 @@ dependencies = [
 
 [[package]]
 name = "land-kernel"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2180,7 +2180,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2192,7 +2192,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2202,7 +2202,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -2228,7 +2228,7 @@ dependencies = [
 
 [[package]]
 name = "land-wit"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2240,7 +2240,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2259,7 +2259,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-impl"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2280,7 +2280,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-server"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -3441,7 +3441,7 @@ dependencies = [
 
 [[package]]
 name = "rust-helloworld"
-version = "0.4.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -3861,9 +3861,9 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.9.32"
+version = "0.9.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fd075d994154d4a774f95b51fb96bdc2832b0ea48425c92546073816cda1f2f"
+checksum = "a0623d197252096520c6f2a5e1171ee436e5af99a5d7caa2891e55e61950e6d9"
 dependencies = [
  "indexmap",
  "itoa",
@@ -4886,9 +4886,9 @@ dependencies = [
 
 [[package]]
 name = "unsafe-libyaml"
-version = "0.2.10"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab4c90930b95a82d00dc9e9ac071b4991924390d46cbd0dfe566148667605e4b"
+checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "untrusted"

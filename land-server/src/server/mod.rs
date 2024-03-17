@@ -59,6 +59,9 @@ impl ServerError {
             anyhow::anyhow!(msg.to_string()),
         )
     }
+    pub fn forbidden(msg: &str) -> Self {
+        Self(StatusCode::FORBIDDEN, anyhow::anyhow!(msg.to_string()))
+    }
 }
 
 // Tell axum how to convert `AppError` into a response.
