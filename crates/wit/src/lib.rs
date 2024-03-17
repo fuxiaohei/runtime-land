@@ -67,12 +67,12 @@ fn find_cmd(cmd: &str) -> Result<PathBuf> {
     let c = match which::which(cmd) {
         Ok(c) => c,
         Err(_) => {
-            // find wasm-opt binary in current exe directroy ./wasm-opt-bin/wasm
+            // find xxx binary in current exe directroy ./xxx/xxx
             let exe_path = std::env::current_exe()?;
             let file = exe_path
                 .parent()
                 .unwrap()
-                .join(format!("{}-bin/{}", cmd, cmd));
+                .join(format!("{}/{}", cmd, cmd));
 
             #[cfg(target_os = "windows")]
             let file = file.with_extension("exe");
