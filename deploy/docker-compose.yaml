@@ -24,7 +24,7 @@ services:
     restart: always
     environment:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
-      - LAND_SERVICE_NAME=land-worker
+      - LAND_SERVICE_NAME=land-worker@docker
       - LAND_DATA_DIR=/data/runtime-land
     ports:
       - "8866:8866"

@@ -43,7 +43,7 @@ pub struct MiddlewareGroup {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpTraefikConfs {
-    pub services: HashMap<String, Service>,
+    // pub services: HashMap<String, Service>,
     pub middlewares: HashMap<String, MiddlewareGroup>,
     pub routers: HashMap<String, Router>,
 }
@@ -56,7 +56,7 @@ pub struct TraefikConfs {
 /// build traefik configuration from ConfData
 pub fn build(data: &ConfData) -> Result<TraefikConfs> {
     let mut traefik_confs = HttpTraefikConfs {
-        services: HashMap::new(),
+        //services: HashMap::new(),
         routers: HashMap::new(),
         middlewares: HashMap::new(),
     };
