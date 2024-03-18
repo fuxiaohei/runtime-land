@@ -45,6 +45,7 @@ async function handleCheck() {
         }
         if (data.deploy_status == "success") {
             setWaitingDone();
+            document.getElementById("refresh-btn").click();
             return;
         }
         setWaitingMessage(data.deploy_status);
@@ -99,12 +100,28 @@ async function handleCheck() {
     });
 })();
 
+// convert data-x-timeago to local time string
 (() => {
-    // convert data-x-timeago to local time string
     const xTimeElements = document.querySelectorAll('[data-x-timeago]');
     xTimeElements.forEach((element) => {
         const xTime = element.getAttribute('data-x-timeago');
         const date = new Date(xTime);
         element.innerText = timeago.format(date, "en_US");
     });
+})();
+
+// refresh playground button
+(() => {
+    let btn = document.getElementById("refresh-btn");
+    btn.addEventListener("click", function () {
+        let iframe = document.getElementById("playground-preview");
+        let url = btn.getAttribute("data-x-url");
+        let new_url = document.getElementById("preview-url").value;
+        if (!new_url.startsWith(url)) {
+            showMessage("Only support refresh same origin: " + url);
+            return;
+        }
+        console.log("iframe", new_url);
+        iframe.src = new_url;
+    })
 })();

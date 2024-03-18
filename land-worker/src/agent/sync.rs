@@ -6,7 +6,7 @@ use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use tracing::{debug, info, instrument, warn};
+use tracing::{info, instrument, warn};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Request {
@@ -68,7 +68,7 @@ async fn sync(addr: String, token: String, dir: String) -> Result<()> {
     if !status.is_success() {
         // if not modified, just return
         if status == reqwest::StatusCode::NOT_MODIFIED {
-            debug!("Not change, checksum: {}", data.checksum);
+            // debug!("Not change, checksum: {}", data.checksum);
             return Ok(());
         }
         warn!("Bad status code: {}", status);
