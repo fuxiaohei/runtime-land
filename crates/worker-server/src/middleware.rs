@@ -1,8 +1,11 @@
+use crate::METRICS_ENABLED;
+
 use super::{DEFAULT_WASM, ENDPOINT_NAME};
 use axum::extract::Request;
 use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::Response;
+use metrics::{counter, Counter};
 use serde::Serialize;
 
 #[derive(Default, Clone, Serialize, Debug)]
@@ -13,6 +16,13 @@ pub struct WorkerContext {
     pub project_id: String,
     pub host: String,
     pub endpoint: String,
+}
+
+#[derive(Clone)]
+pub struct WorkerMetrics {
+    pub req_cnt: Counter,
+    pub req_function_notfound_cnt: Counter,
+    pub req_function_error_cnt: Counter,
 }
 
 /// middleware to add worker context info to request
@@ -46,6 +56,20 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         .to_string();
 
     let endpoint = ENDPOINT_NAME.get().unwrap().to_string();
+    let counters = if *METRICS_ENABLED.get().unwrap() {
+        let labels = vec![
+            ("user_id", user_id.clone()),
+            ("project_id", project_id.clone()),
+            ("endpoint", endpoint.clone()),
+        ];
+        (
+            counter!("req_cnt", &labels),
+            counter!("req_function_notfound_cnt", &labels),
+            counter!("req_function_error_cnt", &labels),
+        )
+    } else {
+        (Counter::noop(), Counter::noop(), Counter::noop())
+    };
     let context = WorkerContext {
         req_id,
         wasm_module,
@@ -54,6 +78,12 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         host,
         endpoint,
     };
+    let metrics = WorkerMetrics {
+        req_cnt: counters.0,
+        req_function_notfound_cnt: counters.1,
+        req_function_error_cnt: counters.2,
+    };
     request.extensions_mut().insert(context);
+    request.extensions_mut().insert(metrics);
     Ok(next.run(request).await)
 }

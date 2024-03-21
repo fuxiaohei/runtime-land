@@ -10,6 +10,7 @@ use axum::{
 };
 use land_worker_impl::hostcall::Request as WasmRequest;
 use land_worker_impl::Context;
+use metrics_exporter_prometheus::PrometheusBuilder;
 use once_cell::sync::OnceCell;
 use std::{net::SocketAddr, time::Duration};
 use tokio::time::Instant;
@@ -25,6 +26,7 @@ pub struct Opts {
     pub default_wasm: String,
     pub endpoint_name: Option<String>,
     pub wasm_aot: bool,
+    pub metrics: bool,
 }
 
 impl Default for Opts {
@@ -35,12 +37,14 @@ impl Default for Opts {
             default_wasm: "".to_string(),
             endpoint_name: Some("localhost".to_string()),
             wasm_aot: false,
+            metrics: false,
         }
     }
 }
 
 static ENDPOINT_NAME: OnceCell<String> = OnceCell::new();
 static AOT_ENABLED: OnceCell<bool> = OnceCell::new();
+static METRICS_ENABLED: OnceCell<bool> = OnceCell::new();
 
 pub async fn start(opts: Opts) -> Result<()> {
     let hostname = if let Some(endpoint) = opts.endpoint_name {
@@ -56,6 +60,13 @@ pub async fn start(opts: Opts) -> Result<()> {
     debug!("Wasm dir: {}", opts.dir);
     debug!("Default wasm: {}", opts.default_wasm);
     debug!("AOT enabled: {}", opts.wasm_aot);
+    debug!("Metrics enabled: {}", opts.metrics);
+
+    // enable prometheus metrics api
+    if opts.metrics {
+        // use for local visit, :9000
+        PrometheusBuilder::new().install()?;
+    }
 
     // create directory
     std::fs::create_dir_all(&opts.dir).unwrap();
@@ -63,6 +74,7 @@ pub async fn start(opts: Opts) -> Result<()> {
     DEFAULT_WASM.set(opts.default_wasm).unwrap();
     ENDPOINT_NAME.set(hostname).unwrap();
     AOT_ENABLED.set(opts.wasm_aot).unwrap();
+    METRICS_ENABLED.set(opts.metrics).unwrap();
 
     // set pool's local dir to load module file
     land_worker_impl::pool::FILE_DIR.set(opts.dir).unwrap();
@@ -98,6 +110,7 @@ pub async fn load_default_wasm() -> Result<()> {
 async fn default_handler(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     Extension(ctx): Extension<middleware::WorkerContext>,
+    Extension(metrics): Extension<middleware::WorkerMetrics>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, ServerError> {
     let st = Instant::now();
@@ -108,6 +121,7 @@ async fn default_handler(
 
     let span = info_span!("[HTTP]",remote = %addr.to_string(), req_id = %ctx.req_id.clone(), method = %method, uri = %uri, host = %ctx.host);
     let span_clone = span.clone();
+    metrics.req_cnt.increment(1);
 
     // if wasm_module is empty, return 404
     if ctx.wasm_module.is_empty() {
@@ -117,6 +131,7 @@ async fn default_handler(
             elapsed = %st.elapsed().as_micros(),
             "Function not found",
         );
+        metrics.req_function_notfound_cnt.increment(1);
         return Err(ServerError::not_found(ctx, "Function not found"));
     }
 
@@ -133,6 +148,7 @@ async fn default_handler(
                 "Internal error: {}",
                 err,
             );
+            metrics.req_function_error_cnt.increment(1);
             let msg = format!("Internal error: {}", err);
             return Err(ServerError::internal_error(ctx, &msg));
         }

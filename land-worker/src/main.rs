@@ -29,6 +29,8 @@ struct Args {
     /// The url of cloud server
     #[clap(long = "url",env = "LAND_SERVER_URL", value_parser = validate_url,default_value("https://rtland-dev.zeabur.app"))]
     pub cloud_server_url: String,
+    #[clap(long = "local", default_value("false"))]
+    pub local_mode: bool,
 }
 
 #[tokio::main]
@@ -39,14 +41,17 @@ async fn main() -> Result<()> {
         return Ok(());
     }
     land_common::tracing::init(args.output.verbose);
-    if args.token.is_empty() {
+    if args.token.is_empty() && !args.local_mode {
         return Err(anyhow!("LAND_SERVER_TOKEN is required"));
     }
 
     // get local ip data
     agent::ip::init().await?;
-    // run worker-agent role
-    agent::run(args.cloud_server_url, args.token, args.dir.clone()).await?;
+    // local mode do not get data from center
+    if !args.local_mode {
+        // run worker-agent role
+        agent::run(args.cloud_server_url, args.token, args.dir.clone()).await?;
+    }
 
     let opts = land_worker_server::Opts {
         addr: args.address.parse()?,
@@ -54,6 +59,7 @@ async fn main() -> Result<()> {
         default_wasm: "".to_string(),
         endpoint_name: None,
         wasm_aot: true,
+        metrics: true,
     };
     land_worker_server::start(opts).await?;
     Ok(())

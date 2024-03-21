@@ -42,6 +42,7 @@ impl Up {
             default_wasm: wasm_target,
             endpoint_name: Some("localhost".to_string()),
             wasm_aot: false,
+            metrics: false,
         };
         land_worker_server::start(opts)
             .await
