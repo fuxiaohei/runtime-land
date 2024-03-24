@@ -1,7 +1,7 @@
 use crate::hostcall::HttpContext;
 use axum::body::Body;
 use wasmtime::component::ResourceTable;
-use wasmtime_wasi::preview2::{WasiCtx, WasiCtxBuilder, WasiView};
+use wasmtime_wasi::{WasiCtx, WasiCtxBuilder, WasiView};
 
 pub struct Context {
     wasi_ctx: WasiCtx,

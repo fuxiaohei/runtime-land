@@ -8,12 +8,12 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 color-print = "0.3.5"
-inquire = "0.7.1"
+inquire = "0.7.3"
 land-common = { workspace = true }
 land-kernel = { workspace = true }
 land-wit = { workspace = true }
 land-worker-server = { workspace = true }
-regex = "1.10.3"
+regex = "1.10.4"
 rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }

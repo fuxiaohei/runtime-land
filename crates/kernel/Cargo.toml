@@ -7,7 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 chrono = { workspace = true }
-jsonwebtoken = "9.2.0"
+jsonwebtoken = "9.3.0"
 land-dao = { workspace = true }
 land-wit = { workspace = true }
 md5 = { workspace = true }
