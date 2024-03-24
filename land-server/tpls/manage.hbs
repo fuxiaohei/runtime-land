@@ -149,8 +149,7 @@
                                         <option value="http">http</option>
                                         <option value="https">https</option>
                                     </select>
-                                    <label class="input-group-text ps-2 pe-0">://</label>
-                                    <span class="input-group-text ps-0 pe-2">{project.domain}.</span>
+                                    <span class="input-group-text px-2">://{project.domain}.</span>
                                     <input required name="domain" type="text" class="form-control" value="{{domain}}" />
                                     <input type="hidden" name="csrf" value="{{csrf_token}}">
                                 </div>
