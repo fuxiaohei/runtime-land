@@ -27,7 +27,7 @@ pub async fn init() -> Result<()> {
                     let _ = deployment::mark_status(
                         deploy_id,
                         deployment::DeployStatus::Failed,
-                        format!("failed: {:?}", e),
+                        format!("failed:{}", e.to_string()),
                         None,
                         None,
                     )
