@@ -6,7 +6,7 @@ use land_dao::models::project::Model as ProjectModel;
 use land_dao::{playground, project};
 use once_cell::sync::OnceCell;
 use tokio::sync::mpsc;
-use tracing::{debug, info, warn};
+use tracing::{debug, info, instrument, warn};
 
 /// global deploy task channel
 pub static DEPLOY_TASK_SENDER: OnceCell<mpsc::Sender<DeployTask>> = OnceCell::new();
@@ -110,6 +110,7 @@ struct UploadResult {
     pub size: i32,
 }
 
+#[instrument("[UP]", skip_all)]
 async fn upload_wasm(
     target_wasm: String,
     project_domain: String,
@@ -125,14 +126,15 @@ async fn upload_wasm(
         size = upload_data_size,
         "Uploading",
     );
-    debug!(
-        "Uploading wasm to storage: {:?}, size: {}",
-        storage_file_name, upload_data_size
-    );
     let global_storage = land_dao::storage::GLOBAL.lock().await;
     global_storage
         .write(&storage_file_name, upload_data)
         .await?;
+    info!(
+        file = storage_file_name,
+        size = upload_data_size,
+        "Upload success"
+    );
     Ok(UploadResult {
         path: storage_file_name,
         md5: upload_data_md5,
