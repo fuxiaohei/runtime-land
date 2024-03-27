@@ -20,14 +20,14 @@ pub struct WorkerContext {
 
 #[derive(Clone)]
 pub struct WorkerMetrics {
-    pub req_cnt: Counter,
-    pub req_function_notfound_cnt: Counter,
-    pub req_function_error_cnt: Counter,
+    pub req_fn_cnt: Counter,
+    pub req_fn_notfound_cnt: Counter,
+    pub req_fn_error_cnt: Counter,
 }
 
 /// middleware to add worker context info to request
 pub async fn middleware(mut request: Request, next: Next) -> Result<Response, StatusCode> {
-    let req_id = ulid::Ulid::new().to_string();
+    let req_id = xid::new().to_string();
     let headers = request.headers().clone();
 
     // get wasm path from x-land-module header
@@ -63,9 +63,9 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
             ("endpoint", endpoint.clone()),
         ];
         (
-            counter!("req_cnt", &labels),
-            counter!("req_function_notfound_cnt", &labels),
-            counter!("req_function_error_cnt", &labels),
+            counter!("req_fn_cnt", &labels),
+            counter!("req_fn_notfound_cnt", &labels),
+            counter!("req_fn_error_cnt", &labels),
         )
     } else {
         (Counter::noop(), Counter::noop(), Counter::noop())
@@ -79,9 +79,9 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         endpoint,
     };
     let metrics = WorkerMetrics {
-        req_cnt: counters.0,
-        req_function_notfound_cnt: counters.1,
-        req_function_error_cnt: counters.2,
+        req_fn_cnt: counters.0,
+        req_fn_notfound_cnt: counters.1,
+        req_fn_error_cnt: counters.2,
     };
     request.extensions_mut().insert(context);
     request.extensions_mut().insert(metrics);

@@ -28,6 +28,7 @@ services:
       - LAND_DATA_DIR=/data/runtime-land
     ports:
       - "8866:8866"
+      - "9000:9000"
     networks:
       - runtime_land_network
     volumes:
@@ -35,3 +36,4 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.land-worker.loadbalancer.server.port=8866
+      - traefik.http.services.land-worker-metrics.loadbalancer.server.port=9000

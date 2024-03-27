@@ -66,6 +66,7 @@ pub async fn start(opts: Opts) -> Result<()> {
     if opts.metrics {
         // use for local visit, :9000
         PrometheusBuilder::new().install()?;
+        info!("Start metrics server: 127.0.0.1:9000");
     }
 
     // create directory
@@ -121,7 +122,7 @@ async fn default_handler(
 
     let span = info_span!("[HTTP]",remote = %addr.to_string(), req_id = %ctx.req_id.clone(), method = %method, uri = %uri, host = %ctx.host);
     let span_clone = span.clone();
-    metrics.req_cnt.increment(1);
+    metrics.req_fn_cnt.increment(1);
 
     // if wasm_module is empty, return 404
     if ctx.wasm_module.is_empty() {
@@ -131,7 +132,7 @@ async fn default_handler(
             elapsed = %st.elapsed().as_micros(),
             "Function not found",
         );
-        metrics.req_function_notfound_cnt.increment(1);
+        metrics.req_fn_notfound_cnt.increment(1);
         return Err(ServerError::not_found(ctx, "Function not found"));
     }
 
@@ -148,7 +149,7 @@ async fn default_handler(
                 "Internal error: {}",
                 err,
             );
-            metrics.req_function_error_cnt.increment(1);
+            metrics.req_fn_error_cnt.increment(1);
             let msg = format!("Internal error: {}", err);
             return Err(ServerError::internal_error(ctx, &msg));
         }

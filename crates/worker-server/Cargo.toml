@@ -16,4 +16,4 @@ serde = { workspace = true }
 tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }
-ulid = "1.1.2"
+xid = "1.0.3"
