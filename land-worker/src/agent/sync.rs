@@ -36,6 +36,7 @@ pub async fn get() -> ConfData {
 
 /// start starts the sync loop
 pub async fn start(interval: u64, addr: String, token: String, dir: String) {
+    info!("Center addr:{}", addr);
     tokio::spawn(async move {
         let mut ticker = tokio::time::interval(tokio::time::Duration::from_secs(interval));
         loop {
