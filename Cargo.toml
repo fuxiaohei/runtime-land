@@ -79,5 +79,5 @@ uuid = { version = "1.8.0", features = ["v4"] }
 wit-bindgen = "0.22.0"
 wit-bindgen-core = "0.22.0"
 wit-bindgen-rust = "0.22.0"
-wit-component = "0.201.0"
+wit-component = "0.202.0"
 url = "2.5.0"

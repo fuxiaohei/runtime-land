@@ -17,7 +17,7 @@ services:
       - runtime_land_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /data/runtime-land:/data/runtime-land
+      - ${LAND_DATA_DIR}:/data/runtime-land
   worker:
     platform: linux/amd64
     image: ghcr.io/fuxiaohei/runtime-land-worker:develop
@@ -32,7 +32,7 @@ services:
     networks:
       - runtime_land_network
     volumes:
-      - /data/runtime-land:/data/runtime-land
+      - ${LAND_DATA_DIR}:/data/runtime-land
     labels:
       - traefik.enable=true
       - traefik.http.services.land-worker.loadbalancer.server.port=8866

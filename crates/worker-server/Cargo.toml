@@ -10,7 +10,9 @@ axum = { workspace = true }
 hostname = "0.3.1"
 land-worker-impl = { workspace = true }
 metrics = "0.22.3"
-metrics-exporter-prometheus = "0.14.0"
+metrics-exporter-prometheus = { version = "0.14.0", default-features = false, features = [
+    "http-listener"
+] }
 once_cell = { workspace = true }
 serde = { workspace = true }
 tokio = { workspace = true }
