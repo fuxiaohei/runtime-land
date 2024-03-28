@@ -17,6 +17,7 @@ mod overview;
 mod playground;
 mod projects;
 mod settings;
+mod traffic;
 
 /// index is a handler for GET /
 pub async fn index() -> impl IntoResponse {
@@ -64,6 +65,8 @@ pub fn router(assets_dir: &str) -> Result<Router> {
             get(playground::index).post(playground::save),
         )
         .route("/playground/:name/check", get(playground::check))
+        .route("/traffic/requests", get(traffic::requests))
+        .route("/traffic/flows", get(traffic::flows))
         .route("/settings", get(settings::index))
         .route("/settings/create-token", post(settings::create_token))
         .route("/settings/manage", get(settings::manage))

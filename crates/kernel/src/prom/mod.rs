@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Result};
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::info;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -34,4 +35,50 @@ pub fn init_prom_env() -> Result<()> {
         .set(prom_env)
         .map_err(|_| anyhow!("PromEnv is already set"))?;
     Ok(())
+}
+
+/// QueryRangeParams is the parameters for querying range
+#[derive(Serialize)]
+pub struct QueryRangeParams {
+    pub query: String,
+    pub start: i64,
+    pub end: i64,
+    pub step: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct QueryResponse {
+    pub status: String,
+    pub data: QueryResponseData,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct QueryResponseData {
+    #[serde(rename = "resultType")]
+    pub result_type: String,
+    pub result: Vec<QueryResponseDataItem>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct QueryResponseDataItem {
+    pub metric: HashMap<String, String>,
+    pub values: Vec<(i64, String)>,
+}
+
+/// query_range queries range from Prometheus
+pub async fn query_range(params: QueryRangeParams) -> Result<QueryResponse> {
+    let prom_env = PROM_ENV
+        .get()
+        .ok_or_else(|| anyhow!("PromEnv is not set"))?;
+    let client = reqwest::Client::new();
+    // use post to query
+    let resp = client
+        .post(&format!("{}/api/v1/query_range", prom_env.addr))
+        .basic_auth(prom_env.user.clone(), Some(prom_env.password.clone()))
+        .form(&params)
+        .send()
+        .await?;
+    let resp = resp.error_for_status()?;
+    let resp = resp.json::<QueryResponse>().await?;
+    Ok(resp)
 }
