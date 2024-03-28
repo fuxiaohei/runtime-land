@@ -26,7 +26,7 @@ anyhow = "1.0.81"
 async-trait = "0.1.79"
 axum = "0.7.5"
 base64 = "0.22.0"
-chrono = "0.4.35"
+chrono = "0.4.37"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 http = "1.1.0"
 land-common = { path = "crates/common" }

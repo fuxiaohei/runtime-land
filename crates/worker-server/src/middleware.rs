@@ -20,9 +20,11 @@ pub struct WorkerContext {
 
 #[derive(Clone)]
 pub struct WorkerMetrics {
-    pub req_fn_cnt: Counter,
-    pub req_fn_notfound_cnt: Counter,
-    pub req_fn_error_cnt: Counter,
+    pub req_fn_total: Counter,
+    pub req_fn_notfound_total: Counter,
+    pub req_fn_error_total: Counter,
+    pub req_fn_in_bytes_total: Counter,
+    pub req_fn_out_bytes_total: Counter,
 }
 
 /// middleware to add worker context info to request
@@ -63,12 +65,20 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
             ("endpoint", endpoint.clone()),
         ];
         (
-            counter!("req_fn_cnt", &labels),
-            counter!("req_fn_notfound_cnt", &labels),
-            counter!("req_fn_error_cnt", &labels),
+            counter!("req_fn_total", &labels),
+            counter!("req_fn_notfound_total", &labels),
+            counter!("req_fn_error_total", &labels),
+            counter!("req_fn_in_bytes_total", &labels),
+            counter!("req_fn_out_bytes_total", &labels),
         )
     } else {
-        (Counter::noop(), Counter::noop(), Counter::noop())
+        (
+            Counter::noop(),
+            Counter::noop(),
+            Counter::noop(),
+            Counter::noop(),
+            Counter::noop(),
+        )
     };
     let context = WorkerContext {
         req_id,
@@ -79,9 +89,11 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         endpoint,
     };
     let metrics = WorkerMetrics {
-        req_fn_cnt: counters.0,
-        req_fn_notfound_cnt: counters.1,
-        req_fn_error_cnt: counters.2,
+        req_fn_total: counters.0,
+        req_fn_notfound_total: counters.1,
+        req_fn_error_total: counters.2,
+        req_fn_in_bytes_total: counters.3,
+        req_fn_out_bytes_total: counters.4,
     };
     request.extensions_mut().insert(context);
     request.extensions_mut().insert(metrics);

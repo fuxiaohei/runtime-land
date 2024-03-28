@@ -1,4 +1,5 @@
 use anyhow::Result;
+use axum::body::HttpBody;
 use axum::Extension;
 use axum::{
     body::Body,
@@ -122,7 +123,7 @@ async fn default_handler(
 
     let span = info_span!("[HTTP]",remote = %addr.to_string(), req_id = %ctx.req_id.clone(), method = %method, uri = %uri, host = %ctx.host);
     let span_clone = span.clone();
-    metrics.req_fn_cnt.increment(1);
+    metrics.req_fn_total.increment(1);
 
     // if wasm_module is empty, return 404
     if ctx.wasm_module.is_empty() {
@@ -132,9 +133,13 @@ async fn default_handler(
             elapsed = %st.elapsed().as_micros(),
             "Function not found",
         );
-        metrics.req_fn_notfound_cnt.increment(1);
+        metrics.req_fn_notfound_total.increment(1);
         return Err(ServerError::not_found(ctx, "Function not found"));
     }
+
+    // collect post body size
+    let body_size = req.body().size_hint().exact().unwrap_or(0);
+    metrics.req_fn_in_bytes_total.increment(body_size);
 
     // call wasm async
     async move {
@@ -149,7 +154,7 @@ async fn default_handler(
                 "Internal error: {}",
                 err,
             );
-            metrics.req_fn_error_cnt.increment(1);
+            metrics.req_fn_error_total.increment(1);
             let msg = format!("Internal error: {}", err);
             return Err(ServerError::internal_error(ctx, &msg));
         }
@@ -161,6 +166,8 @@ async fn default_handler(
         } else {
             info!( status=%status_code,elapsed=%elapsed, "Done");
         }
+        let body_size = resp.body().size_hint().exact().unwrap_or(0);
+        metrics.req_fn_out_bytes_total.increment(body_size);
         Ok(resp)
     }
     .instrument(span_clone)
