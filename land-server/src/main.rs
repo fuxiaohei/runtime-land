@@ -43,6 +43,12 @@ async fn main() -> Result<()> {
     land_dao::settings::init_defaults().await?;
     land_dao::storage::init_defatuls().await?;
 
+    // init clerk envs
+    land_kernel::auth::init_clerk_env().await?;
+
+    // init prom envs
+    land_kernel::prom::init_prom_env()?;
+
     // start crons
     land_kernel::cron::start(land_kernel::cron::Options {
         gen_deploys: 1,

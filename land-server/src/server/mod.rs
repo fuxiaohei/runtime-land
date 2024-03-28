@@ -20,8 +20,6 @@ mod worker;
 /// start starts the server
 #[instrument("[SVR]", skip_all)]
 pub async fn start(assets_dir: &str, addr: SocketAddr) -> Result<()> {
-    // init clerk env
-    land_kernel::auth::init_clerk_env().await?;
 
     let dash_app = dash::router(assets_dir)?;
     let app = Router::new()
