@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap");
+
+html,
+body {
+    font-family: Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+html {
+    height: -webkit-fill-available;
+}
+
+html[data-bs-theme="dark"] {
+    --bs-border-color: #323436;
+}
+
+html[data-bs-theme="dark"] .dropdown-menu {
+    border-color: #323436;
+}
+
+#sign-in-container {
+    width: 640px;
+    margin-top: 4rem;
+}
+
+#sign-in-container .logo-brand img {
+    width: 48px;
+    height: 48px;
+}
+
+#main-container {
+    height: 100vh;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#main-nav {
+    width: 250px;
+    background-color: #f9fdfe;
+}
+
+html[data-bs-theme="dark"] #main-nav {
+    background-color: rgb(19, 21, 22);
+}
+
+#top-nav {
+    height: 63px;
+}
+
+#main-panel {
+    /* height 100%-47px*/
+    height: calc(100% - 63px);
+}
+
+.color-modes i.bi {
+    font-size: 18px;
+}
+
+.color-modes i.bs-theme-current-icon-dark {
+    color: #fffdeb;
+}
+
+#main-nav .nav-link:hover {
+    background-color: #e2e4e5;
+    color: rgb(var(--bs-body-color-rgb));
+}
+
+#main-nav .nav-link.active {
+    background-color: #d4e9f4 !important;
+    color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+html[data-bs-theme="dark"] #main-nav .nav-link.active {
+    background-color: #01283b !important;
+    color: #2e8ef4 !important;
+}
+
+html[data-bs-theme="dark"] #main-nav .nav-link:hover {
+    background-color: #292929;
+    color: var(--bs-secondary-color);
+}

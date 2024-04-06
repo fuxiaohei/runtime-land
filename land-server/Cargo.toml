@@ -1,8 +1,22 @@
 [package]
 name = "land-server"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+axum-template = { version = "2.2.0", features = ["handlebars"] }
+clap = { workspace = true }
+handlebars = "5.1.2"
+land-common = { workspace = true }
+land-core = { workspace = true }
+land-dao = { workspace = true }
+minify-html = "0.15.0"
+rust-embed = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+walkdir = "2.5.0"
