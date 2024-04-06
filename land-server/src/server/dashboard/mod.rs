@@ -11,6 +11,7 @@ use axum_template::engine::Engine;
 use tower_http::services::ServeDir;
 
 mod auth;
+mod projects;
 
 /// index is a handler for GET /
 pub async fn index(engine: TemplateEngine) -> impl IntoResponse {
@@ -23,7 +24,7 @@ pub async fn index(engine: TemplateEngine) -> impl IntoResponse {
         "index.hbs",
         engine,
         IndexVars {
-            page: PageVars::new("Dashboard", "Overview"),
+            page: PageVars::new("Dashboard", "overview"),
         },
     )
 }
@@ -40,6 +41,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 
     let app = Router::new()
         .route("/", any(index))
+        .route("/projects", get(projects::index))
         .route("/sign-in", get(auth::sign_in))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .with_state(Engine::from(hbs));

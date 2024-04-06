@@ -8,8 +8,10 @@
         <div class="projects-nav px-3">
             <nav class="nav flex-column">
                 <p class="text-uppercase small text-body-tertiary pb-1 mb-0">Projects</p>
-                <a class="nav-link active rounded-2 mt-1" href="#"><i class="bi bi-clipboard-data me-2"></i>Overview</a>
-                <a class="nav-link rounded-2 mt-1" href="#"><i class="bi bi-kanban me-2"></i>Projects</a>
+                <a class="nav-link rounded-2 mt-1 {{is_nav_active 'overview' page.nav}}" href="/"><i
+                        class="bi bi-clipboard-data me-2"></i>Overview</a>
+                <a class="nav-link rounded-2 mt-1 {{is_nav_active 'projects' page.nav}}" href="/projects"><i
+                        class="bi bi-kanban me-2"></i>Projects</a>
             </nav>
         </div>
     </div>

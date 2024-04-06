@@ -75,12 +75,50 @@ html[data-bs-theme="dark"] #main-nav {
     color: rgb(var(--bs-primary-rgb)) !important;
 }
 
-html[data-bs-theme="dark"] #main-nav .nav-link.active {
+html[data-bs-theme="dark"] #main-nav a.nav-link.active {
     background-color: #01283b !important;
     color: #2e8ef4 !important;
 }
 
-html[data-bs-theme="dark"] #main-nav .nav-link:hover {
+html[data-bs-theme="dark"] #main-nav a.nav-link:hover {
     background-color: #292929;
     color: var(--bs-secondary-color);
+}
+
+.project-item>a:hover {
+    border-color: #c2c3c5 !important;
+}
+
+html[data-bs-theme="dark"] .project-item>a:hover {
+    border-color: #545555 !important;
+}
+
+.project-item-more>a {
+    border-style: dashed !important;
+}
+
+.project-item svg.js-svg,
+.project-item svg.ts-svg,
+.project-item svg.rust-svg {
+    border-radius: 0.25rem;
+    width: 42px;
+    height: 42px;
+}
+
+.all-projects-thead .lang {
+    width: 40px;
+}
+
+.all-projects-item .lang svg {
+    width: 32px;
+    height: 32px;
+    border-radius: 0.25rem;
+}
+
+#projects-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+#projects-table tbody tr:last-child td {
+    border-bottom: none;
 }

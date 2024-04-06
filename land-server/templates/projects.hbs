@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/nav-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="all-projects" class="pt-3 px-3">
+                    <div class="meta">
+                        <h5>Projects</h5>
+                        <p class="text-body-tertiary mb-1">All projects that you have created.</p>
+                    </div>
+                    <table id="projects-table" class="table shadow-none mb-4">
+                        <thead>
+                            <tr class="all-projects-thead">
+                                <th scope="col" class="lang"></th>
+                                <th scope="col">Name</th>
+                                <th scope="col">URL</th>
+                                <th scope="col">Traffic</th>
+                                <th scope="col">Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="all-projects-item">
+                                <td class="lang" scope="row">{{> partials/svg-js.hbs}}</td>
+                                <td class="title">
+                                    <h6 class="fw-bold mb-1"><a href="#" class="text-body text-decoration-none">Project
+                                            name</a></h6>
+                                    <p class="mb-0 text-body-tertiary small">Project description</p>
+                                </td>
+                                <td class="url">
+                                    <a class="text-body-secondary" href="#">aws-0-ap-southeast-1.pooler.supabase.com</a>
+                                </td>
+                                <td class="traffic">
+                                    <span class="total-requests border-end pe-2 me-2">14342</span>
+                                    <span class="total-bandwidth">284.94 MiB</span>
+                                </td>
+                                <td class="updated">
+                                    <span class="time-ago text-body-tertiary small">14 Days ago</span>
+                                </td>
+                            </tr>
+                            <tr class="all-projects-item">
+                                <td class="lang" scope="row">{{> partials/svg-ts.hbs}}</td>
+                                <td class="title">
+                                    <h6 class="fw-bold mb-1"><a href="#" class="text-body text-decoration-none">Project
+                                            name</a></h6>
+                                    <p class="mb-0 text-body-tertiary small">Project description</p>
+                                </td>
+                                <td class="url">
+                                    <a class="text-body-secondary"
+                                        href="#">ep-dry-cake-a1nuqvik-pooler.ap-southeast-1.aws.neon.tech</a>
+                                </td>
+                                <td class="traffic">
+                                    <span class="total-requests border-end pe-2 me-2">12.84 K</span>
+                                    <span class="total-bandwidth">81.94 GiB</span>
+                                </td>
+                                <td class="updated">
+                                    <span class="time-ago text-body-tertiary small">14 Days ago</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

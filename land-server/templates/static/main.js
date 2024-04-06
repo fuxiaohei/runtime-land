@@ -58,16 +58,17 @@
     })
 
     const customElements = (theme) => {
-        let btn = document.getElementById("main-nav-user-dropdown-btn");
-        if (btn) {
-            if (theme == "light") {
-                btn.classList.remove("btn-dark");
-                btn.classList.add("btn-secondary");
-            } else {
-                btn.classList.remove("btn-secondary");
-                btn.classList.add("btn-dark");
-
-            }
+        let btns = document.querySelectorAll(".custom-theme-btn")
+        if (btns) {
+            btns.forEach((btn) => {
+                if (theme == "light") {
+                    btn.classList.remove("btn-dark");
+                    btn.classList.add("btn-secondary");
+                } else {
+                    btn.classList.remove("btn-secondary");
+                    btn.classList.add("btn-dark");
+                }
+            });
         }
     }
 
