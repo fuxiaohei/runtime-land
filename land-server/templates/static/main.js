@@ -18,6 +18,7 @@
 
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
     }
+    window.getPreferredTheme = getPreferredTheme;
 
     const setTheme = theme => {
         document.documentElement.setAttribute('data-bs-theme', theme)
@@ -75,14 +76,34 @@
     window.addEventListener('DOMContentLoaded', () => {
         showActiveTheme(getPreferredTheme())
         customElements(getPreferredTheme())
-        document.getElementById('bd-theme').addEventListener('click', () => {
-            const storedTheme = getStoredTheme()
-            const currentTheme = storedTheme || getPreferredTheme()
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light'
-            setStoredTheme(newTheme)
-            customElements(newTheme)
-            setTheme(newTheme)
-            showActiveTheme(newTheme, true)
-        });
+        let theme_btn = document.getElementById('bd-theme');
+        if (theme_btn) {
+            theme_btn.addEventListener('click', () => {
+                const storedTheme = getStoredTheme()
+                const currentTheme = storedTheme || getPreferredTheme()
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light'
+                setStoredTheme(newTheme)
+                customElements(newTheme)
+                setTheme(newTheme)
+                showActiveTheme(newTheme, true)
+            });
+        }
     })
+})();
+
+(() => {
+    // convert data-x-time to local time string
+    const xTimeElements = document.querySelectorAll('[data-x-time]');
+    xTimeElements.forEach((element) => {
+        const xTime = element.getAttribute('data-x-time');
+        const date = new Date(xTime);
+        element.innerText = date.toLocaleString();
+    });
+    // convert data-x-timeago to local time string
+    const xTimeElements2 = document.querySelectorAll('[data-x-timeago]');
+    xTimeElements2.forEach((element) => {
+        const xTime = element.getAttribute('data-x-timeago');
+        const date = new Date(xTime);
+        element.innerText = timeago.format(date, "en_US");
+    });
 })();

@@ -92,3 +92,22 @@ impl TemplateVar {
         None
     }
 }
+
+/// show_playground is a handler for GET /playground/:name
+pub async fn show_playground(
+    engine: TemplateEngine,
+    Path(_name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(serde::Serialize)]
+    struct IndexVars {
+        page: PageVars,
+    }
+    // redirect to /overview
+    Ok(RenderHtmlMinified(
+        "playground.hbs",
+        engine,
+        IndexVars {
+            page: PageVars::new("Playground", "playground"),
+        },
+    ))
+}

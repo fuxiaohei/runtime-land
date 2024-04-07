@@ -109,7 +109,8 @@ html[data-bs-theme="dark"] .project-item>a:hover {
     width: 40px;
 }
 
-.all-projects-item .lang svg {
+.all-projects-item .lang svg,
+#playground-container .language-icon svg {
     width: 32px;
     height: 32px;
     border-radius: 0.25rem;
@@ -121,4 +122,17 @@ html[data-bs-theme="dark"] .project-item>a:hover {
 
 #projects-table tbody tr:last-child td {
     border-bottom: none;
+}
+
+.playground-preview-nav {
+    height: 65px;
+}
+
+#playground-preview {
+    width: 100%;
+    height: 100%;
+}
+
+html[data-bs-theme="dark"] #editor-container-wrapper {
+    background-color: #1e1e1e;
 }

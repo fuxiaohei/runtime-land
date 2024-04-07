@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <div class="container-fluid vh-100 p-0" id="playground-container">
+        <div class="row vh-100">
+            <div class="col-6 left-col pe-0 border-end">
+                <div class="d-flex justify-content-between border-bottom align-items-center py-2">
+                    <div class="left d-flex justify-content-start">
+                        <div class="language-icon mx-3">
+                            {{> partials/svg-js.hbs}}
+                        </div>
+                        <div class="title">
+                            <h6 class="py-1 mb-0"><a href="#" class="text-body fw-bold">dif-candy-87</a></h6>
+                            <p class="text-body-tertiary mb-0 small">Updated as <span
+                                    data-x-timeago="2024-04-01T12:09:15.266647Z">2024-04-01T12:09:15.266647Z</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="btn-group me-3">
+                            <button id="main-btn" data-x-status="success" class="btn btn-primary btn-sm text-uppercase">
+                                <div class="waiting-status d-none">
+                                    <div class="spinner-grow spinner-grow-sm me-2" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div><span class="msg-text">success</span>
+                                </div>
+                                <div class="submit-status">
+                                    <span class="ok-text">Save & Deploy</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="editor-loading" class="m-2" style="height: calc(100vh - 17.5rem)">
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    <span role="status">Loading...</span>
+                </div>
+                <div id="editor-container-wrapper" class="d-none p-2">
+                    <div id="editor-container" style="height: calc(100vh - 17.5rem)" data-x-name="dif-candy-87">
+                        <!-- 4.5rem + 11rem + 2rem -->
+                    </div>
+                </div>
+                <div style="height:11rem" class="border-top">
+                    <div class="content small p-2 text-body-secondary">
+                        <p class="mb-1">
+                            <i class="bi bi-chat-right-text me-2"></i>Logs
+                        </p>
+                        <p>Comming soon...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 right-col p-0">
+                <div class="playground-preview-nav d-flex justify-content-between border-bottom align-items-center">
+                    <div class="input-group input-group-sm px-4">
+                        <input id="preview-url" type="url" value="https://dif-candy-87.workerdev.dev"
+                            class="form-control" placeholder="access domain" />
+                        <button data-x-url="https://dif-candy-87.workerdev.dev" id="refresh-btn"
+                            class="btn btn-outline-success" type="button"><i
+                                class='bi bi-arrow-clockwise me-2'></i>Refresh</button>
+                    </div>
+                </div>
+                <div class="bg-transparent" style="height: calc(100vh - 65px)">
+                    <iframe src="https://dif-candy-87.workerdev.dev" frameborder="0" id="playground-preview"
+                        sandbox="allow-forms allow-modals allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <pre class="d-none"><code id="code">export default {
+    async fetch(request) {
+        return new Response(&#x60;Hello, Runtime.land JS SDK abcdef&#x60;);
+    }
+}</code></pre>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="msg-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto text-danger">Deploy Failed</strong>
+            </div>
+            <div id="msg-toast-text" class="toast-body small"></div>
+        </div>
+    </div>
+    {{> partials/footer.hbs}}
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.46.0/min/vs/loader.js"></script>
+    <script type="text/javascript">
+        const projectName = document.getElementById("editor-container").getAttribute("data-x-name");
+        const projectSaveUrl = `/playground/${projectName}`;
+        const projectCheckUrl = `/playground/${projectName}/check`;
+
+        function showToastMessage(text) {
+            document.getElementById('msg-toast-text').innerText = text;
+            const toast = document.getElementById('msg-toast');
+            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
+            toastBootstrap.show();
+            setTimeout(() => {
+                toastBootstrap.hide();
+            }, 5000);
+        }
+
+        // refresh refresh button
+        (() => {
+            let btn = document.getElementById("refresh-btn");
+            btn.addEventListener("click", function () {
+                let iframe = document.getElementById("playground-preview");
+                let url = btn.getAttribute("data-x-url");
+                let new_url = document.getElementById("preview-url").value;
+                if (!new_url.startsWith(url)) {
+                    showToastMessage("Only support refresh same origin: " + url);
+                    return;
+                }
+                console.log("iframe", new_url);
+                iframe.src = new_url;
+            })
+        })();
+
+        // init editor
+        (() => {
+            require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.46.0/min/vs' } });
+            require(['vs/editor/editor.main'], function () {
+                document.getElementById('editor-loading').classList.add('d-none');
+                let container = document.getElementById('editor-container');
+                let containerWrapper = document.getElementById('editor-container-wrapper');
+                containerWrapper.classList.remove('d-none');
+                let code = document.getElementById('code').textContent;
+                var editor = monaco.editor.create(container, {
+                    automaticLayout: true,
+                    value: code,
+                    language: 'javascript',
+                    scrollBeyondLastLine: false,
+                    scrollBeyondLastColumn: 0,
+                    scrollbar: {
+                        useShadows: false,
+                        vertical: 'hidden',
+                        horizontal: 'hidden',
+                    },
+                    minimap: { enabled: false },
+                    overviewRulerLanes: 0,
+                    fontSize: "14px",
+                    theme: getPreferredTheme() === "dark" ? "vs-dark" : "vs",
+                });
+                const btn = document.getElementById("main-btn");
+                btn.addEventListener("click", async function (e) {
+                    let data = new URLSearchParams();
+                    data.append("source", editor.getValue());
+                    let response = await fetch(projectSaveUrl, {
+                        method: "POST",
+                        body: data
+                    });
+                    if (response.ok) {
+                        setWaiting();
+                    } else {
+                        alert("Failed to save!");
+                    }
+                })
+            });
+        })();
+    </script>
+</body>
+
+</html>

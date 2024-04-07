@@ -49,6 +49,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
         .route("/projects", get(projects::index))
+        .route("/playground/:name", get(projects::show_playground))
         .route("/new", get(projects::new))
         .route("/new/playground/:template", get(projects::new_playground))
         .nest_service("/static", ServeDir::new(static_assets_dir))
