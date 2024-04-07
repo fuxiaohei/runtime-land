@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Args;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm_migration::MigratorTrait;
 use std::time::Duration;
 use tracing::{debug, info};
 
@@ -23,7 +24,7 @@ pub struct DBArgs {
     #[clap(
         long("db-database"),
         env("POSTGRES_DATABASE"),
-        default_value("rtland-dev")
+        default_value("runtime-land-v03")
     )]
     pub database: String,
     /// Database connection pool size
@@ -59,7 +60,7 @@ impl DBArgs {
         let db = Database::connect(opt).await?;
 
         // run migrations
-        // super::migration::Migrator::up(&db, None).await?;
+        super::migration::Migrator::up(&db, None).await?;
 
         DB.set(db).unwrap();
         info!("DB Init success: {}", self.url_safe());

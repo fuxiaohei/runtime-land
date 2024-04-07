@@ -36,6 +36,8 @@ async fn main() -> Result<()> {
     land_common::tracing::init(args.output.verbose);
     // Connect to database
     args.dbargs.connect().await?;
+    // Init Defaults data in database
+    land_dao::settings::init_defaults().await?;
     // Init clerk env
     land_core::auth::init_clerk_env().await?;
     // Start the server

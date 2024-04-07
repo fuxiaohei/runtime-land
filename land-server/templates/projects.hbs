@@ -12,9 +12,14 @@
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
                 <div id="all-projects" class="pt-3 px-3">
-                    <div class="meta">
-                        <h5>Projects</h5>
-                        <p class="text-body-tertiary mb-1">All projects that you have created.</p>
+                    <div class="meta d-flex justify-content-between">
+                        <div>
+                            <h5>Projects</h5>
+                            <p class="text-body-tertiary mb-1">All projects that you have created.</p>
+                        </div>
+                        <div>
+                            <a class="btn btn-primary" href="/new"><i class="bi bi-plus-lg me-2"></i>New Project</a>
+                        </div>
                     </div>
                     <table id="projects-table" class="table shadow-none mb-4">
                         <thead>

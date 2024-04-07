@@ -7,7 +7,9 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 axum = { workspace = true }
+axum-extra = { version = "0.9.3", features = ["cookie"] }
 axum-template = { version = "2.2.0", features = ["handlebars"] }
+axum_csrf = { version = "0.9.0", features = ["layer"] }
 clap = { workspace = true }
 handlebars = "5.1.2"
 land-common = { workspace = true }
@@ -20,3 +22,6 @@ tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }
 walkdir = "2.5.0"
+serde_json = { workspace = true }
+base64 = { workspace = true }
+time = { workspace = true }

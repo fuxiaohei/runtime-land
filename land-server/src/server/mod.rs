@@ -1,7 +1,5 @@
 use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Router,
+    body::Body, http::StatusCode, response::{IntoResponse, Response}, Router
 };
 use serde::Serialize;
 use std::net::SocketAddr;
@@ -57,6 +55,15 @@ where
     fn from(err: E) -> Self {
         Self(StatusCode::INTERNAL_SERVER_ERROR, err.into())
     }
+}
+
+/// redirect_response returns a redirect response
+pub fn redirect_response(url: &str) -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::FOUND)
+        .header("Location", url)
+        .body(Body::empty())
+        .unwrap()
 }
 
 /// PageVars is the common variables for all pages

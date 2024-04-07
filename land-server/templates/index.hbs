@@ -12,9 +12,14 @@
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
                 <div id="overview-projects" class="pt-3 px-3">
-                    <div class="meta">
-                        <h5>Recently updated projects</h5>
-                        <p class="text-body-tertiary mb-1">Projects that have been recently updated.</p>
+                    <div class="meta d-flex justify-content-between">
+                        <div>
+                            <h5>Recently updated projects</h5>
+                            <p class="text-body-tertiary mb-1">Projects that have been recently updated.</p>
+                        </div>
+                        <div>
+                            <a class="btn btn-primary" href="/new"><i class="bi bi-plus-lg me-2"></i>New Project</a>
+                        </div>
                     </div>
                     <div class="container p-0">
                         <div class="row g-4 py-3">

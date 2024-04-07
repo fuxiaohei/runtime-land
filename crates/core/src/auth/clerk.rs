@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Result};
+use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use once_cell::sync::OnceCell;
-use serde::Serialize;
-use tracing::info;
+use serde::{Deserialize, Serialize};
+use tracing::{debug, info};
 
 /// ClerkEnv is the environment variables for Clerk.js
 #[derive(Serialize, Clone)]
@@ -46,7 +47,7 @@ pub async fn init_clerk_env() -> Result<()> {
         .map_err(|_| anyhow!("ClerkEnv is already set"))?;
 
     // init jwks
-    // init_clerk_jwks().await?;
+    init_clerk_jwks().await?;
 
     Ok(())
 }
@@ -54,4 +55,95 @@ pub async fn init_clerk_env() -> Result<()> {
 /// get_clerk_env returns ClerkEnv
 pub fn get_clerk_env() -> ClerkEnv {
     CLERK_ENV.get().unwrap().clone()
+}
+
+static CLERK_JWKS: &str = "clerk_jwks";
+
+async fn init_clerk_jwks() -> Result<()> {
+    let value = land_dao::settings::get(CLERK_JWKS).await?;
+    if value.is_none() {
+        let jwks = request_jwks().await?;
+        land_dao::settings::set(CLERK_JWKS, &jwks).await?;
+    }
+    Ok(())
+}
+
+pub async fn request_jwks() -> Result<String> {
+    let jwks_api = "https://api.clerk.dev/v1/jwks";
+    let user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36";
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(jwks_api)
+        .header("User-Agent", user_agent)
+        .header(
+            "Authorization",
+            format!("Bearer {}", CLERK_ENV.get().unwrap().secret_key),
+        )
+        .send()
+        .await?;
+    if !resp.status().is_success() {
+        return Err(anyhow!(
+            "clerk-get-jwks error: {}, {}",
+            resp.status(),
+            resp.text().await?
+        ));
+    }
+    debug!("Clerk-get-jwks success");
+    let text = resp.text().await?;
+    Ok(text)
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct JwksKey {
+    #[serde(rename = "use")]
+    pub use_key: String,
+    pub kty: String,
+    pub kid: String,
+    pub alg: String,
+    pub n: String,
+    pub e: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct JwksModel {
+    pub keys: Vec<JwksKey>,
+}
+
+/// get_jwks returns the first jwks key
+async fn get_jwks() -> Result<JwksKey> {
+    let setting = land_dao::settings::get("clerk_jwks").await?;
+    if setting.is_none() {
+        return Err(anyhow!("Clerk_jwks not found"));
+    }
+    let settings = setting.unwrap();
+    let jwks: JwksModel = serde_json::from_str(&settings.value)?;
+    if jwks.keys.is_empty() {
+        return Err(anyhow!("Clerk_jwks is empty"));
+    }
+    Ok(jwks.keys[0].clone())
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct ClerkJwtSession {
+    pub azp: String,
+    pub exp: i32,
+    pub iat: i32,
+    pub iss: String,
+    pub nbf: i32,
+    pub sid: String,
+    pub sub: String,
+}
+
+/// verify_clerk_session_jwk verifies session token with jwk
+pub async fn verify_clerk_session_jwk(session: String) -> Result<ClerkJwtSession> {
+    let j = get_jwks().await?;
+    if j.alg != "RS256" {
+        return Err(anyhow!("JWK key alg is not RS256"));
+    }
+    let decoding_key = DecodingKey::from_rsa_components(&j.n, &j.e)?;
+    let mut validation = Validation::new(Algorithm::RS256);
+    validation.validate_exp = true;
+    let decoded_token =
+        jsonwebtoken::decode::<ClerkJwtSession>(&session, &decoding_key, &validation)?;
+    Ok(decoded_token.claims)
 }
