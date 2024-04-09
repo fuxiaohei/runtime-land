@@ -11,7 +11,7 @@
         <div id="main-body" class="w-100">
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
-                <div id="crete-new-projects" class="pt-3 px-3">
+                <div id="crete-new-projects" class="pt-3 px-3 container">
                     <div class="meta d-flex justify-content-between">
                         <div>
                             <h5>Create a project</h5>
@@ -19,27 +19,25 @@
                                 project.</p>
                         </div>
                     </div>
-                    <div class="container p-0">
-                        <div class="row g-4 py-3">
-                            <div class="col-4 project-item">
-                                <a class="border rounded-2 d-block p-3 text-decoration-none"
-                                    href="/new/playground/hello-world-javascript">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="project-item-title">
-                                            <h6 class="fw-bold text-body">Hello World - JavaScript</h6>
-                                            <p class="text-body-tertiary small mb-1">A simple HTTP router that shows
-                                                Hello World written in JavaScript.</p>
-                                        </div>
-                                        <div class="project-item-icon ms-2">
-                                            {{> partials/svg-js.hbs}}
-                                        </div>
+                    <div class="row g-4 py-3">
+                        <div class="col-4 project-item">
+                            <a class="border rounded-2 d-block p-3 text-decoration-none"
+                                href="/new/playground/hello-world-javascript">
+                                <div class="d-flex justify-content-between">
+                                    <div class="project-item-title">
+                                        <h6 class="fw-bold text-body">Hello World - JavaScript</h6>
+                                        <p class="text-body-tertiary small mb-1">A simple HTTP router that shows
+                                            Hello World written in JavaScript.</p>
                                     </div>
-                                    <div class="new-playground text-end">
-                                        <button class="btn-sm btn btn-primary mt-2"><i
-                                                class="bi bi-pencil-square me-2"></i>Edit in Playground</button>
+                                    <div class="project-item-icon ms-2">
+                                        {{> partials/svg-js.hbs}}
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                                <div class="new-playground text-end">
+                                    <button class="btn-sm btn btn-primary mt-2"><i
+                                            class="bi bi-pencil-square me-2"></i>Edit in Playground</button>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@
         <div id="main-body" class="w-100">
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
-                <div id="overview-projects" class="pt-3 px-3">
+                <div id="overview-projects" class="pt-3 px-3 container">
                     <div class="meta d-flex justify-content-between">
                         <div>
                             <h5>Recently updated projects</h5>
@@ -21,80 +21,78 @@
                             <a class="btn btn-primary" href="/new"><i class="bi bi-plus-lg me-2"></i>New Project</a>
                         </div>
                     </div>
-                    <div class="container p-0">
-                        <div class="row g-4 py-3">
-                            <div class="col-4 project-item">
-                                <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="project-item-title">
-                                            <h6 class="fw-bold text-body">Project Name</h6>
-                                            <p class="text-body-tertiary small mb-1">Project description</p>
-                                        </div>
-                                        <div class="project-item-icon">
-                                            {{> partials/svg-js.hbs}}
-                                        </div>
+                    <div class="row g-4 py-3">
+                        <div class="col-4 project-item">
+                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
+                                <div class="d-flex justify-content-between">
+                                    <div class="project-item-title">
+                                        <h6 class="fw-bold text-body">Project Name</h6>
+                                        <p class="text-body-tertiary small mb-1">Project description</p>
                                     </div>
-                                    <div class="project-item-meta">
-                                        <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
-                                            <i class="ms-2 bi bi-box-arrow-up-right"></i>
-                                        </button>
-                                        <p class="text-body-tertiary small mb-0">Last updated:
-                                            <span class="time-ago">2 days ago</span>
-                                        </p>
+                                    <div class="project-item-icon">
+                                        {{> partials/svg-js.hbs}}
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-4 project-item">
-                                <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="project-item-title">
-                                            <h6 class="fw-bold text-body">Project Name</h6>
-                                            <p class="text-body-tertiary small mb-1">Project description</p>
-                                        </div>
-                                        <div class="project-item-icon">
-                                            {{> partials/svg-ts.hbs}}
-                                        </div>
+                                </div>
+                                <div class="project-item-meta">
+                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
+                                        <i class="ms-2 bi bi-box-arrow-up-right"></i>
+                                    </button>
+                                    <p class="text-body-tertiary small mb-0">Last updated:
+                                        <span class="time-ago">2 days ago</span>
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-4 project-item">
+                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
+                                <div class="d-flex justify-content-between">
+                                    <div class="project-item-title">
+                                        <h6 class="fw-bold text-body">Project Name</h6>
+                                        <p class="text-body-tertiary small mb-1">Project description</p>
                                     </div>
-                                    <div class="project-item-meta">
-                                        <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
-                                            <i class="ms-2 bi bi-box-arrow-up-right"></i>
-                                        </button>
-                                        <p class="text-body-tertiary small mb-0">Last updated:
-                                            <span class="time-ago">2 days ago</span>
-                                        </p>
+                                    <div class="project-item-icon">
+                                        {{> partials/svg-ts.hbs}}
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-4 project-item">
-                                <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="project-item-title">
-                                            <h6 class="fw-bold text-body">Project Name</h6>
-                                            <p class="text-body-tertiary small mb-1">Project description</p>
-                                        </div>
-                                        <div class="project-item-icon">
-                                            {{> partials/svg-rust.hbs}}
-                                        </div>
+                                </div>
+                                <div class="project-item-meta">
+                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
+                                        <i class="ms-2 bi bi-box-arrow-up-right"></i>
+                                    </button>
+                                    <p class="text-body-tertiary small mb-0">Last updated:
+                                        <span class="time-ago">2 days ago</span>
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-4 project-item">
+                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
+                                <div class="d-flex justify-content-between">
+                                    <div class="project-item-title">
+                                        <h6 class="fw-bold text-body">Project Name</h6>
+                                        <p class="text-body-tertiary small mb-1">Project description</p>
                                     </div>
-                                    <div class="project-item-meta">
-                                        <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
-                                            <i class="ms-2 bi bi-box-arrow-up-right"></i>
-                                        </button>
-                                        <p class="text-body-tertiary small mb-0">Last updated:
-                                            <span class="time-ago">2 days ago</span>
-                                        </p>
+                                    <div class="project-item-icon">
+                                        {{> partials/svg-rust.hbs}}
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-4 project-item project-item-more">
-                                <a href="#" class="border rounded-2 d-block p-3 text-decoration-none">
-                                    View All Projects
-                                </a>
-                            </div>
+                                </div>
+                                <div class="project-item-meta">
+                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
+                                        <i class="ms-2 bi bi-box-arrow-up-right"></i>
+                                    </button>
+                                    <p class="text-body-tertiary small mb-0">Last updated:
+                                        <span class="time-ago">2 days ago</span>
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-4 project-item project-item-more">
+                            <a href="#" class="border rounded-2 d-block p-3 text-decoration-none">
+                                View All Projects
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div id="account-traffic" class="pt-3 px-3">
+                <div id="account-traffic" class="pt-3 px-3 container">
                     <div class="meta">
                         <h5>Account Traffic</h5>
                         <div class="d-flex justify-content-between align-items-center">
@@ -112,22 +110,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="container p-0">
-                        <div class="row g-4 py-3">
-                            <div class="col-6 traffic-item">
-                                <div class="border rounded-2 p-3">
-                                    <div class="traffic-meta">
-                                        <p class="text-body-tertiary small mb-1 text-uppercase">Total Requests</p>
-                                        <p class="fw-bold mb-1">12345</p>
-                                    </div>
+                    <div class="row g-4 py-3">
+                        <div class="col-6 traffic-item">
+                            <div class="border rounded-2 p-3">
+                                <div class="traffic-meta">
+                                    <p class="text-body-tertiary small mb-1 text-uppercase">Total Requests</p>
+                                    <p class="fw-bold mb-1">12345</p>
                                 </div>
                             </div>
-                            <div class="col-6 traffic-item">
-                                <div class="border rounded-2 p-3">
-                                    <div class="traffic-meta">
-                                        <p class="text-body-tertiary small mb-1 text-uppercase">Total Bandwidth</p>
-                                        <p class="fw-bold mb-1">12.356 GiB</p>
-                                    </div>
+                        </div>
+                        <div class="col-6 traffic-item">
+                            <div class="border rounded-2 p-3">
+                                <div class="traffic-meta">
+                                    <p class="text-body-tertiary small mb-1 text-uppercase">Total Bandwidth</p>
+                                    <p class="fw-bold mb-1">12.356 GiB</p>
                                 </div>
                             </div>
                         </div>
