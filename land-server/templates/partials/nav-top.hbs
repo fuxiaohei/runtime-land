@@ -2,11 +2,17 @@
     <div class="dropdown border-end pe-4 me-4" id="main-nav-user-dropdown">
         <button id="main-nav-user-dropdown-btn" class="btn btn-secondary dropdown-toggle custom-theme-btn" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <img width="20" height="20" src="https://avatars.githubusercontent.com/u/2142787?v=4" alt="user-avatar"
-                class="rounded-1" />
-            <span class="ps-2 pe-1">FuXiaoHei</span>
+            <img width="20" height="20" src="{{user.gravatar}}" alt="user-avatar" class="rounded-1" />
+            <span class="ps-2 pe-1">{{user.name}}</span>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li class="border-bottom my-2 pb-2">
+                <div class="text-center">
+                    <img width="80" height="80" src="{{user.gravatar}}" alt="user-avatar" class="rounded-1 mt-2" />
+                    <p class="my-1 fw-bold">{{user.name}}</p>
+                    <p class="my-1 small text-body-tertiary">{{user.email}}</p>
+                </div>
+            </li>
             <li><a href="/settings" class="btn btn-link dropdown-item" type="button"><i
                         class="bi bi-gear me-2"></i>Settings</a>
             </li>

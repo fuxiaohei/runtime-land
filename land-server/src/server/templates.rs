@@ -25,6 +25,7 @@ handlebars_helper!(selected: |x: str, y: str| if x == y { "selected" } else { ""
 handlebars_helper!(is_nav_active: |x: str, y: str| if x == y { "active" } else { "" });
 handlebars_helper!(is_js_project: |x: str| x.to_lowercase() == "js" || x.to_lowercase() == "javascript" );
 handlebars_helper!(is_rust_project: |x: str|  x.to_lowercase() == "rust" );
+handlebars_helper!(is_ts_project: |x: str|  x.to_lowercase() == "ts" || x.to_lowercase() == "typescript");
 handlebars_helper!(eq_str: |x: str, y: str| x == y);
 
 /// init initializes the handlebars template engine
@@ -36,6 +37,7 @@ pub fn init(dir: &str) -> Result<Handlebars<'static>> {
     hbs.register_helper("is_nav_active", Box::new(is_nav_active));
     hbs.register_helper("is_js_project", Box::new(is_js_project));
     hbs.register_helper("is_rust_project", Box::new(is_rust_project));
+    hbs.register_helper("is_ts_project", Box::new(is_ts_project));
     hbs.register_helper("eq_str", Box::new(eq_str));
 
     // register templates

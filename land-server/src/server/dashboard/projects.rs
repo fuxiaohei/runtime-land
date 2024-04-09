@@ -1,5 +1,6 @@
 use super::auth::SessionUser;
 use crate::server::{
+    dashboard::vars::ProjectVar,
     redirect_response,
     templates::{RenderHtmlMinified, TemplateEngine},
     PageVars, ServerError,
@@ -7,21 +8,33 @@ use crate::server::{
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
 use base64::{engine::general_purpose, Engine};
 use land_dao::projects::Language;
+use tracing::info;
 
 /// index is a handler for GET /projects
-pub async fn index(engine: TemplateEngine) -> impl IntoResponse {
+pub async fn index(
+    Extension(user): Extension<SessionUser>,
+    engine: TemplateEngine,
+) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
         page: PageVars,
+        user: SessionUser,
+        projects: Vec<ProjectVar>,
     }
-    // redirect to /overview
-    RenderHtmlMinified(
+
+    // list all projects
+    let projects_data = land_dao::projects::list_by_user_id(user.id, None, 99).await?;
+    info!("List projects: {}", projects_data.len());
+    let projects = ProjectVar::from_models_vec(projects_data).await?;
+    Ok(RenderHtmlMinified(
         "projects.hbs",
         engine,
         IndexVars {
             page: PageVars::new("Projects", "projects"),
+            user,
+            projects,
         },
-    )
+    ))
 }
 
 /// new is a handler for GET /new
@@ -108,6 +121,33 @@ pub async fn show_playground(
         engine,
         IndexVars {
             page: PageVars::new("Playground", "playground"),
+        },
+    ))
+}
+
+/// one is a handler for GET /projects/:name
+pub async fn one(
+    Extension(user): Extension<SessionUser>,
+    engine: TemplateEngine,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(serde::Serialize)]
+    struct IndexVars {
+        page: PageVars,
+        user: SessionUser,
+        project: ProjectVar,
+    }
+    let (p, py) = land_dao::projects::get_project_by_name_with_playground(name, user.id).await?;
+    let project = ProjectVar::new(&p, py.as_ref()).await?;
+
+    let title = format!("{} - Project", project.name);
+    Ok(RenderHtmlMinified(
+        "project.hbs",
+        engine,
+        IndexVars {
+            page: PageVars::new(&title, "project-dashboard"),
+            user,
+            project,
         },
     ))
 }

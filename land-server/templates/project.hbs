@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+    <link title="light" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css">
+    <link title="dark" rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css"
+        disabled="disabled">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/nav-project-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="project-dashboard" class="pt-3 px-3 container d-flex justify-content-between">
+                    <div class="meta d-flex justify-content-start">
+                        <div class="language-icon me-3">
+                            {{> partials/svg-js.hbs}}
+                        </div>
+                        <div>
+                            <h5>{{project.name}}</h5>
+                            <p class="text-body-tertiary mb-2">{{project.description}}</p>
+                        </div>
+                    </div>
+                    <div class="btns">
+                        <a href="{{project.prod_domain_url}}" target="_blank" class="btn btn-primary"><i
+                                class="bi bi-link-45deg me-2"></i>View</a>
+                        <a href="/playground/{{project.name}}" class="btn btn-danger ms-3"><i
+                                class="bi bi-pencil-square me-2"></i>Edit</a>
+                    </div>
+                </div>
+                <div id="project-codeview" class="pt-3 px-3 container">
+                    <div class="card shadow-none">
+                        <div class="card-header">
+                            <p class="mb-0 text-body-secondary small">Last Updated: <span
+                                    data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span></p>
+                        </div>
+                        <div class="card-body p-2">
+                            <pre><code class="language-{{project.language}}">{{project.source}}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>

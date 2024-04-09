@@ -22,71 +22,41 @@
                         </div>
                     </div>
                     <div class="row g-4 py-3">
+                        {{#each projects}}
                         <div class="col-4 project-item">
-                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
+                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="/projects/{{name}}">
                                 <div class="d-flex justify-content-between">
                                     <div class="project-item-title">
-                                        <h6 class="fw-bold text-body">Project Name</h6>
-                                        <p class="text-body-tertiary small mb-1">Project description</p>
+                                        <h6 class="fw-bold text-body">{{name}}</h6>
+                                        <p class="text-body-tertiary small mb-1">Edit by {{created_by}}</p>
                                     </div>
                                     <div class="project-item-icon">
+                                        {{#if (is_js_project language)}}
                                         {{> partials/svg-js.hbs}}
-                                    </div>
-                                </div>
-                                <div class="project-item-meta">
-                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
-                                        <i class="ms-2 bi bi-box-arrow-up-right"></i>
-                                    </button>
-                                    <p class="text-body-tertiary small mb-0">Last updated:
-                                        <span class="time-ago">2 days ago</span>
-                                    </p>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-4 project-item">
-                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
-                                <div class="d-flex justify-content-between">
-                                    <div class="project-item-title">
-                                        <h6 class="fw-bold text-body">Project Name</h6>
-                                        <p class="text-body-tertiary small mb-1">Project description</p>
-                                    </div>
-                                    <div class="project-item-icon">
+                                        {{/if}}
+                                        {{#if (is_ts_project language)}}
                                         {{> partials/svg-ts.hbs}}
-                                    </div>
-                                </div>
-                                <div class="project-item-meta">
-                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
-                                        <i class="ms-2 bi bi-box-arrow-up-right"></i>
-                                    </button>
-                                    <p class="text-body-tertiary small mb-0">Last updated:
-                                        <span class="time-ago">2 days ago</span>
-                                    </p>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col-4 project-item">
-                            <a class="border rounded-2 d-block p-3 text-decoration-none" href="#">
-                                <div class="d-flex justify-content-between">
-                                    <div class="project-item-title">
-                                        <h6 class="fw-bold text-body">Project Name</h6>
-                                        <p class="text-body-tertiary small mb-1">Project description</p>
-                                    </div>
-                                    <div class="project-item-icon">
+                                        {{/if}}
+                                        {{#if (is_rust_project language)}}
                                         {{> partials/svg-rust.hbs}}
+                                        {{/if}}
                                     </div>
                                 </div>
                                 <div class="project-item-meta">
-                                    <button class="btn btn-link px-0 text-body-secondary">clear-eagle-69.deno.dev
+                                    <button class="btn btn-link px-0 text-body-secondary"
+                                        href="{{prod_domain_url}}">{{prod_domain_full}}
                                         <i class="ms-2 bi bi-box-arrow-up-right"></i>
                                     </button>
-                                    <p class="text-body-tertiary small mb-0">Last updated:
-                                        <span class="time-ago">2 days ago</span>
+                                    <p class="text-body-tertiary small mb-0">Last
+                                        updated: <span class="time-ago"
+                                            data-x-timeago="{{updated_at}}">{{updated_at}}</span>
                                     </p>
                                 </div>
                             </a>
                         </div>
+                        {{/each}}
                         <div class="col-4 project-item project-item-more">
-                            <a href="#" class="border rounded-2 d-block p-3 text-decoration-none">
+                            <a href="/projects" class="border rounded-2 d-block p-3 text-decoration-none">
                                 View All Projects
                             </a>
                         </div>

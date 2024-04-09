@@ -75,6 +75,10 @@ html[data-bs-theme="dark"] #main-nav {
     color: rgb(var(--bs-primary-rgb)) !important;
 }
 
+#main-nav-user-dropdown .dropdown-menu {
+    width: 200px;
+}
+
 html[data-bs-theme="dark"] #main-nav a.nav-link.active {
     background-color: #01283b !important;
     color: #2e8ef4 !important;
@@ -99,7 +103,8 @@ html[data-bs-theme="dark"] .project-item>a:hover {
 
 .project-item svg.js-svg,
 .project-item svg.ts-svg,
-.project-item svg.rust-svg {
+.project-item svg.rust-svg,
+#project-dashboard .language-icon svg {
     border-radius: 0.25rem;
     width: 42px;
     height: 42px;
@@ -135,4 +140,14 @@ html[data-bs-theme="dark"] .project-item>a:hover {
 
 html[data-bs-theme="dark"] #editor-container-wrapper {
     background-color: #1e1e1e;
+}
+
+#project-codeview .card-body {
+    background-color: #fafafa;
+    border-bottom-left-radius: var(--bs-border-radius);
+    border-bottom-right-radius: var(--bs-border-radius);
+}
+
+html[data-bs-theme="dark"] #project-codeview .card-body {
+    background-color: #282c34;
 }

@@ -1,33 +1,54 @@
-use super::templates::{RenderHtmlMinified, TemplateEngine};
-use crate::server::PageVars;
+use super::{
+    templates::{RenderHtmlMinified, TemplateEngine},
+    ServerError,
+};
+use crate::server::{
+    dashboard::{auth::SessionUser, vars::ProjectVar},
+    PageVars,
+};
 use anyhow::Result;
 use axum::{
     middleware,
     response::IntoResponse,
     routing::{any, get},
-    Router,
+    Extension, Router,
 };
 use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
 use tower_http::services::ServeDir;
+use tracing::info;
 
 mod auth;
 mod projects;
+mod vars;
 
 /// index is a handler for GET /
-pub async fn index(engine: TemplateEngine) -> impl IntoResponse {
+pub async fn index(
+    Extension(user): Extension<SessionUser>,
+    engine: TemplateEngine,
+) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
         page: PageVars,
+        user: SessionUser,
+        projects: Vec<ProjectVar>,
     }
-    // redirect to /overview
-    RenderHtmlMinified(
+
+    // list recent updated projects
+    // the overview page show 5 cards of the recent updated projects
+    let projects_data = land_dao::projects::list_by_user_id(user.id, None, 5).await?;
+    info!("Overview projects: {}", projects_data.len());
+    let projects = ProjectVar::from_models_vec(projects_data).await?;
+
+    Ok(RenderHtmlMinified(
         "index.hbs",
         engine,
         IndexVars {
             page: PageVars::new("Dashboard", "overview"),
+            user,
+            projects,
         },
-    )
+    ))
 }
 
 /// router returns the router for the dashboard
@@ -49,6 +70,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
         .route("/projects", get(projects::index))
+        .route("/projects/:name", get(projects::one))
         .route("/playground/:name", get(projects::show_playground))
         .route("/new", get(projects::new))
         .route("/new/playground/:template", get(projects::new_playground))

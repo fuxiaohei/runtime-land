@@ -4,11 +4,12 @@ use crate::{
     models::{playground, project},
     now_time,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+    QueryOrder, QuerySelect,
 };
 use tracing::info;
 
@@ -111,6 +112,56 @@ async fn create_project_by_playground(
     Ok(project)
 }
 
+/// list_by_user_id lists all projects by user id
+pub async fn list_by_user_id(
+    user_id: i32,
+    search: Option<String>,
+    limit: u64,
+) -> Result<Vec<project::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find()
+        .limit(limit)
+        .filter(project::Column::UserId.eq(user_id))
+        .filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt);
+    if let Some(search) = search {
+        let search = format!("%{}%", search);
+        select = select.filter(project::Column::Name.like(search));
+    }
+    let projects = select.all(db).await.map_err(|e| anyhow::anyhow!(e))?;
+    Ok(projects)
+}
+
+/// get_by_name gets a project by name
+pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<project::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find()
+        .filter(project::Column::Name.eq(name))
+        .filter(project::Column::Status.eq(ProjectStatus::Active.to_string()));
+    if let Some(user_id) = user_id {
+        select = select.filter(project::Column::UserId.eq(user_id));
+    }
+    let project = select.one(db).await?;
+    Ok(project)
+}
+
+/// get_project_by_name_with_playground gets a project by name with playground
+pub async fn get_project_by_name_with_playground(
+    name: String,
+    user_id: i32,
+) -> Result<(project::Model, Option<playground::Model>)> {
+    let p = get_by_name(name, Some(user_id)).await?;
+    if p.is_none() {
+        return Err(anyhow!("Project not found"));
+    }
+    let p = p.unwrap();
+    let mut py: Option<playground::Model> = None;
+    if p.created_by == ProjectCreatedBy::Playground.to_string() {
+        py = get_playground_by_project(user_id, p.id).await?;
+    }
+    Ok((p, py))
+}
+
 pub type PlaygroundStatus = ProjectStatus;
 
 #[derive(strum::Display)]
@@ -149,5 +200,20 @@ async fn create_playground(
     let mut active_model = p.into_active_model();
     active_model.id = Default::default();
     let p = active_model.insert(DB.get().unwrap()).await?;
+    Ok(p)
+}
+
+/// get_playground_by_project gets a playground by project
+pub async fn get_playground_by_project(
+    user_id: i32,
+    project_id: i32,
+) -> Result<Option<playground::Model>> {
+    let db = DB.get().unwrap();
+    let p = playground::Entity::find()
+        .filter(playground::Column::UserId.eq(user_id))
+        .filter(playground::Column::ProjectId.eq(project_id))
+        .filter(playground::Column::Status.eq(PlaygroundStatus::Active.to_string()))
+        .one(db)
+        .await?;
     Ok(p)
 }

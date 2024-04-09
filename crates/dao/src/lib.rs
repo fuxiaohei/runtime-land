@@ -1,9 +1,9 @@
 pub mod db;
+pub mod deploy;
 pub mod models;
 pub mod projects;
 pub mod settings;
 pub mod user;
-pub mod deploy;
 
 mod migration;
 

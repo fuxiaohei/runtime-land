@@ -7,6 +7,15 @@
     <div class="flex-column mb-auto pt-3">
         <div class="projects-nav px-3">
             <nav class="nav flex-column">
+                <p class="text-uppercase small text-body-tertiary pb-1 mb-0">Project</p>
+                <a class="nav-link rounded-2 mt-1 {{is_nav_active 'project-dashboard' page.nav}}"
+                    href="/projects/{{project.name}}"><i class="bi bi-clipboard-data me-2"></i>Dashboard</a>
+                <a class="nav-link rounded-2 mt-1 {{is_nav_active 'project-traffic' page.nav}}"
+                    href="/projects/{{project.name}}/traffic"><i class="bi bi-kanban me-2"></i>Traffic</a>
+                <a class="nav-link rounded-2 mt-1 {{is_nav_active 'project-settings' page.nav}}"
+                    href="/projects/{{project.name}}/settings"><i class="bi bi-kanban me-2"></i>Settings</a>
+            </nav>
+            <nav class="nav flex-column mt-3">
                 <p class="text-uppercase small text-body-tertiary pb-1 mb-0">Account</p>
                 <a class="nav-link rounded-2 mt-1 {{is_nav_active 'overview' page.nav}}" href="/"><i
                         class="bi bi-clipboard-data me-2"></i>Overview</a>

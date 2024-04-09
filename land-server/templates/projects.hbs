@@ -32,43 +32,38 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {{#each projects}}
                             <tr class="all-projects-item">
-                                <td class="lang" scope="row">{{> partials/svg-js.hbs}}</td>
+                                <td class="lang" scope="row">
+                                    {{#if (is_js_project language)}}
+                                    {{> partials/svg-js.hbs}}
+                                    {{/if}}
+                                    {{#if (is_ts_project language)}}
+                                    {{> partials/svg-ts.hbs}}
+                                    {{/if}}
+                                    {{#if (is_rust_project language)}}
+                                    {{> partials/svg-rust.hbs}}
+                                    {{/if}}
+                                </td>
                                 <td class="title">
-                                    <h6 class="fw-bold mb-1"><a href="#" class="text-body text-decoration-none">Project
-                                            name</a></h6>
-                                    <p class="mb-0 text-body-tertiary small">Project description</p>
+                                    <h6 class="fw-bold mb-1"><a href="/projects/{{name}}"
+                                            class="text-body text-decoration-none">{{name}}</a></h6>
+                                    <p class="mb-0 text-body-tertiary small">{{description}}</p>
                                 </td>
                                 <td class="url">
-                                    <a class="text-body-secondary" href="#">aws-0-ap-southeast-1.pooler.supabase.com</a>
+                                    <a class="text-body-secondary" href="{{prod_domain_url}}"
+                                        target="_blank">{{prod_domain_full}}</a>
                                 </td>
                                 <td class="traffic">
                                     <span class="total-requests border-end pe-2 me-2">14342</span>
                                     <span class="total-bandwidth">284.94 MiB</span>
                                 </td>
                                 <td class="updated">
-                                    <span class="time-ago text-body-tertiary small">14 Days ago</span>
+                                    <span class="time-ago text-body-tertiary small"
+                                        data-x-timeago="{{updated_at}}">{{updated_at}}</span>
                                 </td>
                             </tr>
-                            <tr class="all-projects-item">
-                                <td class="lang" scope="row">{{> partials/svg-ts.hbs}}</td>
-                                <td class="title">
-                                    <h6 class="fw-bold mb-1"><a href="#" class="text-body text-decoration-none">Project
-                                            name</a></h6>
-                                    <p class="mb-0 text-body-tertiary small">Project description</p>
-                                </td>
-                                <td class="url">
-                                    <a class="text-body-secondary"
-                                        href="#">ep-dry-cake-a1nuqvik-pooler.ap-southeast-1.aws.neon.tech</a>
-                                </td>
-                                <td class="traffic">
-                                    <span class="total-requests border-end pe-2 me-2">12.84 K</span>
-                                    <span class="total-bandwidth">81.94 GiB</span>
-                                </td>
-                                <td class="updated">
-                                    <span class="time-ago text-body-tertiary small">14 Days ago</span>
-                                </td>
-                            </tr>
+                            {{/each}}
                         </tbody>
                     </table>
                 </div>
