@@ -125,8 +125,8 @@ pub async fn show_playground(
     ))
 }
 
-/// one is a handler for GET /projects/:name
-pub async fn one(
+/// single is a handler for GET /projects/:name
+pub async fn single(
     Extension(user): Extension<SessionUser>,
     engine: TemplateEngine,
     Path(name): Path<String>,
@@ -142,10 +142,43 @@ pub async fn one(
 
     let title = format!("{} - Project", project.name);
     Ok(RenderHtmlMinified(
-        "project.hbs",
+        "project-single.hbs",
         engine,
         IndexVars {
             page: PageVars::new(&title, "project-dashboard"),
+            user,
+            project,
+        },
+    ))
+}
+
+// settings is a handler for GET /projects/:name/settings
+pub async fn settings(
+    Extension(user): Extension<SessionUser>,
+    engine: TemplateEngine,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(serde::Serialize)]
+    struct IndexVars {
+        page: PageVars,
+        user: SessionUser,
+        project: ProjectVar,
+    }
+    let p = land_dao::projects::get_by_name(name, Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let p = p.unwrap();
+    let project = ProjectVar::new(&p, None).await?;
+    let title = format!("{} - Settings", project.name);
+    Ok(RenderHtmlMinified(
+        "project-settings.hbs",
+        engine,
+        IndexVars {
+            page: PageVars::new(&title, "project-settings"),
             user,
             project,
         },

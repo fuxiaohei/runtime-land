@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/nav-project-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="project-dashboard" class="pt-3 px-3 container d-flex justify-content-between">
+                    <div class="meta d-flex justify-content-start">
+                        <div class="language-icon me-3">
+                            {{> partials/svg-js.hbs}}
+                        </div>
+                        <div>
+                            <h5>{{project.name}}</h5>
+                            <p class="text-body-tertiary mb-2">{{project.description}}</p>
+                        </div>
+                    </div>
+                    <div class="btns">
+                        <a href="{{project.prod_domain_url}}" target="_blank" class="btn btn-primary"><i
+                                class="bi bi-link-45deg me-2"></i>View</a>
+                        <a href="/playground/{{project.name}}" class="btn btn-danger ms-3"><i
+                                class="bi bi-pencil-square me-2"></i>Edit</a>
+                    </div>
+                </div>
+                <form method="post" action="/projects/{{project.name}}/settings" id="project-settings-name-form"
+                    class="mt-3 border-top pt-3 px-3 container">
+                    <div class="mb-3">
+                        <label for="project-name-input" class="form-label">Project Name</label>
+                        <div class="input-group">
+                            <input name="name" type="text" class="form-control" value="{{project.name}}"
+                                id="project-name-input">
+                            <span class="input-group-text">.127-0-0-1.nip.io</span>
+                        </div>
+                        <div class="form-text">The name of the project.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="project-desc-input" class="form-label">Project Description</label>
+                        <input name="description" type="text" class="form-control" id="project-desc-input"
+                            value="{{project.description}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

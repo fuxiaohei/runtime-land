@@ -151,3 +151,8 @@ html[data-bs-theme="dark"] #editor-container-wrapper {
 html[data-bs-theme="dark"] #project-codeview .card-body {
     background-color: #282c34;
 }
+
+#project-name-input {
+    width: 400px;
+    flex: none;
+}
