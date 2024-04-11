@@ -5,9 +5,12 @@ use crate::server::{
     templates::{RenderHtmlMinified, TemplateEngine},
     PageVars, ServerError,
 };
+use axum::Form;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
+use axum_csrf::CsrfToken;
 use base64::{engine::general_purpose, Engine};
 use land_dao::projects::Language;
+use serde::Deserialize;
 use tracing::info;
 
 /// index is a handler for GET /projects
@@ -140,7 +143,7 @@ pub async fn single(
     let (p, py) = land_dao::projects::get_project_by_name_with_playground(name, user.id).await?;
     let project = ProjectVar::new(&p, py.as_ref()).await?;
 
-    let title = format!("{} - Project", project.name);
+    let title = format!("Project - {}", project.name);
     Ok(RenderHtmlMinified(
         "project-single.hbs",
         engine,
@@ -154,6 +157,111 @@ pub async fn single(
 
 // settings is a handler for GET /projects/:name/settings
 pub async fn settings(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    engine: TemplateEngine,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(serde::Serialize)]
+    struct IndexVars {
+        page: PageVars,
+        user: SessionUser,
+        project: ProjectVar,
+        csrf: String,
+    }
+    let csrf = csrf_layer.authenticity_token()?;
+    let p = land_dao::projects::get_by_name(name, Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let p = p.unwrap();
+    let project = ProjectVar::new(&p, None).await?;
+    let title = format!("Settings - {}", project.name);
+    Ok((
+        csrf_layer,
+        RenderHtmlMinified(
+            "project-settings.hbs",
+            engine,
+            IndexVars {
+                page: PageVars::new(&title, "project-settings"),
+                user,
+                project,
+                csrf,
+            },
+        )
+        .into_response(),
+    ))
+}
+
+#[derive(Deserialize)]
+pub struct UpdateNameForm {
+    pub name: String,
+    pub desc: String,
+    pub csrf: String,
+}
+
+/// update_name is a handler for POST /projects/:name/settings
+pub async fn update_name(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    Path(name): Path<String>,
+    Form(form): Form<UpdateNameForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    csrf_layer.verify(&form.csrf)?;
+    let redirect_url = format!("/projects/{}/settings", form.name);
+    // check if the project exists
+    let p = land_dao::projects::get_by_name(name.clone(), Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    info!("Project rename, from: {}, to: {}", name, form.name);
+    land_dao::projects::update_name(p.unwrap().id, form.name, form.desc).await?;
+    Ok(redirect_response(&redirect_url))
+}
+
+#[derive(Deserialize)]
+pub struct DeleteForm {
+    pub name: String,
+    pub csrf: String,
+}
+
+/// delete is a handler for DELETE /projects/:name
+pub async fn delete(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    Path(name): Path<String>,
+    Form(form): Form<DeleteForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    csrf_layer.verify(&form.csrf)?;
+    let redirect_url = "/projects";
+    // check if the project exists
+    let p = land_dao::projects::get_by_name(name.clone(), Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let p = p.unwrap();
+    if p.name != form.name {
+        return Err(ServerError::status_code(
+            StatusCode::BAD_REQUEST,
+            "Project name mismatch",
+        ));
+    }
+    info!("Project delete: {}", name);
+    land_dao::projects::delete(p.id, name).await?;
+    Ok(redirect_response(redirect_url))
+}
+
+// traffic is a handler for GET /projects/:name/traffic
+pub async fn traffic(
     Extension(user): Extension<SessionUser>,
     engine: TemplateEngine,
     Path(name): Path<String>,
@@ -173,12 +281,12 @@ pub async fn settings(
     }
     let p = p.unwrap();
     let project = ProjectVar::new(&p, None).await?;
-    let title = format!("{} - Settings", project.name);
+    let title = format!("Traffic - {}", project.name);
     Ok(RenderHtmlMinified(
-        "project-settings.hbs",
+        "project-traffic.hbs",
         engine,
         IndexVars {
-            page: PageVars::new(&title, "project-settings"),
+            page: PageVars::new(&title, "project-traffic"),
             user,
             project,
         },

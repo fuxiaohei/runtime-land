@@ -153,6 +153,6 @@ html[data-bs-theme="dark"] #project-codeview .card-body {
 }
 
 #project-name-input {
-    width: 400px;
+    width: 240px;
     flex: none;
 }

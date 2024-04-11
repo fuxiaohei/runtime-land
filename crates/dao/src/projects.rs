@@ -7,6 +7,7 @@ use crate::{
 use anyhow::{anyhow, Result};
 use rand::Rng;
 use random_word::Lang;
+use sea_orm::sea_query::Expr;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
     QueryOrder, QuerySelect,
@@ -143,6 +144,36 @@ pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<pr
     }
     let project = select.one(db).await?;
     Ok(project)
+}
+
+/// delete deletes a project
+pub async fn delete(id: i32, name: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    let now_timestamp = now_time().and_utc().timestamp();
+    let rename = format!("{}_deleted_{}", name, now_timestamp);
+    project::Entity::update_many()
+        .col_expr(
+            project::Column::Status,
+            Expr::value(ProjectStatus::Deleted.to_string()),
+        )
+        .col_expr(project::Column::Name, Expr::value(rename))
+        .filter(project::Column::Id.eq(id))
+        .exec(db)
+        .await?;
+    Ok(())
+}
+
+/// update_name updates a project name
+pub async fn update_name(id: i32, name: String, desc: String) -> Result<()> {
+    let db = DB.get().unwrap();
+    project::Entity::update_many()
+        .col_expr(project::Column::Name, Expr::value(name.clone()))
+        .col_expr(project::Column::ProdDomain, Expr::value(name))
+        .col_expr(project::Column::Description, Expr::value(desc))
+        .filter(project::Column::Id.eq(id))
+        .exec(db)
+        .await?;
+    Ok(())
 }
 
 /// get_project_by_name_with_playground gets a project by name with playground

@@ -7,6 +7,7 @@ use crate::server::{
     PageVars,
 };
 use anyhow::Result;
+use axum::routing::post;
 use axum::{
     middleware,
     response::IntoResponse,
@@ -64,14 +65,22 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     // set csrf config
     let config = CsrfConfig::default();
 
+    let projects_router = Router::new()
+        .route("/", get(projects::index))
+        .route("/:name", get(projects::single))
+        .route(
+            "/:name/settings",
+            get(projects::settings).post(projects::update_name),
+        )
+        .route("/:name/settings/delete", post(projects::delete))
+        .route("/:name/traffic", get(projects::traffic));
+
     let app = Router::new()
         .route("/", any(index))
         .route("/sign-in", get(auth::sign_in))
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
-        .route("/projects", get(projects::index))
-        .route("/projects/:name", get(projects::single))
-        .route("/projects/:name/settings", get(projects::settings))
+        .nest("/projects", projects_router)
         .route("/playground/:name", get(projects::show_playground))
         .route("/new", get(projects::new))
         .route("/new/playground/:template", get(projects::new_playground))

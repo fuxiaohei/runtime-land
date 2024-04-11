@@ -11,42 +11,61 @@
         <div id="main-body" class="w-100">
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
-                <div id="project-dashboard" class="pt-3 px-3 container d-flex justify-content-between">
-                    <div class="meta d-flex justify-content-start">
-                        <div class="language-icon me-3">
-                            {{> partials/svg-js.hbs}}
-                        </div>
-                        <div>
-                            <h5>{{project.name}}</h5>
-                            <p class="text-body-tertiary mb-2">{{project.description}}</p>
-                        </div>
-                    </div>
-                    <div class="btns">
-                        <a href="{{project.prod_domain_url}}" target="_blank" class="btn btn-primary"><i
-                                class="bi bi-link-45deg me-2"></i>View</a>
-                        <a href="/playground/{{project.name}}" class="btn btn-danger ms-3"><i
-                                class="bi bi-pencil-square me-2"></i>Edit</a>
-                    </div>
-                </div>
+                {{> partials/project-nav.hbs}}
                 <form method="post" action="/projects/{{project.name}}/settings" id="project-settings-name-form"
                     class="mt-3 border-top pt-3 px-3 container">
                     <div class="mb-3">
                         <label for="project-name-input" class="form-label">Project Name</label>
                         <div class="input-group">
                             <input name="name" type="text" class="form-control" value="{{project.name}}"
-                                id="project-name-input">
+                                id="project-name-input" required>
                             <span class="input-group-text">.127-0-0-1.nip.io</span>
                         </div>
                         <div class="form-text">The name of the project.</div>
                     </div>
                     <div class="mb-3">
                         <label for="project-desc-input" class="form-label">Project Description</label>
-                        <input name="description" type="text" class="form-control" id="project-desc-input"
-                            value="{{project.description}}">
+                        <input name="desc" type="text" class="form-control" id="project-desc-input"
+                            value="{{project.description}}" required>
+                        <input type="hidden" name="csrf" value="{{csrf}}">
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
-
+                <div class="mt-3 border-top pt-3 px-3 container">
+                    <div class="mb-3">
+                        <label for="project-delete-input" class="form-label text-danger">Delete Project</label>
+                        <p class="text-body-secondary">
+                            Deleting a project will permanently remove all of its data and cannot be undone.
+                        </p>
+                        <button class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteProjectModal">Delete
+                            Project</button>
+                        <div class="modal fade" id="deleteProjectModal" tabindex="-1"
+                            aria-labelledby="deleteProjectModal" aria-hidden="true">
+                            <form action="/projects/{{project.name}}/settings/delete" method="post">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Delete Project</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Type in the project name <strong>{{project.name}}</strong> to confirm.
+                                            </p>
+                                            <input name="name" type="text" class="form-control"
+                                                id="project-delete-input" required>
+                                            <input type="hidden" name="csrf" value="{{csrf}}">
+                                            <button type="submit" class="btn btn-danger mt-3"
+                                                id="deleteProjectBtn">Delete
+                                                Project</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 {{> partials/nav-footer.hbs}}
             </div>
     </main>
