@@ -1,9 +1,15 @@
 use axum::{
-    body::Body, http::StatusCode, response::{IntoResponse, Response}, Router
+    body::Body,
+    extract::Request,
+    http::StatusCode,
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
+    Router,
 };
+use http::HeaderValue;
 use serde::Serialize;
 use std::net::SocketAddr;
-use tracing::info;
+use tracing::{info, instrument, warn};
 
 mod dashboard;
 mod templates;
@@ -11,7 +17,9 @@ mod templates;
 /// start the server
 pub async fn start(addr: SocketAddr, assets_dir: &str) -> anyhow::Result<()> {
     let dashboard_router = dashboard::router(assets_dir)?;
-    let app = Router::new().merge(dashboard_router);
+    let app = Router::new()
+        .merge(dashboard_router)
+        .route_layer(middleware::from_fn(log_middleware));
 
     info!("Starting server on {}", addr);
     // run it
@@ -84,4 +92,59 @@ impl PageVars {
             nav: nav.to_string(),
         }
     }
+}
+
+#[instrument("[HTTP]", skip_all)]
+async fn log_middleware(request: Request, next: Next) -> Result<Response, StatusCode> {
+    let uri = request.uri().clone();
+    let path = uri.path();
+    if path.starts_with("/static") {
+        // ignore static assets log
+        return Ok(next.run(request).await);
+    }
+    if path.starts_with("/api/worker/v1/deploys") {
+        // high sequence url
+        return Ok(next.run(request).await);
+    }
+
+    let method = request.method().clone().to_string();
+    let st = tokio::time::Instant::now();
+    let resp = next.run(request).await;
+    let server_err = resp.extensions().get::<ServerError>();
+    let status = resp.status().as_u16();
+    let elasped = st.elapsed().as_millis();
+    if let Some(err) = server_err {
+        warn!(
+            method = method,
+            path = path,
+            status = status,
+            elasped = elasped,
+            "Failed: {}",
+            err.1
+        );
+    } else {
+        let empty_header = HeaderValue::from_str("").unwrap();
+        let content_type = resp
+            .headers()
+            .get("content-type")
+            .unwrap_or(&empty_header)
+            .to_str()
+            .unwrap();
+        let content_size = resp
+            .headers()
+            .get("content-length")
+            .unwrap_or(&empty_header)
+            .to_str()
+            .unwrap();
+        info!(
+            method = method,
+            path = path,
+            status = status,
+            cost = elasped,
+            typ = content_type,
+            size = content_size,
+            "Ok",
+        );
+    }
+    Ok(resp)
 }

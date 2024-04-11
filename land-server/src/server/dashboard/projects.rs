@@ -41,16 +41,21 @@ pub async fn index(
 }
 
 /// new is a handler for GET /new
-pub async fn new(engine: TemplateEngine) -> impl IntoResponse {
+pub async fn new(
+    Extension(user): Extension<SessionUser>,
+    engine: TemplateEngine,
+) -> impl IntoResponse {
     #[derive(serde::Serialize)]
     struct IndexVars {
         page: PageVars,
+        user: SessionUser,
     }
     RenderHtmlMinified(
         "project-new.hbs",
         engine,
         IndexVars {
             page: PageVars::new("Create a Project", "projects"),
+            user,
         },
     )
 }

@@ -6,22 +6,22 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+async-trait = { workspace = true }
+bcrypt = "0.15.1"
+chrono = { workspace = true }
 clap = { workspace = true }
+lazy_static = { workspace = true }
 once_cell = { workspace = true }
+rand = { workspace = true }
+random_word = { version = "0.4.3", features = ["en"] }
 sea-orm = { version = "0.12.15", features = [
     "runtime-tokio-rustls",
     "sqlx-postgres",
 ] }
 sea-orm-migration = "0.12.15"
-tracing = { workspace = true }
-async-trait = { workspace = true }
-chrono = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 strum = { version = "0.26.2", features = ["derive"] }
-bcrypt = "0.15.1"
-rand = { workspace = true }
-uuid = { workspace = true }
-lazy_static = { workspace = true }
 tokio = { workspace = true }
-random_word = { version = "0.4.3", features = ["en"] }
+tracing = { workspace = true }
+uuid = { workspace = true }

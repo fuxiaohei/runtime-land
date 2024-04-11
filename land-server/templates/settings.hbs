@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/nav-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="settings-header" class="pt-3 px-3 container">
+                    <h5>Account Settings</h5>
+                    <div class="d-flex justify-content-start mt-3">
+                        <img width="100" height="100" src="{{user.gravatar}}" class="rounded-2" alt="user-gravatar">
+                        <div class="ms-3">
+                            <h5 class="fw-bold">{{user.name}}</h5>
+                            <p class="mb-1 text-body-secondary">{{user.email}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="user-tokens-setting" class="pt-3 px-3 container mt-3 border-top">
+                    <div>
+                        <h5>Access Tokens</h5>
+                        <p class="text-body-tertiary mb-1">Access tokens are used to authenticate with the API.</p>
+                    </div>
+                    <div class="card shadow-none mt-3">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush shadow-none">
+                                <li
+                                    class="list-group-item py-3 token-list-item d-flex align-items-center justify-content-between">
+                                    <div class="token-meta">
+                                        <p class="mb-0"><span><i class="bi bi-key me-2"></i>
+                                                <strong>cli-test-01</strong>
+                                            </span>
+                                            <span class="text-body-secondary ms-2"><small>Use at <span
+                                                        data-x-timeago="2024-03-10T02:43:47.654984Z">1 month
+                                                        ago</span></small></span>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-danger btn-sm token-del-btn"
+                                            data-bs-toggle="modal" data-bs-target="#delete-token-3-modal">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <div class="modal fade" id="delete-token-3-modal" tabindex="-1"
+                                            aria-labelledby="create-token-modal" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5">Delete token</h1>
+                                                    </div>
+                                                    <form method="post" action="/settings/delete-token">
+                                                        <div class="modal-body text-start">
+                                                            <p class="text-body-tertiary">Enter the token's name
+                                                                <strong>cli-test-01</strong>
+                                                            </p>
+                                                            <input class="form-control" type="text" name="name"
+                                                                placeholder="The name of the token" required="">
+                                                            <input type="hidden" name="csrf"
+                                                                value="36Nm71nqpLZb4pMFwR9Aak6FufjkS+nMdozxAxqaJ10=">
+                                                            <input type="hidden" name="id" value="3">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item text-end pt-3">
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#create-token-modal"><i class="bi bi-plus me-2"></i>Create New
+                                        Token</button>
+                                    <div class="modal fade" id="create-token-modal" tabindex="-1"
+                                        aria-labelledby="create-token-modal" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5">Create new token</h1>
+                                                </div>
+                                                <form method="post" action="/settings/create-token">
+                                                    <div class="modal-body text-start">
+                                                        <p class="text-body-tertiary">Enter the description of the new
+                                                            access token.</p>
+                                                        <input class="form-control" type="text" name="name"
+                                                            placeholder="What is this token for?" required>
+                                                        <input type="hidden" name="csrf" value="{{csrf}}">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Create</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="user-disable-settings" class="pt-3 px-3 container mt-3 border-top">
+                    <div>
+                        <h5>Disable Account</h5>
+                        <p class="text-danger">Disabling your account will remove all your data and cannot be
+                            undone.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#disableAccountModal">Disable
+                            Account</button>
+                        <div class="modal fade" id="disableAccountModal" tabindex="-1"
+                            aria-labelledby="disableAccountModal" aria-hidden="true">
+                            <form action="/settings/disable-account" method="post">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Disable Account</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="disableAccountModalBody">
+                                            <div class="alert alert-danger">
+                                                <p><i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                    <strong>Warning!</strong>
+                                                </p>
+                                                <p>Disabling your account will remove all your data and the action
+                                                    cannot
+                                                    be recovered.</p>
+                                            </div>
+                                            <p>Type in your email to confirm.</p>
+                                            <input name="email" type="email" class="form-control" required>
+                                            <input type="hidden" name="csrf" value="{{csrf}}">
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-danger mt-3">Disable
+                                                    Account</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

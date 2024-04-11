@@ -21,6 +21,7 @@ use tracing::info;
 
 mod auth;
 mod projects;
+mod settings;
 mod vars;
 
 /// index is a handler for GET /
@@ -75,12 +76,17 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/:name/settings/delete", post(projects::delete))
         .route("/:name/traffic", get(projects::traffic));
 
+    let settings_router = Router::new()
+        .route("/", get(settings::index))
+        .route("/create-token", post(settings::create_token));
+
     let app = Router::new()
         .route("/", any(index))
         .route("/sign-in", get(auth::sign_in))
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
         .nest("/projects", projects_router)
+        .nest("/settings", settings_router)
         .route("/playground/:name", get(projects::show_playground))
         .route("/new", get(projects::new))
         .route("/new/playground/:template", get(projects::new_playground))
