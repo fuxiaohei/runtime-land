@@ -6,7 +6,7 @@ use crate::{
 use anyhow::Result;
 use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::ops::Add;
@@ -40,6 +40,17 @@ pub async fn get_token_by_value(
         select = select.filter(user_token::Column::Usage.eq(u.to_string()));
     }
     let token = select.one(db).await.map_err(|e| anyhow::anyhow!(e))?;
+    Ok(token)
+}
+
+/// get_token_by_id gets an active token by id
+pub async fn get_token_by_id(id: i32) -> Result<Option<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find_by_id(id)
+        .filter(user_token::Column::Status.eq(TokenStatus::Active.to_string()))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
     Ok(token)
 }
 
@@ -127,6 +138,26 @@ pub async fn is_new_token(id: i32) -> bool {
 pub async fn unset_new_token(id: i32) {
     let mut creating_map = CREATED_TOKENS.lock().await;
     creating_map.remove(&id);
+}
+
+/// list_tokens_by_user gets all tokens by user
+pub async fn list_tokens_by_user(
+    user_id: i32,
+    usage: Option<TokenUsage>,
+) -> Result<Vec<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = user_token::Entity::find()
+        .filter(user_token::Column::UserId.eq(user_id))
+        .filter(user_token::Column::Status.eq(TokenStatus::Active.to_string()));
+    if let Some(u) = usage {
+        select = select.filter(user_token::Column::Usage.eq(u.to_string()));
+    }
+    let tokens = select
+        .order_by_desc(user_token::Column::UpdatedAt)
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(tokens)
 }
 
 /// remove_token deletes a token

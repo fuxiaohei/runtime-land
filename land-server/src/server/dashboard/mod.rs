@@ -78,7 +78,8 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 
     let settings_router = Router::new()
         .route("/", get(settings::index))
-        .route("/create-token", post(settings::create_token));
+        .route("/create-token", post(settings::create_token))
+        .route("/delete-token", post(settings::delete_token));
 
     let app = Router::new()
         .route("/", any(index))
