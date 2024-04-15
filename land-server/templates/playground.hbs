@@ -12,12 +12,20 @@
                 <div class="d-flex justify-content-between border-bottom align-items-center py-2">
                     <div class="left d-flex justify-content-start">
                         <div class="language-icon mx-3">
+                            {{#if (is_js_project project.language)}}
                             {{> partials/svg-js.hbs}}
+                            {{/if}}
+                            {{#if (is_ts_project project.language)}}
+                            {{> partials/svg-ts.hbs}}
+                            {{/if}}
+                            {{#if (is_rust_project project.language)}}
+                            {{> partials/svg-rust.hbs}}
+                            {{/if}}
                         </div>
                         <div class="title">
-                            <h6 class="py-1 mb-0"><a href="#" class="text-body fw-bold">dif-candy-87</a></h6>
+                            <h6 class="py-1 mb-0"><a href="/projects/{{project.name}}" class="text-body fw-bold">{{project.name}}</a></h6>
                             <p class="text-body-tertiary mb-0 small">Updated as <span
-                                    data-x-timeago="2024-04-01T12:09:15.266647Z">2024-04-01T12:09:15.266647Z</span>
+                                    data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span>
                             </p>
                         </div>
                     </div>
@@ -41,7 +49,7 @@
                     <span role="status">Loading...</span>
                 </div>
                 <div id="editor-container-wrapper" class="d-none p-2">
-                    <div id="editor-container" style="height: calc(100vh - 17.5rem)" data-x-name="dif-candy-87">
+                    <div id="editor-container" style="height: calc(100vh - 17.5rem)" data-x-name="{{project.name}}">
                         <!-- 4.5rem + 11rem + 2rem -->
                     </div>
                 </div>
@@ -71,11 +79,8 @@
             </div>
         </div>
     </div>
-    <pre class="d-none"><code id="code">export default {
-    async fetch(request) {
-        return new Response(&#x60;Hello, Runtime.land JS SDK abcdef&#x60;);
-    }
-}</code></pre>
+    <pre class="d-none"><code id="code">{{project.source}}</code></pre>
+    <input type="hidden" name="csrf" value="{{csrf}}" id="csrf-value">
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="msg-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -146,12 +151,14 @@
                 btn.addEventListener("click", async function (e) {
                     let data = new URLSearchParams();
                     data.append("source", editor.getValue());
+                    let csrf = document.getElementById("csrf-value").value;
+                    data.append("csrf", csrf);
                     let response = await fetch(projectSaveUrl, {
                         method: "POST",
                         body: data
                     });
                     if (response.ok) {
-                        setWaiting();
+                        // setWaiting();
                     } else {
                         alert("Failed to save!");
                     }

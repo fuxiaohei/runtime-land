@@ -88,7 +88,10 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-out", get(auth::sign_out))
         .nest("/projects", projects_router)
         .nest("/settings", settings_router)
-        .route("/playground/:name", get(projects::show_playground))
+        .route(
+            "/playground/:name",
+            get(projects::show_playground).post(projects::save_playground),
+        )
         .route("/new", get(projects::new))
         .route("/new/playground/:template", get(projects::new_playground))
         .nest_service("/static", ServeDir::new(static_assets_dir))

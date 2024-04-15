@@ -6,7 +6,9 @@ use crate::{
 use anyhow::Result;
 use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
+use sea_orm::{
+    sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder,
+};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::ops::Add;
@@ -180,7 +182,7 @@ pub async fn remove_session_token(value: &str) -> Result<()> {
 #[strum(serialize_all = "lowercase")]
 pub enum UserStatus {
     Active,
-    SelfDeleted,
+    Disabled,
 }
 
 #[derive(strum::Display)]
@@ -263,4 +265,20 @@ pub async fn create_user(
     user_active_model.id = Default::default();
     let user_model = user_active_model.insert(DB.get().unwrap()).await?;
     Ok(user_model)
+}
+
+/// disable_user disables a user
+pub async fn disable_user(user_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    let now = now_time();
+    user_info::Entity::update_many()
+        .col_expr(
+            user_info::Column::Status,
+            Expr::value(UserStatus::Disabled.to_string()),
+        )
+        .col_expr(user_info::Column::UpdatedAt, Expr::value(now))
+        .filter(user_info::Column::Id.eq(user_id))
+        .exec(db)
+        .await?;
+    Ok(())
 }

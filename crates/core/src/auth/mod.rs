@@ -14,11 +14,15 @@ pub async fn verify_session(session_value: &str) -> Result<UserModel> {
         return Err(anyhow!("Session not found"));
     }
     let token = token.unwrap();
-    let user = user::get_info_by_id(token.user_id, Some(UserStatus::Active)).await?;
+    let user = user::get_info_by_id(token.user_id, None).await?;
     if user.is_none() {
         return Err(anyhow!("User not found"));
     }
-    Ok(user.unwrap())
+    let user = user.unwrap();
+    if user.status == UserStatus::Disabled.to_string() {
+        return Err(anyhow!("User is disabled"));
+    }
+    Ok(user)
 }
 
 /// verify_clerk_and_create_token verifies clerk session and creates a new token

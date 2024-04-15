@@ -12,6 +12,7 @@ use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
     QueryOrder, QuerySelect,
 };
+use std::str::FromStr;
 use tracing::info;
 
 #[derive(strum::Display, strum::EnumString, Clone)]
@@ -244,7 +245,37 @@ pub async fn get_playground_by_project(
         .filter(playground::Column::UserId.eq(user_id))
         .filter(playground::Column::ProjectId.eq(project_id))
         .filter(playground::Column::Status.eq(PlaygroundStatus::Active.to_string()))
+        .order_by_desc(playground::Column::Id)
         .one(db)
         .await?;
     Ok(p)
+}
+
+/// update_playground updates a playground
+pub async fn update_playground(
+    project_id: i32,
+    user_id: i32,
+    source: String,
+    old_playground: &playground::Model,
+) -> Result<()> {
+    // create new playground record
+    let _ = create_playground(
+        user_id,
+        project_id,
+        Language::from_str(&old_playground.language)?,
+        source,
+        old_playground.visiblity == PlaygroundVisibility::Public.to_string(),
+    )
+    .await?;
+    // set old one as deleted
+    let db = DB.get().unwrap();
+    playground::Entity::update_many()
+        .col_expr(
+            playground::Column::Status,
+            Expr::value(PlaygroundStatus::Deleted.to_string()),
+        )
+        .filter(playground::Column::Id.eq(old_playground.id))
+        .exec(db)
+        .await?;
+    Ok(())
 }

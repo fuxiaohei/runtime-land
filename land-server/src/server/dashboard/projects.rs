@@ -116,21 +116,61 @@ impl TemplateVar {
 
 /// show_playground is a handler for GET /playground/:name
 pub async fn show_playground(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
     engine: TemplateEngine,
-    Path(_name): Path<String>,
+    Path(name): Path<String>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
         page: PageVars,
+        user: SessionUser,
+        project: ProjectVar,
+        csrf: String,
     }
-    // redirect to /overview
-    Ok(RenderHtmlMinified(
-        "playground.hbs",
-        engine,
-        IndexVars {
-            page: PageVars::new("Playground", "playground"),
-        },
-    ))
+    let csrf = csrf_layer.authenticity_token()?;
+    let (p, py) = land_dao::projects::get_project_by_name_with_playground(name, user.id).await?;
+    let project = ProjectVar::new(&p, py.as_ref()).await?;
+    let title = format!("Playground - {}", project.name);
+    Ok((
+        csrf_layer,
+        RenderHtmlMinified(
+            "playground.hbs",
+            engine,
+            IndexVars {
+                page: PageVars::new(&title, "playground"),
+                user,
+                project,
+                csrf,
+            },
+        ),
+    )
+        .into_response())
+}
+
+#[derive(Deserialize)]
+pub struct PlaygroundForm {
+    pub source: String,
+    pub csrf: String,
+}
+
+/// save_playground is a handler for POST /playground/:name
+pub async fn save_playground(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    Path(name): Path<String>,
+    Form(form): Form<PlaygroundForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    csrf_layer.verify(&form.csrf)?;
+    let (p, py) = land_dao::projects::get_project_by_name_with_playground(name, user.id).await?;
+    if py.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Playground not found",
+        ));
+    }
+    land_dao::projects::update_playground(p.id, user.id, form.source, &py.unwrap()).await?;
+    Ok(StatusCode::OK)
 }
 
 /// single is a handler for GET /projects/:name
