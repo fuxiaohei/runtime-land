@@ -3,6 +3,10 @@ members = [
     "crates/common",
     "crates/core",
     "crates/dao",
+    "crates/sdk",
+    "crates/sdk-macro",
+    "crates/wasm",
+    "crates/wasm-gen",
     "land-cli",
     "land-server",
     "land-worker",
@@ -19,6 +23,8 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 land-common = { path = "./crates/common" }
 land-core = { path = "./crates/core" }
 land-dao = { path = "./crates/dao" }
+land-wasm-gen = { path = "./crates/wasm-gen" }
+land-wasm = { path = "./crates/wasm" }
 lazy_static = "1.4.0"
 time = { version = "0.3.36", features = ["local-offset"] }
 tracing = "0.1.40"
@@ -55,3 +61,7 @@ base64 = "0.22.0"
 rand = "0.8.5"
 uuid = { version = "1.8.0", features = ["v4"] }
 http = "1.1.0"
+wit-bindgen = "0.24.0"
+wit-bindgen-core = "0.24.0"
+wit-bindgen-rust = "0.24.0"
+wit-component = "0.203.0"
