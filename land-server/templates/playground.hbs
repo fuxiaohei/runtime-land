@@ -23,7 +23,8 @@
                             {{/if}}
                         </div>
                         <div class="title">
-                            <h6 class="py-1 mb-0"><a href="/projects/{{project.name}}" class="text-body fw-bold">{{project.name}}</a></h6>
+                            <h6 class="py-1 mb-0"><a href="/projects/{{project.name}}"
+                                    class="text-body fw-bold">{{project.name}}</a></h6>
                             <p class="text-body-tertiary mb-0 small">Updated as <span
                                     data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span>
                             </p>
@@ -80,8 +81,7 @@
         </div>
     </div>
     <pre class="d-none"><code id="code">{{project.source}}</code></pre>
-    <input type="hidden" name="csrf" value="{{csrf}}" id="csrf-value">
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
         <div id="msg-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <strong class="me-auto text-danger">Deploy Failed</strong>
@@ -151,8 +151,6 @@
                 btn.addEventListener("click", async function (e) {
                     let data = new URLSearchParams();
                     data.append("source", editor.getValue());
-                    let csrf = document.getElementById("csrf-value").value;
-                    data.append("csrf", csrf);
                     let response = await fetch(projectSaveUrl, {
                         method: "POST",
                         body: data
@@ -160,7 +158,8 @@
                     if (response.ok) {
                         // setWaiting();
                     } else {
-                        alert("Failed to save!");
+                        let text = await response.text();
+                        showToastMessage(text);
                     }
                 })
             });

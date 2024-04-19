@@ -22,6 +22,7 @@ use tracing::{debug, info, warn};
 #[derive(Clone, Serialize, Debug)]
 pub struct SessionUser {
     pub id: i32,
+    pub uuid: String,
     pub name: String,
     pub email: String,
     pub gravatar: String,
@@ -172,6 +173,7 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
     let user = user.unwrap();
     let session_user = SessionUser {
         id: user.id,
+        uuid: user.uuid,
         name: user.nick_name,
         email: user.email,
         gravatar: user.gravatar,
