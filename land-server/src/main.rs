@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use land_common::{tracing::TraceArgs, version};
 
+mod deployer;
 mod server;
 
 #[derive(Parser, Debug)]
@@ -34,12 +35,18 @@ async fn main() -> Result<()> {
 
     // Initialize tracing
     land_common::tracing::init(args.output.verbose);
+
     // Connect to database
     args.dbargs.connect().await?;
+    
     // Init Defaults data in database
     land_dao::settings::init_defaults().await?;
     // Init clerk env
     land_core::auth::init_clerk_env().await?;
+
+    // Start deployer background task
+    deployer::run_background().await?;
+
     // Start the server
     server::start(args.address.parse()?, "./assets").await?;
 

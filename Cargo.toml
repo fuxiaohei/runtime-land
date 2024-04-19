@@ -38,7 +38,14 @@ land-wasm = { path = "./crates/wasm" }
 land-wasm-gen = { path = "./crates/wasm-gen" }
 land-worker-server = { path = "./crates/worker-server" }
 lazy_static = "1.4.0"
+md5 = "0.7.0"
 once_cell = "1.19.0"
+opendal = { version = "0.45.1", default-features = false, features = [
+    "services-fs",
+    "services-s3",
+    "services-memory",
+    "rustls",
+] }
 rand = "0.8.5"
 reqwest = { version = "0.12.3", default-features = false, features = [
     "stream",

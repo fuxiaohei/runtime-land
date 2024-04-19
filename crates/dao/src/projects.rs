@@ -147,6 +147,19 @@ pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<pr
     Ok(project)
 }
 
+/// get_by_id gets a project by id
+pub async fn get_by_id(id:i32, user_id: Option<i32>) -> Result<Option<project::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find()
+        .filter(project::Column::Id.eq(id))
+        .filter(project::Column::Status.eq(ProjectStatus::Active.to_string()));
+    if let Some(user_id) = user_id {
+        select = select.filter(project::Column::UserId.eq(user_id));
+    }
+    let project = select.one(db).await?;
+    Ok(project)
+}
+
 /// delete deletes a project
 pub async fn delete(id: i32, name: String) -> Result<()> {
     let db = DB.get().unwrap();

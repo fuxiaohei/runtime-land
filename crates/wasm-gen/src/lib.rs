@@ -188,3 +188,30 @@ pub fn optimize(path: &str) -> Result<Option<String>> {
     let _ = std::fs::remove_file(path);
     Ok(Some(target))
 }
+
+/// componentize_js compile to js to wasm component
+pub fn componentize_js(src: &str, target: &str, js_engine: Option<String>) -> Result<()> {
+    // compile js to wizer
+    compile_js(src, target, js_engine)?;
+    componentize_wasm(target)
+}
+
+/// componentize_wasm compile wasm to wasm component
+pub fn componentize_wasm(target: &str) -> Result<()> {
+    // use wasm-opt to optimize wasm if wasm-opt exists
+    if let Some(op) = optimize(target)? {
+        std::fs::rename(op, target)?;
+    }
+
+    // encode wasm module to component
+    encode_component(target, target)?;
+
+    // check target exists
+    if !std::path::Path::new(target).exists() {
+        return Err(anyhow::anyhow!(
+            "Build target '{}' does not exist!",
+            &target,
+        ));
+    }
+    Ok(())
+}
