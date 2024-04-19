@@ -48,5 +48,16 @@ async fn main() -> Result<()> {
     // Initialize tracing
     land_common::tracing::init(args.output.verbose);
 
+    // Start the server
+    let opts = land_worker_server::Opts {
+        addr: args.address.parse()?,
+        dir: args.dir.clone(),
+        default_wasm: "".to_string(),
+        endpoint_name: None,
+        wasm_aot: true,
+        metrics: true,
+    };
+    land_worker_server::start(opts).await?;
+    
     Ok(())
 }

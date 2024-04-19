@@ -7,9 +7,11 @@ members = [
     "crates/sdk-macro",
     "crates/wasm",
     "crates/wasm-gen",
+    "crates/worker-server",
     "land-cli",
     "land-server",
     "land-worker",
+    "tests/rust-helloworld"
 ]
 default-members = ["land-cli"]
 resolver = "2"
@@ -23,8 +25,11 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 land-common = { path = "./crates/common" }
 land-core = { path = "./crates/core" }
 land-dao = { path = "./crates/dao" }
+land-sdk = { path = "crates/sdk" }
+land-sdk-macro = { path = "crates/sdk-macro" }
 land-wasm-gen = { path = "./crates/wasm-gen" }
 land-wasm = { path = "./crates/wasm" }
+land-worker-server = { path = "./crates/worker-server" }
 lazy_static = "1.4.0"
 time = { version = "0.3.36", features = ["local-offset"] }
 tracing = "0.1.40"

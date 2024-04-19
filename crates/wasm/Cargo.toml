@@ -20,3 +20,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 wasmtime = { version = "19.0.2", features = ["component-model", "async"] }
 wasmtime-wasi = "19.0.2"
+
+[build-dependencies]
+land-wasm-gen = { workspace = true }
