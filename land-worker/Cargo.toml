@@ -1,7 +1,13 @@
 [package]
 name = "land-worker"
-version = "0.1.0"
-edition = "2021"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+land-common = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+url = "2.5.0"

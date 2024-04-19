@@ -5,3 +5,18 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+axum = { workspace = true }
+bytesize = { version = "1.3.0", features = ["serde"] }
+futures-util = "0.3.30"
+http-body = "1.0.0"
+http-body-util = "0.1.1"
+lazy_static = { workspace = true }
+moka = { version = "0.12.7", features = ["sync"] }
+once_cell = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+wasmtime = { version = "19.0.2", features = ["component-model", "async"] }
+wasmtime-wasi = "19.0.2"
