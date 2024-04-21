@@ -7,6 +7,7 @@ use wasmtime::{
     Engine, Store,
 };
 
+use crate::engine::MODULE_VERSION;
 use crate::hostcall;
 
 /// Worker is used to run wasm component
@@ -26,7 +27,7 @@ impl std::fmt::Debug for Worker {
 impl Worker {
     // from_binary is used to create worker from bytes
     pub async fn from_binary(bytes: &[u8], path: Option<String>) -> Result<Self> {
-        let engine = super::engine::get("default");
+        let engine = super::engine::get("default")?;
         let component = Component::from_binary(&engine, bytes)?;
         debug!("Load wasm component from binary, size:{}", bytes.len());
 
@@ -46,7 +47,7 @@ impl Worker {
     }
 
     async fn from_aot(path: String) -> Result<Self> {
-        let engine = super::engine::get("default");
+        let engine = super::engine::get("default")?;
         let bytes = std::fs::read(&path)?;
         debug!(
             "Load wasm component from AOT file: {}, size: {}",
@@ -72,7 +73,7 @@ impl Worker {
     }
 
     fn compile_aot(src: &str, dst: &str) -> Result<()> {
-        let engine = super::engine::get("default");
+        let engine = super::engine::get("default")?;
         let component = Component::from_file(&engine, src)?;
         let bytes = Component::serialize(&component)?;
         debug!("Write AOT from {} to {}, size: {}", src, dst, bytes.len());
@@ -86,7 +87,8 @@ impl Worker {
 
         // compile aot wasm
         if is_aot {
-            let aot_path = path.replace(".wasm", ".wasm.aot");
+            let suffix = format!(".wasm.{}.aot", MODULE_VERSION);
+            let aot_path = path.replace(".wasm", &suffix);
             if std::path::Path::new(&aot_path).exists() {
                 return Self::from_aot(aot_path).await;
             }

@@ -29,6 +29,7 @@ base64 = "0.22.0"
 chrono = "0.4.38"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 http = "1.1.0"
+hostname = "0.4.0"
 land-common = { path = "./crates/common" }
 land-core = { path = "./crates/core" }
 land-dao = { path = "./crates/dao" }

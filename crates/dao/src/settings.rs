@@ -224,3 +224,10 @@ pub async fn reload_storage() -> Result<()> {
     // unknown storage
     Err(anyhow::anyhow!("Unknown storage: {}", storage.current))
 }
+
+/// get_storage returns the current storage
+pub async fn get_storage() -> Result<Storage> {
+    let item = get("storage").await?;
+    let storage: Storage = serde_json::from_str(&item.unwrap().value)?;
+    Ok(storage)
+}

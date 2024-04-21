@@ -1,6 +1,7 @@
+use anyhow::Result;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, sync::Mutex};
-use tracing::debug;
+use tracing::{debug, info};
 use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig};
 
 // global engine hashmap with string key with sync mutex
@@ -8,15 +9,20 @@ lazy_static! {
     pub static ref ENGINE_MAP: Mutex<HashMap<String, Engine>> = Mutex::new(HashMap::new());
 }
 
+/// MODULE_VERSION is the module version
+pub const MODULE_VERSION: &str = "w19";
+
 // 10 ms to trigger epoch increment
 pub const EPOCH_INC_INTERVAL: u64 = 10;
 
-/// init_epoch_loop initialize the global ENGINE_MAP epoch callbacks
-pub fn init_epoch_loop() {
+/// init_engines initialize default engine
+pub fn init_engines() -> Result<()> {
     // try use std to run this loop. not tokio
     std::thread::spawn(|| {
         increment_epoch_loop_inner();
     });
+    let _ = get("default")?;
+    Ok(())
 }
 
 /// increment_epoch_loop
@@ -38,11 +44,14 @@ fn increment_epoch_loop_inner() {
     }
 }
 
-fn create_config() -> Config {
+fn create_config() -> Result<Config> {
     let mut config = Config::new();
     config.wasm_component_model(true);
     config.async_support(true);
     config.epoch_interruption(true);
+    config.module_version(wasmtime::ModuleVersionStrategy::Custom(
+        MODULE_VERSION.to_string(),
+    ))?;
 
     // SIMD support requires SSE3 and SSSE3 on x86_64.
     // in docker container, it will cause error
@@ -80,16 +89,18 @@ fn create_config() -> Config {
         pooling_allocation_config,
     ));
 
-    config
+    Ok(config)
 }
 
 /// get engine by key
-pub fn get(key: &str) -> Engine {
+pub fn get(key: &str) -> Result<Engine> {
     let mut map = ENGINE_MAP.lock().unwrap();
     if map.contains_key(key) {
-        return map.get(key).unwrap().clone();
+        return Ok(map.get(key).unwrap().clone());
     }
-    let engine = Engine::new(&create_config()).unwrap();
+    info!("Create new engine for key: {}", key);
+    let config = create_config()?;
+    let engine = Engine::new(&config).unwrap();
     map.insert(key.to_string(), engine.clone());
-    engine
+    Ok(engine)
 }

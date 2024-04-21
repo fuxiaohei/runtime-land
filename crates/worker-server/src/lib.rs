@@ -83,7 +83,7 @@ pub async fn start(opts: Opts) -> Result<()> {
 
     // start wasmtime engines epoch calls
     land_wasm::hostcall::init_clients();
-    land_wasm::init_epoch_loop();
+    land_wasm::init_engines()?;
 
     // load default wasm
     load_default_wasm().await?;

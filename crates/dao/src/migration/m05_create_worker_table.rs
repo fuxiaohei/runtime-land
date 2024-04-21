@@ -5,8 +5,8 @@ use tracing::debug;
 enum Worker {
     Table,
     Id,
-    IP,
-    IPv6,
+    Ip,
+    Ipv6,
     Region,
     Hostname,
     IPInfo,
@@ -35,17 +35,12 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Worker::IP)
+                        ColumnDef::new(Worker::Ip)
                             .string_len(64)
                             .unique_key()
                             .not_null(),
                     )
-                    .col(
-                        ColumnDef::new(Worker::IPv6)
-                            .string_len(128)
-                            .unique_key()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(Worker::Ipv6).string_len(128).not_null())
                     .col(ColumnDef::new(Worker::Hostname).string_len(256).not_null())
                     .col(ColumnDef::new(Worker::Region).string_len(32).not_null())
                     .col(ColumnDef::new(Worker::IPInfo).text().not_null())
@@ -73,7 +68,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .name("idx-worker-ip")
                     .table(Worker::Table)
-                    .col(Worker::IP)
+                    .col(Worker::Ip)
                     .to_owned(),
             )
             .await?;
@@ -84,7 +79,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .name("idx-worker-ipv6")
                     .table(Worker::Table)
-                    .col(Worker::IPv6)
+                    .col(Worker::Ipv6)
                     .to_owned(),
             )
             .await?;

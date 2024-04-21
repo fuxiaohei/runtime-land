@@ -1,5 +1,5 @@
 mod engine;
-pub use engine::init_epoch_loop;
+pub use engine::init_engines;
 
 mod worker;
 pub use worker::Worker;

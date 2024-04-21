@@ -11,22 +11,22 @@ axum-extra = { version = "0.9.3", features = ["cookie"] }
 axum-template = { version = "2.2.0", features = ["handlebars"] }
 axum_csrf = { version = "0.9.0", features = ["layer"] }
 base64 = { workspace = true }
+chrono = { workspace = true }
 clap = { workspace = true }
 handlebars = "5.1.2"
 http = { workspace = true }
 land-common = { workspace = true }
 land-core = { workspace = true }
 land-dao = { workspace = true }
+land-wasm-gen = { workspace = true }
+md5 = { workspace = true }
 minify-html = "0.15.0"
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tempdir = "0.3.7"
 time = { workspace = true }
 tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }
 walkdir = "2.5.0"
-tempdir = "0.3.7"
-land-wasm-gen = { workspace = true }
-chrono = { workspace = true }
-md5 = { workspace = true }

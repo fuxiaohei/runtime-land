@@ -1,5 +1,5 @@
 use crate::db::DB;
-use crate::models::deployment;
+use crate::models::{deployment, deployment_task};
 use crate::now_time;
 use anyhow::Result;
 use sea_orm::sea_query::Expr;
@@ -7,6 +7,7 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder,
 };
 use serde::{Deserialize, Serialize};
+use tracing::{debug, info};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Spec {
@@ -128,23 +129,33 @@ pub async fn set_failed(id: i32, msg: String) -> Result<()> {
     Ok(())
 }
 
-/// set_uploading sets a deployment as uploading
-pub async fn set_uploading(id: i32) -> Result<()> {
+async fn set_status(id: i32, status: DeployStatus) -> Result<()> {
     let db = DB.get().unwrap();
     deployment::Entity::update_many()
         .filter(deployment::Column::Id.eq(id))
         .col_expr(
             deployment::Column::DeployStatus,
-            Expr::value(DeployStatus::Uploading.to_string()),
-        )
-        .col_expr(
-            deployment::Column::DeployMessage,
-            Expr::value(DeployStatus::Uploading.to_string()),
+            Expr::value(status.to_string()),
         )
         .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// set_uploading sets a deployment as uploading
+pub async fn set_uploading(id: i32) -> Result<()> {
+    set_status(id, DeployStatus::Uploading).await
+}
+
+/// set_compiling sets a deployment as compiling
+pub async fn set_compiling(id: i32) -> Result<()> {
+    set_status(id, DeployStatus::Compiling).await
+}
+
+/// set_success sets a deployment as success
+pub async fn set_success(id: i32) -> Result<()> {
+    set_status(id, DeployStatus::Success).await
 }
 
 /// set_uploaded sets a deployment as uploaded, waiting for deploying
@@ -167,4 +178,124 @@ pub async fn set_uploaded(id: i32, path: String, md5: String, size: i32) -> Resu
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// list_tasks_by_taskid gets all tasks by task_id
+pub async fn list_tasks_by_taskid(task_id: String) -> Result<Vec<deployment_task::Model>> {
+    let db = DB.get().unwrap();
+    let tasks = deployment_task::Entity::find()
+        .filter(deployment_task::Column::TaskId.eq(task_id))
+        .all(db)
+        .await?;
+    Ok(tasks)
+}
+
+/// create_task creates a task
+pub async fn create_task(
+    worker_id: i32,
+    ip: String,
+    project_id: i32,
+    deployment_id: i32,
+    task_id: String,
+    content: String,
+) -> Result<deployment_task::Model> {
+    let now = now_time();
+    let model = deployment_task::Model {
+        id: 0,
+        worker_id,
+        ip,
+        project_id,
+        deployment_id,
+        task_id,
+        content,
+        deploy_status: DeployStatus::Deploying.to_string(),
+        deploy_message: "deploying".to_string(),
+        created_at: now,
+        updated_at: now,
+    };
+    let mut active_model = model.into_active_model();
+    active_model.id = Default::default();
+    let db = DB.get().unwrap();
+    let model = active_model.insert(db).await?;
+    Ok(model)
+}
+
+/// list_tasks_by_ip gets all tasks by ip
+pub async fn list_tasks_by_ip(
+    ip: String,
+    status: Option<DeployStatus>,
+) -> Result<Vec<deployment_task::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = deployment_task::Entity::find().filter(deployment_task::Column::Ip.eq(ip));
+    if let Some(s) = status {
+        select = select.filter(deployment_task::Column::DeployStatus.eq(s.to_string()));
+    }
+    let tasks = select
+        .order_by_desc(deployment_task::Column::Id)
+        .all(db)
+        .await?;
+    Ok(tasks)
+}
+
+/// update_task_result updates task result
+pub async fn update_task_result(task_id: String, ip: String, result: String) -> Result<()> {
+    let task = get_task(task_id.clone(), ip.clone()).await?;
+    if task.is_none() {
+        debug!("Task not found, task_id: {}, ip: {}", task_id, ip);
+        return Ok(());
+    }
+    let task = task.unwrap();
+    if task.deploy_status == DeployStatus::Success.to_string() {
+        debug!("Task already success, task_id: {}, ip: {}", task_id, ip);
+        return Ok(());
+    }
+
+    // if result is success, update as success
+    if result == "success" {
+        deployment_task::Entity::update_many()
+            .filter(deployment_task::Column::TaskId.eq(task_id.clone()))
+            .filter(deployment_task::Column::Ip.eq(ip.clone()))
+            .col_expr(
+                deployment_task::Column::DeployStatus,
+                Expr::value(DeployStatus::Success.to_string()),
+            )
+            .col_expr(
+                deployment_task::Column::DeployMessage,
+                Expr::value("success"),
+            )
+            .col_expr(deployment_task::Column::UpdatedAt, Expr::value(now_time()))
+            .exec(DB.get().unwrap())
+            .await?;
+        info!("Task success, task_id: {}, ip: {}", task_id, ip);
+    } else {
+        deployment_task::Entity::update_many()
+            .filter(deployment_task::Column::TaskId.eq(task_id.clone()))
+            .filter(deployment_task::Column::Ip.eq(ip.clone()))
+            .col_expr(
+                deployment_task::Column::DeployStatus,
+                Expr::value(DeployStatus::Failed.to_string()),
+            )
+            .col_expr(
+                deployment_task::Column::DeployMessage,
+                Expr::value(result.clone()),
+            )
+            .col_expr(deployment_task::Column::UpdatedAt, Expr::value(now_time()))
+            .exec(DB.get().unwrap())
+            .await?;
+        info!(
+            "Task failed, task_id: {}, ip: {}, msg: {}",
+            task_id, ip, result
+        );
+    }
+    Ok(())
+}
+
+async fn get_task(task_id: String, ip: String) -> Result<Option<deployment_task::Model>> {
+    let db = DB.get().unwrap();
+    let task = deployment_task::Entity::find()
+        .filter(deployment_task::Column::TaskId.eq(task_id))
+        .filter(deployment_task::Column::Ip.eq(ip))
+        .one(db)
+        .await?;
+    Ok(task)
 }

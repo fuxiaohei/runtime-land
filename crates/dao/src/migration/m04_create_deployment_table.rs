@@ -104,7 +104,6 @@ async fn create_deployment_table(manager: &SchemaManager<'_>) -> Result<(), DbEr
                 .name("idx-deployment-domain")
                 .table(Deployment::Table)
                 .col(Deployment::Domain)
-                .unique()
                 .to_owned(),
         )
         .await?;
@@ -195,6 +194,7 @@ enum DeploymentTask {
     ProjectId,
     DeploymentId,
     TaskId,
+    Content,
     DeployStatus,
     DeployMessage,
     CreatedAt,
@@ -235,6 +235,7 @@ async fn create_deployment_task_table(manager: &SchemaManager<'_>) -> Result<(),
                         .string_len(128)
                         .not_null(),
                 )
+                .col(ColumnDef::new(DeploymentTask::Content).text().not_null())
                 .col(
                     ColumnDef::new(DeploymentTask::DeployStatus)
                         .string_len(12)

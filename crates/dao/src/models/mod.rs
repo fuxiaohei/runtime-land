@@ -9,3 +9,4 @@ pub mod project;
 pub mod settings;
 pub mod user_info;
 pub mod user_token;
+pub mod worker;

@@ -7,8 +7,14 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
+hostname = { workspace = true }
 land-common = { workspace = true }
 land-worker-server = { workspace = true }
+once_cell = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = "0.9.33"
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = "2.5.0"

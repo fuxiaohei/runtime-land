@@ -1,6 +1,6 @@
 use axum::{
     body::Body,
-    extract::Request,
+    extract::{ConnectInfo, Request},
     http::StatusCode,
     middleware::{self, Next},
     response::{IntoResponse, Response},
@@ -13,15 +13,21 @@ use tracing::{info, instrument, warn};
 
 mod dashboard;
 mod templates;
+mod workerapi;
 
 /// start the server
 pub async fn start(addr: SocketAddr, assets_dir: &str) -> anyhow::Result<()> {
     let dashboard_router = dashboard::router(assets_dir)?;
+    let workerapi_router = workerapi::router()?;
     let app = Router::new()
+        .nest("/api/v1/worker-api/", workerapi_router)
         .merge(dashboard_router)
         .route_layer(middleware::from_fn(log_middleware));
 
     info!("Starting server on {}", addr);
+
+    // with connect info
+    let app = app.into_make_service_with_connect_info::<SocketAddr>();
     // run it
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app).await?;
@@ -102,7 +108,12 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
         // ignore static assets log
         return Ok(next.run(request).await);
     }
-    if path.starts_with("/api/worker/v1/deploys") {
+    let mut remote = "0.0.0.0".to_string();
+    if let Some(connect_info) = request.extensions().get::<ConnectInfo<SocketAddr>>() {
+        remote = connect_info.to_string();
+    }
+
+    if path.starts_with("/api/v1") {
         // high sequence url
         return Ok(next.run(request).await);
     }
@@ -115,6 +126,7 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
     let elasped = st.elapsed().as_millis();
     if let Some(err) = server_err {
         warn!(
+            remote = remote,
             method = method,
             path = path,
             status = status,
@@ -137,6 +149,7 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
             .to_str()
             .unwrap();
         info!(
+            remote = remote,
             method = method,
             path = path,
             status = status,
