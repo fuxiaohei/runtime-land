@@ -17,6 +17,7 @@ pub struct ProjectVar {
     pub updated_at: DateTimeUTC,
     pub source: String,
     pub is_editable: bool,
+    pub deploy_status: String,
 }
 
 impl ProjectVar {
@@ -41,6 +42,7 @@ impl ProjectVar {
                 updated_at: p.updated_at.and_utc(),
                 description: p.description,
                 source: String::new(), // for list show, source is not needed
+                deploy_status: p.deploy_status,
             })
             .collect())
     }
@@ -64,6 +66,7 @@ impl ProjectVar {
             source: String::new(),
             created_by: project.created_by.clone(),
             is_editable: project.created_by == ProjectCreatedBy::Playground.to_string(),
+            deploy_status: project.deploy_status.clone(),
         };
         if let Some(playground) = playground {
             var.source = playground.source.clone();

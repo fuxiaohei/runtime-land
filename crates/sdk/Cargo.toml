@@ -9,5 +9,5 @@ anyhow = { workspace = true }
 http = { workspace = true }
 land-sdk-macro = { workspace = true }
 lazy_static = { workspace = true }
-matchit = "0.8.0"
+matchit = "0.8.1"
 wit-bindgen = { workspace = true }

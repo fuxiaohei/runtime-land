@@ -115,7 +115,7 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
 
     if path.starts_with("/api/v1") {
         // high sequence url
-        return Ok(next.run(request).await);
+        // return Ok(next.run(request).await);
     }
 
     let method = request.method().clone().to_string();

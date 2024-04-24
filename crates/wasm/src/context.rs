@@ -22,12 +22,7 @@ impl ResourceLimiter for Limiter {
         // gradually resize, this will track the total allocations throughout the lifetime of the
         // instance.
         self.memory_allocated += desired - current;
-        debug!(
-            "Memory growing: current: {}, desired: {}, allocated: {}",
-            ByteSize(0),
-            ByteSize(desired as u64),
-            ByteSize(self.memory_allocated as u64),
-        );
+        debug!("Memory: {}", ByteSize(self.memory_allocated as u64),);
         Ok(true)
     }
 

@@ -1,5 +1,4 @@
 pub mod db;
-pub mod deploy;
 pub mod deployment;
 pub mod models;
 pub mod projects;

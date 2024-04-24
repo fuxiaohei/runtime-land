@@ -1,6 +1,6 @@
 use crate::{
     db::DB,
-    deploy::DeployStatus,
+    deployment::DeployStatus,
     models::{playground, project},
     now_time,
 };
@@ -148,7 +148,7 @@ pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<pr
 }
 
 /// get_by_id gets a project by id
-pub async fn get_by_id(id:i32, user_id: Option<i32>) -> Result<Option<project::Model>> {
+pub async fn get_by_id(id: i32, user_id: Option<i32>) -> Result<Option<project::Model>> {
     let db = DB.get().unwrap();
     let mut select = project::Entity::find()
         .filter(project::Column::Id.eq(id))

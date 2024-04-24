@@ -28,24 +28,35 @@ pub async fn run_tasks() -> Result<()> {
 
 async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     // 0. set current task compiling
-    land_dao::deployment::set_compiling(dp.id).await?;
+    land_dao::deployment::set_compiling(dp.id, dp.project_id).await?;
 
     // 1. read project
     let project = land_dao::projects::get_by_id(dp.project_id, None).await?;
     if project.is_none() {
-        land_dao::deployment::set_failed(dp.id, "Project not found or deleted".to_string()).await?;
+        land_dao::deployment::set_failed(
+            dp.id,
+            dp.project_id,
+            "Project not found or deleted".to_string(),
+        )
+        .await?;
         return Ok(());
     }
     let project = project.unwrap();
     // 2. if project is not a playground, set failed
     if project.created_by != land_dao::projects::ProjectCreatedBy::Playground.to_string() {
-        land_dao::deployment::set_failed(dp.id, "Project is not a playground".to_string()).await?;
+        land_dao::deployment::set_failed(
+            dp.id,
+            dp.project_id,
+            "Project is not a playground".to_string(),
+        )
+        .await?;
         return Ok(());
     }
     // 3. read playground
     let pl = land_dao::projects::get_playground_by_project(dp.user_id, dp.project_id).await?;
     if pl.is_none() {
-        land_dao::deployment::set_failed(dp.id, "Playground not found".to_string()).await?;
+        land_dao::deployment::set_failed(dp.id, dp.project_id, "Playground not found".to_string())
+            .await?;
         return Ok(());
     }
     let pl = pl.unwrap();
@@ -72,7 +83,7 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     debug!("Compile success: {:?}", target_wasm);
 
     // 6. set deploy task uploading
-    land_dao::deployment::set_uploading(dp.id).await?;
+    land_dao::deployment::set_uploading(dp.id, dp.project_id).await?;
 
     // 7. upload wasm to storage(r2)
     let now_text = chrono::Utc::now().format("%Y%m%d%H%M%S").to_string();
@@ -98,6 +109,7 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     // 8. set deploy task uploaded
     land_dao::deployment::set_uploaded(
         dp.id,
+        dp.project_id,
         storage_file_name.clone(),
         upload_data_md5,
         upload_data_size,
@@ -107,8 +119,13 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     // 9. get living workers
     let workers = land_dao::worker::list_online().await?;
     if workers.is_empty() {
-        land_dao::deployment::set_failed(dp.id, "No online workers".to_string()).await?;
-        warn!("Deployment {} failed, no online workers", dp.id);
+        land_dao::deployment::set_failed(dp.id, dp.project_id, "No online workers".to_string())
+            .await?;
+        warn!(
+            id = dp.id,
+            domain = dp.domain,
+            "Deployment failed, no online workers"
+        );
         return Ok(());
     }
 

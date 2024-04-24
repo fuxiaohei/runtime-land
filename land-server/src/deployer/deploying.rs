@@ -17,8 +17,13 @@ pub async fn run_tasks() -> Result<()> {
     let workers = land_dao::worker::list_online().await?;
     if workers.is_empty() {
         for dp in dps {
-            land_dao::deployment::set_failed(dp.id, "No online workers".to_string()).await?;
-            warn!("Deployment {} failed, no online workers", dp.id);
+            land_dao::deployment::set_failed(dp.id, dp.project_id, "No online workers".to_string())
+                .await?;
+            warn!(
+                id = dp.id,
+                domain = dp.domain,
+                "Deployment failed, no online workers"
+            );
         }
         return Ok(());
     }
@@ -30,6 +35,7 @@ pub async fn run_tasks() -> Result<()> {
                 .instrument(debug_span!("[DEPLOY-2]", dp = dp.id))
                 .await
             {
+                let _ = land_dao::deployment::set_failed(dp.id, dp.project_id, e.to_string()).await;
                 warn!("Handle deploy failed: {}", e);
             }
         });
@@ -41,8 +47,13 @@ pub async fn run_tasks() -> Result<()> {
 async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     let tasks = land_dao::deployment::list_tasks_by_taskid(dp.task_id.clone()).await?;
     if tasks.is_empty() {
-        land_dao::deployment::set_failed(dp.id, "No tasks found".to_string()).await?;
-        warn!("Deployment {} failed, no tasks found", dp.id);
+        land_dao::deployment::set_failed(dp.id, dp.project_id, "No tasks found".to_string())
+            .await?;
+        warn!(
+            id = dp.id,
+            domain = dp.domain,
+            "Deployment failed, no tasks found"
+        );
         return Ok(());
     }
 
@@ -63,13 +74,18 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
 
     // if total_count == success_count, set dp as deployed
     if total_count == success_count {
-        land_dao::deployment::set_success(dp.id).await?;
-        info!("Deployment {} success", dp.id);
+        land_dao::deployment::set_success(dp.id, dp.project_id).await?;
+        info!(id = dp.id, domain = dp.domain, "Deployment success");
     } else if final_count == total_count {
-        land_dao::deployment::set_failed(dp.id, "Some tasks failed".to_string()).await?;
-        warn!("Deployment {} failed", dp.id);
+        land_dao::deployment::set_failed(dp.id, dp.project_id, "Some tasks failed".to_string())
+            .await?;
+        warn!(
+            id = dp.id,
+            domain = dp.domain,
+            "Deployment failed, some tasks failed"
+        );
     } else {
-        debug!("Deployment {} is deploying", dp.id);
+        debug!(id = dp.id, domain = dp.domain, "Deployment still running");
     }
 
     Ok(())

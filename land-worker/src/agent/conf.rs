@@ -24,7 +24,10 @@ pub async fn handle_task(task: &TaskValue) -> Result<()> {
         debug!("Wasm file already exists: {}", wasm_path);
     }
 
-    // 2. write traefik conf
+    // 2. load wasm into mem
+    land_wasm::pool::prepare_worker(&task.wasm_path, true).await?;
+
+    // 3. write traefik conf after wasm is ready
     let conf_file = format!(
         "{}/traefik/{}.yaml",
         data_dir,

@@ -1,5 +1,5 @@
 use crate::db::DB;
-use crate::models::{deployment, deployment_task};
+use crate::models::{deployment, deployment_task, project};
 use crate::now_time;
 use anyhow::Result;
 use sea_orm::sea_query::Expr;
@@ -44,6 +44,18 @@ pub enum DeployStatus {
 pub enum DeploymentStatus {
     Active,
     Deleted,
+}
+
+/// get_last_by_project gets the last deployment by project
+pub async fn get_last_by_project(project_id: i32) -> Result<Option<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let dp = deployment::Entity::find()
+        .filter(deployment::Column::ProjectId.eq(project_id))
+        .filter(deployment::Column::Status.eq(DeploymentStatus::Active.to_string()))
+        .order_by_desc(deployment::Column::Id) // find latest one, need be success or failed
+        .one(db)
+        .await?;
+    Ok(dp)
 }
 
 /// create a deployment
@@ -114,7 +126,7 @@ pub async fn list_by_status(status: DeployStatus) -> Result<Vec<deployment::Mode
 }
 
 /// set_failed sets a deployment as failed
-pub async fn set_failed(id: i32, msg: String) -> Result<()> {
+pub async fn set_failed(id: i32, project_id: i32, msg: String) -> Result<()> {
     let db = DB.get().unwrap();
     deployment::Entity::update_many()
         .filter(deployment::Column::Id.eq(id))
@@ -126,10 +138,19 @@ pub async fn set_failed(id: i32, msg: String) -> Result<()> {
         .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
         .exec(db)
         .await?;
+    project::Entity::update_many()
+        .filter(project::Column::Id.eq(project_id))
+        .col_expr(
+            project::Column::DeployStatus,
+            Expr::value(DeployStatus::Failed.to_string()),
+        )
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .exec(db)
+        .await?;
     Ok(())
 }
 
-async fn set_status(id: i32, status: DeployStatus) -> Result<()> {
+async fn set_status(id: i32, project_id: i32, status: DeployStatus) -> Result<()> {
     let db = DB.get().unwrap();
     deployment::Entity::update_many()
         .filter(deployment::Column::Id.eq(id))
@@ -140,26 +161,41 @@ async fn set_status(id: i32, status: DeployStatus) -> Result<()> {
         .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
         .exec(db)
         .await?;
+    project::Entity::update_many()
+        .filter(project::Column::Id.eq(project_id))
+        .col_expr(
+            project::Column::DeployStatus,
+            Expr::value(status.to_string()),
+        )
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .exec(db)
+        .await?;
     Ok(())
 }
 
 /// set_uploading sets a deployment as uploading
-pub async fn set_uploading(id: i32) -> Result<()> {
-    set_status(id, DeployStatus::Uploading).await
+pub async fn set_uploading(id: i32, project_id: i32) -> Result<()> {
+    set_status(id, project_id, DeployStatus::Uploading).await
 }
 
 /// set_compiling sets a deployment as compiling
-pub async fn set_compiling(id: i32) -> Result<()> {
-    set_status(id, DeployStatus::Compiling).await
+pub async fn set_compiling(id: i32, project_id: i32) -> Result<()> {
+    set_status(id, project_id, DeployStatus::Compiling).await
 }
 
 /// set_success sets a deployment as success
-pub async fn set_success(id: i32) -> Result<()> {
-    set_status(id, DeployStatus::Success).await
+pub async fn set_success(id: i32, project_id: i32) -> Result<()> {
+    set_status(id, project_id, DeployStatus::Success).await
 }
 
 /// set_uploaded sets a deployment as uploaded, waiting for deploying
-pub async fn set_uploaded(id: i32, path: String, md5: String, size: i32) -> Result<()> {
+pub async fn set_uploaded(
+    id: i32,
+    project_id: i32,
+    path: String,
+    md5: String,
+    size: i32,
+) -> Result<()> {
     let db = DB.get().unwrap();
     deployment::Entity::update_many()
         .filter(deployment::Column::Id.eq(id))
@@ -175,6 +211,15 @@ pub async fn set_uploaded(id: i32, path: String, md5: String, size: i32) -> Resu
             Expr::value(DeployStatus::Deploying.to_string()),
         )
         .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
+        .exec(db)
+        .await?;
+    project::Entity::update_many()
+        .filter(project::Column::Id.eq(project_id))
+        .col_expr(
+            project::Column::DeployStatus,
+            Expr::value(DeployStatus::Deploying.to_string()),
+        )
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
         .exec(db)
         .await?;
     Ok(())

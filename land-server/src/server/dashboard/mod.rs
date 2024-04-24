@@ -74,7 +74,8 @@ pub fn router(assets_dir: &str) -> Result<Router> {
             get(projects::settings).post(projects::update_name),
         )
         .route("/:name/settings/delete", post(projects::delete))
-        .route("/:name/traffic", get(projects::traffic));
+        .route("/:name/traffic", get(projects::traffic))
+        .route("/:name/check-deploy", get(projects::check_deploy));
 
     let settings_router = Router::new()
         .route("/", get(settings::index))

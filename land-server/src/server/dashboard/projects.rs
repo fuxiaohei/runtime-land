@@ -5,8 +5,8 @@ use crate::server::{
     templates::{RenderHtmlMinified, TemplateEngine},
     PageVars, ServerError,
 };
-use axum::Form;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
+use axum::{Form, Json};
 use axum_csrf::CsrfToken;
 use base64::{engine::general_purpose, Engine};
 use land_dao::projects::Language;
@@ -336,4 +336,27 @@ pub async fn traffic(
             project,
         },
     ))
+}
+
+/// check_deploy is a handler for GET /projects/:name/check-deploy
+pub async fn check_deploy(
+    Extension(user): Extension<SessionUser>,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    let p = land_dao::projects::get_by_name(name, Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let p = p.unwrap();
+    let dp = land_dao::deployment::get_last_by_project(p.id).await?;
+    if dp.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Deployment not found",
+        ));
+    }
+    Ok(Json(dp.unwrap()))
 }

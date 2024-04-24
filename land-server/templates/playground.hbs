@@ -32,7 +32,8 @@
                     </div>
                     <div class="right">
                         <div class="btn-group me-3">
-                            <button id="main-btn" data-x-status="success" class="btn btn-primary btn-sm text-uppercase">
+                            <button id="main-btn" data-x-status="{{project.deploy_status}}"
+                                class="btn btn-primary btn-sm text-uppercase">
                                 <div class="waiting-status d-none">
                                     <div class="spinner-grow spinner-grow-sm me-2" role="status">
                                         <span class="visually-hidden">Loading...</span>
@@ -66,15 +67,15 @@
             <div class="col-6 right-col p-0">
                 <div class="playground-preview-nav d-flex justify-content-between border-bottom align-items-center">
                     <div class="input-group input-group-sm px-4">
-                        <input id="preview-url" type="url" value="https://dif-candy-87.workerdev.dev"
-                            class="form-control" placeholder="access domain" />
-                        <button data-x-url="https://dif-candy-87.workerdev.dev" id="refresh-btn"
+                        <input id="preview-url" type="url" value="{{project.prod_domain_url}}" class="form-control"
+                            placeholder="access domain" />
+                        <button data-x-url="{{project.prod_domain_url}}" id="refresh-btn"
                             class="btn btn-outline-success" type="button"><i
                                 class='bi bi-arrow-clockwise me-2'></i>Refresh</button>
                     </div>
                 </div>
                 <div class="bg-transparent" style="height: calc(100vh - 65px)">
-                    <iframe src="https://dif-candy-87.workerdev.dev" frameborder="0" id="playground-preview"
+                    <iframe src="{{project.prod_domain_url}}" frameborder="0" id="playground-preview"
                         sandbox="allow-forms allow-modals allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
                 </div>
             </div>
@@ -94,7 +95,24 @@
     <script type="text/javascript">
         const projectName = document.getElementById("editor-container").getAttribute("data-x-name");
         const projectSaveUrl = `/playground/${projectName}`;
-        const projectCheckUrl = `/playground/${projectName}/check`;
+        const projectCheckUrl = `/projects/${projectName}/check-deploy`;
+
+        function setWaiting(message) {
+            const btn = document.getElementById("main-btn");
+            btn.setAttribute("disabled", true);
+            btn.querySelector(".waiting-status").classList.remove("d-none");
+            btn.querySelector(".submit-status").classList.add("d-none");
+            btn.querySelector(".msg-text").innerText = message;
+            window.deployStatus = "waiting";
+        }
+
+        function setWaitingDone() {
+            const btn = document.getElementById("main-btn");
+            btn.querySelector(".submit-status").classList.remove("d-none");
+            btn.querySelector(".waiting-status").classList.add("d-none");
+            btn.removeAttribute("disabled");
+            window.deployStatus = "";
+        }
 
         function showToastMessage(text) {
             document.getElementById('msg-toast-text').innerText = text;
@@ -105,6 +123,44 @@
                 toastBootstrap.hide();
             }, 5000);
         }
+
+        async function handleCheck() {
+            let resp = await fetch(projectCheckUrl);
+            if (resp.ok) {
+                let data = await resp.json();
+                if (data.deploy_status == "failed") {
+                    showMessage(data.deploy_message);
+                    setWaitingDone();
+                    return;
+                }
+                if (data.deploy_status == "success") {
+                    setWaitingDone();
+                    document.getElementById("refresh-btn").click();
+                    return;
+                }
+                setWaiting(data.deploy_status);
+            }
+        }
+
+        // set initial status
+        (() => {
+            let status = document.getElementById("main-btn").getAttribute("data-x-status");
+            if (status != "success" && status != "failed") {
+                setWaiting(status);
+                handleCheck();
+            }
+        })();
+
+        // check deploy status
+        (() => {
+            window.deployStatus = "";
+            setInterval(async function () {
+                if (window.deployStatus == "waiting") {
+                    await handleCheck();
+                }
+            }, 1000)
+        })();
+
 
         // refresh refresh button
         (() => {
@@ -156,7 +212,7 @@
                         body: data
                     });
                     if (response.ok) {
-                        // setWaiting();
+                        setWaiting("compiling");
                     } else {
                         let text = await response.text();
                         showToastMessage(text);
