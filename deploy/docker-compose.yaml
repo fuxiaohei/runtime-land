@@ -1,0 +1,37 @@
+version: "3"
+
+networks:
+  runtime_land_network:
+    external: true
+
+services:
+  proxy:
+    platform: linux/amd64
+    image: traefik:v3.0
+    command: --api.insecure=true --providers.docker=true --providers.docker.exposedByDefault=false --accesslog=true --providers.file.directory=/data/runtime-land/traefik/ --providers.file.watch=true
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080" # traefik dashboard
+    networks:
+      - runtime_land_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LAND_DATA_DIR}:/data/runtime-land
+  worker:
+    platform: linux/amd64
+    image: ghcr.io/fuxiaohei/runtime-land-worker:develop
+    restart: always
+    environment:
+      - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
+      - LAND_SERVICE_NAME=land-worker@docker
+      - LAND_DATA_DIR=/data/runtime-land
+    ports:
+      - "9000:9000" # metrics port
+    networks:
+      - runtime_land_network
+    volumes:
+      - ${LAND_DATA_DIR}:/data/runtime-land
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.land-worker.loadbalancer.server.port=9844
