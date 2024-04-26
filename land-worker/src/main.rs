@@ -50,6 +50,17 @@ async fn main() -> Result<()> {
     // Initialize tracing
     land_common::tracing::init(args.output.verbose);
 
+    let opts = land_worker_server::Opts {
+        addr: args.address.parse()?,
+        dir: args.dir.clone(),
+        default_wasm: "".to_string(),
+        endpoint_name: None,
+        wasm_aot: true,
+        metrics: true,
+    };
+    // Init server global vars
+    land_worker_server::init_globals(&opts)?;
+
     // Init ip data
     agent::ip::init().await.expect("init ip error");
     if !args.local_mode {
@@ -62,15 +73,7 @@ async fn main() -> Result<()> {
     }
 
     // Start the server
-    let opts = land_worker_server::Opts {
-        addr: args.address.parse()?,
-        dir: args.dir.clone(),
-        default_wasm: "".to_string(),
-        endpoint_name: None,
-        wasm_aot: true,
-        metrics: true,
-    };
-    land_worker_server::start(opts).await?;
+    land_worker_server::start(opts.addr).await?;
 
     Ok(())
 }

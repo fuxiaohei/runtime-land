@@ -3,6 +3,7 @@ use land_dao::models::deployment::Model as DeploymentModel;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, debug_span, info, warn, Instrument};
 
+/// run_tasks deploy tasks
 pub async fn run_tasks() -> Result<()> {
     // 1.read waiting tasks from db
     let dps =
@@ -111,7 +112,7 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
         dp.id,
         dp.project_id,
         storage_file_name.clone(),
-        upload_data_md5,
+        upload_data_md5.clone(),
         upload_data_size,
     )
     .await?;
@@ -139,6 +140,7 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
         download_url: storage_settings.build_url(&storage_file_name)?,
         wasm_path: storage_file_name,
         task_id: dp.task_id.clone(),
+        checksum: upload_data_md5,
     };
     let task_content = serde_json::to_string(&task_value)?;
     for worker in workers {
@@ -157,11 +159,12 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
 }
 
 #[derive(Serialize, Deserialize)]
-struct TaskValue {
-    user_uuid: String,
-    project_uuid: String,
-    domain: String,
-    download_url: String,
-    wasm_path: String,
-    task_id: String,
+pub struct TaskValue {
+    pub user_uuid: String,
+    pub project_uuid: String,
+    pub domain: String,
+    pub download_url: String,
+    pub wasm_path: String,
+    pub task_id: String,
+    pub checksum: String,
 }

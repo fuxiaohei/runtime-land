@@ -43,7 +43,8 @@ pub enum DeployStatus {
 #[strum(serialize_all = "lowercase")]
 pub enum DeploymentStatus {
     Active,
-    Deleted,
+    Deleted,  // if a deployment is deleted, it will not be shown
+    Outdated, // if a deployment is outdated, it will be deleted
 }
 
 /// get_last_by_project gets the last deployment by project
@@ -185,7 +186,20 @@ pub async fn set_compiling(id: i32, project_id: i32) -> Result<()> {
 
 /// set_success sets a deployment as success
 pub async fn set_success(id: i32, project_id: i32) -> Result<()> {
-    set_status(id, project_id, DeployStatus::Success).await
+    set_status(id, project_id, DeployStatus::Success).await?;
+    // set old deployments as outdated
+    let db = DB.get().unwrap();
+    deployment::Entity::update_many()
+        .filter(deployment::Column::ProjectId.eq(project_id))
+        .filter(deployment::Column::Id.ne(id))
+        .col_expr(
+            deployment::Column::Status,
+            Expr::value(DeploymentStatus::Outdated.to_string()),
+        )
+        .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
+        .exec(db)
+        .await?;
+    Ok(())
 }
 
 /// set_uploaded sets a deployment as uploaded, waiting for deploying

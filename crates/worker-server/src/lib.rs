@@ -47,9 +47,9 @@ static ENDPOINT_NAME: OnceCell<String> = OnceCell::new();
 static AOT_ENABLED: OnceCell<bool> = OnceCell::new();
 static METRICS_ENABLED: OnceCell<bool> = OnceCell::new();
 
-pub async fn start(opts: Opts) -> Result<()> {
-    let hostname = if let Some(endpoint) = opts.endpoint_name {
-        endpoint
+pub fn init_globals(opts: &Opts) -> Result<()> {
+    let hostname = if let Some(endpoint) = &opts.endpoint_name {
+        endpoint.clone()
     } else {
         hostname::get()
             .unwrap_or("unknown".into())
@@ -73,29 +73,32 @@ pub async fn start(opts: Opts) -> Result<()> {
     // create directory
     std::fs::create_dir_all(&opts.dir).unwrap();
 
-    DEFAULT_WASM.set(opts.default_wasm).unwrap();
+    DEFAULT_WASM.set(opts.default_wasm.clone()).unwrap();
     ENDPOINT_NAME.set(hostname).unwrap();
     AOT_ENABLED.set(opts.wasm_aot).unwrap();
     METRICS_ENABLED.set(opts.metrics).unwrap();
 
     // set pool's local dir to load module file
-    land_wasm::pool::FILE_DIR.set(opts.dir).unwrap();
+    land_wasm::pool::FILE_DIR.set(opts.dir.clone()).unwrap();
 
     // start wasmtime engines epoch calls
     land_wasm::hostcall::init_clients();
     land_wasm::init_engines()?;
 
+    Ok(())
+}
+
+pub async fn start(addr: SocketAddr) -> Result<()> {
     // load default wasm
     load_default_wasm().await?;
-
     let app = Router::new()
         .route("/", any(default_handler))
         .route("/*path", any(default_handler))
         .layer(TimeoutLayer::new(Duration::from_secs(10)))
         .route_layer(axum::middleware::from_fn(middleware::middleware));
     let make_service = app.into_make_service_with_connect_info::<SocketAddr>();
-    info!("Starting worker server on: {}", opts.addr);
-    let listener = tokio::net::TcpListener::bind(opts.addr).await?;
+    info!("Starting worker server on: {}", addr);
+    let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, make_service).await?;
     Ok(())
 }

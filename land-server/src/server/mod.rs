@@ -113,9 +113,9 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
         remote = connect_info.to_string();
     }
 
-    if path.starts_with("/api/v1") {
+    if path.starts_with("/api/v1/worker-api/alive") {
         // high sequence url
-        // return Ok(next.run(request).await);
+        return Ok(next.run(request).await);
     }
 
     let method = request.method().clone().to_string();

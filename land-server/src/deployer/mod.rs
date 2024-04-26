@@ -2,6 +2,7 @@ use tracing::warn;
 
 mod deploying;
 mod waiting;
+pub use waiting::TaskValue;
 
 /// run_background starts the background worker to handle the deployer's tasks.
 pub fn run_background() {

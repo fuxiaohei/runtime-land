@@ -1,14 +1,19 @@
 use super::ServerError;
+use crate::deployer::TaskValue;
 use anyhow::Result;
+use axum::routing::get;
 use axum::{response::IntoResponse, routing::post, Json, Router};
 use land_common::IPInfo;
 use land_dao::deployment::DeployStatus;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use tracing::info;
 
 /// router returns the router for the worker api
 pub fn router() -> Result<Router> {
-    let app = Router::new().route("/alive", post(alive));
+    let app = Router::new()
+        .route("/alive", post(alive))
+        .route("/deploys", get(deploys));
     Ok(app)
 }
 
@@ -37,9 +42,13 @@ async fn alive(Json(p): Json<Request>) -> Result<impl IntoResponse, ServerError>
 
     let mut tasks_conf = vec![];
     let tasks =
-        land_dao::deployment::list_tasks_by_ip(ipinfo.ip, Some(DeployStatus::Deploying)).await?;
+        land_dao::deployment::list_tasks_by_ip(ipinfo.ip.clone(), Some(DeployStatus::Deploying))
+            .await?;
     for task in tasks {
         tasks_conf.push(task.content);
+    }
+    if !tasks_conf.is_empty() {
+        info!(ip = ipinfo.ip, "Alive with {} tasks", tasks_conf.len())
     }
     Ok(Json(tasks_conf))
 }
@@ -48,4 +57,33 @@ async fn alive(Json(p): Json<Request>) -> Result<impl IntoResponse, ServerError>
 pub struct Request {
     pub ip: IPInfo,
     pub tasks: HashMap<String, String>,
+}
+
+/// deploys is the handler for the /deploys endpoint
+async fn deploys() -> Result<impl IntoResponse, ServerError> {
+    let dps = land_dao::deployment::list_by_status(DeployStatus::Success).await?;
+    let mut tasks = vec![];
+    let (domain, _) = land_dao::settings::get_domain_settings().await?;
+    let storage_settings = land_dao::settings::get_storage().await?;
+    for dp in dps {
+        let task = TaskValue {
+            user_uuid: dp.user_uuid.clone(),
+            project_uuid: dp.project_uuid.clone(),
+            domain: format!("{}.{}", dp.domain, domain),
+            download_url: storage_settings.build_url(&dp.storage_path)?,
+            wasm_path: dp.storage_path.clone(),
+            task_id: dp.task_id.clone(),
+            checksum: dp.storage_md5,
+        };
+        tasks.push(task);
+    }
+    let content = serde_json::to_vec(&tasks)?;
+    let checksum = format!("{:x}", md5::compute(content));
+    Ok(Json(DeploysResp { checksum, tasks }))
+}
+
+#[derive(Serialize, Deserialize)]
+struct DeploysResp {
+    checksum: String,
+    tasks: Vec<TaskValue>,
 }

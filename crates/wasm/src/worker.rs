@@ -1,3 +1,5 @@
+use crate::engine::MODULE_VERSION;
+use crate::hostcall;
 use anyhow::Result;
 use axum::body::Body;
 use tracing::debug;
@@ -6,9 +8,6 @@ use wasmtime::{
     component::{Component, InstancePre, Linker},
     Engine, Store,
 };
-
-use crate::engine::MODULE_VERSION;
-use crate::hostcall;
 
 /// Worker is used to run wasm component
 #[derive(Clone)]
@@ -72,7 +71,7 @@ impl Worker {
         })
     }
 
-    fn compile_aot(src: &str, dst: &str) -> Result<()> {
+    pub fn compile_aot(src: &str, dst: &str) -> Result<()> {
         let engine = super::engine::get("default")?;
         let component = Component::from_file(&engine, src)?;
         let bytes = Component::serialize(&component)?;

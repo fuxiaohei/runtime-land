@@ -1,11 +1,12 @@
 use super::Worker;
+use crate::engine::MODULE_VERSION;
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
 use moka::sync::Cache;
 use once_cell::sync::OnceCell;
 use std::time::Duration;
 use tokio::time::Instant;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 /// FILE_DIR is the directory of wasm files
 pub static FILE_DIR: OnceCell<String> = OnceCell::new();
@@ -49,4 +50,17 @@ pub async fn prepare_worker(key: &str, is_aot: bool) -> Result<Worker> {
         return prepare_wasm_worker(key, is_aot).await;
     }
     Err(anyhow!("Invalid key"))
+}
+
+/// compile_aot compile aot wasm
+pub async fn compile_aot(path: &str) -> Result<()> {
+    let suffix = format!(".wasm.{}.aot", MODULE_VERSION);
+    let aot_path = path.replace(".wasm", &suffix);
+    if std::path::Path::new(&aot_path).exists() {
+        debug!("AOT file already exists: {}", &aot_path);
+        return Ok(());
+    }
+    Worker::compile_aot(&path, &aot_path)?;
+    debug!("Compile AOT success: {}", &aot_path);
+    Ok(())
 }
