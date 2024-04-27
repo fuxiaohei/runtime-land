@@ -33,8 +33,7 @@ impl Worker {
         // create linker
         let mut linker: Linker<super::Context> = Linker::new(&engine);
         // init wasi context
-        wasmtime_wasi::command::add_to_linker(&mut linker)
-            .expect("add wasmtime_wasi::preview2 failed");
+        wasmtime_wasi::add_to_linker_async(&mut linker)?;
         hostcall::HttpService::add_to_linker(&mut linker, super::Context::http_ctx)
             .expect("add http_service failed");
 
@@ -59,8 +58,7 @@ impl Worker {
         // create linker
         let mut linker: Linker<super::Context> = Linker::new(&engine);
         // init wasi context
-        wasmtime_wasi::command::add_to_linker(&mut linker)
-            .expect("add wasmtime_wasi::preview2 failed");
+        wasmtime_wasi::add_to_linker_async(&mut linker)?;
         hostcall::HttpService::add_to_linker(&mut linker, super::Context::http_ctx)
             .expect("add http_service failed");
 
