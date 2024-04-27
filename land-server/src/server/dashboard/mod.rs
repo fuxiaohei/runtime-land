@@ -22,7 +22,7 @@ pub use auth::SessionUser;
 mod projects;
 mod settings;
 mod vars;
-pub use vars::{TokenVar,WorkerVar};
+pub use vars::{TokenVar, WorkerVar};
 
 /// index is a handler for GET /
 pub async fn index(
@@ -69,6 +69,10 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     // set admin router
     let admin_router = Router::new()
         .route("/", get(admin::index))
+        .route(
+            "/settings",
+            get(admin::settings).post(admin::update_settings),
+        )
         .route("/workers", get(admin::workers))
         .route("/create-token", post(admin::create_token))
         .route("/delete-token", post(admin::delete_token));

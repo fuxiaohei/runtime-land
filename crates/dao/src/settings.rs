@@ -3,7 +3,9 @@ use anyhow::{anyhow, Result};
 use once_cell::sync::Lazy;
 use opendal::services::{Fs, Memory, S3};
 use opendal::Operator;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Set,
+};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tracing::info;
@@ -48,6 +50,17 @@ pub async fn set_domain_settings(domain: String, protocol: String) -> Result<()>
     let content = serde_json::to_string(&DomainSettings { domain, protocol })?;
     set(DOMAIN_SETTINGS, &content).await?;
     Ok(())
+}
+
+/// list_names returns all settings names
+pub async fn list_names() -> Result<Vec<String>> {
+    let db = DB.get().unwrap();
+    let items = settings::Entity::find()
+        .order_by_asc(settings::Column::Name)
+        .all(db)
+        .await?;
+    let names = items.iter().map(|item| item.name.clone()).collect();
+    Ok(names)
 }
 
 /// get settings item

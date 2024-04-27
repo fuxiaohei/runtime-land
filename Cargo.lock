@@ -2159,7 +2159,7 @@ version = "0.1.0"
 
 [[package]]
 name = "land-common"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "clap",
  "lazy_static",
@@ -2172,7 +2172,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "jsonwebtoken",
@@ -2186,7 +2186,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2212,7 +2212,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2224,7 +2224,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2234,7 +2234,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -2266,7 +2266,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2288,7 +2288,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2300,7 +2300,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -2322,7 +2322,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-server"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "axum",
@@ -3773,7 +3773,7 @@ dependencies = [
 
 [[package]]
 name = "rust-helloworld"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "http 1.1.0",

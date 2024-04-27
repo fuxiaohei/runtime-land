@@ -1,10 +1,15 @@
+use super::redirect_response;
 use super::{dashboard::SessionUser, templates::TemplateEngine, ServerError};
 use crate::server::dashboard::WorkerVar;
 use crate::server::{dashboard::TokenVar, templates::RenderHtmlMinified, PageVars};
 use anyhow::Result;
+use axum::extract::Query;
 use axum::{response::IntoResponse, Extension};
+use axum::{Form, Json};
 use axum_csrf::CsrfToken;
+use http::StatusCode;
 use land_dao::user::TokenUsage;
+use tracing::info;
 
 mod tokens;
 pub use tokens::*;
@@ -115,4 +120,73 @@ pub async fn workers(
         ),
     )
         .into_response())
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct SettingsQuery {
+    pub name: Option<String>,
+}
+
+/// settings is a handler for GET /admin/settings
+pub async fn settings(
+    Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    engine: TemplateEngine,
+    Query(q): Query<SettingsQuery>,
+) -> Result<impl IntoResponse, ServerError> {
+    // if name is not None, it means the user is trying to read one setting and return as json not page
+    if q.name.is_some() {
+        let settings = land_dao::settings::get(&q.name.unwrap()).await?;
+        if settings.is_none() {
+            return Err(ServerError::status_code(
+                StatusCode::NOT_FOUND,
+                "Setting not found",
+            ));
+        }
+        return Ok(Json(settings.unwrap()).into_response());
+    }
+    #[derive(serde::Serialize)]
+    struct IndexVars {
+        page: PageVars,
+        user: SessionUser,
+        csrf: String,
+        settings: Vec<String>,
+    }
+
+    let csrf = csrf_layer.authenticity_token()?;
+    let settings = land_dao::settings::list_names().await?;
+
+    Ok((
+        csrf_layer,
+        RenderHtmlMinified(
+            "admin/settings.hbs",
+            engine,
+            IndexVars {
+                page: PageVars::new_admin("Settings", "admin-settings"),
+                user,
+                csrf,
+                settings,
+            },
+        ),
+    )
+        .into_response())
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct SettingsForm {
+    pub name: String,
+    pub value: String,
+    pub csrf: String,
+}
+
+/// settings is a handler for GET /admin/settings
+pub async fn update_settings(
+    // Extension(user): Extension<SessionUser>,
+    csrf_layer: CsrfToken,
+    Form(f): Form<SettingsForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    csrf_layer.verify(&f.csrf)?;
+    land_dao::settings::set(&f.name, &f.value).await?;
+    info!("Setting updated: {}", f.name);
+    Ok(redirect_response("/admin/settings"))
 }
