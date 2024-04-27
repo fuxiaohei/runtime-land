@@ -1,9 +1,9 @@
 use super::{dashboard::SessionUser, templates::TemplateEngine, ServerError};
+use crate::server::dashboard::WorkerVar;
 use crate::server::{dashboard::TokenVar, templates::RenderHtmlMinified, PageVars};
 use anyhow::Result;
 use axum::{response::IntoResponse, Extension};
 use axum_csrf::CsrfToken;
-use land_dao::models::worker::Model as WorkerModel;
 use land_dao::user::TokenUsage;
 
 mod tokens;
@@ -72,7 +72,7 @@ pub async fn workers(
         user: SessionUser,
         csrf: String,
         tokens: Vec<TokenVar>,
-        workers: Vec<WorkerModel>,
+        workers: Vec<WorkerVar>,
     }
 
     let csrf = csrf_layer.authenticity_token()?;
@@ -97,7 +97,8 @@ pub async fn workers(
     }
 
     // list workers
-    let workers = land_dao::worker::list_all().await?;
+    let workers_value = land_dao::worker::list_all().await?;
+    let workers = WorkerVar::from_models_vec(workers_value);
 
     Ok((
         csrf_layer,

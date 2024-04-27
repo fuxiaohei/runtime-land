@@ -68,7 +68,7 @@ async fn run_inner(addr: String, token: String) -> Result<()> {
         tasks: results.clone(),
     };
     let resp = CLIENT
-        .post(url)
+        .post(&url)
         .header(AUTHORIZATION, format!("Bearer {}", token))
         .json(&req)
         .send()
@@ -77,7 +77,7 @@ async fn run_inner(addr: String, token: String) -> Result<()> {
     if !status.is_success() {
         let text = resp.text().await?;
         warn!("Bad response status: {}, body: {}", status, text);
-        return Err(anyhow!("Bad response status: {}", status));
+        return Err(anyhow!("Bad response status: {}, url: {}", status, url));
     }
     let values: Vec<String> = resp.json().await?;
     // if key in results is not in values, remove key

@@ -22,7 +22,7 @@ pub use auth::SessionUser;
 mod projects;
 mod settings;
 mod vars;
-pub use vars::TokenVar;
+pub use vars::{TokenVar,WorkerVar};
 
 /// index is a handler for GET /
 pub async fn index(

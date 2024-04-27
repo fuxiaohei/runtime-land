@@ -20,7 +20,7 @@ services:
       - ${LAND_DATA_DIR}:/data/runtime-land
   worker:
     platform: linux/amd64
-    image: ghcr.io/fuxiaohei/runtime-land-worker:develop
+    image: ghcr.io/fuxiaohei/runtime-land-worker:dev
     restart: always
     environment:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
