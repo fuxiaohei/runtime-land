@@ -1,0 +1,13 @@
+global:
+  scrape_interval: "1m"
+  scrape_timeout: "10s"
+  evaluation_interval: "1m"
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+scrape_configs:
+  - job_name: "runtime-land-v03"
+    static_configs:
+      - targets:
+          - "43.133.43.122:9000"

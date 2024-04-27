@@ -26,7 +26,7 @@ pub struct SessionUser {
     pub name: String,
     pub email: String,
     pub gravatar: String,
-    pub is_admin: bool,
+    pub admin: bool,
 }
 
 /// sign_in renders the /sign-in page
@@ -177,11 +177,11 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         name: user.nick_name,
         email: user.email,
         gravatar: user.gravatar,
-        is_admin: user.role == UserRole::Admin.to_string(),
+        admin: user.role == UserRole::Admin.to_string(),
     };
 
-    // /settings/manage need admin role
-    if path.starts_with("/settings/manage") && !session_user.is_admin {
+    // /admin need admin role
+    if path.starts_with("/admin") && !session_user.admin {
         warn!(path = path, "Session is not admin: {}", session_value);
         return Ok(redirect_response("/overview").into_response());
     }

@@ -11,6 +11,7 @@ bcrypt = "0.15.1"
 chrono = { workspace = true }
 clap = { workspace = true }
 lazy_static = { workspace = true }
+md5 = { workspace = true }
 once_cell = { workspace = true }
 opendal = { workspace = true }
 rand = { workspace = true }
@@ -22,6 +23,7 @@ sea-orm = { version = "0.12.15", features = [
 sea-orm-migration = "0.12.15"
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = { workspace = true }
 strum = { version = "0.26.2", features = ["derive"] }
 tokio = { workspace = true }
 tracing = { workspace = true }

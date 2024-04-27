@@ -24,6 +24,7 @@ minify-html = "0.15.0"
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = { workspace = true }
 tempdir = "0.3.7"
 time = { workspace = true }
 tokio = { workspace = true }

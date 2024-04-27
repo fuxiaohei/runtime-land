@@ -1,10 +1,16 @@
 use super::ServerError;
-use crate::deployer::TaskValue;
 use anyhow::Result;
+use axum::extract::Request;
+use axum::middleware;
+use axum::middleware::Next;
+use axum::response::Response;
 use axum::routing::get;
 use axum::{response::IntoResponse, routing::post, Json, Router};
+use http::StatusCode;
 use land_common::IPInfo;
+use land_dao::confs::TaskValue;
 use land_dao::deployment::DeployStatus;
+use land_dao::user::TokenUsage;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::info;
@@ -13,12 +19,42 @@ use tracing::info;
 pub fn router() -> Result<Router> {
     let app = Router::new()
         .route("/alive", post(alive))
-        .route("/deploys", get(deploys));
+        .route("/deploys", get(deploys))
+        .route_layer(middleware::from_fn(middleware));
     Ok(app)
 }
 
+pub async fn middleware(request: Request, next: Next) -> Result<Response, StatusCode> {
+    let auth_token = request
+        .headers()
+        .get("Authorization")
+        .ok_or(StatusCode::UNAUTHORIZED)?
+        .to_str()
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let token = auth_token.trim_start_matches("Bearer ");
+    if token.is_empty() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    let token = land_dao::user::get_token_by_value(token, Some(TokenUsage::Worker))
+        .await
+        .map_err(|err| {
+            info!("Token error: {}", err);
+            StatusCode::UNAUTHORIZED
+        })?;
+    if token.is_none() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    Ok(next.run(request).await)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AliveRequest {
+    pub ip: IPInfo,
+    pub tasks: HashMap<String, String>,
+}
+
 /// alive is the handler for the /alive endpoint
-async fn alive(Json(p): Json<Request>) -> Result<impl IntoResponse, ServerError> {
+async fn alive(Json(p): Json<AliveRequest>) -> Result<impl IntoResponse, ServerError> {
     let ipinfo = p.ip;
     let ip = ipinfo.ip.clone();
     let ipcontent = serde_json::to_string(&ipinfo)?;
@@ -53,12 +89,6 @@ async fn alive(Json(p): Json<Request>) -> Result<impl IntoResponse, ServerError>
     Ok(Json(tasks_conf))
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Request {
-    pub ip: IPInfo,
-    pub tasks: HashMap<String, String>,
-}
-
 /// deploys is the handler for the /deploys endpoint
 async fn deploys() -> Result<impl IntoResponse, ServerError> {
     let dps = land_dao::deployment::list_by_status(DeployStatus::Success).await?;
@@ -66,16 +96,8 @@ async fn deploys() -> Result<impl IntoResponse, ServerError> {
     let (domain, _) = land_dao::settings::get_domain_settings().await?;
     let storage_settings = land_dao::settings::get_storage().await?;
     for dp in dps {
-        let task = TaskValue {
-            user_uuid: dp.user_uuid.clone(),
-            project_uuid: dp.project_uuid.clone(),
-            domain: format!("{}.{}", dp.domain, domain),
-            download_url: storage_settings.build_url(&dp.storage_path)?,
-            wasm_path: dp.storage_path.clone(),
-            task_id: dp.task_id.clone(),
-            checksum: dp.storage_md5,
-        };
-        tasks.push(task);
+        let task_value = TaskValue::new(&dp, &storage_settings, &domain)?;
+        tasks.push(task_value);
     }
     let content = serde_json::to_vec(&tasks)?;
     let checksum = format!("{:x}", md5::compute(content));

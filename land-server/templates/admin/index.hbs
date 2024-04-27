@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/admin-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+             
+                <div id="user-tokens-setting" class="pt-3 px-3 container mt-3 border-top">
+                    <div>
+                        <h5>Private Tokens</h5>
+                        <p class="text-body-tertiary mb-1">Access tokens are used to authenticate with the Workers.</p>
+                    </div>
+                    <div class="card shadow-none mt-3">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush shadow-none">
+                                {{#each tokens}}
+                                <li
+                                    class="list-group-item py-3 token-list-item d-flex align-items-center justify-content-between">
+                                    <div class="token-meta">
+                                        <p class="mb-0"><span><i class="bi bi-key me-2"></i>
+                                                <strong>{{name}}</strong>
+                                            </span>
+                                            <span class="text-body-secondary ms-2"><small>Use at <span
+                                                        data-x-timeago="{{updated_at}}">{{updated_at}}</span></small></span>
+                                        </p>
+                                        <p class="mb-0"><span id="token-{{id}}-value">{{value}}</span>
+                                            <button data-x-id="{{id}}" class="btn btn-link token-value-copy-btn"><i
+                                                    class='bi bi-copy ms-2'></i></button>
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-danger btn-sm token-del-btn"
+                                            data-bs-toggle="modal" data-bs-target="#delete-token-{{id}}-modal">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <div class="modal fade" id="delete-token-{{id}}-modal" tabindex="-1"
+                                            aria-labelledby="create-token-modal" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5">Delete token</h1>
+                                                    </div>
+                                                    <form method="post" action="/admin/delete-token">
+                                                        <div class="modal-body text-start">
+                                                            <p class="text-body-tertiary">Enter the token's name
+                                                                <strong>{{name}}</strong>
+                                                            </p>
+                                                            <input class="form-control" type="text" name="name"
+                                                                placeholder="The name of the token" required="">
+                                                            <input type="hidden" name="csrf" value="{{../csrf}}">
+                                                            <input type="hidden" name="id" value="{{id}}">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit"
+                                                                class="btn btn-primary">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                {{/each}}
+                                <li class="list-group-item text-end pt-3">
+                                    <button class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#create-token-modal"><i class="bi bi-plus me-2"></i>Create New
+                                        Token</button>
+                                    <div class="modal fade" id="create-token-modal" tabindex="-1"
+                                        aria-labelledby="create-token-modal" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5">Create new token</h1>
+                                                </div>
+                                                <form method="post" action="/admin/create-token">
+                                                    <div class="modal-body text-start">
+                                                        <p class="text-body-tertiary">Enter the description of the new
+                                                            access token.</p>
+                                                        <input class="form-control" type="text" name="name"
+                                                            placeholder="What is this token for?" required>
+                                                        <input type="hidden" name="csrf" value="{{csrf}}">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Create</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+</body>
+
+</html>

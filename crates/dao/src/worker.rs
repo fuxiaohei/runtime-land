@@ -1,6 +1,8 @@
 use crate::{db::DB, models::worker, now_time};
 use anyhow::Result;
-use sea_orm::{sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
+use sea_orm::{
+    sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set,
+};
 use tracing::info;
 
 #[derive(strum::Display)]
@@ -15,6 +17,16 @@ pub async fn list_online() -> Result<Vec<worker::Model>> {
     let db = DB.get().unwrap();
     let workers = worker::Entity::find()
         .filter(worker::Column::Status.eq(Status::Online.to_string()))
+        .all(db)
+        .await?;
+    Ok(workers)
+}
+
+/// list_all returns all workers
+pub async fn list_all() -> Result<Vec<worker::Model>> {
+    let db = DB.get().unwrap();
+    let workers = worker::Entity::find()
+        .order_by_desc(worker::Column::UpdatedAt)
         .all(db)
         .await?;
     Ok(workers)

@@ -11,6 +11,7 @@ use serde::Serialize;
 use std::net::SocketAddr;
 use tracing::{info, instrument, warn};
 
+mod admin;
 mod dashboard;
 mod templates;
 mod workerapi;
@@ -87,6 +88,7 @@ pub struct PageVars {
     pub version: String,
     pub build_time: String,
     pub nav: String,
+    pub admin: bool,
 }
 
 impl PageVars {
@@ -96,6 +98,16 @@ impl PageVars {
             version: land_common::version::SHORT.to_string(),
             build_time: land_common::version::date(),
             nav: nav.to_string(),
+            admin: false,
+        }
+    }
+    pub fn new_admin(title: &str, nav: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            version: land_common::version::SHORT.to_string(),
+            build_time: land_common::version::date(),
+            nav: nav.to_string(),
+            admin: true,
         }
     }
 }

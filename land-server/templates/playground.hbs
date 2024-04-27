@@ -129,7 +129,7 @@
             if (resp.ok) {
                 let data = await resp.json();
                 if (data.deploy_status == "failed") {
-                    showMessage(data.deploy_message);
+                    showToastMessage(data.deploy_message);
                     setWaitingDone();
                     return;
                 }

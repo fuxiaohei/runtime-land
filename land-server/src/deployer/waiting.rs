@@ -1,6 +1,5 @@
 use anyhow::Result;
-use land_dao::models::deployment::Model as DeploymentModel;
-use serde::{Deserialize, Serialize};
+use land_dao::{confs::TaskValue, models::deployment::Model as DeploymentModel};
 use tracing::{debug, debug_span, info, warn, Instrument};
 
 /// run_tasks deploy tasks
@@ -14,12 +13,10 @@ pub async fn run_tasks() -> Result<()> {
     }
     // 2. handle each task
     debug!("Found {} waiting tasks", dps.len());
-    for dp in dps {
+    for mut dp in dps {
         tokio::spawn(async move {
-            if let Err(e) = handle_deploy(&dp)
-                .instrument(debug_span!("[DEPLOY-1]", dp = dp.id))
-                .await
-            {
+            let span = debug_span!("[DEPLOY-1]", dp = dp.id);
+            if let Err(e) = handle_deploy(&mut dp).instrument(span).await {
                 warn!("Handle deploy failed: {}", e);
             }
         });
@@ -27,7 +24,7 @@ pub async fn run_tasks() -> Result<()> {
     Ok(())
 }
 
-async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
+async fn handle_deploy(dp: &mut DeploymentModel) -> Result<()> {
     // 0. set current task compiling
     land_dao::deployment::set_compiling(dp.id, dp.project_id).await?;
 
@@ -133,15 +130,11 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
     // 10. create each task for each worker
     let (domain, _) = land_dao::settings::get_domain_settings().await?;
     let storage_settings = land_dao::settings::get_storage().await?;
-    let task_value = TaskValue {
-        user_uuid: dp.user_uuid.clone(),
-        project_uuid: dp.project_uuid.clone(),
-        domain: format!("{}.{}", dp.domain, domain),
-        download_url: storage_settings.build_url(&storage_file_name)?,
-        wasm_path: storage_file_name,
-        task_id: dp.task_id.clone(),
-        checksum: upload_data_md5,
-    };
+
+    dp.storage_path = storage_file_name.clone();
+    dp.storage_md5 = upload_data_md5.clone();
+    let task_value = TaskValue::new(dp, &storage_settings, &domain)?;
+
     let task_content = serde_json::to_string(&task_value)?;
     for worker in workers {
         let task = land_dao::deployment::create_task(
@@ -156,15 +149,4 @@ async fn handle_deploy(dp: &DeploymentModel) -> Result<()> {
         info!("Create task {} for worker {}", task.id, worker.id);
     }
     Ok(())
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct TaskValue {
-    pub user_uuid: String,
-    pub project_uuid: String,
-    pub domain: String,
-    pub download_url: String,
-    pub wasm_path: String,
-    pub task_id: String,
-    pub checksum: String,
 }

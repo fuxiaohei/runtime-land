@@ -60,7 +60,7 @@ pub async fn compile_aot(path: &str) -> Result<()> {
         debug!("AOT file already exists: {}", &aot_path);
         return Ok(());
     }
-    Worker::compile_aot(&path, &aot_path)?;
+    Worker::compile_aot(path, &aot_path)?;
     debug!("Compile AOT success: {}", &aot_path);
     Ok(())
 }

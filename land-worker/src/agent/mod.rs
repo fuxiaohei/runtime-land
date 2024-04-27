@@ -1,8 +1,8 @@
-use crate::agent::conf::handle_total;
-
 use self::conf::handle_task;
+use crate::agent::conf::handle_total;
 use anyhow::{anyhow, Result};
 use land_common::IPInfo;
+use land_dao::confs::TaskValue;
 use once_cell::sync::Lazy;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
@@ -109,17 +109,6 @@ async fn run_inner(addr: String, token: String) -> Result<()> {
     }
 
     Ok(())
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct TaskValue {
-    user_uuid: String,
-    project_uuid: String,
-    domain: String,
-    download_url: String,
-    wasm_path: String,
-    task_id: String,
-    checksum: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

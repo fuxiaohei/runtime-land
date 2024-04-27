@@ -156,3 +156,12 @@ html[data-bs-theme="dark"] #project-codeview .card-body {
     width: 240px;
     flex: none;
 }
+
+#admin-workers span.worker-online {
+    color: var(--bs-success);
+    font-weight: bold;
+}
+
+#admin-workers span.worker-offline {
+    color: var(--bs-danger);
+}

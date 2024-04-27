@@ -1,8 +1,7 @@
 use super::{TaskTotal, TaskValue};
 use crate::agent::{CLIENT, DATA_DIR};
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 use tracing::{debug, info};
 
 async fn download_wasm(data_dir: &str, task: &TaskValue) -> Result<()> {
@@ -29,14 +28,21 @@ fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<()> {
         data_dir,
         task.domain.replace('.', "_")
     );
+    // if old file exist, check file md5
+    if PathBuf::from(conf_file.clone()).exists() {
+        let old_conf = std::fs::read_to_string(conf_file.clone())?;
+        let old_md5 = format!("{:x}", md5::compute(old_conf.as_bytes()));
+        if old_md5.eq(&task.traefik_checksum.clone().unwrap_or_default()) {
+            debug!("Traefik conf file already exists: {}", conf_file);
+            return Ok(());
+        }
+    }
     let conf_dir = PathBuf::from(conf_file.clone());
     let conf_dir = conf_dir.parent().unwrap();
     std::fs::create_dir_all(conf_dir)?;
 
-    let traefik_confs = build_item(task)?;
-    let traefik_yaml = serde_yaml::to_string(&traefik_confs)?;
     info!("Write traefik conf to file: {}", conf_file);
-    std::fs::write(conf_file, traefik_yaml)?;
+    std::fs::write(conf_file, task.traefik.clone().unwrap_or_default())?;
     Ok(())
 }
 
@@ -69,91 +75,4 @@ pub async fn handle_total(data_dir: &str, total: &TaskTotal) -> Result<()> {
         write_traefik_conf(data_dir, task)?;
     }
     Ok(())
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TraefikConfs {
-    pub http: HttpTraefikConfs,
-}
-
-fn build_item(item: &TaskValue) -> Result<TraefikConfs> {
-    let mut traefik_confs = HttpTraefikConfs {
-        //services: HashMap::new(),
-        routers: HashMap::new(),
-        middlewares: HashMap::new(),
-    };
-    let svc = std::env::var("LAND_SERVICE_NAME").unwrap_or_else(|_| "runtimeland-foo".to_string());
-    let mut headers = MiddlewareHeader {
-        custom_request_headers: HashMap::new(),
-    };
-    // check filepath exist
-    headers
-        .custom_request_headers
-        .insert("x-land-m".to_string(), item.wasm_path.clone());
-    headers
-        .custom_request_headers
-        .insert("x-land-uuid".to_string(), item.user_uuid.clone());
-    headers
-        .custom_request_headers
-        .insert("x-land-puuid".to_string(), item.project_uuid.clone());
-    traefik_confs
-        .middlewares
-        .insert(format!("m-{}", item.task_id), MiddlewareGroup { headers });
-
-    let router = Router {
-        middlewares: vec![format!("m-{}", item.task_id)],
-        service: svc.clone(),
-        rule: format!("Host(`{}`)", item.domain),
-    };
-    traefik_confs
-        .routers
-        .insert(format!("r-{}", item.task_id), router);
-    Ok(TraefikConfs {
-        http: traefik_confs,
-    })
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ServiceLoadBalancerServer {
-    pub url: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ServiceLoadBalancer {
-    pub servers: Vec<ServiceLoadBalancerServer>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Service {
-    #[serde(rename = "loadBalancer")]
-    pub load_balancer: ServiceLoadBalancer,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Router {
-    // #[serde(rename = "entryPoints")]
-    // pub entry_points: Vec<String>,
-    pub middlewares: Vec<String>,
-    pub service: String,
-    pub rule: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MiddlewareHeader {
-    // #[serde(rename = "customResponseHeaders")]
-    // pub custom_response_headers: HashMap<String, String>,
-    #[serde(rename = "customRequestHeaders")]
-    pub custom_request_headers: HashMap<String, String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MiddlewareGroup {
-    pub headers: MiddlewareHeader,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HttpTraefikConfs {
-    // pub services: HashMap<String, Service>,
-    pub middlewares: HashMap<String, MiddlewareGroup>,
-    pub routers: HashMap<String, Router>,
 }

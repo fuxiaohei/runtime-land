@@ -1,11 +1,9 @@
 use super::{
+    admin,
     templates::{RenderHtmlMinified, TemplateEngine},
     ServerError,
 };
-use crate::server::{
-    dashboard::{auth::SessionUser, vars::ProjectVar},
-    PageVars,
-};
+use crate::server::{dashboard::vars::ProjectVar, PageVars};
 use anyhow::Result;
 use axum::routing::post;
 use axum::{
@@ -20,9 +18,11 @@ use tower_http::services::ServeDir;
 use tracing::info;
 
 mod auth;
+pub use auth::SessionUser;
 mod projects;
 mod settings;
 mod vars;
+pub use vars::TokenVar;
 
 /// index is a handler for GET /
 pub async fn index(
@@ -66,6 +66,13 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     // set csrf config
     let config = CsrfConfig::default();
 
+    // set admin router
+    let admin_router = Router::new()
+        .route("/", get(admin::index))
+        .route("/workers", get(admin::workers))
+        .route("/create-token", post(admin::create_token))
+        .route("/delete-token", post(admin::delete_token));
+
     let projects_router = Router::new()
         .route("/", get(projects::index))
         .route("/:name", get(projects::single))
@@ -89,6 +96,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-out", get(auth::sign_out))
         .nest("/projects", projects_router)
         .nest("/settings", settings_router)
+        .nest("/admin", admin_router)
         .route(
             "/playground/:name",
             get(projects::show_playground).post(projects::save_playground),

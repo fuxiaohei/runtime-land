@@ -9,13 +9,15 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 hostname = { workspace = true }
 land-common = { workspace = true }
+land-dao = { workspace = true }
 land-wasm = { workspace = true }
 land-worker-server = { workspace = true }
+md5 = { workspace = true }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml = "0.9.33"
+serde_yaml = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = "2.5.0"

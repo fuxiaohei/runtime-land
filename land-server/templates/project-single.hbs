@@ -21,8 +21,10 @@
                 <div id="project-codeview" class="pt-3 px-3 container">
                     <div class="card shadow-none">
                         <div class="card-header">
-                            <p class="mb-0 text-body-secondary small">Last Updated: <span
-                                    data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span></p>
+                            <p class="mb-0 text-body-secondary small">
+                                <i class="bi bi-clock me-2"></i>Last Updated:
+                                <span data-x-timeago="{{project.updated_at}}">{{project.updated_at}}</span>
+                            </p>
                         </div>
                         <div class="card-body p-2">
                             <pre><code class="language-{{project.language}}">{{project.source}}</code></pre>
