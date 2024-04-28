@@ -43,7 +43,8 @@
                                     <input type="hidden" name="csrf" value="{{csrf}}">
                                 </div>
                                 <div class="my-3">
-                                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                                    <button type="submit" id="settings-btn" class="btn btn-primary" disabled>Save
+                                        Settings</button>
                                 </div>
                             </form>
                         </div>
@@ -58,10 +59,12 @@
         document.getElementById('settings-select').addEventListener('change', async (e) => {
             const value = e.target.value;
             const settings_value = document.getElementById('settings-value');
+            const settings_btn = document.getElementById('settings-btn');
             // if value is empty, set settings-value blank
             if (!value) {
                 settings_value.value = '';
                 settings_value.disabled = true;
+                settings_btn.disabled = true;
                 return;
             }
             settings_value.value = 'Loading...';
@@ -69,11 +72,13 @@
             if (response.status !== 200) {
                 settings_value.value = "Failed to fetch settings";
                 settings_value.disabled = true;
+                settings_btn.disabled = true;
                 return;
             }
             const data = await response.json();
             settings_value.value = data.value;
             settings_value.disabled = false;
+            settings_btn.disabled = false;
         });
     </script>
 </body>

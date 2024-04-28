@@ -165,3 +165,11 @@ html[data-bs-theme="dark"] #project-codeview .card-body {
 #admin-workers span.worker-offline {
     color: var(--bs-danger);
 }
+
+#admin-projects .status.status-active {
+    color: var(--bs-success);
+}
+
+#admin-projects .status.status-disabled {
+    color: var(--bs-danger);
+}

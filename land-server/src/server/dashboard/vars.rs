@@ -5,6 +5,9 @@ use serde::Serialize;
 pub struct ProjectVar {
     pub id: i32,
     pub name: String,
+    pub user_email: String,
+    pub user_nickname: String,
+    pub user_id: i32,
     pub prod_domain: String,
     pub prod_domain_full: String,
     pub prod_domain_url: String,
@@ -18,6 +21,7 @@ pub struct ProjectVar {
     pub source: String,
     pub is_editable: bool,
     pub deploy_status: String,
+    pub status: String,
 }
 
 impl ProjectVar {
@@ -30,6 +34,9 @@ impl ProjectVar {
             .map(|p| ProjectVar {
                 id: p.id,
                 name: p.name.clone(),
+                user_email: String::new(),
+                user_nickname: String::new(),
+                user_id: p.user_id,
                 prod_domain: p.prod_domain.clone(),
                 prod_domain_full: format!("{}.{}", p.prod_domain, domain),
                 prod_domain_url: format!("{}://{}.{}", protocol, p.prod_domain, domain),
@@ -43,6 +50,7 @@ impl ProjectVar {
                 description: p.description,
                 source: String::new(), // for list show, source is not needed
                 deploy_status: p.deploy_status,
+                status: p.status,
             })
             .collect())
     }
@@ -54,6 +62,9 @@ impl ProjectVar {
         let mut var = ProjectVar {
             id: project.id,
             name: project.name.clone(),
+            user_email: String::new(),
+            user_nickname: String::new(),
+            user_id: project.user_id,
             prod_domain: project.prod_domain.clone(),
             prod_domain_full: format!("{}.{}", project.prod_domain, domain),
             prod_domain_url: format!("{}://{}.{}", protocol, project.prod_domain, domain),
@@ -67,6 +78,7 @@ impl ProjectVar {
             created_by: project.created_by.clone(),
             is_editable: project.created_by == ProjectCreatedBy::Playground.to_string(),
             deploy_status: project.deploy_status.clone(),
+            status: project.status.clone(),
         };
         if let Some(playground) = playground {
             var.source = playground.source.clone();
@@ -105,5 +117,39 @@ impl WorkerVar {
                 status: w.status.to_string(),
             })
             .collect()
+    }
+}
+
+#[derive(Serialize)]
+pub struct PaginationVarItem {
+    pub link: String,
+    pub current: bool,
+    pub page: u64,
+}
+
+#[derive(Serialize)]
+pub struct PaginationVar {
+    pub current: u64,
+    pub count: u64,
+    pub total: u64,
+    pub items: Vec<PaginationVarItem>,
+}
+
+impl PaginationVar {
+    pub fn new(current: u64, size: u64, count: u64, total: u64, link: &str) -> PaginationVar {
+        let mut items = vec![];
+        for i in 1..=total {
+            items.push(PaginationVarItem {
+                link: format!("{}?page={}&size={}", link, i, size),
+                current: i == current,
+                page: i,
+            });
+        }
+        PaginationVar {
+            current,
+            count,
+            total,
+            items,
+        }
     }
 }

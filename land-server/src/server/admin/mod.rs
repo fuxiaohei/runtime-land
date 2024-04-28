@@ -13,6 +13,8 @@ use tracing::info;
 
 mod tokens;
 pub use tokens::*;
+mod projects;
+pub use projects::*;
 
 /// index is a handler for GET /admin/
 pub async fn index(
@@ -25,29 +27,9 @@ pub async fn index(
         page: PageVars,
         user: SessionUser,
         csrf: String,
-        tokens: Vec<TokenVar>,
     }
 
     let csrf = csrf_layer.authenticity_token()?;
-
-    // list cmd line tokens
-    let token_values =
-        land_dao::user::list_tokens_by_user(user.id, Some(TokenUsage::Worker)).await?;
-    let mut tokens = vec![];
-    for token in token_values {
-        // need to check if the token is new, unset it if it is
-        let is_new = land_dao::user::is_new_token(token.id).await;
-        if is_new {
-            land_dao::user::unset_new_token(token.id).await;
-        }
-        tokens.push(TokenVar {
-            id: token.id,
-            name: token.name,
-            value: token.value,
-            is_new: true,
-            updated_at: token.updated_at.and_utc(),
-        });
-    }
 
     Ok((
         csrf_layer,
@@ -58,7 +40,6 @@ pub async fn index(
                 page: PageVars::new_admin("Dashboard", "admin-dashboard"),
                 user,
                 csrf,
-                tokens,
             },
         ),
     )

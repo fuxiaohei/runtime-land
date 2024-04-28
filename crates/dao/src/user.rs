@@ -282,3 +282,18 @@ pub async fn disable_user(user_id: i32) -> Result<()> {
         .await?;
     Ok(())
 }
+
+/// list_infos lists user infos by ids
+pub async fn list_infos(user_ids: Vec<i32>) -> Result<HashMap<i32, user_info::Model>> {
+    let db = DB.get().unwrap();
+    let users = user_info::Entity::find()
+        .filter(user_info::Column::Id.is_in(user_ids))
+        .all(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    let mut user_map = HashMap::new();
+    for user in users {
+        user_map.insert(user.id, user);
+    }
+    Ok(user_map)
+}

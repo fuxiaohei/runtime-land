@@ -3,7 +3,7 @@ use super::{
     templates::{RenderHtmlMinified, TemplateEngine},
     ServerError,
 };
-use crate::server::{dashboard::vars::ProjectVar, PageVars};
+use crate::server::PageVars;
 use anyhow::Result;
 use axum::routing::post;
 use axum::{
@@ -22,7 +22,7 @@ pub use auth::SessionUser;
 mod projects;
 mod settings;
 mod vars;
-pub use vars::{TokenVar, WorkerVar};
+pub use vars::{PaginationVar, ProjectVar, TokenVar, WorkerVar};
 
 /// index is a handler for GET /
 pub async fn index(
@@ -73,6 +73,9 @@ pub fn router(assets_dir: &str) -> Result<Router> {
             "/settings",
             get(admin::settings).post(admin::update_settings),
         )
+        .route("/projects", get(admin::projects))
+        .route("/projects/redeploy", post(admin::redeploy))
+        .route("/projects/disable", post(admin::disable_project))
         .route("/workers", get(admin::workers))
         .route("/create-token", post(admin::create_token))
         .route("/delete-token", post(admin::delete_token));

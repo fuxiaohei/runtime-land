@@ -43,6 +43,7 @@ pub enum DeployStatus {
 #[strum(serialize_all = "lowercase")]
 pub enum DeploymentStatus {
     Active,
+    Disabled, // if a deployment is disabled, it will not be deployed
     Deleted,  // if a deployment is deleted, it will not be shown
     Outdated, // if a deployment is outdated, it will be deleted
 }

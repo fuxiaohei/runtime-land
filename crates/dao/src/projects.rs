@@ -1,3 +1,5 @@
+use crate::deployment::DeploymentStatus;
+use crate::models::deployment;
 use crate::{
     db::DB,
     deployment::DeployStatus,
@@ -9,8 +11,8 @@ use rand::Rng;
 use random_word::Lang;
 use sea_orm::sea_query::Expr;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
-    QueryOrder, QuerySelect,
+    ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, ItemsAndPagesNumber,
+    PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
 };
 use std::str::FromStr;
 use tracing::info;
@@ -25,6 +27,7 @@ pub enum Language {
 #[strum(serialize_all = "lowercase")]
 pub enum ProjectStatus {
     Active,
+    Disabled, // set disabled by user
     Deleted,
 }
 
@@ -134,6 +137,22 @@ pub async fn list_by_user_id(
     Ok(projects)
 }
 
+/// list_paginate lists all projects with pagination
+pub async fn list_paginate(
+    current: u64,
+    page_size: u64,
+) -> Result<(Vec<project::Model>, ItemsAndPagesNumber)> {
+    let db = DB.get().unwrap();
+    let pager = project::Entity::find()
+        .filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()))
+        .order_by_desc(project::Column::Id)
+        .paginate(db, page_size);
+    // current page data
+    let projects = pager.fetch_page(current - 1).await?;
+    let pages = pager.num_items_and_pages().await?;
+    Ok((projects, pages))
+}
+
 /// get_by_name gets a project by name
 pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<project::Model>> {
     let db = DB.get().unwrap();
@@ -205,6 +224,31 @@ pub async fn get_project_by_name_with_playground(
         py = get_playground_by_project(user_id, p.id).await?;
     }
     Ok((p, py))
+}
+
+/// set_disabled sets a project as disabled
+pub async fn set_disabled(project_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    deployment::Entity::update_many()
+        .col_expr(
+            deployment::Column::Status,
+            Expr::value(DeploymentStatus::Disabled.to_string()),
+        )
+        .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(deployment::Column::ProjectId.eq(project_id))
+        .filter(deployment::Column::Status.eq(DeploymentStatus::Active.to_string()))
+        .exec(db)
+        .await?;
+    project::Entity::update_many()
+        .col_expr(
+            project::Column::Status,
+            Expr::value(ProjectStatus::Disabled.to_string()),
+        )
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(project::Column::Id.eq(project_id))
+        .exec(db)
+        .await?;
+    Ok(())
 }
 
 pub type PlaygroundStatus = ProjectStatus;

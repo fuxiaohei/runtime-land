@@ -83,7 +83,7 @@ async fn run_inner(addr: String, token: String) -> Result<()> {
     // if key in results is not in values, remove key
     results.retain(|k, _| values.contains(k));
     if values.is_empty() {
-        debug!("No tasks to handle");
+        // debug!("No tasks to handle");
         return Ok(());
     }
     for value in values {
