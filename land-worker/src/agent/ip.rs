@@ -24,12 +24,7 @@ static IP_DATA: Lazy<Mutex<IPInfo>> = Lazy::new(|| {
 pub async fn init() -> Result<()> {
     let resp = reqwest::get(IPINFO_LINK).await?;
     let mut ip_info: IPInfo = resp.json().await?;
-    ip_info.hostname = Some(
-        hostname::get()
-            .unwrap_or("unknown".into())
-            .to_string_lossy()
-            .to_string(),
-    );
+    ip_info.hostname = Some(land_common::version::hostname());
     info!("IP info: {:?}", ip_info);
     let mut ip_data = IP_DATA.lock().await;
     *ip_data = ip_info;

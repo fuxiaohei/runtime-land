@@ -34,3 +34,16 @@ pub fn print(binary: &str, verbose: bool) {
         println!("{} {}", binary, *SHORT);
     }
 }
+
+/// hostname returns the hostname of the machine
+pub fn hostname() -> String {
+    // read /etc/hostname first
+    let hostname = std::fs::read_to_string("/etc/hostname");
+    if let Ok(hostname) = hostname {
+        return hostname.trim().to_string();
+    }
+    hostname::get()
+        .unwrap_or("unknown".into())
+        .to_string_lossy()
+        .to_string()
+}

@@ -7,7 +7,6 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
-hostname = { workspace = true }
 land-common = { workspace = true }
 land-dao = { workspace = true }
 land-wasm = { workspace = true }

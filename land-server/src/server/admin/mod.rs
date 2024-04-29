@@ -169,5 +169,12 @@ pub async fn update_settings(
     csrf_layer.verify(&f.csrf)?;
     land_dao::settings::set(&f.name, &f.value).await?;
     info!("Setting updated: {}", f.name);
+
+    // if storage is updated, need reload
+    if f.name.eq("storage") {
+        info!("Reload storage settings");
+        land_dao::settings::reload_storage().await?;
+    }
+
     Ok(redirect_response("/admin/settings"))
 }

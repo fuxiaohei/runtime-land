@@ -51,10 +51,7 @@ pub fn init_globals(opts: &Opts) -> Result<()> {
     let hostname = if let Some(endpoint) = &opts.endpoint_name {
         endpoint.clone()
     } else {
-        hostname::get()
-            .unwrap_or("unknown".into())
-            .to_string_lossy()
-            .to_string()
+        land_common::version::hostname()
     };
 
     debug!("Endpoint: {}", hostname);
