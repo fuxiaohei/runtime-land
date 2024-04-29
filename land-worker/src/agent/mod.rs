@@ -141,6 +141,7 @@ async fn compare_total(total: &TaskTotal) -> Result<()> {
     let local_file = format!("{}/deploys.json", data_dir);
     // if local file not exists, write total to local file
     if !std::path::Path::new(&local_file).exists() {
+        info!("No local deploys data");
         handle_total(data_dir.as_str(), total).await?;
         let content = serde_json::to_string(total)?;
         std::fs::write(&local_file, content)?;
@@ -157,6 +158,7 @@ async fn compare_total(total: &TaskTotal) -> Result<()> {
     }
 
     // write new total to local file
+    info!("Deploys changes detected");
     handle_total(data_dir.as_str(), total).await?;
     let content = serde_json::to_string(total)?;
     std::fs::write(&local_file, content)?;

@@ -1,6 +1,7 @@
 use crate::db::DB;
 use crate::models::{deployment, deployment_task, project};
 use crate::now_time;
+use crate::user::UserStatus;
 use anyhow::Result;
 use sea_orm::sea_query::Expr;
 use sea_orm::{
@@ -94,6 +95,21 @@ pub async fn create(
     let db = DB.get().unwrap();
     let model = active_model.insert(db).await?;
     Ok(model)
+}
+
+/// create_by_project creates a deployment by project
+pub async fn create_by_project(project_id: i32) -> Result<deployment::Model> {
+    let p = crate::projects::get_by_id(project_id, None).await?;
+    if p.is_none() {
+        return Err(anyhow::anyhow!("project not found"));
+    }
+    let p = p.unwrap();
+    let user = crate::user::get_info_by_id(p.user_id, Some(UserStatus::Active)).await?;
+    if user.is_none() {
+        return Err(anyhow::anyhow!("User not found"));
+    }
+    let user = user.unwrap();
+    return create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await;
 }
 
 /// is_deploying checks if a project is deploying

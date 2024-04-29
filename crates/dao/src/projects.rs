@@ -158,7 +158,7 @@ pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<pr
     let db = DB.get().unwrap();
     let mut select = project::Entity::find()
         .filter(project::Column::Name.eq(name))
-        .filter(project::Column::Status.eq(ProjectStatus::Active.to_string()));
+        .filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()));
     if let Some(user_id) = user_id {
         select = select.filter(project::Column::UserId.eq(user_id));
     }
@@ -171,7 +171,7 @@ pub async fn get_by_id(id: i32, user_id: Option<i32>) -> Result<Option<project::
     let db = DB.get().unwrap();
     let mut select = project::Entity::find()
         .filter(project::Column::Id.eq(id))
-        .filter(project::Column::Status.eq(ProjectStatus::Active.to_string()));
+        .filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()));
     if let Some(user_id) = user_id {
         select = select.filter(project::Column::UserId.eq(user_id));
     }
@@ -248,6 +248,24 @@ pub async fn set_disabled(project_id: i32) -> Result<()> {
         .filter(project::Column::Id.eq(project_id))
         .exec(db)
         .await?;
+    Ok(())
+}
+
+/// set_enabled sets a project as enabled
+pub async fn set_enabled(project_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    project::Entity::update_many()
+        .col_expr(
+            project::Column::Status,
+            Expr::value(ProjectStatus::Active.to_string()),
+        )
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(project::Column::Id.eq(project_id))
+        .exec(db)
+        .await?;
+
+    // create new deployment to deploy again
+    let _ = crate::deployment::create_by_project(project_id).await?;
     Ok(())
 }
 

@@ -28,7 +28,12 @@
                                 <div class="d-flex justify-content-between">
                                     <div class="project-item-title">
                                         <h6 class="fw-bold text-body">{{name}}</h6>
-                                        <p class="text-body-tertiary small mb-1">Edit by {{created_by}}</p>
+                                        <p class="text-body-tertiary small mb-1">Edit by <span
+                                                class="text-uppercase">{{created_by}}</span>
+                                            {{#if (eq_str status 'disabled')}}
+                                            <span class="ms-2 text-uppercase text-danger">{{status}}</span>
+                                            {{/if}}
+                                        </p>
                                     </div>
                                     <div class="project-item-icon">
                                         {{#if (is_js_project language)}}

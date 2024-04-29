@@ -9,7 +9,7 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
 use axum::{Form, Json};
 use axum_csrf::CsrfToken;
 use base64::{engine::general_purpose, Engine};
-use land_dao::projects::Language;
+use land_dao::projects::{Language, ProjectStatus};
 use serde::Deserialize;
 use tracing::info;
 
@@ -265,8 +265,16 @@ pub async fn update_name(
             "Project not found",
         ));
     }
+    let p = p.unwrap();
+    if p.status == ProjectStatus::Disabled.to_string() {
+        return Err(ServerError::status_code(
+            StatusCode::BAD_REQUEST,
+            "Project is disabled",
+        ));
+    }
     info!("Project rename, from: {}, to: {}", name, form.name);
-    land_dao::projects::update_name(p.unwrap().id, form.name, form.desc).await?;
+    land_dao::projects::update_name(p.id, form.name, form.desc).await?;
+    land_dao::deployment::create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await?;
     Ok(redirect_response(&redirect_url))
 }
 

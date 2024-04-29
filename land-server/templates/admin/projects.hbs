@@ -43,9 +43,15 @@
                                         <button data-x-id="{{id}}"
                                             class="redeploy-btn btn btn-link text-decoration-none text-info" href="#"><i
                                                 class="bi bi-download me-2"></i>Redeploy</button>
+                                        {{#if (eq_str status 'disabled')}}
+                                        <button data-x-id="{{id}}"
+                                            class="enable-btn border-start text-decoration-none text-success btn btn-link"><i
+                                                class="bi bi-check2-circle me-2"></i>Enable</button>
+                                        {{else}}
                                         <button data-x-id="{{id}}"
                                             class="disable-btn border-start text-decoration-none text-warning btn btn-link"><i
                                                 class="bi bi-x-octagon me-2"></i>Disable</button>
+                                        {{/if}}
                                     </div>
                                 </li>
                                 {{/each}}
@@ -90,8 +96,26 @@
                 });
                 if (response.status === 200) {
                     alert("Disabled successfully");
+                    window.location.reload();
                 } else {
                     alert("Failed to disable");
+                }
+            });
+        });
+        document.querySelectorAll(".enable-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                const id = e.target.getAttribute("data-x-id");
+                const values = new URLSearchParams()
+                values.append("project_id", id)
+                const response = await fetch(`/admin/projects/enable`, {
+                    method: "POST",
+                    body: values,
+                });
+                if (response.status === 200) {
+                    alert("Enabled successfully");
+                    window.location.reload();
+                } else {
+                    alert("Failed to enable");
                 }
             });
         });

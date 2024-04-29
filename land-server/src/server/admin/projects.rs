@@ -142,3 +142,26 @@ pub async fn disable_project(
     );
     Ok(())
 }
+
+/// ProjectEnableQuery is a queyr struct for enable_project
+type ProjectEnableQuery = ProjectDisableQuery;
+
+/// enable_project is a handler for POST /admin/projects/enable
+pub async fn enable_project(
+    Form(f): Form<ProjectEnableQuery>,
+) -> Result<impl IntoResponse, ServerError> {
+    let project = land_dao::projects::get_by_id(f.project_id, None).await?;
+    if project.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let project = project.unwrap();
+    land_dao::projects::set_enabled(project.id).await?;
+    info!(
+        "Enable project: {}, name: {}",
+        project.id, project.prod_domain
+    );
+    Ok(())
+}

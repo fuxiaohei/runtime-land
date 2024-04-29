@@ -1,8 +1,10 @@
 use super::{TaskTotal, TaskValue};
 use crate::agent::{CLIENT, DATA_DIR};
 use anyhow::Result;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use tracing::{debug, info};
+use walkdir::WalkDir;
 
 async fn download_wasm(data_dir: &str, task: &TaskValue) -> Result<()> {
     let wasm_path = format!("{}/{}", data_dir, task.wasm_path);
@@ -22,9 +24,9 @@ async fn download_wasm(data_dir: &str, task: &TaskValue) -> Result<()> {
     Ok(())
 }
 
-fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<()> {
+fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<String> {
     let conf_file = format!(
-        "{}/traefik/{}.yaml",
+        "{}/traefik/fn_{}.yaml",
         data_dir,
         task.domain.replace('.', "_")
     );
@@ -34,7 +36,7 @@ fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<()> {
         let old_md5 = format!("{:x}", md5::compute(old_conf.as_bytes()));
         if old_md5.eq(&task.traefik_checksum.clone().unwrap_or_default()) {
             debug!("Traefik conf file already exists: {}", conf_file);
-            return Ok(());
+            return Ok(conf_file);
         }
     }
     let conf_dir = PathBuf::from(conf_file.clone());
@@ -42,8 +44,8 @@ fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<()> {
     std::fs::create_dir_all(conf_dir)?;
 
     info!("Write traefik conf to file: {}", conf_file);
-    std::fs::write(conf_file, task.traefik.clone().unwrap_or_default())?;
-    Ok(())
+    std::fs::write(&conf_file, task.traefik.clone().unwrap_or_default())?;
+    Ok(conf_file)
 }
 
 /// handle_task handles the task
@@ -56,13 +58,14 @@ pub async fn handle_task(task: &TaskValue) -> Result<()> {
     land_wasm::pool::prepare_worker(&task.wasm_path, true).await?;
 
     // 3. write traefik conf after wasm is ready
-    write_traefik_conf(data_dir.as_str(), task)?;
+    let _ = write_traefik_conf(data_dir.as_str(), task)?;
 
     Ok(())
 }
 
 /// handle_total handles the total tasks
 pub async fn handle_total(data_dir: &str, total: &TaskTotal) -> Result<()> {
+    let mut writed_conf_files = HashMap::new();
     for task in &total.tasks {
         // 1. it downloads wasm module file
         download_wasm(data_dir, task).await?;
@@ -72,7 +75,29 @@ pub async fn handle_total(data_dir: &str, total: &TaskTotal) -> Result<()> {
         land_wasm::pool::compile_aot(&wasm_path).await?;
 
         // 3. write traefik conf
-        write_traefik_conf(data_dir, task)?;
+        let conf_file = write_traefik_conf(data_dir, task)?;
+        writed_conf_files.insert(conf_file, true);
+    }
+
+    // clean deleted deploys conf file
+    let traefik_conf_dir = format!("{}/traefik", data_dir);
+    for entry in WalkDir::new(traefik_conf_dir) {
+        let entry = entry?;
+        if !entry.file_type().is_file() {
+            continue;
+        }
+        let path = entry.path();
+        let filename = path.file_name().unwrap().to_str().unwrap();
+        if !filename.starts_with("fn_") {
+            continue;
+        }
+        // if path exist in writed_conf_files, continue,
+        // otherwise, delete the file
+        if writed_conf_files.contains_key(path.to_str().unwrap()) {
+            continue;
+        }
+        info!("Delete traefik conf file: {}", path.to_str().unwrap());
+        std::fs::remove_file(path)?;
     }
     Ok(())
 }

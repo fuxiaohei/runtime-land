@@ -17,11 +17,21 @@
         </div>
     </div>
     <div class="btns">
+        {{#unless (eq_str project.status 'disabled')}}
         <a href="{{project.prod_domain_url}}" target="_blank" class="btn btn-primary"><i
                 class="bi bi-link-45deg me-2"></i>View</a>
         {{#if project.is_editable}}
         <a href="/playground/{{project.name}}" class="btn btn-danger ms-3"><i
                 class="bi bi-pencil-square me-2"></i>Edit</a>
         {{/if}}
+        {{/unless}}
     </div>
 </div>
+{{#if (eq_str project.status 'disabled')}}
+<div class="container mt-3">
+    <div class="mx-1 alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Your project is disabled. Please contact the Administrator to enable it.
+    </div>
+</div>
+{{/if}}
