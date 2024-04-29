@@ -52,6 +52,7 @@ pub async fn update_online(
             info!("Set worker online: {}", ip);
         }
         let mut active_info: worker::ActiveModel = info.into();
+        active_info.hostname = Set(hostname);
         active_info.status = Set(status.to_string());
         active_info.updated_at = Set(now);
         let info = active_info.update(db).await?;

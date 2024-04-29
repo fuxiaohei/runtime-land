@@ -26,7 +26,8 @@ services:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
       - LAND_SERVICE_NAME=land-worker@docker
       - LAND_DATA_DIR=/data/runtime-land
-      - HOSTNAME=$(cat /etc/hostname)
+      - LAND_SERVER_URL=${LAND_SERVER_URL}
+      - HOSTNAME=localhost
     ports:
       - "9000:9000" # metrics port
     networks:
