@@ -109,7 +109,7 @@ pub async fn create_by_project(project_id: i32) -> Result<deployment::Model> {
         return Err(anyhow::anyhow!("User not found"));
     }
     let user = user.unwrap();
-    return create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await;
+    create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await
 }
 
 /// is_deploying checks if a project is deploying

@@ -37,8 +37,8 @@ pub fn print(binary: &str, verbose: bool) {
 
 /// hostname returns the hostname of the machine
 pub fn hostname() -> String {
-    // read /etc/hostname first
-    let hostname = std::fs::read_to_string("/etc/hostname");
+    // read HOSTNAME env
+    let hostname = std::env::var("HOSTNAME");
     if let Ok(hostname) = hostname {
         return hostname.trim().to_string();
     }

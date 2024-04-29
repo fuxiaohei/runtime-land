@@ -6,12 +6,12 @@ authors = { workspace = true }
 
 [dependencies]
 clap = { workspace = true }
+hostname = "0.4.0"
 lazy_static = { workspace = true }
 serde = { workspace = true }
 time = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-hostname = "0.4.0"
 
 [build-dependencies]
 vergen = { version = "8.3.1", features = [

@@ -932,7 +932,7 @@ dependencies = [
  "cranelift-entity",
  "cranelift-isle",
  "gimli",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "log",
  "regalloc2",
  "smallvec",
@@ -1150,7 +1150,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "978747c1d849a7d2ee5e8adc0159961c48fb7e5db2f06af6723b80123bb53856"
 dependencies = [
  "cfg-if",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "lock_api",
  "once_cell",
  "parking_lot_core",
@@ -1687,9 +1687,9 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.14.3"
+version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "290f1a1d9242c78d09ce40a5e87e7554ee637af1351968159f4952f028f75604"
+checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 dependencies = [
  "ahash 0.8.11",
  "allocator-api2",
@@ -1701,7 +1701,7 @@ version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
 dependencies = [
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
 ]
 
 [[package]]
@@ -2030,7 +2030,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "168fb715dda47215e360912c096649d23d58bf392ac62f73919e831745e40f26"
 dependencies = [
  "equivalent",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "serde",
 ]
 
@@ -2219,7 +2219,7 @@ dependencies = [
  "http 1.1.0",
  "land-sdk-macro",
  "lazy_static",
- "matchit 0.8.1",
+ "matchit 0.8.2",
  "wit-bindgen",
 ]
 
@@ -2492,9 +2492,9 @@ checksum = "0e7465ac9959cc2b1404e8e2367b43684a6d13790fe23056cc8c6c5a6b7bcb94"
 
 [[package]]
 name = "matchit"
-version = "0.8.1"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "357db4d45704af452edb5861033c1c28db6f583d2e34cc6d40c6e096eb111499"
+checksum = "540f1c43aed89909c0cc0cc604e3bb2f7e7a341a3728a9e6cfe760e733cd11ed"
 
 [[package]]
 name = "maybe-owned"
@@ -2580,7 +2580,7 @@ checksum = "8b07a5eb561b8cbc16be2d216faf7757f9baf3bfb94dbb0fae3df8387a5bb47f"
 dependencies = [
  "crossbeam-epoch",
  "crossbeam-utils",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "metrics",
  "num_cpus",
  "quanta",
@@ -2809,7 +2809,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8dd6c0cdf9429bce006e1362bfce61fa1bfd8c898a643ed8d2b471934701d3d"
 dependencies = [
  "crc32fast",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "indexmap",
  "memchr",
 ]
@@ -2877,7 +2877,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49203cdcae0030493bad186b28da2fa25645fa276a51b6fec8010d281e02ef79"
 dependencies = [
  "dlv-list",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
 ]
 
 [[package]]
@@ -5534,7 +5534,7 @@ checksum = "39192edb55d55b41963db40fd49b0b542156f04447b5b512744a91d38567bdbc"
 dependencies = [
  "ahash 0.8.11",
  "bitflags 2.5.0",
- "hashbrown 0.14.3",
+ "hashbrown 0.14.5",
  "indexmap",
  "semver",
 ]
