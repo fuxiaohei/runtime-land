@@ -1,0 +1,45 @@
+<div class="pt-3 px-3 container border-top" id="account-traffic" data-x-acc="{{user.uuid}}">
+    <div>
+        <h6 class="mb-0">Global Traffic</h6>
+        <p class="fs-6 text-body-tertiary mb-0">Aggregated all projects traffic in recently.</p>
+    </div>
+    <div class="row g-4 py-4">
+        <div class="col-6">
+            <div class="border rounded p-4">
+                <div>
+                    <p class="text-body-tertiary text-uppercase mb-2">Request counts</p>
+                    <p class="fw-bold mb-1" id="requests-total"></p>
+                    <div id="requests-loading-spinner" class="spinner-grow spinner-grow-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="requests-chart" style="height: 150px;"></div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="border rounded p-4">
+                <div>
+                    <p class="text-body-tertiary text-uppercase mb-2">Transferred Bytes</p>
+                    <p class="fw-bold mb-1" id="flows-total"></p>
+                    <div id="flows-loading-spinner" class="spinner-grow spinner-grow-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="flows-chart" style="height: 150px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"
+    integrity="sha256-QvgynZibb2U53SsVu98NggJXYqwRL7tg3FeyfXvPOUY=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    (() => {
+        let params = new URLSearchParams();
+        // params.append("account", document.getElementById("account-traffic").getAttribute("data-x-acc"));
+        params.append("account", "90071832-582e-4037-9d76-93cb1e3d706e")
+        fetch("/traffic/requests", {
+            method: "POST",
+            body: params,
+        })
+    })()
+</script>

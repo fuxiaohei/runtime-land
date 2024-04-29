@@ -23,6 +23,7 @@ mod projects;
 mod settings;
 mod vars;
 pub use vars::{PaginationVar, ProjectVar, TokenVar, WorkerVar};
+mod traffic;
 
 /// index is a handler for GET /
 pub async fn index(
@@ -102,6 +103,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-in", get(auth::sign_in))
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
+        .route("/traffic/requests", post(traffic::requests))
         .nest("/projects", projects_router)
         .nest("/settings", settings_router)
         .nest("/admin", admin_router)
