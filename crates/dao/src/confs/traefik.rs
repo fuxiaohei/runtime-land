@@ -9,13 +9,12 @@ pub struct TraefikConfs {
 }
 
 /// build_item builds the TraefikConfs for the given TaskValue.
-pub fn build_item(item: &TaskValue) -> Result<TraefikConfs> {
+pub fn build_item(item: &TaskValue, service_name: &str) -> Result<TraefikConfs> {
     let mut traefik_confs = HttpTraefikConfs {
         //services: HashMap::new(),
         routers: BTreeMap::new(),
         middlewares: BTreeMap::new(),
     };
-    let svc = std::env::var("LAND_SERVICE_NAME").unwrap_or_else(|_| "runtimeland-foo".to_string());
     let mut headers = MiddlewareHeader {
         custom_request_headers: BTreeMap::new(),
     };
@@ -35,7 +34,7 @@ pub fn build_item(item: &TaskValue) -> Result<TraefikConfs> {
 
     let router = Router {
         middlewares: vec![format!("m-{}", item.task_id)],
-        service: svc.clone(),
+        service: service_name.to_string(),
         rule: format!("Host(`{}`)", item.domain),
     };
     traefik_confs

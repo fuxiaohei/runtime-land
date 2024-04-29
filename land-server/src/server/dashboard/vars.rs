@@ -28,7 +28,7 @@ impl ProjectVar {
     pub async fn from_models_vec(
         projects: Vec<models::project::Model>,
     ) -> anyhow::Result<Vec<ProjectVar>> {
-        let (domain, protocol) = settings::get_domain_settings().await?;
+        let (domain, protocol, _) = settings::get_domain_settings().await?;
         Ok(projects
             .into_iter()
             .map(|p| ProjectVar {
@@ -58,7 +58,7 @@ impl ProjectVar {
         project: &land_dao::models::project::Model,
         playground: Option<&land_dao::models::playground::Model>,
     ) -> anyhow::Result<Self> {
-        let (domain, protocol) = settings::get_domain_settings().await?;
+        let (domain, protocol, _) = settings::get_domain_settings().await?;
         let mut var = ProjectVar {
             id: project.id,
             name: project.name.clone(),

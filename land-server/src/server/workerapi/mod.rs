@@ -93,10 +93,10 @@ async fn alive(Json(p): Json<AliveRequest>) -> Result<impl IntoResponse, ServerE
 async fn deploys() -> Result<impl IntoResponse, ServerError> {
     let dps = land_dao::deployment::list_by_status(DeployStatus::Success).await?;
     let mut tasks = vec![];
-    let (domain, _) = land_dao::settings::get_domain_settings().await?;
+    let (domain, _, service_name) = land_dao::settings::get_domain_settings().await?;
     let storage_settings = land_dao::settings::get_storage().await?;
     for dp in dps {
-        let task_value = TaskValue::new(&dp, &storage_settings, &domain)?;
+        let task_value = TaskValue::new(&dp, &storage_settings, &domain, &service_name)?;
         tasks.push(task_value);
     }
     let content = serde_json::to_vec(&tasks)?;

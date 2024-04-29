@@ -16,6 +16,7 @@ static DOMAIN_SETTINGS: &str = "domain_settings";
 pub struct DomainSettings {
     pub domain: String,
     pub protocol: String,
+    pub service_name: String,
 }
 
 /// init_defaults initializes default settings
@@ -31,6 +32,7 @@ async fn init_default_domains() -> Result<()> {
         let content = serde_json::to_string(&DomainSettings {
             domain: "127-0-0-1.nip.io".to_string(),
             protocol: "http".to_string(),
+            service_name: "land-worker@docker".to_string(), // traefik service name
         })?;
         set(DOMAIN_SETTINGS, &content).await?;
         info!("Init domain settings: {}", content);
@@ -39,15 +41,23 @@ async fn init_default_domains() -> Result<()> {
 }
 
 /// get_domain_settings returns domain suffix and protocol
-pub async fn get_domain_settings() -> Result<(String, String)> {
+pub async fn get_domain_settings() -> Result<(String, String, String)> {
     let content = get(DOMAIN_SETTINGS).await?.unwrap().value;
     let settings: DomainSettings = serde_json::from_str(content.as_str())?;
-    Ok((settings.domain, settings.protocol))
+    Ok((settings.domain, settings.protocol, settings.service_name))
 }
 
 /// set_domain_settings sets domain suffix and protocol
-pub async fn set_domain_settings(domain: String, protocol: String) -> Result<()> {
-    let content = serde_json::to_string(&DomainSettings { domain, protocol })?;
+pub async fn set_domain_settings(
+    domain: String,
+    protocol: String,
+    service_name: String,
+) -> Result<()> {
+    let content = serde_json::to_string(&DomainSettings {
+        domain,
+        protocol,
+        service_name,
+    })?;
     set(DOMAIN_SETTINGS, &content).await?;
     Ok(())
 }
