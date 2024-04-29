@@ -1,1 +1,3 @@
-docker run -p 9090:9090 -v $(pwd)/deploy/prometheus.yaml:/etc/prometheus/prometheus.yml -v $(pwd)/data/prometheus-data:/prometheus prom/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.retention.time=40d
+docker run -p 9090:9090 -v $(pwd)/deploy/prometheus.yaml:/etc/prometheus/prometheus.yml -v $(pwd)/data/prometheus-data:/prometheus prom/prometheus --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=40d --config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web-config.yml
+
+# /bin/prometheus --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=40d --config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web-config.yml

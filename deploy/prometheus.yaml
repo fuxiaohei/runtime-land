@@ -7,7 +7,7 @@ alerting:
     - static_configs:
         - targets: []
 scrape_configs:
-  - job_name: "runtime-land-v03"
+  - job_name: "runtime-land-dev"
     static_configs:
       - targets:
-          - "43.133.43.122:9000"
+          - "127.0.0.1:9000"
