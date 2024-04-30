@@ -68,7 +68,7 @@ pub fn extract(dir: &str) -> Result<()> {
         let content = TemplateAssets::get(&filepath).unwrap().data;
         let mut path = std::path::PathBuf::from(dir);
         path.push(filepath);
-        debug!(path = path.to_str(), "Extract asset");
+        // debug!(path = path.to_str(), "Extract asset");
 
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
         std::fs::write(path, content).unwrap();
