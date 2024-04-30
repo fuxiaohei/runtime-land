@@ -342,9 +342,9 @@ dependencies = [
 
 [[package]]
 name = "axum-template"
-version = "2.2.0"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36ecc5f1c66c5633fd8aca0fa1960a5ee455a89f0694e71636d96a9737e0f689"
+checksum = "f7013f6403ac283c62d843b344d27742a3ffb48f57a2263522b7c978cec40cc1"
 dependencies = [
  "axum",
  "handlebars",
@@ -2159,7 +2159,7 @@ version = "0.1.0"
 
 [[package]]
 name = "land-common"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "clap",
  "hostname 0.4.0",
@@ -2173,7 +2173,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "jsonwebtoken",
@@ -2187,7 +2187,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2213,7 +2213,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2225,7 +2225,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2235,7 +2235,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -2267,7 +2267,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2289,7 +2289,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2301,7 +2301,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -2323,7 +2323,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-server"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -2356,9 +2356,9 @@ checksum = "884e2677b40cc8c339eaefcb701c32ef1fd2493d71118dc0ca4b6a736c93bd67"
 
 [[package]]
 name = "libc"
-version = "0.2.153"
+version = "0.2.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
+checksum = "ae743338b92ff9146ce83992f766a31066a91a8c84a45e0e9f21e7cf6de6d346"
 
 [[package]]
 name = "libflate"
@@ -3430,9 +3430,9 @@ dependencies = [
 
 [[package]]
 name = "raw-cpuid"
-version = "11.0.1"
+version = "11.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d86a7c4638d42c44551f4791a20e687dbb4c3de1f33c43dd71e355cd429def1"
+checksum = "e29830cbb1290e404f24c73af91c5d8d631ce7e128691e9477556b540cd01ecd"
 dependencies = [
  "bitflags 2.5.0",
 ]
@@ -3792,7 +3792,7 @@ dependencies = [
 
 [[package]]
 name = "rust-helloworld"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -4385,9 +4385,9 @@ checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
 
 [[package]]
 name = "socket2"
-version = "0.5.6"
+version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05ffd9c0a93b7543e062e759284fcf5f5e3b098501104bfbdde4d404db792871"
+checksum = "ce305eb0b4296696835b71df73eb912e0f1ffd2556a501fcede6e0c50349191c"
 dependencies = [
  "libc",
  "windows-sys 0.52.0",

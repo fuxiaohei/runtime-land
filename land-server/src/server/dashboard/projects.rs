@@ -27,7 +27,7 @@ pub async fn index(
 
     // list all projects
     let projects_data = land_dao::projects::list_by_user_id(user.id, None, 99).await?;
-    info!("List projects: {}", projects_data.len());
+    info!("List projects: {}, acc: {}", projects_data.len(), user.uuid);
     let projects = ProjectVar::from_models_vec(projects_data).await?;
     Ok(RenderHtmlMinified(
         "projects.hbs",

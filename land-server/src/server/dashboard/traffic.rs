@@ -26,15 +26,15 @@ impl RequestsForm {
     fn get_period(&self) -> PeriodParams {
         let st = chrono::Utc::now().timestamp();
         if let Some(p) = self.period.as_ref() {
-            if p.eq("weekly") {
+            if p.eq("7d") {
                 let end = (st + 3599) / 3600 * 3600; // add 3500 for round hour, use next hour
                 let start = end - 604800; // 86400 * 7 + 2
-                let sequence = (0..169).map(|i| start + i * 3600).collect();
+                let sequence = (0..85).map(|i| start + i * 3600 * 2).collect();
                 return PeriodParams {
                     start,
                     end,
                     step: 3600,
-                    step_word: "1h".to_string(),
+                    step_word: "2h".to_string(),
                     sequence,
                 };
             }

@@ -40,7 +40,11 @@ pub async fn index(
     // list recent updated projects
     // the overview page show 5 cards of the recent updated projects
     let projects_data = land_dao::projects::list_by_user_id(user.id, None, 5).await?;
-    info!("Overview projects: {}", projects_data.len());
+    info!(
+        "Overview projects: {}, acc: {}",
+        projects_data.len(),
+        user.uuid
+    );
     let projects = ProjectVar::from_models_vec(projects_data).await?;
 
     Ok(RenderHtmlMinified(
@@ -80,7 +84,8 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/projects/enable", post(admin::enable_project))
         .route("/workers", get(admin::workers))
         .route("/create-token", post(admin::create_token))
-        .route("/delete-token", post(admin::delete_token));
+        .route("/delete-token", post(admin::delete_token))
+        .route("/debug", get(admin::debug));
 
     let projects_router = Router::new()
         .route("/", get(projects::index))

@@ -8,7 +8,7 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
-axum-template = { version = "2.2.0", features = ["handlebars"] }
+axum-template = { version = "2.3.0", features = ["handlebars"] }
 axum_csrf = { version = "0.9.0", features = ["layer"] }
 base64 = { workspace = true }
 chrono = { workspace = true }

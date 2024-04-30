@@ -27,7 +27,7 @@
                                 <th scope="col" class="lang"></th>
                                 <th scope="col">Name</th>
                                 <th scope="col">URL</th>
-                                <th scope="col">Traffic</th>
+                                <th scope="col">Traffic<span class="small ms-1 text-body-tertiary">(REQUESTS | BYTES, 24 Hour)</span></th>
                                 <th scope="col">Updated</th>
                             </tr>
                         </thead>
@@ -48,7 +48,7 @@
                                 <td class="title">
                                     <h6 class="fw-bold mb-1"><a href="/projects/{{name}}"
                                             class="text-body text-decoration-none">{{name}}</a></h6>
-                                    <p class="mb-0 text-body-tertiary small">{{description}}</p>
+                                    <p class="mb-0 text-body-secondary small">{{description}}</p>
                                 </td>
                                 <td class="url">
                                     <a class="text-body-secondary" href="{{prod_domain_url}}"
@@ -59,7 +59,7 @@
                                     <span class="total-bandwidth">284.94 MiB</span>
                                 </td>
                                 <td class="updated">
-                                    <span class="time-ago text-body-tertiary small"
+                                    <span class="time-ago text-body-secondary small"
                                         data-x-timeago="{{updated_at}}">{{updated_at}}</span>
                                 </td>
                             </tr>

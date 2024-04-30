@@ -6,7 +6,20 @@
     {{else}}
     <div>
         <h6 class="mb-0">Global Traffic</h6>
-        <p class="fs-6 text-body-tertiary mb-0">Aggregated all projects traffic in recently.</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <p class="text-body-tertiary mb-1">Aggregate traffic data for your account.</p>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle text-body-secondary custom-theme-btn"
+                    id="traffic-period-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Last 24 Hours
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item traffic-period-select" data-x-period="1d" href="#">Last 24 Hours</a>
+                    </li>
+                    <li><a class="dropdown-item traffic-period-select" data-x-period="7d" href="#">Last 7 Days</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
     {{/if}}
     <div class="row g-4 py-4">
@@ -39,12 +52,18 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"
     integrity="sha256-QvgynZibb2U53SsVu98NggJXYqwRL7tg3FeyfXvPOUY=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-    (async () => {
+
+    const load_requests = (async () => {
         let d = document.getElementById("requests-loading-spinner");
+        d.classList.remove("d-none");
+        let c = document.getElementById('requests-chart');
+        c.classList.add("opacity-0");
+
         let acc = document.getElementById("traffic").getAttribute("data-x-acc");
         let project = document.getElementById("traffic").getAttribute("data-x-project") || "";
         let params = new URLSearchParams();
         params.append("account", acc);
+        params.append("period", window.traffic_period || "1d");
         if (project) {
             params.append("project", project);
         }
@@ -59,10 +78,12 @@
         }
         // hide loading spinner
         d.classList.add("d-none");
+        c.classList.remove("opacity-0");
+
         let series = await resp.json();
         series = series["metric"] || { total: 0, values: [] };
         document.getElementById("requests-total").innerText = friendly_bytesize(series.total, false);
-        let chart = echarts.init(document.getElementById('requests-chart'), null, { renderer: 'svg' });
+        let chart = echarts.init(c, null, { renderer: 'svg' });
         let option = {
             title: {
                 show: false,
@@ -114,7 +135,7 @@
                             },
                             {
                                 offset: 1,
-                                color: '#FFF'
+                                color: 'rgba(201,30,4,0)'
                             }
                         ])
                     },
@@ -122,14 +143,20 @@
             ]
         };
         chart.setOption(option);
-    })();
+    });
+    load_requests();
 
-    (async () => {
+    const load_flows = (async () => {
         let d = document.getElementById("flows-loading-spinner");
+        d.classList.remove("d-none");
+        let c = document.getElementById('flows-chart');
+        c.classList.add("opacity-0");
+
         let acc = document.getElementById("traffic").getAttribute("data-x-acc");
         let project = document.getElementById("traffic").getAttribute("data-x-project") || "";
         let params = new URLSearchParams();
         params.append("account", acc);
+        params.append("period", window.traffic_period || "1d");
         if (project) {
             params.append("project", project);
         }
@@ -144,6 +171,8 @@
         }
         // hide loading spinner
         d.classList.add("d-none");
+        c.classList.remove("opacity-0");
+
         let series = await resp.json();
         let in_series = series["flowtype-in-uuid-" + acc] || { total: 0, values: [] };
         let out_series = series["flowtype-out-uuid-" + acc] || { total: 0, values: [] };
@@ -152,7 +181,7 @@
             out_series = series["flowtype-out-p_uuid-" + project] || { total: 0, values: [] };
         }
         document.getElementById("flows-total").innerText = friendly_bytesize(out_series.total, true);
-        let chart = echarts.init(document.getElementById('flows-chart'), null, { renderer: 'svg' });
+        let chart = echarts.init(c, null, { renderer: 'svg' });
         let option = {
             title: {
                 show: false,
@@ -210,7 +239,7 @@
                             },
                             {
                                 offset: 1,
-                                color: '#FFF'
+                                color: 'rgba(8, 52, 189, 0)'
                             }
                         ])
                     },
@@ -224,7 +253,7 @@
                     lineStyle: {
                         normal: {
                             color: "#91cc75",
-                            width: 2,
+                            width: 1,
                         }
                     },
                     areaStyle: {
@@ -235,7 +264,7 @@
                             },
                             {
                                 offset: 1,
-                                color: '#FFF'
+                                color: 'rgba(58, 173, 3, 0)'
                             }
                         ])
                     },
@@ -243,7 +272,8 @@
             ]
         };
         chart.setOption(option);
-    })();
+    });
+    load_flows();
 
     /// friendly_bytesize convert bytes to human readable size
     function friendly_bytesize(v, with_byte_unit) {
@@ -268,6 +298,27 @@
         const hours = dateObj.getHours() >= 10 ? dateObj.getHours() : '0' + dateObj.getHours()
         const minutes = dateObj.getMinutes() < 10 ? dateObj.getMinutes() + '0' : dateObj.getMinutes()
         const UnixTimeToDate = hours + ':' + minutes
+        if (window.traffic_period == "7d") {
+            const month = dateObj.getMonth() + 1
+            const days = dateObj.getDate() >= 10 ? dateObj.getDate() : '0' + dateObj.getDate()
+            return month + '/' + days + ' ' + UnixTimeToDate
+        }
         return UnixTimeToDate
     }
+
+    (() => {
+        document.querySelectorAll(".traffic-period-select").forEach((e) => {
+            e.addEventListener("click", function (e) {
+                e.preventDefault();
+                // set traffic period to global
+                let period = e.target.getAttribute("data-x-period");
+                window.traffic_period = period;
+                let text = e.target.innerText;
+                document.getElementById("traffic-period-btn").innerText = text;
+                load_requests();
+                load_flows();
+            });
+        });
+    })();
+
 </script>

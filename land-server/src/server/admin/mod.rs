@@ -3,7 +3,7 @@ use super::{dashboard::SessionUser, templates::TemplateEngine, ServerError};
 use crate::server::dashboard::WorkerVar;
 use crate::server::{dashboard::TokenVar, templates::RenderHtmlMinified, PageVars};
 use anyhow::Result;
-use axum::extract::Query;
+use axum::extract::{Query, Request};
 use axum::{response::IntoResponse, Extension};
 use axum::{Form, Json};
 use axum_csrf::CsrfToken;
@@ -177,4 +177,14 @@ pub async fn update_settings(
     }
 
     Ok(redirect_response("/admin/settings"))
+}
+
+/// debug is a handler for GET /admin/debug
+pub async fn debug(req: Request) -> Result<impl IntoResponse, ServerError> {
+    // print uri and headers
+    info!("uri: {}", req.uri());
+    for (key, value) in req.headers() {
+        info!("{}: {:?}", key, value);
+    }
+    Ok(redirect_response("/admin"))
 }
