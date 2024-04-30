@@ -121,7 +121,10 @@ async fn log_middleware(request: Request, next: Next) -> Result<Response, Status
         return Ok(next.run(request).await);
     }
     let mut remote = "0.0.0.0".to_string();
-    if let Some(connect_info) = request.extensions().get::<ConnectInfo<SocketAddr>>() {
+    // if x-real-ip exists, use it
+    if let Some(real_ip) = request.headers().get("x-real-ip") {
+        remote = real_ip.to_str().unwrap().to_string();
+    } else if let Some(connect_info) = request.extensions().get::<ConnectInfo<SocketAddr>>() {
         remote = connect_info.to_string();
     }
 
