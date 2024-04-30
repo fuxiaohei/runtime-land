@@ -1,8 +1,14 @@
-<div class="pt-3 px-3 container border-top" id="account-traffic" data-x-acc="{{user.uuid}}">
+<div class="container" id="traffic" data-x-acc="{{user.uuid}}" data-x-project="{{project.uuid}}">
+    {{#if project}}
+    <div>
+        <h6 class="mb-0">Traffic Analysis</h6>
+    </div>
+    {{else}}
     <div>
         <h6 class="mb-0">Global Traffic</h6>
         <p class="fs-6 text-body-tertiary mb-0">Aggregated all projects traffic in recently.</p>
     </div>
+    {{/if}}
     <div class="row g-4 py-4">
         <div class="col-6">
             <div class="border rounded p-4">
@@ -33,13 +39,235 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"
     integrity="sha256-QvgynZibb2U53SsVu98NggJXYqwRL7tg3FeyfXvPOUY=" crossorigin="anonymous"></script>
 <script type="text/javascript">
-    (() => {
+    (async () => {
+        let d = document.getElementById("requests-loading-spinner");
+        let acc = document.getElementById("traffic").getAttribute("data-x-acc");
+        let project = document.getElementById("traffic").getAttribute("data-x-project") || "";
         let params = new URLSearchParams();
-        // params.append("account", document.getElementById("account-traffic").getAttribute("data-x-acc"));
-        params.append("account", "90071832-582e-4037-9d76-93cb1e3d706e")
-        fetch("/traffic/requests", {
+        params.append("account", acc);
+        if (project) {
+            params.append("project", project);
+        }
+        let resp = await fetch("/traffic/requests", {
             method: "POST",
             body: params,
         })
-    })()
+        if (!resp.ok) {
+            document.getElementById("requests-total").innerText = "Request timeout";
+            d.classList.add("d-none");
+            return
+        }
+        // hide loading spinner
+        d.classList.add("d-none");
+        let series = await resp.json();
+        series = series["metric"] || { total: 0, values: [] };
+        document.getElementById("requests-total").innerText = friendly_bytesize(series.total, false);
+        let chart = echarts.init(document.getElementById('requests-chart'), null, { renderer: 'svg' });
+        let option = {
+            title: {
+                show: false,
+            },
+            tooltip: {
+                trigger: "axis",
+                formatter: function (params) {
+                    let t = params[0].axisValueLabel;
+                    let v = params[0].value[1];
+                    return `<span>${t}<br/><span style="color:#AC3B2A">REQUESTS</span> <strong>${v}</strong></span>`
+                }
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    formatter: function (value, index) {
+                        return unix2hour(value) // js use milliseconds
+                    },
+                    color: "#AAA",
+                },
+                splitNumber: 3,
+            },
+            yAxis: {
+                show: false
+            },
+            grid: {
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 20,
+            },
+            series: [
+                {
+                    type: 'line',
+                    data: series.values || [],
+                    smooth: true,
+                    symbol: "none",
+                    lineStyle: {
+                        normal: {
+                            color: "#AC3B2A",
+                            width: 1,
+                        }
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: '#AC3B2A'
+                            },
+                            {
+                                offset: 1,
+                                color: '#FFF'
+                            }
+                        ])
+                    },
+                }
+            ]
+        };
+        chart.setOption(option);
+    })();
+
+    (async () => {
+        let d = document.getElementById("flows-loading-spinner");
+        let acc = document.getElementById("traffic").getAttribute("data-x-acc");
+        let project = document.getElementById("traffic").getAttribute("data-x-project") || "";
+        let params = new URLSearchParams();
+        params.append("account", acc);
+        if (project) {
+            params.append("project", project);
+        }
+        let resp = await fetch("/traffic/flows", {
+            method: "POST",
+            body: params,
+        })
+        if (!resp.ok) {
+            document.getElementById("flows-total").innerText = "Request timeout";
+            d.classList.add("d-none");
+            return
+        }
+        // hide loading spinner
+        d.classList.add("d-none");
+        let series = await resp.json();
+        let in_series = series["flowtype-in-uuid-" + acc] || { total: 0, values: [] };
+        let out_series = series["flowtype-out-uuid-" + acc] || { total: 0, values: [] };
+        if (project) {
+            in_series = series["flowtype-in-p_uuid-" + project] || { total: 0, values: [] };
+            out_series = series["flowtype-out-p_uuid-" + project] || { total: 0, values: [] };
+        }
+        document.getElementById("flows-total").innerText = friendly_bytesize(out_series.total, true);
+        let chart = echarts.init(document.getElementById('flows-chart'), null, { renderer: 'svg' });
+        let option = {
+            title: {
+                show: false,
+            },
+            tooltip: {
+                trigger: "axis",
+                formatter: function (params) {
+                    let t = params[0].axisValueLabel;
+                    let content = `<span>${t}<br/>`
+                    params.forEach((p) => {
+                        let v = friendly_bytesize(p.value[1], true);
+                        let name = p.seriesName.toUpperCase();
+                        content += `<span style="color:${p.color}">${name}</span> <strong>${v}</strong><br/>`
+                    })
+                    return content + "</span>"
+                }
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    formatter: function (value, index) {
+                        return unix2hour(value) // js use milliseconds
+                    },
+                    color: "#AAA",
+                },
+                splitNumber: 3,
+            },
+            yAxis: {
+                show: false
+            },
+            grid: {
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 20,
+            },
+            series: [
+                {
+                    type: 'line',
+                    data: in_series.values,
+                    name: "in",
+                    smooth: true,
+                    symbol: "none",
+                    lineStyle: {
+                        normal: {
+                            color: "#5470c6",
+                            width: 1,
+                        }
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: '#5470c6'
+                            },
+                            {
+                                offset: 1,
+                                color: '#FFF'
+                            }
+                        ])
+                    },
+                },
+                {
+                    type: 'line',
+                    data: out_series.values,
+                    name: "out",
+                    smooth: true,
+                    symbol: "none",
+                    lineStyle: {
+                        normal: {
+                            color: "#91cc75",
+                            width: 2,
+                        }
+                    },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: "#91cc75"
+                            },
+                            {
+                                offset: 1,
+                                color: '#FFF'
+                            }
+                        ])
+                    },
+                },
+            ]
+        };
+        chart.setOption(option);
+    })();
+
+    /// friendly_bytesize convert bytes to human readable size
+    function friendly_bytesize(v, with_byte_unit) {
+        if (v < 0.1) {
+            return 0
+        }
+        let bytes_units = ['iB', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        let units = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+        let i = 0;
+        while (v > 1000) {
+            v /= 1000;
+            i++;
+        }
+        v = v.toFixed(2);
+        let u = with_byte_unit ? bytes_units[i] : units[i];
+        return `${v}${u}`
+    }
+
+    /// convert unixtimestamp to hour and minute, HH:MM
+    function unix2hour(v) {
+        const dateObj = new Date(v)
+        const hours = dateObj.getHours() >= 10 ? dateObj.getHours() : '0' + dateObj.getHours()
+        const minutes = dateObj.getMinutes() < 10 ? dateObj.getMinutes() + '0' : dateObj.getMinutes()
+        const UnixTimeToDate = hours + ':' + minutes
+        return UnixTimeToDate
+    }
 </script>

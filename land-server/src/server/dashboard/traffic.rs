@@ -1,8 +1,8 @@
+use super::SessionUser;
+use crate::server::ServerError;
 use axum::{response::IntoResponse, Extension, Form, Json};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
-use crate::server::ServerError;
-use super::SessionUser;
 
 /// RequestsForm is a query for requests metrics
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,7 +76,7 @@ pub async fn requests(
     let now = tokio::time::Instant::now();
     let period = q.get_period();
     let acc = q.account.unwrap_or_default();
-    /* 
+    /*
     FIXME: user.uuid is testing data, need to be replaced by real user uuid
     if acc != user.uuid.to_string() {
         return Err(ServerError::status_code(
@@ -85,6 +85,63 @@ pub async fn requests(
         ));
     }*/
     let query = get_request_query(acc, q.project, period.step_word);
+    // end time is now ts with latest 10 decade
+    debug!(
+        "query: {}, start:{}, end:{}, step:{}",
+        query, period.start, period.end, period.step
+    );
+    let params = land_core::metrics::QueryRangeParams {
+        query: query.clone(),
+        step: period.step,
+        start: period.start,
+        end: period.end,
+    };
+    let res = land_core::metrics::query_range(params).await?;
+    let values = land_core::metrics::LineSeries::from(&res, period.sequence);
+    info!(
+        "query: {}, start:{}, end:{}, step:{}, cost:{}",
+        query,
+        period.start,
+        period.end,
+        period.step,
+        now.elapsed().as_millis(),
+    );
+    Ok(Json(values))
+}
+
+fn get_flow_query(acc: String, project: Option<String>, step: String) -> String {
+    if let Some(pid) = project {
+        "sum by (p_uuid,flowtype) (increase(req_fn_bytes_total{p_uuid='".to_string()
+            + &pid
+            + "'}["
+            + step.as_str()
+            + "]))"
+    } else {
+        "sum by (uuid,flowtype) (increase(req_fn_bytes_total{uuid='".to_string()
+            + &acc
+            + "'}["
+            + step.as_str()
+            + "]))"
+    }
+}
+
+/// flows is a handler for GET /traffic/flows
+pub async fn flows(
+    Extension(_user): Extension<SessionUser>,
+    Form(q): Form<RequestsForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    let now = tokio::time::Instant::now();
+    let period = q.get_period();
+    let acc = q.account.unwrap_or_default();
+    /*
+    FIXME: user.uuid is testing data, need to be replaced by real user uuid
+    if acc != user.uuid.to_string() {
+        return Err(ServerError::status_code(
+            StatusCode::FORBIDDEN,
+            "User uuid does not match",
+        ));
+    }*/
+    let query = get_flow_query(acc, q.project, period.step_word);
     // end time is now ts with latest 10 decade
     debug!(
         "query: {}, start:{}, end:{}, step:{}",

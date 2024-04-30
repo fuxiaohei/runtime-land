@@ -104,6 +104,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/sign-callback", get(auth::sign_callback))
         .route("/sign-out", get(auth::sign_out))
         .route("/traffic/requests", post(traffic::requests))
+        .route("/traffic/flows", post(traffic::flows))
         .nest("/projects", projects_router)
         .nest("/settings", settings_router)
         .nest("/admin", admin_router)

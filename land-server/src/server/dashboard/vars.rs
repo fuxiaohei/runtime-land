@@ -4,6 +4,7 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct ProjectVar {
     pub id: i32,
+    pub uuid: String,
     pub name: String,
     pub user_email: String,
     pub user_nickname: String,
@@ -33,6 +34,7 @@ impl ProjectVar {
             .into_iter()
             .map(|p| ProjectVar {
                 id: p.id,
+                uuid: p.uuid.clone(),
                 name: p.name.clone(),
                 user_email: String::new(),
                 user_nickname: String::new(),
@@ -61,6 +63,7 @@ impl ProjectVar {
         let (domain, protocol, _) = settings::get_domain_settings().await?;
         let mut var = ProjectVar {
             id: project.id,
+            uuid: project.uuid.clone(),
             name: project.name.clone(),
             user_email: String::new(),
             user_nickname: String::new(),
@@ -139,8 +142,13 @@ impl PaginationVar {
     pub fn new(current: u64, size: u64, count: u64, total: u64, link: &str) -> PaginationVar {
         let mut items = vec![];
         for i in 1..=total {
+            let page_link = if link.contains('?') {
+                format!("{}&page={}&size={}", link, i, size)
+            } else {
+                format!("{}?page={}&size={}", link, i, size)
+            };
             items.push(PaginationVarItem {
-                link: format!("{}?page={}&size={}", link, i, size),
+                link: page_link,
                 current: i == current,
                 page: i,
             });
