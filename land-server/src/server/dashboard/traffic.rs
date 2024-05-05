@@ -1,6 +1,7 @@
 use super::SessionUser;
 use crate::server::ServerError;
 use axum::{response::IntoResponse, Extension, Form, Json};
+use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
@@ -70,20 +71,18 @@ fn get_request_query(acc: String, project: Option<String>, step: String) -> Stri
 
 /// requests is a handler for GET /traffic/requests
 pub async fn requests(
-    Extension(_user): Extension<SessionUser>,
+    Extension(user): Extension<SessionUser>,
     Form(q): Form<RequestsForm>,
 ) -> Result<impl IntoResponse, ServerError> {
     let now = tokio::time::Instant::now();
     let period = q.get_period();
     let acc = q.account.unwrap_or_default();
-    /*
-    FIXME: user.uuid is testing data, need to be replaced by real user uuid
     if acc != user.uuid.to_string() {
         return Err(ServerError::status_code(
             StatusCode::FORBIDDEN,
             "User uuid does not match",
         ));
-    }*/
+    }
     let query = get_request_query(acc, q.project, period.step_word);
     // end time is now ts with latest 10 decade
     debug!(

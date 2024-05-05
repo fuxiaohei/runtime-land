@@ -8,7 +8,18 @@ services:
   proxy:
     platform: linux/amd64
     image: traefik:v3.0
-    command: --api.insecure=true --providers.docker=true --providers.docker.exposedByDefault=false --accesslog=true --providers.file.directory=/data/runtime-land/traefik/ --providers.file.watch=true
+    container_name: "runtime-land-dev-traefik-proxy"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/data/runtime-land/traefik/"
+      - "--providers.file.watch=true"
+      - "--accesslog=true"
+      - "--accesslog.format=json"
+      - "--accesslog.filepath=/data/runtime-land/logs/access.log"
+      - "--accesslog.fields.headers.defaultmode=keep"
+      - "--accesslog.fields.headers.names.Authorization=drop"
     restart: always
     ports:
       - "80:80"
