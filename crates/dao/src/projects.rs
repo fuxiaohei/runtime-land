@@ -78,11 +78,11 @@ pub async fn create_project_with_playground(
     language: Language,
     description: String,
     source: String,
-) -> Result<String> {
+) -> Result<project::Model> {
     let p = create_project_by_playground(user_id, language.clone(), description).await?;
     let py = create_playground(user_id, p.id, language, source, false).await?;
     info!("Playground created: {}, py: {}", p.name, py.id);
-    Ok(p.name)
+    Ok(p)
 }
 
 /// create_project_by_playground creates from a playground
@@ -99,7 +99,7 @@ async fn create_project_by_playground(
         name: name.clone(),
         language: language.to_string(),
         status: ProjectStatus::Active.to_string(),
-        deploy_status: DeployStatus::Compiling.to_string(),
+        deploy_status: DeployStatus::Waiting.to_string(),
         uuid: uuid::Uuid::new_v4().to_string(),
         description: description.to_string(),
         dev_domain: String::new(),

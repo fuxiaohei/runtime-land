@@ -78,15 +78,20 @@ pub async fn new_playground(
         ));
     }
     let tpl = tpl.unwrap();
-    let project_name = land_dao::projects::create_project_with_playground(
+    let p = land_dao::projects::create_project_with_playground(
         user.id,
         tpl.language,
         tpl.description,
         tpl.content,
     )
     .await?;
+    let dp = land_dao::deployment::create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await?;
+    info!(
+        "New playground and project, name: {}, dp: {}",
+        p.name, dp.id
+    );
     Ok(redirect_response(
-        format!("/playground/{}", project_name).as_str(),
+        format!("/playground/{}", p.name).as_str(),
     ))
 }
 
