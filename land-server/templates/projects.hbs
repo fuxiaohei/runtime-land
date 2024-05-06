@@ -27,7 +27,8 @@
                                 <th scope="col" class="lang"></th>
                                 <th scope="col">Name</th>
                                 <th scope="col">URL</th>
-                                <th scope="col">Traffic<span class="small ms-1 text-body-tertiary">(REQUESTS | BYTES, 24 Hour)</span></th>
+                                <th scope="col">Traffic<span class="small ms-1 text-body-tertiary">(REQUESTS | BYTES, 24
+                                        Hour)</span></th>
                                 <th scope="col">Updated</th>
                             </tr>
                         </thead>
@@ -55,8 +56,15 @@
                                         target="_blank">{{prod_domain_full}}</a>
                                 </td>
                                 <td class="traffic">
-                                    <span class="total-requests border-end pe-2 me-2">14342</span>
-                                    <span class="total-bandwidth">284.94 MiB</span>
+                                    {{#if traffic}}
+                                    <span class="traffic-requests border-end pe-2 me-2"
+                                        data-x-value="{{traffic.requests}}">{{traffic.requests}}</span>
+                                    <span class="traffic-bytes"
+                                        data-x-value="{{traffic.transferred_bytes}}">{{traffic.transferred_bytes}}</span>
+                                    {{else}}
+                                    <span class="border-end pe-2 me-2">-</span>
+                                    <span>-</span>
+                                    {{/if}}
                                 </td>
                                 <td class="updated">
                                     <span class="time-ago text-body-secondary small"
@@ -71,6 +79,16 @@
             </div>
     </main>
     {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll(".traffic-requests").forEach(function (el) {
+            let value = parseInt(el.getAttribute("data-x-value")) || 0;
+            el.textContent = friendly_bytesize(value, false);
+        });
+        document.querySelectorAll(".traffic-bytes").forEach(function (el) {
+            let value = parseInt(el.getAttribute("data-x-value")) || 0;
+            el.textContent = friendly_bytesize(value, true);
+        });
+    </script>
 </body>
 
 </html>

@@ -1,4 +1,6 @@
-use land_dao::{models, projects::ProjectCreatedBy, settings, DateTimeUTC};
+use land_dao::{
+    models, projects::ProjectCreatedBy, settings, traffic::TrafficSummary, DateTimeUTC,
+};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -23,6 +25,7 @@ pub struct ProjectVar {
     pub is_editable: bool,
     pub deploy_status: String,
     pub status: String,
+    pub traffic: Option<TrafficSummary>,
 }
 
 impl ProjectVar {
@@ -53,6 +56,7 @@ impl ProjectVar {
                 source: String::new(), // for list show, source is not needed
                 deploy_status: p.deploy_status,
                 status: p.status,
+                traffic: None,
             })
             .collect())
     }
@@ -82,6 +86,7 @@ impl ProjectVar {
             is_editable: project.created_by == ProjectCreatedBy::Playground.to_string(),
             deploy_status: project.deploy_status.clone(),
             status: project.status.clone(),
+            traffic: None,
         };
         if let Some(playground) = playground {
             var.source = playground.source.clone();

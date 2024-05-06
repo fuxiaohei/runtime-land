@@ -107,3 +107,20 @@
         element.innerText = timeago.format(date, "en_US");
     });
 })();
+
+/// friendly_bytesize convert bytes to human readable size
+function friendly_bytesize(v, with_byte_unit) {
+    if (v < 0.1) {
+        return 0
+    }
+    let bytes_units = ['iB', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+    let units = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+    let i = 0;
+    while (v > 1000) {
+        v /= 1000;
+        i++;
+    }
+    v = v.toFixed(2);
+    let u = with_byte_unit ? bytes_units[i] : units[i];
+    return `${v}${u}`
+}

@@ -6,10 +6,10 @@ use tracing::{debug, info};
 pub async fn refresh() -> Result<()> {
     info!("Traffic::refresh");
 
-    let (current_hour_ts, current_hour_str) = land_dao::projects::get_traffic_hour();
+    let (current_hour_ts, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
     let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
     for p in projects {
-        let traffic_data = land_dao::projects::get_traffic(p.id).await?;
+        let traffic_data = land_dao::traffic::get_traffic(p.id, 0).await?;
         if traffic_data.is_some() {
             continue;
         }
@@ -40,7 +40,7 @@ pub async fn refresh() -> Result<()> {
             }
             total
         };
-        land_dao::projects::save_traffic(
+        land_dao::traffic::save_traffic(
             p.id,
             current_hour_str.clone(),
             requests_value as i32,

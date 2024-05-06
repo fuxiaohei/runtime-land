@@ -6,6 +6,7 @@ pub mod settings;
 pub mod user;
 pub mod worker;
 pub mod confs;
+pub mod traffic;
 
 mod migration;
 

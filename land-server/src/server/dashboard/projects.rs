@@ -28,7 +28,14 @@ pub async fn index(
     // list all projects
     let projects_data = land_dao::projects::list_by_user_id(user.id, None, 99).await?;
     info!("List projects: {}, acc: {}", projects_data.len(), user.uuid);
-    let projects = ProjectVar::from_models_vec(projects_data).await?;
+    let mut projects = ProjectVar::from_models_vec(projects_data).await?;
+    let project_ids = projects.iter().map(|p| p.id).collect::<Vec<i32>>();
+    let summary_traffics = land_dao::traffic::summary_projects_traffic(project_ids).await?;
+    for p in projects.iter_mut() {
+        if let Some(traffic) = summary_traffics.get(&p.id) {
+            p.traffic = Some(traffic.clone());
+        }
+    }
     Ok(RenderHtmlMinified(
         "projects.hbs",
         engine,
