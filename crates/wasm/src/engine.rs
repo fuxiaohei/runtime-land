@@ -2,7 +2,7 @@ use anyhow::Result;
 use lazy_static::lazy_static;
 use std::{collections::HashMap, sync::Mutex};
 use tracing::{debug, info};
-use wasmtime::{Config, Engine, InstanceAllocationStrategy, PoolingAllocationConfig};
+use wasmtime::{Config, Engine, InstanceAllocationStrategy};
 
 // global engine hashmap with string key with sync mutex
 lazy_static! {
@@ -53,51 +53,47 @@ fn create_config() -> Result<Config> {
         MODULE_VERSION.to_string(),
     ))?;
 
-    const GB: usize = 1 << 30;
     const MB: usize = 1 << 20;
     const KB: usize = 1 << 10;
 
-    // set 1GB memory static allocation when starting
+    // set 512MB memory static allocation when starting
     // in 64-bit mode, wasmtime default maximum memory size is 4GB
-    config.static_memory_maximum_size(1 * GB as u64);
-    config.static_memory_guard_size(1 * GB as u64);
-    config.dynamic_memory_reserved_for_growth(1 * GB as u64);
-    config.dynamic_memory_guard_size(128 * KB as u64);
+    config.static_memory_maximum_size(512 * MB as u64);
+    config.static_memory_guard_size(512 * MB as u64);
+    config.dynamic_memory_reserved_for_growth(1 * MB as u64);
+    config.dynamic_memory_guard_size(64 * KB as u64);
 
     // SIMD support requires SSE3 and SSSE3 on x86_64.
     // in docker container, it will cause error
     // config.wasm_simd(false);
 
-    let mut pooling_allocation_config = PoolingAllocationConfig::default();
+    // let mut pooling_allocation_config = PoolingAllocationConfig::default();
 
     // Core wasm programs have 1 memory
-    pooling_allocation_config.max_memories_per_module(1);
-    // Total memory size 128 MB, allow for up to memory_limit of linear memory. Wasm pages are 64k
-
-    pooling_allocation_config.memory_pages(128 * (MB as u64) / (64 * 1024));
+    // pooling_allocation_config.max_memories_per_module(1);
+    // Total memory size 64 MB, allow for up to memory_limit of linear memory. Wasm pages are 64KB
+    // pooling_allocation_config.memory_pages(1000);
 
     // Core wasm programs have 1 table
-    pooling_allocation_config.max_tables_per_module(1);
+    // pooling_allocation_config.max_tables_per_module(1);
 
     // Some applications create a large number of functions, in particular
     // when compiled in debug mode or applications written in swift. Every
     // function can end up in the table
-    pooling_allocation_config.table_elements(98765);
+    // pooling_allocation_config.table_elements(10000);
 
     // Maximum number of slots in the pooling allocator to keep "warm", or those
     // to keep around to possibly satisfy an affine allocation request or an
     // instantiation of a module previously instantiated within the pool.
-    pooling_allocation_config.max_unused_warm_slots(100);
+    // pooling_allocation_config.max_unused_warm_slots(100);
 
     // Use a large pool, but one smaller than the default of 1000 to avoid runnign out of virtual
     // memory space if multiple engines are spun up in a single process. We'll likely want to move
     // to the on-demand allocator eventually for most purposes; see
     // https://github.com/fastly/Viceroy/issues/255
-    pooling_allocation_config.total_core_instances(1000);
+    // pooling_allocation_config.total_core_instances(1000);
 
-    config.allocation_strategy(InstanceAllocationStrategy::Pooling(
-        pooling_allocation_config,
-    ));
+    config.allocation_strategy(InstanceAllocationStrategy::pooling());
 
     Ok(config)
 }
