@@ -2,33 +2,26 @@ use anyhow::Result;
 use land_core::metrics::MultiLineSeries;
 use tracing::{debug, info};
 
-/// refresh refreshes the metrics
-pub async fn refresh() -> Result<()> {
-    info!("Traffic::refresh");
-
+pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     let (current_hour_ts, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
-    let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
-    for p in projects {
-        let traffic_data = land_dao::traffic::get_traffic(p.id, 0).await?;
+    for pid in projects {
+        let traffic_data = land_dao::traffic::get_traffic(pid.0, 0).await?;
         if traffic_data.is_some() {
             continue;
         }
-        debug!(project_id = p.id, "Traffic refresh");
-
+        debug!(project_id = pid.0, "Traffic refresh");
         let period = TrafficPeriodParams::new("1d", Some(current_hour_ts));
-
         // get requests total value
         let requests_data =
-            query_requests_traffic(String::new(), Some(p.uuid.clone()), &period).await?;
+            query_requests_traffic(String::new(), Some(pid.1.clone()), &period).await?;
         let requests_value = if requests_data.is_empty() {
             0
         } else {
             let series = requests_data.get("metric").unwrap();
             series.total
         };
-
         // get flows value
-        let flows_data = query_flows_traffic(String::new(), Some(p.uuid), &period).await?;
+        let flows_data = query_flows_traffic(String::new(), Some(pid.1), &period).await?;
         let flows_value = if flows_data.is_empty() {
             0
         } else {
@@ -41,18 +34,29 @@ pub async fn refresh() -> Result<()> {
             total
         };
         land_dao::traffic::save_traffic(
-            p.id,
+            pid.0,
             current_hour_str.clone(),
             requests_value as i32,
             flows_value as i32,
         )
         .await?;
         debug!(
-            project_id = p.id,
+            project_id = pid.0,
             "Traffic refresh done, requests: {}, flows: {}", requests_value, flows_value,
         );
     }
+    Ok(())
+}
 
+/// refresh refreshes the metrics
+pub async fn refresh() -> Result<()> {
+    info!("Traffic::refresh");
+    let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
+    let mut pids = vec![];
+    for p in projects {
+        pids.push((p.id, p.uuid));
+    }
+    refresh_projects(pids).await?;
     Ok(())
 }
 

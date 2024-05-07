@@ -180,7 +180,7 @@
             in_series = series["flowtype-in-p_uuid-" + project] || { total: 0, values: [] };
             out_series = series["flowtype-out-p_uuid-" + project] || { total: 0, values: [] };
         }
-        document.getElementById("flows-total").innerText = friendly_bytesize(out_series.total, true);
+        document.getElementById("flows-total").innerText = friendly_bytesize(out_series.total + in_series.total, true);
         let chart = echarts.init(c, null, { renderer: 'svg' });
         let option = {
             title: {

@@ -1,4 +1,4 @@
-FROM rust:1.77 as build
+FROM rust:1.78 as build
 
 WORKDIR /usr/src/land-server
 COPY . .

@@ -11,7 +11,7 @@ use axum_csrf::CsrfToken;
 use base64::{engine::general_purpose, Engine};
 use land_dao::projects::{Language, ProjectStatus};
 use serde::Deserialize;
-use tracing::info;
+use tracing::{debug, info, warn};
 
 /// index is a handler for GET /projects
 pub async fn index(
@@ -29,12 +29,25 @@ pub async fn index(
     let projects_data = land_dao::projects::list_by_user_id(user.id, None, 99).await?;
     info!("List projects: {}, acc: {}", projects_data.len(), user.uuid);
     let mut projects = ProjectVar::from_models_vec(projects_data).await?;
-    let project_ids = projects.iter().map(|p| p.id).collect::<Vec<i32>>();
-    let summary_traffics = land_dao::traffic::summary_projects_traffic(project_ids).await?;
+    let pids = projects.iter().map(|p| p.id).collect::<Vec<i32>>();
+    let summary_traffics = land_dao::traffic::summary_projects_traffic(pids).await?;
+
+    let mut missing_pids = vec![];
     for p in projects.iter_mut() {
         if let Some(traffic) = summary_traffics.get(&p.id) {
             p.traffic = Some(traffic.clone());
+        } else {
+            missing_pids.push((p.id, p.uuid.clone()));
         }
+    }
+    if !missing_pids.is_empty() {
+        debug!("Missing traffic data, refresh: {:?}", missing_pids);
+        tokio::spawn(async move {
+            match crate::deployer::refresh_projects(missing_pids).await {
+                Ok(_) => debug!("Traffic refresh done"),
+                Err(e) => warn!("Traffic refresh error: {:?}", e),
+            }
+        });
     }
     Ok(RenderHtmlMinified(
         "projects.hbs",
