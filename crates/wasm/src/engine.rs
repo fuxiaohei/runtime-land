@@ -95,6 +95,8 @@ fn create_config() -> Result<Config> {
 
     config.allocation_strategy(InstanceAllocationStrategy::pooling());
 
+    debug!("Create new config: {:?}", config);
+    
     Ok(config)
 }
 
