@@ -53,6 +53,17 @@ fn create_config() -> Result<Config> {
         MODULE_VERSION.to_string(),
     ))?;
 
+    const GB: usize = 1 << 30;
+    const MB: usize = 1 << 20;
+    const KB: usize = 1 << 10;
+
+    // set 1GB memory static allocation when starting
+    // in 64-bit mode, wasmtime default maximum memory size is 4GB
+    config.static_memory_maximum_size(1 * GB as u64);
+    config.static_memory_guard_size(1 * GB as u64);
+    config.dynamic_memory_reserved_for_growth(1 * GB as u64);
+    config.dynamic_memory_guard_size(128 * KB as u64);
+
     // SIMD support requires SSE3 and SSSE3 on x86_64.
     // in docker container, it will cause error
     // config.wasm_simd(false);
@@ -63,7 +74,6 @@ fn create_config() -> Result<Config> {
     pooling_allocation_config.max_memories_per_module(1);
     // Total memory size 128 MB, allow for up to memory_limit of linear memory. Wasm pages are 64k
 
-    const MB: usize = 1 << 20;
     pooling_allocation_config.memory_pages(128 * (MB as u64) / (64 * 1024));
 
     // Core wasm programs have 1 table
