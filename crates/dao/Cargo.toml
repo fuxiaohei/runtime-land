@@ -16,7 +16,9 @@ once_cell = { workspace = true }
 opendal = { workspace = true }
 rand = { workspace = true }
 random_word = { version = "0.4.3", features = ["en"] }
-sea-orm = { version = "0.12.15", features = [
+sea-orm = { version = "0.12.15", default-features = false, features = [
+    "with-chrono",
+    "with-json",
     "runtime-tokio-rustls",
     "sqlx-postgres",
 ] }
