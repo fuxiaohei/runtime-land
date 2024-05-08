@@ -83,7 +83,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .route("/projects/disable", post(admin::disable_project))
         .route("/projects/enable", post(admin::enable_project))
         .route("/workers", get(admin::workers))
-        .route("/create-token", post(admin::create_token))
+        .route("/create-worker-token", post(admin::create_worker_token))
         .route("/delete-token", post(admin::delete_token))
         .route("/debug", get(admin::debug));
 

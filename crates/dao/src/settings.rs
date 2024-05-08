@@ -157,7 +157,7 @@ pub struct FsStorage {
 impl Default for FsStorage {
     fn default() -> Self {
         Self {
-            directory: "/data/runtime-land-data/".to_string(),
+            directory: "/tmp/runtime-land-data/".to_string(),
         }
     }
 }

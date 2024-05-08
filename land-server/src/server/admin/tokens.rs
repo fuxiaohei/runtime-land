@@ -6,23 +6,23 @@ use land_dao::user::TokenUsage;
 use tracing::info;
 
 #[derive(serde::Deserialize, Debug)]
-pub struct CreateTokenForm {
+pub struct CreateWorkerTokenForm {
     pub name: String,
     pub csrf: String,
 }
 
-/// create_token is a handler for POST /admin/create-token
-pub async fn create_token(
+/// create_worker_token is a handler for POST /admin/create-worker-token
+pub async fn create_worker_token(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    Form(form): Form<CreateTokenForm>,
+    Form(form): Form<CreateWorkerTokenForm>,
 ) -> Result<impl IntoResponse, ServerError> {
     csrf_layer.verify(&form.csrf)?;
     let token =
         land_dao::user::create_new_token(user.id, &form.name, 365 * 24 * 3600, TokenUsage::Worker)
             .await?;
-    info!("New token created: {:?}", token);
-    Ok(redirect_response("/admin"))
+    info!("New worker token created: {:?}", token);
+    Ok(redirect_response("/admin/workers"))
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -39,7 +39,7 @@ pub async fn delete_token(
 ) -> Result<impl IntoResponse, ServerError> {
     csrf_layer.verify(&form.csrf)?;
     let token = land_dao::user::get_token_by_id(form.id).await?;
-    if token.is_none(){
+    if token.is_none() {
         return Err(ServerError::status_code(
             StatusCode::NOT_FOUND,
             "Token not found",
