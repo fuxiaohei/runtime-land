@@ -55,8 +55,8 @@ rust-embed = { version = "8.3.0", features = [
     "include-exclude",
     "compression",
 ] }
-serde = { version = "1.0.200", features = ["derive"] }
-serde_json = "1.0.116"
+serde = { version = "1.0.201", features = ["derive"] }
+serde_json = "1.0.117"
 serde_yaml = "0.9.33"
 time = { version = "0.3.36", features = ["local-offset"] }
 tokio = { version = "1.37.0", features = ["full"] }
