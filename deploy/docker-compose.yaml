@@ -1,5 +1,3 @@
-version: "3"
-
 networks:
   runtime_land_network:
     external: true
@@ -10,7 +8,8 @@ services:
     image: traefik:v3.0
     container_name: "runtime-land-dev-traefik-proxy"
     command:
-      - "--api.insecure=true"
+      - "--api=true"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
       - "--providers.file.directory=/data/runtime-land/traefik/"
@@ -23,22 +22,29 @@ services:
     restart: always
     ports:
       - "80:80"
-      - "8080:8080" # traefik dashboard
     networks:
       - runtime_land_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${LAND_DATA_DIR}:/data/runtime-land
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-dashboard-http-router.entrypoints=http
+      - traefik.http.routers.traefik-dashboard-http-router.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.traefik-dashboard-http-router.service=api@internal
+      - traefik.http.middlewares.dashboard_auth.basicauth.users=admin:$$apr1$$TZ3Indax$$xAOly0K/dH13PEfXHNqvS1
+      - traefik.http.routers.traefik-dashboard-http-router.middlewares=dashboard_auth
   worker:
     platform: linux/amd64
     image: ghcr.io/fuxiaohei/runtime-land-worker:dev
+    container_name: "runtime-land-dev-worker"
     restart: always
     environment:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}
       - LAND_SERVICE_NAME=land-worker@docker
       - LAND_DATA_DIR=/data/runtime-land
       - LAND_SERVER_URL=${LAND_SERVER_URL}
-      - HOSTNAME=localhost
+      - HOSTNAME=${HOSTNAME}
     ports:
       - "9000:9000" # metrics port
     networks:
