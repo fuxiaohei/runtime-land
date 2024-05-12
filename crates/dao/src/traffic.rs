@@ -7,7 +7,7 @@ use sea_orm::{
 use serde::Serialize;
 use std::collections::HashMap;
 
-#[derive(Debug,Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct TrafficSummary {
     pub requests: i32,
     pub transferred_bytes: i32,

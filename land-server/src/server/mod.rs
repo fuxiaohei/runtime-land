@@ -13,6 +13,7 @@ use tracing::{info, instrument, warn};
 
 mod admin;
 mod dashboard;
+mod examples;
 mod templates;
 mod workerapi;
 

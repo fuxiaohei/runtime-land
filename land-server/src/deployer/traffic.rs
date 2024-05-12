@@ -42,7 +42,10 @@ pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
         .await?;
         debug!(
             project_id = pid.0,
-            "Traffic refresh done, requests: {}, flows: {}", requests_value, flows_value,
+            hour = current_hour_str,
+            "Traffic refresh done, requests: {}, flows: {}",
+            requests_value,
+            flows_value,
         );
     }
     Ok(())
