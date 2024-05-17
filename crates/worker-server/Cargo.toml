@@ -9,7 +9,7 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 land-common = { workspace = true }
 land-wasm = { workspace = true }
-metrics = "0.22.3"
+metrics = { workspace = true }
 metrics-exporter-prometheus = { version = "0.14.0", default-features = false, features = [
     "http-listener",
 ] }

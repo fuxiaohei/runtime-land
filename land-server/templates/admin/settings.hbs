@@ -25,7 +25,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <select name="name" id="settings-select" class="form-select">
-                                            <option selected>Select an item</option>
+                                            <option value="" selected>Select an item</option>
                                             {{#each settings}}
                                             <option value="{{this}}">{{this}}</option>
                                             {{/each}}
@@ -56,13 +56,14 @@
     {{> partials/footer.hbs}}
     <script type="text/javascript">
         // when settings-select change value, fetch /admin/settings?name=value to get json response and handle not 200 response
-        document.getElementById('settings-select').addEventListener('change', async (e) => {
+        let selector = document.getElementById('settings-select');
+        selector.addEventListener('change', async (e) => {
             const value = e.target.value;
             const settings_value = document.getElementById('settings-value');
             const settings_btn = document.getElementById('settings-btn');
             // if value is empty, set settings-value blank
             if (!value) {
-                settings_value.value = '';
+                settings_value.value = 'Select a settings item to edit.';
                 settings_value.disabled = true;
                 settings_btn.disabled = true;
                 return;
@@ -80,6 +81,12 @@
             settings_value.disabled = false;
             settings_btn.disabled = false;
         });
+        // get 'show' query parameter from url
+        let show = new URLSearchParams(window.location.search).get('show');
+        if (show) {
+            selector.value = show;
+            selector.dispatchEvent(new Event('change'));
+        }
     </script>
 </body>
 

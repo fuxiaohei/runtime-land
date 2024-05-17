@@ -12,6 +12,7 @@ use tracing::{debug, info, warn};
 
 mod conf;
 pub mod ip;
+mod sysm;
 
 /// DATA_DIR is the directory to store data
 static DATA_DIR: Lazy<Mutex<String>> = Lazy::new(|| Mutex::new(String::from("data")));
@@ -47,6 +48,19 @@ pub async fn run_background(addr: String, token: String, dir: String) {
             if let Err(e) = run_all(addr.clone(), token.clone()).await {
                 warn!("Run all deploys failed: {}", e);
             }
+        }
+    });
+
+    // collect system metrics every 30 seconds
+    tokio::spawn(async move {
+        let mut ticker = tokio::time::interval(tokio::time::Duration::from_secs(30));
+        loop {
+            let mut sys = sysinfo::System::new_all();
+            let mut networks = sysinfo::Networks::new_with_refreshed_list();
+            if let Err(e) = sysm::run_sysm(&mut sys, &mut networks).await {
+                warn!("Run sysm failed: {}", e);
+            }
+            ticker.tick().await;
         }
     });
 }

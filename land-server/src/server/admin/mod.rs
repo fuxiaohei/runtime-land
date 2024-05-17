@@ -106,6 +106,7 @@ pub async fn workers(
 #[derive(serde::Deserialize, Debug)]
 pub struct SettingsQuery {
     pub name: Option<String>,
+    pub show: Option<String>,
 }
 
 /// settings is a handler for GET /admin/settings
@@ -176,7 +177,9 @@ pub async fn update_settings(
         land_dao::settings::reload_storage().await?;
     }
 
-    Ok(redirect_response("/admin/settings"))
+    Ok(redirect_response(
+        format!("/admin/settings?show={}", f.name).as_str(),
+    ))
 }
 
 /// debug is a handler for GET /admin/debug

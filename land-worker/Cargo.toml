@@ -12,11 +12,13 @@ land-dao = { workspace = true }
 land-wasm = { workspace = true }
 land-worker-server = { workspace = true }
 md5 = { workspace = true }
+metrics = { workspace = true }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
+sysinfo = "0.30.12"
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = "2.5.0"
