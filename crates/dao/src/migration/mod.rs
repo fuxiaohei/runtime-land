@@ -6,6 +6,7 @@ mod m03_create_project_table;
 mod m04_create_deployment_table;
 mod m05_create_worker_table;
 mod m06_create_traffic_table;
+mod m07_create_envs_table;
 
 pub struct Migrator;
 
@@ -19,6 +20,7 @@ impl MigratorTrait for Migrator {
             Box::new(m04_create_deployment_table::Migration),
             Box::new(m05_create_worker_table::Migration),
             Box::new(m06_create_traffic_table::Migration),
+            Box::new(m07_create_envs_table::Migration),
         ]
     }
 }

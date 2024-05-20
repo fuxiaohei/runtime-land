@@ -18,7 +18,7 @@
                         <label for="project-name-input" class="form-label">Project Name</label>
                         <div class="input-group">
                             <input name="name" type="text" class="form-control" value="{{project.name}}"
-                                id="project-name-input" required>
+                                id="project-name-input" required />
                             <span class="input-group-text">.127-0-0-1.nip.io</span>
                         </div>
                         <div class="form-text">The name of the project.</div>
@@ -30,6 +30,58 @@
                         <input type="hidden" name="csrf" value="{{csrf}}">
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+                <form action="/projects/{{project.name}}/envs" method="post" id="project-envs-form"
+                    class="mt-3 border-top pt-3 px-3 container">
+                    <div class="mb-3">
+                        <label class="form-label">Environment Variables</label>
+                        <div class="form-text mb-3">
+                            Use environment variables to provide secrets to your project. You can access these variables
+                            in your project's code via object <a href="#"><code>env</code></a>. The value of the
+                            environment is encrypted and stored securely.
+                        </div>
+                        <div class="card shadow-none mb-3">
+                            <ul class="list-group list-group-flush shadow-none">
+                                <li
+                                    class="list-group-item py-2 env-list-item d-flex align-items-center justify-content-between">
+                                    <div class="env-meta">
+                                        <div class="name-meta">
+                                            <i class="bi bi-key me-2"></i>
+                                            <strong class="name">abc</strong>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-link btn-sm env-del-btn">
+                                            <i class="bi bi-trash text-body"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                                <li
+                                    class="list-group-item d-none py-2 env-list-add-item-tpl d-flex align-items-center justify-content-between">
+                                    <div class="env-meta flex-fill">
+                                        <div class="name-meta d-flex align-items-center">
+                                            <i class="bi bi-key me-2"></i>
+                                            <input type="text" class="form-control w-50 border-0 shadow-none me-3 ps-0"
+                                                name="name" placeholder="Name" required />
+                                            <input type="text" class="form-control border-0 shadow-none" name="value"
+                                                placeholder="Value" required />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-link btn-sm env-del-btn">
+                                            <i class="bi bi-x text-body"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <button id="envs-add-btn" type="button" class="btn btn-info">
+                                <i class="bi bi-plus me-2"></i>
+                                Add Variable
+                            </button>
+                        </div>
+                    </div>
                 </form>
                 <div class="mt-3 border-top pt-3 px-3 container">
                     <div class="mb-3">
@@ -54,8 +106,8 @@
                                             <p>Type in the project name <strong>{{project.name}}</strong> to confirm.
                                             </p>
                                             <input name="name" type="text" class="form-control"
-                                                id="project-delete-input" required>
-                                            <input type="hidden" name="csrf" value="{{csrf}}">
+                                                id="project-delete-input" required />
+                                            <input type="hidden" name="csrf" value="{{csrf}}" />
                                             <button type="submit" class="btn btn-danger mt-3"
                                                 id="deleteProjectBtn">Delete
                                                 Project</button>
@@ -70,6 +122,28 @@
             </div>
     </main>
     {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        function removeAddEnvItem(e) {
+            // current element parent parent removed
+            // if e.target is <i>, need 3 parents 
+            if(e.target.tagName === "I") {
+                e.target.parentElement.parentElement.parentElement.remove();
+                return;
+            }
+            e.target.parentElement.parentElement.remove();
+        }
+
+        const env_add_template = document.querySelector(".env-list-add-item-tpl").cloneNode(true);
+        document.getElementById("envs-add-btn").addEventListener("click", function (e) {
+            const env_list = document.querySelector(".env-list-add-item-tpl");
+            const env_add = env_add_template.cloneNode(true);
+            env_add.classList.remove("d-none");
+            env_add.classList.remove("env-list-add-item-tpl");
+            env_add.classList.add("env-list-item");
+            env_add.querySelector(".env-del-btn").addEventListener("click", removeAddEnvItem);
+            env_list.parentNode.insertBefore(env_add, env_list);
+        })
+    </script>
 </body>
 
 </html>

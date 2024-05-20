@@ -173,3 +173,7 @@ html[data-bs-theme="dark"] #project-codeview .card-body {
 #admin-projects .status.status-disabled {
     color: var(--bs-danger);
 }
+
+.env-del-btn:hover i {
+    color: var(--bs-danger) !important;
+}

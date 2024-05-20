@@ -4,6 +4,7 @@ pub use super::deployment::Entity as Deployment;
 pub use super::deployment_task::Entity as DeploymentTask;
 pub use super::playground::Entity as Playground;
 pub use super::project::Entity as Project;
+pub use super::project_envs::Entity as ProjectEnvs;
 pub use super::project_traffic::Entity as ProjectTraffic;
 pub use super::settings::Entity as Settings;
 pub use super::user_info::Entity as UserInfo;
