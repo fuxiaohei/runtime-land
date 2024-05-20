@@ -5,10 +5,10 @@ use crate::server::{
     templates::{RenderHtmlMinified, TemplateEngine},
     PageVars, ServerError,
 };
-use axum::{response::IntoResponse, Extension, Form};
+use axum::{extract::Path, response::IntoResponse, Extension, Form};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
-use land_dao::user::TokenUsage;
+use land_dao::{envs::EnvsParams, user::TokenUsage};
 use tracing::info;
 
 /// index is a handler for GET /settings
@@ -84,7 +84,7 @@ pub async fn create_token(
 pub struct DeleteTokenForm {
     pub name: String,
     pub csrf: String,
-    pub id:i32,
+    pub id: i32,
 }
 
 /// delete_token is a handler for POST /settings/delete-token
@@ -95,7 +95,7 @@ pub async fn delete_token(
 ) -> Result<impl IntoResponse, ServerError> {
     csrf_layer.verify(&form.csrf)?;
     let token = land_dao::user::get_token_by_id(form.id).await?;
-    if token.is_none(){
+    if token.is_none() {
         return Err(ServerError::status_code(
             StatusCode::NOT_FOUND,
             "Token not found",
@@ -117,4 +117,24 @@ pub async fn delete_token(
     info!("Delete token: {:?}", token);
     land_dao::user::remove_token(form.id).await?;
     Ok(redirect_response("/settings"))
+}
+
+/// update_envs is a handler for POST /{project_name}/update-envs
+pub async fn update_envs(
+    Extension(user): Extension<SessionUser>,
+    Path(name): Path<String>,
+    axum_extra::extract::Form(form): axum_extra::extract::Form<EnvsParams>,
+) -> Result<impl IntoResponse, ServerError> {
+    let p = land_dao::projects::get_by_name(name.clone(), Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let p = p.unwrap();
+    land_dao::envs::update_envs(form, p.id).await?;
+    Ok(redirect_response(
+        format!("/projects/{}/settings", name).as_str(),
+    ))
 }

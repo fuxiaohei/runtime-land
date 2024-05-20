@@ -6,7 +6,7 @@ services:
   proxy:
     platform: linux/amd64
     image: traefik:v3.0
-    container_name: "runtime-land-dev-traefik-proxy"
+    container_name: "runtime-land-traefik-proxy"
     command:
       - "--api=true"
       - "--api.dashboard=true"
@@ -37,7 +37,7 @@ services:
   worker:
     platform: linux/amd64
     image: ghcr.io/fuxiaohei/runtime-land-worker:dev
-    container_name: "runtime-land-dev-worker"
+    container_name: "runtime-land-worker"
     restart: always
     environment:
       - LAND_SERVER_TOKEN=${LAND_SERVER_TOKEN}

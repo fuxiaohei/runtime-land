@@ -1,6 +1,6 @@
 use super::auth::SessionUser;
 use crate::server::{
-    dashboard::vars::ProjectVar,
+    dashboard::vars::{EnvVar, ProjectVar},
     examples::TemplateVar,
     redirect_response,
     templates::{RenderHtmlMinified, TemplateEngine},
@@ -209,6 +209,7 @@ pub async fn settings(
         user: SessionUser,
         project: ProjectVar,
         csrf: String,
+        envs: Vec<EnvVar>,
     }
     let csrf = csrf_layer.authenticity_token()?;
     let p = land_dao::projects::get_by_name(name, Some(user.id)).await?;
@@ -220,6 +221,11 @@ pub async fn settings(
     }
     let p = p.unwrap();
     let project = ProjectVar::new(&p, None).await?;
+
+    // list envs
+    let envs_data = land_dao::envs::list_envs(p.id).await?;
+    let envs = EnvVar::from_models_vec(envs_data).await?;
+
     let title = format!("Settings - {}", project.name);
     Ok((
         csrf_layer,
@@ -231,6 +237,7 @@ pub async fn settings(
                 user,
                 project,
                 csrf,
+                envs,
             },
         )
         .into_response(),
