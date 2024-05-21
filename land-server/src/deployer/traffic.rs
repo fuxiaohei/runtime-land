@@ -1,5 +1,5 @@
 use anyhow::Result;
-use land_core::metrics::MultiLineSeries;
+use land_dao::metrics::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
 use tracing::{debug, info};
 
 pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
@@ -123,14 +123,14 @@ pub async fn query_requests_traffic(
         "query: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
-    let params = land_core::metrics::QueryRangeParams {
+    let params = QueryRangeParams {
         query: query.clone(),
         step: period.step,
         start: period.start,
         end: period.end,
     };
-    let res = land_core::metrics::query_range(params).await?;
-    let values = land_core::metrics::LineSeries::from(&res, period.sequence.clone());
+    let res = query_range(params).await?;
+    let values = LineSeries::from(&res, period.sequence.clone());
     Ok(values)
 }
 
@@ -161,13 +161,13 @@ pub async fn query_flows_traffic(
         "query: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
-    let params = land_core::metrics::QueryRangeParams {
+    let params = QueryRangeParams {
         query: query.clone(),
         step: period.step,
         start: period.start,
         end: period.end,
     };
-    let res = land_core::metrics::query_range(params).await?;
-    let values = land_core::metrics::LineSeries::from(&res, period.sequence.clone());
+    let res = query_range(params).await?;
+    let values = LineSeries::from(&res, period.sequence.clone());
     Ok(values)
 }

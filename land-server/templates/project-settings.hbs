@@ -54,8 +54,8 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <button class="btn btn-link btn-sm env-del-btn">
-                                        <i class="bi bi-trash text-body"></i>
+                                    <button data-x-env-id="{{id}}" class="btn btn-link btn-sm env-del-btn">
+                                        <i data-x-env-id="{{id}}" class="bi bi-trash text-body"></i>
                                     </button>
                                 </div>
                             </li>
@@ -73,7 +73,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <button type="button" class="btn btn-link btn-sm env-del-btn">
+                                    <button type="button" class="btn btn-link btn-sm env-rm-btn">
                                         <i class="bi bi-x text-body"></i>
                                     </button>
                                 </div>
@@ -140,6 +140,29 @@
             e.target.parentElement.parentElement.remove();
         }
 
+        document.querySelectorAll(".env-del-btn").forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const env_id = e.target.getAttribute("data-x-env-id");
+                const env_item = document.getElementById("env-item-" + env_id);
+                // if input[name=op] == del, rollback handle
+                const env_op = env_item.querySelector("input[name=op]");
+                if (env_op.value != "delete") {
+                    env_op.value = "delete";
+                    env_item.querySelector("strong.name").classList.add("text-decoration-line-through");
+                    const env_del_btn = env_item.querySelector(".env-del-btn i");
+                    env_del_btn.classList.remove("bi-trash");
+                    env_del_btn.classList.add("bi-arrow-clockwise");
+                } else {
+                    env_op.value = "";
+                    env_item.querySelector("strong.name").classList.remove("text-decoration-line-through");
+                    const env_del_btn = env_item.querySelector(".env-del-btn i");
+                    env_del_btn.classList.remove("bi-arrow-clockwise");
+                    env_del_btn.classList.add("bi-trash");
+                }
+            });
+        });
+
         const env_add_template = document.querySelector(".env-list-add-item-tpl").cloneNode(true);
         document.getElementById("envs-add-btn").addEventListener("click", function (e) {
             const env_list = document.querySelector(".env-list-add-item-tpl");
@@ -147,7 +170,7 @@
             env_add.classList.remove("d-none");
             env_add.classList.remove("env-list-add-item-tpl");
             env_add.classList.add("env-list-item");
-            env_add.querySelector(".env-del-btn").addEventListener("click", removeAddEnvItem);
+            env_add.querySelector(".env-rm-btn").addEventListener("click", removeAddEnvItem);
             env_list.parentNode.insertBefore(env_add, env_list);
         })
     </script>

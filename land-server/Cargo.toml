@@ -10,13 +10,11 @@ axum = { workspace = true }
 axum-extra = { version = "0.9.3", features = ["cookie","form"] }
 axum-template = { version = "2.3.0", features = ["handlebars"] }
 axum_csrf = { version = "0.9.0", features = ["layer"] }
-base64 = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }
 handlebars = "5.1.2"
 http = { workspace = true }
 land-common = { workspace = true }
-land-core = { workspace = true }
 land-dao = { workspace = true }
 land-wasm-gen = { workspace = true }
 md5 = { workspace = true }

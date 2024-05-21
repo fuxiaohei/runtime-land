@@ -13,8 +13,7 @@ use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     CookieJar,
 };
-use base64::{engine::general_purpose, Engine};
-use land_core::auth::{get_clerk_env, ClerkEnv};
+use land_dao::clerkauth::{get_clerk_env, verify_clerk_and_create_token, verify_session, ClerkEnv};
 use land_dao::user::{self, SignCallbackValue, UserRole};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info, warn};
@@ -54,7 +53,7 @@ pub struct SignCallbackQuery {
 
 impl SignCallbackQuery {
     pub fn to_value(&self) -> anyhow::Result<SignCallbackValue> {
-        let data = general_purpose::STANDARD.decode(&self.value)?;
+        let data = land_common::encoding::base64_decode(&self.value)?;
         let value: SignCallbackValue = serde_json::from_slice(&data)?;
         Ok(value)
     }
@@ -72,8 +71,7 @@ pub async fn sign_callback(
     debug!("Sign callback value: {:?}", callback_value);
     // check Clerk session validation
     let clerk_session = jar.get("__session").unwrap().value().to_string();
-    let session_token =
-        land_core::auth::verify_clerk_and_create_token(clerk_session, &callback_value).await;
+    let session_token = verify_clerk_and_create_token(clerk_session, &callback_value).await;
     if session_token.is_err() {
         warn!(
             "Clerk session validation failed: {}",
@@ -146,7 +144,7 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         // if session is exist, validate session
         if path.starts_with("/sign-in") && !session_value.is_empty() {
             debug!(path = path, "Session is exist when sign-in");
-            let user = land_core::auth::verify_session(session_value).await;
+            let user = verify_session(session_value).await;
             if user.is_ok() {
                 // session is ok, redirect to homepage
                 return Ok(redirect_response("/").into_response());
@@ -164,7 +162,7 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
     }
 
     // after validation, it gets session user from session_id and set to request extensions
-    let user = land_core::auth::verify_session(session_value).await;
+    let user = verify_session(session_value).await;
     if user.is_err() {
         warn!(path = path, "Session is invalid: {}", session_value);
         // session is invalid, redirect to sign-out page

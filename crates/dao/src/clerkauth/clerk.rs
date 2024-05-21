@@ -60,10 +60,10 @@ pub fn get_clerk_env() -> ClerkEnv {
 static CLERK_JWKS: &str = "clerk_jwks";
 
 async fn init_clerk_jwks() -> Result<()> {
-    let value = land_dao::settings::get(CLERK_JWKS).await?;
+    let value = crate::settings::get(CLERK_JWKS).await?;
     if value.is_none() {
         let jwks = request_jwks().await?;
-        land_dao::settings::set(CLERK_JWKS, &jwks).await?;
+        crate::settings::set(CLERK_JWKS, &jwks).await?;
     }
     Ok(())
 }
@@ -111,7 +111,7 @@ pub struct JwksModel {
 
 /// get_jwks returns the first jwks key
 async fn get_jwks() -> Result<JwksKey> {
-    let setting = land_dao::settings::get("clerk_jwks").await?;
+    let setting = crate::settings::get("clerk_jwks").await?;
     if setting.is_none() {
         return Err(anyhow!("Clerk_jwks not found"));
     }

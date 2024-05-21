@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "crates/common",
-    "crates/core",
     "crates/dao",
     "crates/sdk",
     "crates/sdk-macro",
@@ -17,7 +16,7 @@ default-members = ["land-cli"]
 resolver = "2"
 
 [workspace.package]
-version = "0.3.4-beta.1"
+version = "0.3.5"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
@@ -25,12 +24,10 @@ authors = ["fuxiaohei <fudong0797@gmail.com>"]
 anyhow = "1.0.86"
 async-trait = "0.1.80"
 axum = "0.7.5"
-base64 = "0.22.1"
 chrono = "0.4.38"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 http = "1.1.0"
 land-common = { path = "./crates/common" }
-land-core = { path = "./crates/core" }
 land-dao = { path = "./crates/dao" }
 land-sdk = { path = "crates/sdk" }
 land-sdk-macro = { path = "crates/sdk-macro" }

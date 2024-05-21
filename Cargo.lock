@@ -59,6 +59,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "aes-gcm-siv"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae0784134ba9375416d469ec31e7c5f9fa94405049cf08c5ce5b4698be673e0d"
+dependencies = [
+ "aead",
+ "aes",
+ "cipher",
+ "ctr",
+ "polyval",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
 name = "ahash"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -208,6 +223,18 @@ name = "arbitrary"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d5a26814d8dcb93b0e5a0ff3c6d80a8843bafb21b39e8e18a6f05471870e110"
+
+[[package]]
+name = "arrayref"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b4930d2cb77ce62f89ee5d5289b4ac049559b1c45539271f5ed4fdc7db34545"
+
+[[package]]
+name = "arrayvec"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 
 [[package]]
 name = "async-stream"
@@ -475,6 +502,17 @@ dependencies = [
  "radium",
  "tap",
  "wyz",
+]
+
+[[package]]
+name = "blake2b_simd"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23285ad32269793932e830392f2fe2f83e26488fd3ec778883a93c8323735780"
+dependencies = [
+ "arrayref",
+ "arrayvec",
+ "constant_time_eq",
 ]
 
 [[package]]
@@ -818,6 +856,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "constant_time_eq"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7144d30dcf0fafbce74250a3963025d8d52177934239851c917d29f1df280c2"
 
 [[package]]
 name = "cookie"
@@ -1326,6 +1370,18 @@ checksum = "7e5768da2206272c81ef0b5e951a41862938a6070da63bcea197899942d3b947"
 dependencies = [
  "cfg-if",
  "rustix",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "filetime"
+version = "0.2.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ee447700ac8aa0b2f2bd7bc4462ad686ba06baa6727ac149a2d6277f0d240fd"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "redox_syscall 0.4.1",
  "windows-sys 0.52.0",
 ]
 
@@ -2046,12 +2102,17 @@ version = "0.1.0"
 
 [[package]]
 name = "land-common"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
+ "anyhow",
+ "base64 0.22.1",
  "clap",
+ "hex",
  "hostname 0.4.0",
  "lazy_static",
+ "rand 0.8.5",
  "serde",
+ "simple_crypt",
  "time",
  "tracing",
  "tracing-subscriber",
@@ -2059,34 +2120,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "land-core"
-version = "0.3.4-beta.1"
-dependencies = [
- "anyhow",
- "jsonwebtoken",
- "land-dao",
- "once_cell",
- "reqwest",
- "serde",
- "serde_json",
- "tracing",
-]
-
-[[package]]
 name = "land-dao"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "async-trait",
  "bcrypt",
  "chrono",
  "clap",
+ "jsonwebtoken",
+ "land-common",
  "lazy_static",
  "md5",
  "once_cell",
  "opendal",
  "rand 0.8.5",
  "random_word",
+ "reqwest",
  "sea-orm",
  "sea-orm-migration",
  "serde",
@@ -2101,7 +2151,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "http",
@@ -2113,7 +2163,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "http",
@@ -2123,20 +2173,18 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "axum",
  "axum-extra",
  "axum-template",
  "axum_csrf",
- "base64 0.22.1",
  "chrono",
  "clap",
  "handlebars",
  "http",
  "land-common",
- "land-core",
  "land-dao",
  "land-wasm-gen",
  "md5",
@@ -2156,7 +2204,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2178,7 +2226,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2190,7 +2238,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "clap",
@@ -2214,7 +2262,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-server"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "axum",
@@ -3598,6 +3646,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-argon2"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5885493fdf0be6cdff808d1533ce878d21cfa49c7086fa00c66355cd9141bfc"
+dependencies = [
+ "base64 0.21.7",
+ "blake2b_simd",
+ "constant_time_eq",
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "rust-embed"
 version = "8.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3635,7 +3695,7 @@ dependencies = [
 
 [[package]]
 name = "rust-helloworld"
-version = "0.3.4-beta.1"
+version = "0.3.5"
 dependencies = [
  "anyhow",
  "http",
@@ -4137,6 +4197,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple_crypt"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19a335d088ffc07695a1aee7b94b72a70ba438bed139cf3f3397fcc6c102d113"
+dependencies = [
+ "aes-gcm-siv",
+ "anyhow",
+ "bincode",
+ "log",
+ "rust-argon2",
+ "serde",
+ "serde_derive",
+ "tar",
+]
+
+[[package]]
 name = "siphasher"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4583,6 +4659,17 @@ name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
+name = "tar"
+version = "0.4.40"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b16afcea1f22891c49a00c751c7b63b2233284064f11a200fc624137c51e2ddb"
+dependencies = [
+ "filetime",
+ "libc",
+ "xattr",
+]
 
 [[package]]
 name = "target-lexicon"
@@ -6110,6 +6197,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
 dependencies = [
  "tap",
+]
+
+[[package]]
+name = "xattr"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da84f1a25939b27f6820d92aed108f83ff920fdf11a7b19366c27c4cda81d4f"
+dependencies = [
+ "libc",
+ "linux-raw-sys",
+ "rustix",
 ]
 
 [[package]]

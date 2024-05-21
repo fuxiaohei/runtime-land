@@ -43,9 +43,9 @@ async fn main() -> Result<()> {
     // Init Defaults data in database
     land_dao::settings::init_defaults().await?;
     // Init clerk env
-    land_core::auth::init_clerk_env().await?;
+    land_dao::clerkauth::init_clerk_env().await?;
     // Init prometheus env
-    land_core::metrics::init_prometheus().await?;
+    land_dao::metrics::init_prometheus().await?;
 
     // Start deployer background task
     deployer::run_background();

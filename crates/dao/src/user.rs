@@ -5,7 +5,6 @@ use crate::{
 };
 use anyhow::Result;
 use lazy_static::lazy_static;
-use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use sea_orm::{
     sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder,
 };
@@ -102,11 +101,7 @@ pub async fn create_new_token(
 ) -> Result<user_token::Model> {
     let now = chrono::Utc::now();
     let expired_at = now.add(chrono::TimeDelta::try_seconds(expire).unwrap());
-    let value: String = rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(40)
-        .map(char::from)
-        .collect();
+    let value: String = land_common::encoding::rand_string(40);
     let token_model = user_token::Model {
         id: 0,
         user_id,
@@ -232,11 +227,7 @@ pub async fn create_user(
         return Err(anyhow::anyhow!("OAuth provider is not supported"));
     }
     // generate randompassword , and create user
-    let password_salt: String = thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(20)
-        .map(char::from)
-        .collect();
+    let password_salt = land_common::encoding::rand_string(20);
     let full_password = format!("{}{}", password_salt, origin_user_id);
     let password = bcrypt::hash(full_password, bcrypt::DEFAULT_COST)?;
 

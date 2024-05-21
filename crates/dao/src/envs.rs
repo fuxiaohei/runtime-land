@@ -1,11 +1,9 @@
 use crate::{db::DB, models::project_envs, now_time};
 use anyhow::Result;
-use rand::Rng;
 use sea_orm::{
     sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
     QueryOrder, Set,
 };
-use sha2::{Digest, Sha256};
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -81,11 +79,13 @@ async fn set_env(project_id: i32, key: &str, value: &str) -> Result<()> {
         .one(db)
         .await?;
     if item.is_none() {
+        let salt = land_common::encoding::rand_string(16);
+        let encrypt_value = land_common::encoding::encrypt_text(value, &salt)?;
         let item = project_envs::ActiveModel {
             project_id: Set(project_id),
             env_key: Set(key.to_string()),
-            env_value: Set(value.to_string()),
-            env_salt: Set("".to_string()),
+            env_value: Set(encrypt_value),
+            env_salt: Set(salt),
             created_at: Set(now),
             status: Set(EnvStatus::Active.to_string()),
             ..Default::default()
@@ -93,8 +93,10 @@ async fn set_env(project_id: i32, key: &str, value: &str) -> Result<()> {
         item.insert(db).await?;
     } else {
         let item = item.unwrap();
+        let salt = item.env_salt.clone();
+        let encrypt_value = land_common::encoding::encrypt_text(value, &salt)?;
         let mut item = item.into_active_model();
-        item.env_value = Set(value.to_string());
+        item.env_value = Set(encrypt_value);
         item.save(db).await?;
     }
     Ok(())
@@ -110,32 +112,4 @@ pub async fn list_envs(project_id: i32) -> Result<Vec<project_envs::Model>> {
         .all(db)
         .await?;
     Ok(items)
-}
-
-const SALT_LEN: usize = 16; // Length of the salt
-const KEY_LEN: usize = 32; // AES-256 requires a 32-byte key
-const IV_LEN: usize = 16; // AES block size is 16 bytes
-
-fn generate_salt() -> [u8; SALT_LEN] {
-    let mut salt = [0u8; SALT_LEN];
-    rand::rngs::OsRng.fill(&mut salt);
-    salt
-}
-
-fn derive_key_from_salt(salt: &[u8]) -> [u8; KEY_LEN] {
-    let mut hasher = Sha256::new();
-    hasher.update(salt);
-    let result = hasher.finalize();
-    let mut key = [0u8; KEY_LEN];
-    key.copy_from_slice(&result[..KEY_LEN]);
-    key
-}
-
-fn generate_iv_from_salt(salt: &[u8]) -> [u8; IV_LEN] {
-    let mut hasher = Sha256::new();
-    hasher.update(salt);
-    let result = hasher.finalize();
-    let mut iv = [0u8; IV_LEN];
-    iv.copy_from_slice(&result[KEY_LEN..KEY_LEN + IV_LEN]);
-    iv
 }
