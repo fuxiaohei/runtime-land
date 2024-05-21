@@ -215,7 +215,6 @@ async fn wasm_caller_handler(
     }
     let method = req.method().clone();
     let envs = envs::get_by_project(ctx.project_uuid.clone()).await;
-    println!("envs: {:?}", envs);
     let mut context = Context::new(envs);
     // if method is GET or DELETE, set body to None
     let body_handle = if method == "GET" || method == "DELETE" {

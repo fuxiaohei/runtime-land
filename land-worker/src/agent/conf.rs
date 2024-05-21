@@ -34,9 +34,13 @@ fn write_traefik_conf(data_dir: &str, task: &TaskValue) -> Result<String> {
     if PathBuf::from(conf_file.clone()).exists() {
         let old_conf = std::fs::read_to_string(conf_file.clone())?;
         let old_md5 = format!("{:x}", md5::compute(old_conf.as_bytes()));
-        if old_md5.eq(&task.traefik_checksum.clone().unwrap_or_default()) {
+        let new_md5 = task.traefik_checksum.clone().unwrap_or_default();
+        if old_md5 == new_md5 {
             debug!("Traefik conf file already exists: {}", conf_file);
             return Ok(conf_file);
+        }else{
+            debug!("Traefik conf file already exists, but checksum not match: {}", conf_file);
+            debug!("Old checksum: {}, new checksum: {}", old_md5, new_md5);
         }
     }
     let conf_dir = PathBuf::from(conf_file.clone());

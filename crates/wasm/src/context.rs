@@ -67,7 +67,8 @@ impl Context {
         wasi_ctx_builder.inherit_stderr().inherit_stdout();
         if let Some(envs) = envs {
             for (k, v) in envs {
-                wasi_ctx_builder.env(k, v);
+                // set env key as upper case
+                wasi_ctx_builder.env(k.to_uppercase(), v);
             }
         }
         Context {
