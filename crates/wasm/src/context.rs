@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::hostcall::HttpContext;
 use axum::body::Body;
 use bytesize::ByteSize;
@@ -54,18 +56,22 @@ impl WasiView for Context {
 
 impl Default for Context {
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
 
 impl Context {
-    pub fn new() -> Self {
+    pub fn new(envs: Option<HashMap<String, String>>) -> Self {
         let table = ResourceTable::new();
+        let mut wasi_ctx_builder = WasiCtxBuilder::new();
+        wasi_ctx_builder.inherit_stderr().inherit_stdout();
+        if let Some(envs) = envs {
+            for (k, v) in envs {
+                wasi_ctx_builder.env(k, v);
+            }
+        }
         Context {
-            wasi_ctx: WasiCtxBuilder::new()
-                .inherit_stderr()
-                .inherit_stdout()
-                .build(),
+            wasi_ctx: wasi_ctx_builder.build(),
             http_ctx: HttpContext::new(),
             limiter: Limiter::default(),
             table,

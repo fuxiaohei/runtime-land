@@ -6,11 +6,13 @@ enum ProjectEnvs {
     Table,
     Id,
     ProjectId,
+    ProjectUuid,
     EnvKey,
     EnvValue,
     EnvSalt,
     Status,
     CreatedAt,
+    UpdatedAt,
 }
 
 #[derive(DeriveMigrationName)]
@@ -33,6 +35,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(ProjectEnvs::ProjectId).integer().not_null())
+                    .col(ColumnDef::new(ProjectEnvs::ProjectUuid).string_len(64).not_null())
                     .col(
                         ColumnDef::new(ProjectEnvs::EnvKey)
                             .string_len(128)
@@ -51,6 +54,12 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(ProjectEnvs::CreatedAt)
+                            .timestamp()
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_string())
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(ProjectEnvs::UpdatedAt)
                             .timestamp()
                             .extra("DEFAULT CURRENT_TIMESTAMP".to_string())
                             .not_null(),

@@ -223,7 +223,7 @@ pub async fn settings(
     let project = ProjectVar::new(&p, None).await?;
 
     // list envs
-    let envs_data = land_dao::envs::list_envs(p.id).await?;
+    let envs_data = land_dao::envs::list_envs_by_project(p.id).await?;
     let envs = EnvVar::from_models_vec(envs_data).await?;
 
     let title = format!("Settings - {}", project.name);

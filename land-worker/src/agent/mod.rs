@@ -11,6 +11,7 @@ use tokio::sync::Mutex;
 use tracing::{debug, info, warn};
 
 mod conf;
+pub mod envs;
 pub mod ip;
 mod sysm;
 
@@ -69,17 +70,25 @@ pub async fn run_background(addr: String, token: String, dir: String) {
 struct Request {
     pub ip: IPInfo,
     pub tasks: HashMap<String, String>,
+    pub envs_conf_md5: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AliveResponse {
+    pub tasks: Vec<String>,
+    pub envs_conf_md5: Option<String>,
 }
 
 // global reqwest client to reuse
 static CLIENT: Lazy<reqwest::Client> = Lazy::new(reqwest::Client::new);
 
 async fn run_inner(addr: String, token: String) -> Result<()> {
-    let url = format!("{}/api/v1/worker-api/alive", addr);
+    let url = format!("{}/api/v1/worker-api/alive2", addr);
     let mut results = TASKS_RESULT.lock().await;
     let req = Request {
         ip: ip::get().await,
         tasks: results.clone(),
+        envs_conf_md5: None,
     };
     let resp = CLIENT
         .post(&url)
@@ -93,7 +102,19 @@ async fn run_inner(addr: String, token: String) -> Result<()> {
         warn!("Bad response status: {}, body: {}", status, text);
         return Err(anyhow!("Bad response status: {}, url: {}", status, url));
     }
-    let values: Vec<String> = resp.json().await?;
+    let resp_value: AliveResponse = resp.json().await?;
+    if let Some(env_md5) = resp_value.envs_conf_md5 {
+        let env_local = land_dao::envs::ENV_WORKER_LOCAL.lock().await;
+        if env_local.md5 != env_md5 {
+            info!("Sync envs, md5:{}", env_md5);
+            tokio::spawn(async move {
+                if let Err(e) = envs::sync_envs(addr, token, env_md5).await {
+                    warn!("Sync envs failed: {}", e);
+                }
+            });
+        };
+    }
+    let values = resp_value.tasks;
     // if key in results is not in values, remove key
     results.retain(|k, _| values.contains(k));
     if values.is_empty() {

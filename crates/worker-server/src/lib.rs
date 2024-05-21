@@ -12,12 +12,14 @@ use axum::{
 use land_wasm::hostcall::Request as WasmRequest;
 use land_wasm::{Context, Worker};
 use metrics_exporter_prometheus::PrometheusBuilder;
+use middleware::WorkerContext;
 use once_cell::sync::OnceCell;
 use std::{net::SocketAddr, time::Duration};
 use tokio::time::Instant;
 use tower_http::timeout::TimeoutLayer;
 use tracing::{debug, info, info_span, warn, Instrument};
 
+pub mod envs;
 mod middleware;
 
 /// Opts for the worker server
@@ -147,7 +149,7 @@ async fn default_handler(
 
     // call wasm async
     async move {
-        let result = wasm_caller_handler(req, &ctx.wasm_module, ctx.req_id.clone()).await;
+        let result = wasm_caller_handler(req, &ctx, ctx.req_id.clone()).await;
         if let Err(err) = result {
             let elapsed = st.elapsed().as_micros();
             warn!(
@@ -188,10 +190,10 @@ pub async fn prepare_worker(wasm_path: &str) -> Result<Worker> {
 
 async fn wasm_caller_handler(
     req: Request<Body>,
-    wasm_path: &str,
+    ctx: &WorkerContext,
     req_id: String,
 ) -> Result<Response<Body>> {
-    let worker = prepare_worker(wasm_path).await?;
+    let worker = prepare_worker(&ctx.wasm_module).await?;
 
     // convert request to host-call request
     let mut headers: Vec<(String, String)> = vec![];
@@ -212,7 +214,9 @@ async fn wasm_caller_handler(
         uri = new_uri.parse().unwrap();
     }
     let method = req.method().clone();
-    let mut context = Context::new();
+    let envs = envs::get_by_project(ctx.project_uuid.clone()).await;
+    println!("envs: {:?}", envs);
+    let mut context = Context::new(envs);
     // if method is GET or DELETE, set body to None
     let body_handle = if method == "GET" || method == "DELETE" {
         0

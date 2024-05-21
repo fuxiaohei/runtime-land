@@ -133,7 +133,7 @@ pub async fn update_envs(
         ));
     }
     let p = p.unwrap();
-    land_dao::envs::update_envs(form, p.id).await?;
+    land_dao::envs::update_envs(form, p.id, p.uuid).await?;
     Ok(redirect_response(
         format!("/projects/{}/settings", name).as_str(),
     ))

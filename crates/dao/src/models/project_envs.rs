@@ -9,12 +9,14 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub project_id: i32,
+    pub project_uuid: String,
     pub env_key: String,
     #[sea_orm(column_type = "Text")]
     pub env_value: String,
     pub env_salt: String,
     pub status: String,
     pub created_at: DateTime,
+    pub updated_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

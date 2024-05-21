@@ -1,8 +1,10 @@
 use tracing::warn;
 
 mod deploying;
+mod envs;
 mod traffic;
 mod waiting;
+
 pub use traffic::{
     query_flows_traffic, query_requests_traffic, refresh_projects, TrafficPeriodParams,
 };
@@ -37,6 +39,17 @@ pub fn run_background() {
                     warn!("Metrics::refresh failed: {}", e);
                 }
             }
+        }
+    });
+    tokio::spawn(async {
+        loop {
+            match envs::refresh().await {
+                Ok(_) => {}
+                Err(e) => {
+                    warn!("Envs::refresh failed: {}", e);
+                }
+            };
+            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
         }
     });
 }

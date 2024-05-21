@@ -2267,6 +2267,7 @@ dependencies = [
  "anyhow",
  "axum",
  "land-common",
+ "land-dao",
  "land-wasm",
  "metrics",
  "metrics-exporter-prometheus",
