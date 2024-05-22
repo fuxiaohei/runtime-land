@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main class="container text-center">
+        <div class="logo pt-5">
+            <img src="/static/img/logo-v2.png" alt="logo" class="p-2 border rounded bg-white"
+                style="margin-top:5%;width:120px;height:120px">
+        </div>
+        <h3 class="pt-5 text-body-secondary">Runtime.land</h3>
+        <div id="loading-spinner" class="spinner-border mt-5" style="width: 4rem; height: 4rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Signing out...</p>
+        <p class="pt-5 text-body-tertiary">@2023-2024 Runtime.land - All rights reserved.</p>
+        <div id="sign-in"></div>
+    </main>
+    <script>
+        const script = document.createElement('script');
+        script.setAttribute('data-clerk-publishable-key', `{{clerk.publishable_key}}`);
+        script.async = true;
+        script.src = `{{clerk.javascript_src}}`;
+        script.addEventListener('load', async function () {
+            await window.Clerk.load();
+            await window.Clerk.signOut();
+            window.location = "/sign-in";
+        });
+        document.body.appendChild(script)
+    </script>
+
+</body>
+
+</html>

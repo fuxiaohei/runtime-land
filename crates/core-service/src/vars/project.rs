@@ -1,6 +1,6 @@
-use land_dao::{
-    models, projects::ProjectCreatedBy, settings, traffic::TrafficSummary, DateTimeUTC,
-};
+use land_dao::projects::ProjectCreatedBy;
+use land_dao::traffic::TrafficSummary;
+use land_dao::{models, settings, DateTimeUTC};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -92,97 +92,5 @@ impl ProjectVar {
             var.source = playground.source.clone();
         }
         Ok(var)
-    }
-}
-
-#[derive(Serialize)]
-pub struct TokenVar {
-    pub id: i32,
-    pub name: String,
-    pub value: String,
-    pub is_new: bool,
-    pub updated_at: DateTimeUTC,
-}
-
-#[derive(Serialize)]
-pub struct WorkerVar {
-    pub id: i32,
-    pub ip: String,
-    pub hostname: String,
-    pub updated_at: DateTimeUTC,
-    pub status: String,
-}
-
-impl WorkerVar {
-    pub fn from_models_vec(workers: Vec<models::worker::Model>) -> Vec<WorkerVar> {
-        workers
-            .into_iter()
-            .map(|w| WorkerVar {
-                id: w.id,
-                ip: w.ip,
-                hostname: w.hostname,
-                updated_at: w.updated_at.and_utc(),
-                status: w.status.to_string(),
-            })
-            .collect()
-    }
-}
-
-#[derive(Serialize)]
-pub struct PaginationVarItem {
-    pub link: String,
-    pub current: bool,
-    pub page: u64,
-}
-
-#[derive(Serialize)]
-pub struct PaginationVar {
-    pub current: u64,
-    pub count: u64,
-    pub total: u64,
-    pub items: Vec<PaginationVarItem>,
-}
-
-impl PaginationVar {
-    pub fn new(current: u64, size: u64, count: u64, total: u64, link: &str) -> PaginationVar {
-        let mut items = vec![];
-        for i in 1..=total {
-            let page_link = if link.contains('?') {
-                format!("{}&page={}&size={}", link, i, size)
-            } else {
-                format!("{}?page={}&size={}", link, i, size)
-            };
-            items.push(PaginationVarItem {
-                link: page_link,
-                current: i == current,
-                page: i,
-            });
-        }
-        PaginationVar {
-            current,
-            count,
-            total,
-            items,
-        }
-    }
-}
-
-#[derive(Serialize)]
-pub struct EnvVar {
-    pub id: i32,
-    pub key: String,
-}
-
-impl EnvVar {
-    pub async fn from_models_vec(
-        envs: Vec<models::project_envs::Model>,
-    ) -> anyhow::Result<Vec<EnvVar>> {
-        Ok(envs
-            .into_iter()
-            .map(|e| EnvVar {
-                id: e.id,
-                key: e.env_key,
-            })
-            .collect())
     }
 }

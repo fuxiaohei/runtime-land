@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/admin-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="admin-projects" class="pt-3 px-3 container">
+                    <div>
+                        <h5>Projects</h5>
+                        <p class="text-body-tertiary mb-1">Manage all projects here.</p>
+                    </div>
+                    <div class="card shadow-none mt-3">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush shadow-none">
+                                {{#each projects}}
+                                <li
+                                    class="list-group-item py-3 token-list-item d-flex align-items-center justify-content-between">
+                                    <div class="left">
+                                        <p class="mb-2">
+                                            <span class="name fw-bold">{{name}}</span>
+                                            <span class="owner small text-body-secondary ps-2">
+                                                ({{user_nickname}} {{user_email}})
+                                            </span>
+                                            <span
+                                                class="status status-{{status}} text-uppercase small ps-2">{{status}}</span>
+                                        </p>
+                                        <p class="mb-1 small text-body-tertiary">
+                                            <span class="language {{language}}">{{language}}</span>
+                                            <span class="created ms-2 ps-2 border-start">Created by
+                                                {{created_by}}</span>
+                                            <span class="updated ms-2 ps-2 border-start"
+                                                data-x-timeago="{{updated_at}}">{{updated_at}}</span>
+                                        </p>
+                                    </div>
+                                    <div class="right">
+                                        <button data-x-id="{{id}}"
+                                            class="redeploy-btn btn btn-link text-decoration-none text-info" href="#"><i
+                                                class="bi bi-download me-2"></i>Redeploy</button>
+                                        {{#if (eq_str status 'disabled')}}
+                                        <button data-x-id="{{id}}"
+                                            class="enable-btn border-start text-decoration-none text-success btn btn-link"><i
+                                                class="bi bi-check2-circle me-2"></i>Enable</button>
+                                        {{else}}
+                                        <button data-x-id="{{id}}"
+                                            class="disable-btn border-start text-decoration-none text-warning btn btn-link"><i
+                                                class="bi bi-x-octagon me-2"></i>Disable</button>
+                                        {{/if}}
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                    <ul class="pagination pagination-sm mt-3">
+                        {{#each pagination.items}}
+                        <li class="page-item"><a class="page-link" href="{{link}}">{{page}}</a></li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll(".redeploy-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                const id = e.target.getAttribute("data-x-id");
+                const values = new URLSearchParams()
+                values.append("project_id", id)
+                const response = await fetch(`/admin/projects/redeploy`, {
+                    method: "POST",
+                    body: values,
+                });
+                if (response.status === 200) {
+                    alert("Redeployed successfully");
+                } else {
+                    alert("Failed to redeploy");
+                }
+            });
+        });
+        document.querySelectorAll(".disable-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                const id = e.target.getAttribute("data-x-id");
+                const values = new URLSearchParams()
+                values.append("project_id", id)
+                const response = await fetch(`/admin/projects/disable`, {
+                    method: "POST",
+                    body: values,
+                });
+                if (response.status === 200) {
+                    alert("Disabled successfully");
+                    window.location.reload();
+                } else {
+                    alert("Failed to disable");
+                }
+            });
+        });
+        document.querySelectorAll(".enable-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+                const id = e.target.getAttribute("data-x-id");
+                const values = new URLSearchParams()
+                values.append("project_id", id)
+                const response = await fetch(`/admin/projects/enable`, {
+                    method: "POST",
+                    body: values,
+                });
+                if (response.status === 200) {
+                    alert("Enabled successfully");
+                    window.location.reload();
+                } else {
+                    alert("Failed to enable");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

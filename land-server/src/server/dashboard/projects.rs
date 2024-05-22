@@ -1,13 +1,11 @@
-use crate::server::{
-    dashboard::vars::{EnvVar, ProjectVar},
-    examples::TemplateVar,
-};
+use crate::server::examples::TemplateVar;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
 use axum::{Form, Json};
 use axum_csrf::CsrfToken;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::{response_redirect, ServerError};
-use land_core_service::template::{self, PageVars, RenderHtmlMinified};
+use land_core_service::template::{self, RenderHtmlMinified};
+use land_core_service::vars::{EnvVar, PageVars, ProjectVar};
 use land_dao::projects::ProjectStatus;
 use serde::Deserialize;
 use tracing::{debug, info, warn};

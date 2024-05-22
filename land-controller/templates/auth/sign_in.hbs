@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        <div id="sign-in-container" class="container p-0">
+            <div class="logo-brand d-flex align-items-center">
+                <img src="/static/img/logo-v2.png" class="inline-block border rounded-1 p-1" alt="logo">
+                <span class="fs-4 fw-bold ms-3">Runtime.land <span class="badge text-bg-danger">Admin</span> </span>
+            </div>
+            <p class="text-body-secondary border-bottom py-3 mb-3">Manage your projects and workers with ease.</p>
+            <div id="sign-in-btn-container" class="mt-3">
+                <div id="loading-spinner" class="ms-2">
+                    <div class="spinner-grow text-body-secondary spinner-grow-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="ps-3">Signing in...</span>
+                </div>
+                <button class="btn btn-primary d-none" id="sign-in-btn">
+                    <i class="bi bi-github me-3"></i>Continue with Github via Clerk
+                </button>
+            </div>
+            <div id="sign-in"></div>
+            <p class="pt-4 mt-4 text-body-tertiary small">@2023-2024 Runtime.land - All rights reserved.</p>
+        </div>
+    </div>
+    <script>
+        let redirect_url = window.location.href;
+        const script = document.createElement('script');
+        script.setAttribute('data-clerk-publishable-key', `{{clerk.publishable_key}}`);
+        script.async = true;
+        script.src = `{{clerk.javascript_src}}`;
+        script.addEventListener('load', async function () {
+            await window.Clerk.load({
+                afterSignInUrl: redirect_url,
+                appearance: {
+                    baseTheme: 'dark'
+                },
+            });
+            if (window.Clerk.session && window.Clerk.user) {
+                // console.log(window.Clerk.user)
+                // signed-in, redirect to /sign-callback
+                let verify_data = {
+                    session_id: window.Clerk.session.id,
+                    avatar_url: window.Clerk.user.imageUrl,
+                    first_name: window.Clerk.user.firstName,
+                    full_name: window.Clerk.user.fullName,
+                    user_name: window.Clerk.user.username,
+                    email: window.Clerk.user.primaryEmailAddress.emailAddress,
+                    origin_user_id: window.Clerk.user.id,
+                    origin_provider: "clerk@" + (window.Clerk.user.primaryEmailAddress.verification?.strategy || "unknown"),
+                    // redirect_to: redirect_to,
+                }
+                let data = encodeURIComponent(btoa(JSON.stringify(verify_data)));
+                window.location = "/sign-callback?v=" + data
+                return;
+            }
+
+            // if not sign-in, show sign-in button
+            document.getElementById('loading-spinner').classList.add('d-none');
+            document.getElementById('sign-in-btn').classList.remove('d-none');
+        });
+        document.body.appendChild(script)
+        const btn = document.getElementById('sign-in-btn');
+        btn.addEventListener('click', () => {
+            const signInComponent = document.querySelector('#sign-in');
+            window.Clerk.openSignIn(signInComponent);
+        });
+    </script>
+
+</body>
+
+</html>

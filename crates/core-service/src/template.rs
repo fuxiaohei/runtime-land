@@ -2,7 +2,6 @@ use anyhow::Result;
 use axum::response::IntoResponse;
 use axum_template::engine::Engine as AxumTemplateEngine;
 use handlebars::{handlebars_helper, Handlebars};
-use serde::Serialize;
 use tracing::debug;
 use walkdir::WalkDir;
 
@@ -70,37 +69,6 @@ where
                 axum::response::Html(minified).into_response()
             }
             Err(x) => x.into_response(),
-        }
-    }
-}
-
-/// PageVars is the common variables for all pages
-#[derive(Debug, Default, Serialize)]
-pub struct PageVars {
-    pub title: String,
-    pub version: String,
-    pub build_time: String,
-    pub nav: String,
-    pub admin: bool,
-}
-
-impl PageVars {
-    pub fn new(title: &str, nav: &str) -> Self {
-        Self {
-            title: title.to_string(),
-            version: land_common::version::SHORT.to_string(),
-            build_time: land_common::version::date(),
-            nav: nav.to_string(),
-            admin: false,
-        }
-    }
-    pub fn new_admin(title: &str, nav: &str) -> Self {
-        Self {
-            title: title.to_string(),
-            version: land_common::version::SHORT.to_string(),
-            build_time: land_common::version::date(),
-            nav: nav.to_string(),
-            admin: true,
         }
     }
 }

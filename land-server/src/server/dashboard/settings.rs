@@ -1,10 +1,10 @@
-use crate::server::dashboard::vars::TokenVar;
 use axum::{extract::Path, response::IntoResponse, Extension, Form};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::{response_redirect, ServerError};
-use land_core_service::template::{self, PageVars, RenderHtmlMinified};
+use land_core_service::template::{self, RenderHtmlMinified};
+use land_core_service::vars::{PageVars, TokenVar};
 use land_dao::{envs::EnvsParams, user::TokenUsage};
 use tracing::info;
 

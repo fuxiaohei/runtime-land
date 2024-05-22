@@ -10,6 +10,8 @@ pub use clerk::{get_clerk_env, init_clerk_env, ClerkEnv};
 mod middleware;
 pub use middleware::{admin_middleware, middleware, SessionUser};
 
+pub mod route;
+
 /// verify_session verifies session token
 pub async fn verify_session(session_value: &str) -> Result<UserModel> {
     let token = user::get_token_by_value(session_value, Some(TokenUsage::Session)).await?;

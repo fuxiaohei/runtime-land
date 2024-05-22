@@ -3,7 +3,8 @@ use axum::Extension;
 use axum_csrf::CsrfToken;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::ServerError;
-use land_core_service::template::{self, PageVars, RenderHtmlMinified};
+use land_core_service::template::{self, RenderHtmlMinified};
+use land_core_service::vars::PageVars;
 use serde::Serialize;
 
 /// index is a handler for GET /admin/
@@ -24,7 +25,7 @@ pub async fn index(
     Ok((
         csrf_layer,
         RenderHtmlMinified(
-            "admin/index.hbs",
+            "index.hbs",
             engine,
             IndexVars {
                 page: PageVars::new_admin("Dashboard", "admin-dashboard"),

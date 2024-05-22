@@ -11,15 +11,13 @@ use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
 use land_core_service::clerkauth::{self, SessionUser};
 use land_core_service::httputil::ServerError;
-use land_core_service::template::{self, PageVars, RenderHtmlMinified};
+use land_core_service::template::{self, RenderHtmlMinified};
+use land_core_service::vars::{PageVars, ProjectVar};
 use tower_http::services::ServeDir;
 use tracing::info;
 
-mod auth;
 mod projects;
 mod settings;
-mod vars;
-pub use vars::{PaginationVar, ProjectVar, TokenVar, WorkerVar};
 mod traffic;
 
 /// index is a handler for GET /
@@ -103,9 +101,9 @@ pub fn router(assets_dir: &str) -> Result<Router> {
 
     let app = Router::new()
         .route("/", any(index))
-        .route("/sign-in", get(auth::sign_in))
-        .route("/sign-callback", get(auth::sign_callback))
-        .route("/sign-out", get(auth::sign_out))
+        .route("/sign-in", get(clerkauth::route::sign_in))
+        .route("/sign-callback", get(clerkauth::route::sign_callback))
+        .route("/sign-out", get(clerkauth::route::sign_out))
         .route("/traffic/requests", post(traffic::requests))
         .route("/traffic/flows", post(traffic::flows))
         .nest("/projects", projects_router)
