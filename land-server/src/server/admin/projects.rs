@@ -1,11 +1,12 @@
-use crate::server::dashboard::{PaginationVar, ProjectVar, SessionUser};
-use crate::server::templates::{RenderHtmlMinified, TemplateEngine};
-use crate::server::{PageVars, ServerError};
+use crate::server::dashboard::{PaginationVar, ProjectVar};
 use axum::extract::Query;
 use axum::response::IntoResponse;
 use axum::{Extension, Form};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
+use land_core_service::clerkauth::SessionUser;
+use land_core_service::httputil::ServerError;
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
 use land_dao::user::UserStatus;
 use tracing::info;
 
@@ -19,7 +20,7 @@ pub struct ProjectsQuery {
 pub async fn projects(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Query(q): Query<ProjectsQuery>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]

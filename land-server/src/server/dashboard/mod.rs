@@ -1,9 +1,4 @@
-use super::{
-    admin,
-    templates::{RenderHtmlMinified, TemplateEngine},
-    ServerError,
-};
-use crate::server::PageVars;
+use super::admin;
 use anyhow::Result;
 use axum::routing::post;
 use axum::{
@@ -14,11 +9,13 @@ use axum::{
 };
 use axum_csrf::{CsrfConfig, CsrfLayer};
 use axum_template::engine::Engine;
+use land_core_service::clerkauth::{self, SessionUser};
+use land_core_service::httputil::ServerError;
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
 use tower_http::services::ServeDir;
 use tracing::info;
 
 mod auth;
-pub use auth::SessionUser;
 mod projects;
 mod settings;
 mod vars;
@@ -28,7 +25,7 @@ mod traffic;
 /// index is a handler for GET /
 pub async fn index(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -63,7 +60,7 @@ pub fn router(assets_dir: &str) -> Result<Router> {
     super::templates::extract(assets_dir)?;
 
     // init handlebars template engine
-    let hbs = super::templates::init(assets_dir)?;
+    let hbs = land_core_service::template::init(assets_dir)?;
 
     // set static assets directory
     let static_assets_dir = format!("{}/static", assets_dir);
@@ -123,6 +120,6 @@ pub fn router(assets_dir: &str) -> Result<Router> {
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .layer(CsrfLayer::new(config))
         .with_state(Engine::from(hbs))
-        .route_layer(middleware::from_fn(auth::middleware));
+        .route_layer(middleware::from_fn(clerkauth::middleware));
     Ok(app)
 }

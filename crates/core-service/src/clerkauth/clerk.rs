@@ -3,6 +3,7 @@ use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
+use land_dao::settings;
 
 /// ClerkEnv is the environment variables for Clerk.js
 #[derive(Serialize, Clone)]
@@ -60,10 +61,10 @@ pub fn get_clerk_env() -> ClerkEnv {
 static CLERK_JWKS: &str = "clerk_jwks";
 
 async fn init_clerk_jwks() -> Result<()> {
-    let value = crate::settings::get(CLERK_JWKS).await?;
+    let value: Option<land_dao::models::settings::Model> = settings::get(CLERK_JWKS).await?;
     if value.is_none() {
         let jwks = request_jwks().await?;
-        crate::settings::set(CLERK_JWKS, &jwks).await?;
+        settings::set(CLERK_JWKS, &jwks).await?;
     }
     Ok(())
 }
@@ -111,7 +112,7 @@ pub struct JwksModel {
 
 /// get_jwks returns the first jwks key
 async fn get_jwks() -> Result<JwksKey> {
-    let setting = crate::settings::get("clerk_jwks").await?;
+    let setting = settings::get("clerk_jwks").await?;
     if setting.is_none() {
         return Err(anyhow!("Clerk_jwks not found"));
     }

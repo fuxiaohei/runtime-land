@@ -1,35 +1,17 @@
-use crate::server::{
-    redirect_response,
-    templates::{RenderHtmlMinified, TemplateEngine},
-    PageVars, ServerError,
-};
-use axum::{
-    extract::{Query, Request},
-    http::StatusCode,
-    middleware::Next,
-    response::{IntoResponse, Response},
-};
+use axum::{extract::Query, http::StatusCode, response::IntoResponse};
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     CookieJar,
 };
-use land_dao::clerkauth::{get_clerk_env, verify_clerk_and_create_token, verify_session, ClerkEnv};
-use land_dao::user::{self, SignCallbackValue, UserRole};
+use land_core_service::clerkauth::{get_clerk_env, verify_clerk_and_create_token, ClerkEnv};
+use land_core_service::httputil::{response_redirect, ServerError};
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
+use land_dao::user::{self, SignCallbackValue};
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info, warn};
 
-#[derive(Clone, Serialize, Debug)]
-pub struct SessionUser {
-    pub id: i32,
-    pub uuid: String,
-    pub name: String,
-    pub email: String,
-    pub gravatar: String,
-    pub admin: bool,
-}
-
 /// sign_in renders the /sign-in page
-pub async fn sign_in(engine: TemplateEngine) -> impl IntoResponse {
+pub async fn sign_in(engine: template::Engine) -> impl IntoResponse {
     #[derive(serde::Serialize)]
     struct SignInVars {
         page: PageVars,
@@ -78,7 +60,7 @@ pub async fn sign_callback(
             session_token.err().unwrap()
         );
         // sign failed, redirect to sign-out page
-        let resp = redirect_response("/sign-out");
+        let resp = response_redirect("/sign-out");
         return Ok((jar, resp).into_response());
     }
     let session_token = session_token.unwrap();
@@ -86,14 +68,14 @@ pub async fn sign_callback(
     session_cookie.set_max_age(Some(time::Duration::days(1)));
     session_cookie.set_path("/");
     session_cookie.set_same_site(Some(SameSite::Strict));
-    let resp = redirect_response("/");
+    let resp = response_redirect("/");
     Ok((jar.add(session_cookie), resp).into_response())
 }
 
 /// sign_out is a handler for GET /sign-out
 pub async fn sign_out(
     jar: CookieJar,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     let session_value = jar
         .get("__runtime_land_session")
@@ -118,73 +100,4 @@ pub async fn sign_out(
     )
     .into_response();
     Ok((jar.remove(Cookie::from("__runtime_land_session")), resp).into_response())
-}
-
-pub async fn middleware(mut request: Request, next: Next) -> Result<Response, StatusCode> {
-    let uri = request.uri().clone();
-    let path = uri.path();
-
-    // skip static assets auth
-    if path.starts_with("/static/") {
-        // debug!("auth skip path: {}", path);
-        return Ok(next.run(request).await);
-    }
-
-    // get session cookie
-    let headers = request.headers();
-    let jar = CookieJar::from_headers(headers);
-    let session_value = jar
-        .get("__runtime_land_session")
-        .map(|c| c.value())
-        .unwrap_or_default();
-
-    // if path is /sign-*, it need validate session
-    // if success, /sign-in redirects to homepage, /sign-out continues
-    if path.starts_with("/sign") {
-        // if session is exist, validate session
-        if path.starts_with("/sign-in") && !session_value.is_empty() {
-            debug!(path = path, "Session is exist when sign-in");
-            let user = verify_session(session_value).await;
-            if user.is_ok() {
-                // session is ok, redirect to homepage
-                return Ok(redirect_response("/").into_response());
-            }
-        }
-        return Ok(next.run(request).await);
-    }
-
-    // get clerk session
-    let clerk_session = jar.get("__session").map(|c| c.value()).unwrap_or_default();
-    if session_value.is_empty() || clerk_session.is_empty() {
-        warn!(path = path, "Session or Clerk session is empty");
-        // no session, redirect to sign-in page
-        return Ok(redirect_response("/sign-in").into_response());
-    }
-
-    // after validation, it gets session user from session_id and set to request extensions
-    let user = verify_session(session_value).await;
-    if user.is_err() {
-        warn!(path = path, "Session is invalid: {}", session_value);
-        // session is invalid, redirect to sign-out page
-        return Ok(redirect_response("/sign-out").into_response());
-    }
-    let user = user.unwrap();
-    let session_user = SessionUser {
-        id: user.id,
-        uuid: user.uuid,
-        name: user.nick_name,
-        email: user.email,
-        gravatar: user.gravatar,
-        admin: user.role == UserRole::Admin.to_string(),
-    };
-
-    // /admin need admin role
-    if path.starts_with("/admin") && !session_user.admin {
-        warn!(path = path, "Session is not admin: {}", session_value);
-        return Ok(redirect_response("/overview").into_response());
-    }
-
-    // debug!(path = path, "Session is valid: {}", session_value);
-    request.extensions_mut().insert(session_user);
-    Ok(next.run(request).await)
 }

@@ -1,13 +1,14 @@
-use super::redirect_response;
-use super::{dashboard::SessionUser, templates::TemplateEngine, ServerError};
+use crate::server::dashboard::TokenVar;
 use crate::server::dashboard::WorkerVar;
-use crate::server::{dashboard::TokenVar, templates::RenderHtmlMinified, PageVars};
 use anyhow::Result;
 use axum::extract::{Query, Request};
 use axum::{response::IntoResponse, Extension};
 use axum::{Form, Json};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
+use land_core_service::clerkauth::SessionUser;
+use land_core_service::httputil::{response_redirect, ServerError};
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
 use land_dao::user::TokenUsage;
 use tracing::info;
 
@@ -20,7 +21,7 @@ pub use projects::*;
 pub async fn index(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -50,7 +51,7 @@ pub async fn index(
 pub async fn workers(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -113,7 +114,7 @@ pub struct SettingsQuery {
 pub async fn settings(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Query(q): Query<SettingsQuery>,
 ) -> Result<impl IntoResponse, ServerError> {
     // if name is not None, it means the user is trying to read one setting and return as json not page
@@ -177,7 +178,7 @@ pub async fn update_settings(
         land_dao::settings::reload_storage().await?;
     }
 
-    Ok(redirect_response(
+    Ok(response_redirect(
         format!("/admin/settings?show={}", f.name).as_str(),
     ))
 }
@@ -189,5 +190,5 @@ pub async fn debug(req: Request) -> Result<impl IntoResponse, ServerError> {
     for (key, value) in req.headers() {
         info!("{}: {:?}", key, value);
     }
-    Ok(redirect_response("/admin"))
+    Ok(response_redirect("/admin"))
 }

@@ -1,5 +1,5 @@
 [package]
-name = "land-server"
+name = "land-core-service"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }
@@ -9,25 +9,15 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { version = "0.9.3", features = ["cookie","form"] }
 axum-template = { version = "2.3.0", features = ["handlebars"] }
-axum_csrf = { version = "0.9.0", features = ["layer"] }
-chrono = { workspace = true }
-clap = { workspace = true }
 handlebars = "5.1.2"
-http = { workspace = true }
+jsonwebtoken = "9.3.0"
 land-common = { workspace = true }
-land-core-service = { workspace = true }
 land-dao = { workspace = true }
-land-wasm-gen = { workspace = true }
-md5 = { workspace = true }
 minify-html = "0.15.0"
 once_cell = { workspace = true }
-rust-embed = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml = { workspace = true }
-tempdir = "0.3.7"
-time = { workspace = true }
-tokio = { workspace = true }
-tower-http = { workspace = true }
+tokio =  { workspace = true }
 tracing = { workspace = true }
 walkdir = { workspace = true }

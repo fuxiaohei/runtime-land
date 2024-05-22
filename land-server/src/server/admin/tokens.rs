@@ -1,7 +1,8 @@
-use crate::server::{dashboard::SessionUser, redirect_response, ServerError};
 use axum::{response::IntoResponse, Extension, Form};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
+use land_core_service::clerkauth::SessionUser;
+use land_core_service::httputil::{response_redirect, ServerError};
 use land_dao::user::TokenUsage;
 use tracing::info;
 
@@ -22,7 +23,7 @@ pub async fn create_worker_token(
         land_dao::user::create_new_token(user.id, &form.name, 365 * 24 * 3600, TokenUsage::Worker)
             .await?;
     info!("New worker token created: {:?}", token);
-    Ok(redirect_response("/admin/workers"))
+    Ok(response_redirect("/admin/workers"))
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -54,5 +55,5 @@ pub async fn delete_token(
     }
     info!("Delete token: {:?}", token);
     land_dao::user::remove_token(form.id).await?;
-    Ok(redirect_response("/admin"))
+    Ok(response_redirect("/admin"))
 }

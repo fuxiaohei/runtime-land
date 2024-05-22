@@ -1,13 +1,10 @@
-use super::auth::SessionUser;
-use crate::server::{
-    dashboard::vars::TokenVar,
-    redirect_response,
-    templates::{RenderHtmlMinified, TemplateEngine},
-    PageVars, ServerError,
-};
+use crate::server::dashboard::vars::TokenVar;
 use axum::{extract::Path, response::IntoResponse, Extension, Form};
 use axum_csrf::CsrfToken;
 use http::StatusCode;
+use land_core_service::clerkauth::SessionUser;
+use land_core_service::httputil::{response_redirect, ServerError};
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
 use land_dao::{envs::EnvsParams, user::TokenUsage};
 use tracing::info;
 
@@ -15,7 +12,7 @@ use tracing::info;
 pub async fn index(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -77,7 +74,7 @@ pub async fn create_token(
         land_dao::user::create_new_token(user.id, &form.name, 365 * 24 * 3600, TokenUsage::Cmdline)
             .await?;
     info!("New token created: {:?}", token);
-    Ok(redirect_response("/settings"))
+    Ok(response_redirect("/settings"))
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -116,7 +113,7 @@ pub async fn delete_token(
     }
     info!("Delete token: {:?}", token);
     land_dao::user::remove_token(form.id).await?;
-    Ok(redirect_response("/settings"))
+    Ok(response_redirect("/settings"))
 }
 
 /// update_envs is a handler for POST /{project_name}/update-envs
@@ -134,7 +131,7 @@ pub async fn update_envs(
     }
     let p = p.unwrap();
     land_dao::envs::update_envs(form, p.id, p.uuid).await?;
-    Ok(redirect_response(
+    Ok(response_redirect(
         format!("/projects/{}/settings", name).as_str(),
     ))
 }

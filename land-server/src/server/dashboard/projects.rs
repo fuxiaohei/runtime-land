@@ -1,14 +1,13 @@
-use super::auth::SessionUser;
 use crate::server::{
     dashboard::vars::{EnvVar, ProjectVar},
     examples::TemplateVar,
-    redirect_response,
-    templates::{RenderHtmlMinified, TemplateEngine},
-    PageVars, ServerError,
 };
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
 use axum::{Form, Json};
 use axum_csrf::CsrfToken;
+use land_core_service::clerkauth::SessionUser;
+use land_core_service::httputil::{response_redirect, ServerError};
+use land_core_service::template::{self, PageVars, RenderHtmlMinified};
 use land_dao::projects::ProjectStatus;
 use serde::Deserialize;
 use tracing::{debug, info, warn};
@@ -16,7 +15,7 @@ use tracing::{debug, info, warn};
 /// index is a handler for GET /projects
 pub async fn index(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -63,7 +62,7 @@ pub async fn index(
 /// new is a handler for GET /new
 pub async fn new(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
 ) -> impl IntoResponse {
     #[derive(serde::Serialize)]
     struct IndexVars {
@@ -105,7 +104,7 @@ pub async fn new_playground(
         "New playground and project, name: {}, dp: {}",
         p.name, dp.id
     );
-    Ok(redirect_response(
+    Ok(response_redirect(
         format!("/playground/{}", p.name).as_str(),
     ))
 }
@@ -113,7 +112,7 @@ pub async fn new_playground(
 /// show_playground is a handler for GET /playground/:name
 pub async fn show_playground(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
@@ -172,7 +171,7 @@ pub async fn save_playground(
 /// single is a handler for GET /projects/:name
 pub async fn single(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
@@ -200,7 +199,7 @@ pub async fn single(
 pub async fn settings(
     Extension(user): Extension<SessionUser>,
     csrf_layer: CsrfToken,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]
@@ -278,7 +277,7 @@ pub async fn update_name(
     info!("Project rename, from: {}, to: {}", name, form.name);
     land_dao::projects::update_name(p.id, form.name, form.desc).await?;
     land_dao::deployment::create(user.id, user.uuid, p.id, p.uuid, p.prod_domain).await?;
-    Ok(redirect_response(&redirect_url))
+    Ok(response_redirect(&redirect_url))
 }
 
 #[derive(Deserialize)]
@@ -313,13 +312,13 @@ pub async fn delete(
     }
     info!("Project delete: {}", name);
     land_dao::projects::delete(p.id, name).await?;
-    Ok(redirect_response(redirect_url))
+    Ok(response_redirect(redirect_url))
 }
 
 // traffic is a handler for GET /projects/:name/traffic
 pub async fn traffic(
     Extension(user): Extension<SessionUser>,
-    engine: TemplateEngine,
+    engine: template::Engine,
     Path(name): Path<String>,
 ) -> Result<impl IntoResponse, ServerError> {
     #[derive(serde::Serialize)]

@@ -15,6 +15,7 @@ target/
 
 # Assets
 assets/
+admin_assets/
 data/
 
 # Added by cargo

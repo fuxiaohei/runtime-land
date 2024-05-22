@@ -2,8 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use land_common::{tracing::TraceArgs, version};
 
-mod aliving;
-mod deployer;
+
 mod server;
 
 #[derive(Parser, Debug)]
@@ -20,7 +19,7 @@ struct Args {
     #[clap(flatten)]
     output: TraceArgs,
     /// Address to listen on.
-    #[clap(long, default_value("0.0.0.0:9840"))]
+    #[clap(long, default_value("0.0.0.0:9860"))]
     address: String,
     #[clap(flatten)]
     dbargs: land_dao::db::DBArgs,
@@ -44,17 +43,9 @@ async fn main() -> Result<()> {
     land_dao::settings::init_defaults().await?;
     // Init clerk env
     land_core_service::clerkauth::init_clerk_env().await?;
-    // Init prometheus env
-    land_dao::metrics::init_prometheus().await?;
-
-    // Start deployer background task
-    deployer::run_background();
-
-    // Start worker aliving check background task
-    aliving::run_background();
 
     // Start the server
-    server::start(args.address.parse()?, "./assets").await?;
+    server::start(args.address.parse()?, "./admin_assets").await?;
 
     Ok(())
 }
