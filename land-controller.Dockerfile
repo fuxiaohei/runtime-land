@@ -15,6 +15,6 @@ RUN \
   apt-get clean
 COPY --from=build /usr/src/land-controller/target/release/land-controller /opt/bin/land-controller
 COPY --from=build /usr/src/land-controller/wizer-v6.0.0-x86_64-linux /opt/bin/wizer
-EXPOSE 9840
+EXPOSE 9860
 CMD ["/opt/bin/land-controller","--verbose"]
 
