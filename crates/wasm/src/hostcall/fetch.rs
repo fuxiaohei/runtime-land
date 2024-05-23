@@ -34,7 +34,7 @@ impl Host for HttpContext {
         &mut self,
         request: Request,
         options: RequestOptions,
-    ) -> wasmtime::Result<Result<Response, RequestError>> {
+    ) -> Result<Response, RequestError> {
         let st = tokio::time::Instant::now();
         debug!(method = request.method, uri = request.uri, "Fetch start");
 
@@ -49,7 +49,16 @@ impl Host for HttpContext {
 
         // read body bytes,
         // TODO: use streaming way to read body
-        let body_bytes = axum::body::to_bytes(body, std::usize::MAX).await?;
+        let body_bytes = axum::body::to_bytes(body, std::usize::MAX)
+            .await
+            .map_err(|e| {
+                warn!(
+                    method = request.method,
+                    uri = request.uri,
+                    "Fetch failed: {e}"
+                );
+                RequestError::InvalidRequest(e.to_string())
+            })?;
 
         // call fetch
         let fetch_response = match client
@@ -71,9 +80,9 @@ impl Host for HttpContext {
                 );
                 let content = e.to_string();
                 if content.contains("connect") {
-                    return Ok(Err(RequestError::NetworkError(e.to_string())));
+                    return Err(RequestError::NetworkError(e.to_string()));
                 }
-                return Ok(Err(RequestError::InvalidRequest(e.to_string())));
+                return Err(RequestError::InvalidRequest(e.to_string()));
             }
         };
 
@@ -122,6 +131,6 @@ impl Host for HttpContext {
             cost = elasped,
             "Fetch done",
         );
-        Ok(Ok(resp))
+        Ok(resp)
     }
 }

@@ -10,7 +10,8 @@ lazy_static! {
 }
 
 /// MODULE_VERSION is the module version
-pub const MODULE_VERSION: &str = "w20";
+/// w21 means wasmtime 21
+pub const MODULE_VERSION: &str = "w21";
 
 // 10 ms to trigger epoch increment
 pub const EPOCH_INC_INTERVAL: u64 = 10;

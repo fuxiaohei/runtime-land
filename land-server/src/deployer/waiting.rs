@@ -131,8 +131,8 @@ async fn handle_deploy(dp: &mut DeploymentModel) -> Result<()> {
     let (domain, _, service_name) = land_dao::settings::get_domain_settings().await?;
     let storage_settings = land_dao::settings::get_storage().await?;
 
-    dp.storage_path = storage_file_name.clone();
-    dp.storage_md5 = upload_data_md5.clone();
+    dp.storage_path.clone_from(&storage_file_name);
+    dp.storage_md5.clone_from(&upload_data_md5);
     let task_value = TaskValue::new(dp, &storage_settings, &domain, &service_name)?;
 
     let task_content = serde_json::to_string(&task_value)?;

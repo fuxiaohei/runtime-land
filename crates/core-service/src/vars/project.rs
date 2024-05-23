@@ -89,7 +89,7 @@ impl ProjectVar {
             traffic: None,
         };
         if let Some(playground) = playground {
-            var.source = playground.source.clone();
+            var.source.clone_from(&playground.source);
         }
         Ok(var)
     }

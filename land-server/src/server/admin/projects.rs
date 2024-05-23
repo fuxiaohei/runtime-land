@@ -51,8 +51,8 @@ pub async fn projects(
     for p in projects.iter_mut() {
         let user = users.get(&p.user_id);
         if let Some(user) = user {
-            p.user_email = user.email.clone();
-            p.user_nickname = user.nick_name.clone();
+            p.user_email.clone_from(&user.email);
+            p.user_nickname.clone_from(&user.nick_name);
         }
     }
 
