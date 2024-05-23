@@ -2196,6 +2196,7 @@ dependencies = [
  "color-print",
  "inquire",
  "land-common",
+ "land-core-service",
  "regex",
  "rust-embed",
  "tokio",
@@ -2259,6 +2260,7 @@ dependencies = [
  "serde_json",
  "time",
  "tokio",
+ "toml",
  "tracing",
  "walkdir",
 ]

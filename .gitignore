@@ -21,3 +21,4 @@ data/
 # Added by cargo
 
 /target
+/demo

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 const VERSION: &str = "1.0";
@@ -22,7 +23,7 @@ impl Data {
     pub fn new_js() -> Data {
         Data {
             name: "js".to_string(),
-            description: "Javascript".to_string(),
+            description: "JavaScript".to_string(),
             language: "js".to_string(),
             version: VERSION.to_string(),
             build: BuildData {
@@ -30,5 +31,15 @@ impl Data {
                 cmd: "".to_string(),
             },
         }
+    }
+    pub fn from_file(file: &str) -> Result<Data> {
+        let content = std::fs::read_to_string(file)?;
+        let data: Data = toml::from_str(&content)?;
+        Ok(data)
+    }
+    pub fn to_file(&self, file: &str) -> Result<()> {
+        let content = toml::to_string(self)?;
+        std::fs::write(file, content)?;
+        Ok(())
     }
 }

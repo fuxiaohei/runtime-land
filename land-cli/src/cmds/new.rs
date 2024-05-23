@@ -1,8 +1,13 @@
 use anyhow::{anyhow, Result};
 use clap::Args;
+use color_print::cprintln;
 use inquire::validator::Validation;
 use inquire::{CustomUserError, Select, Text};
+use land_core_service::metadata::Data;
+use std::path;
 use tracing::debug;
+
+use crate::embed::ExampleAssets;
 
 /// Command New
 #[derive(Args, Debug)]
@@ -25,15 +30,64 @@ impl New {
         debug!("Create new project: {:?}", self);
 
         let project_name = get_project_name(self.name.clone())?;
-        let template_name = get_template_name(self.template.clone())?;
+        let tpl = get_template_name(self.template.clone())?;
         let desc = get_desc(self.desc.clone())?;
         debug!(
             "Project name: {}, template: {}, desc: {}",
-            project_name, template_name, desc
+            project_name, tpl, desc
         );
+
+        cprintln!("<green>Create project '{}'</green>", project_name);
+
+        // check dir named 'project_name' exists
+        if !path::Path::new(&project_name).exists() {
+            // create dir named 'project_name'
+            std::fs::create_dir(&project_name)?;
+        }
+
+        extract_tpl(&project_name, &tpl, &desc)?;
 
         Ok(())
     }
+}
+
+fn extract_tpl(dir: &str, tpl: &TemplateMeta, desc: &str) -> Result<()> {
+    let metadata_file = format!("{}/land.toml", tpl.name);
+    let file = ExampleAssets::get(&metadata_file);
+    if file.is_none() {
+        return Err(anyhow!("Template '{}' not found", tpl.name));
+    }
+    // extract template
+    for item in ExampleAssets::iter() {
+        if !item.starts_with(&tpl.name) {
+            continue;
+        }
+        let raw_file = ExampleAssets::get(&item).unwrap();
+        let target_file = format!("{}{}", dir, item.replace(&tpl.name, ""));
+        let target_dir = path::Path::new(&target_file).parent().unwrap();
+        if !target_dir.exists() {
+            std::fs::create_dir_all(target_dir)?;
+        }
+        std::fs::write(&target_file, raw_file.data)?;
+        debug!("Extract file: {}", target_file);
+    }
+    // refresh toml file
+    let meta_desc = if desc.is_empty() {
+        tpl.desc.clone()
+    } else {
+        desc.to_string()
+    };
+    refresh_toml(dir, &meta_desc)?;
+    Ok(())
+}
+
+fn refresh_toml(dir: &str, desc: &str) -> Result<()> {
+    let toml_file = format!("{}/land.toml", dir);
+    let mut meta = Data::from_file(&toml_file)?;
+    meta.name = dir.to_string();
+    meta.description = desc.to_string();
+    meta.to_file(&toml_file)?;
+    Ok(())
 }
 
 /// validate_name validates the name of the project
@@ -81,12 +135,10 @@ impl std::fmt::Display for TemplateMeta {
 }
 
 fn default_templates() -> Vec<TemplateMeta> {
-    vec![
-        TemplateMeta {
-            name: "js-hello".to_string(),
-            desc: "Simple hello world using Javascript".to_string(),
-        },
-    ]
+    vec![TemplateMeta {
+        name: "js-hello".to_string(),
+        desc: "Simple hello world using Javascript".to_string(),
+    }]
 }
 
 fn get_template_name(name: Option<String>) -> Result<TemplateMeta> {

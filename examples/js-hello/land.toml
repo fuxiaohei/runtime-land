@@ -1,2 +1,8 @@
-# land-cli toml demo
-# TODO: fill in the toml file with the correct values
+name = "js"
+description = "JavaScript"
+language = "js"
+version = "1.0"
+
+[build]
+main = "src/index.js"
+cmd = ""

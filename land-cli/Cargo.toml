@@ -14,3 +14,5 @@ regex = "1.10.4"
 rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+land-core-service = { workspace = true }
+
