@@ -16,7 +16,7 @@ pub struct Data {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BuildData {
     pub main: String,
-    pub cmd: String,
+    pub cmd: Option<String>,
 }
 
 impl Data {
@@ -28,7 +28,7 @@ impl Data {
             version: VERSION.to_string(),
             build: BuildData {
                 main: "src/index.js".to_string(),
-                cmd: "".to_string(),
+                cmd: None,
             },
         }
     }
@@ -41,5 +41,11 @@ impl Data {
         let content = toml::to_string(self)?;
         std::fs::write(file, content)?;
         Ok(())
+    }
+    pub fn target_wasm_path(&self) -> String {
+        if self.language == "js" {
+            return format!("dist/{}.wasm", self.name);
+        }
+        self.build.main.clone()
     }
 }

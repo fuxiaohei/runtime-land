@@ -2197,6 +2197,8 @@ dependencies = [
  "inquire",
  "land-common",
  "land-core-service",
+ "land-wasm-gen",
+ "land-worker-server",
  "regex",
  "rust-embed",
  "tokio",

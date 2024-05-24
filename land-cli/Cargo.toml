@@ -15,4 +15,5 @@ rust-embed = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 land-core-service = { workspace = true }
-
+land-wasm-gen = { workspace = true }
+land-worker-server = { workspace = true }

@@ -3,7 +3,7 @@ use clap::Args;
 use color_print::cprintln;
 use inquire::validator::Validation;
 use inquire::{CustomUserError, Select, Text};
-use land_core_service::metadata::Data;
+use land_core_service::metadata;
 use std::path;
 use tracing::debug;
 
@@ -52,7 +52,7 @@ impl New {
 }
 
 fn extract_tpl(dir: &str, tpl: &TemplateMeta, desc: &str) -> Result<()> {
-    let metadata_file = format!("{}/land.toml", tpl.name);
+    let metadata_file = format!("{}/{}", tpl.name, metadata::DEFAULT_FILE);
     let file = ExampleAssets::get(&metadata_file);
     if file.is_none() {
         return Err(anyhow!("Template '{}' not found", tpl.name));
@@ -82,8 +82,8 @@ fn extract_tpl(dir: &str, tpl: &TemplateMeta, desc: &str) -> Result<()> {
 }
 
 fn refresh_toml(dir: &str, desc: &str) -> Result<()> {
-    let toml_file = format!("{}/land.toml", dir);
-    let mut meta = Data::from_file(&toml_file)?;
+    let toml_file = format!("{}/{}", dir, metadata::DEFAULT_FILE);
+    let mut meta = metadata::Data::from_file(&toml_file)?;
     meta.name = dir.to_string();
     meta.description = desc.to_string();
     meta.to_file(&toml_file)?;
