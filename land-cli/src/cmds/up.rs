@@ -35,7 +35,7 @@ impl Up {
             dir: "./".to_string(),
             default_wasm: dist_wasm_path,
             endpoint_name: Some("land-cli".to_string()),
-            wasm_aot: true,
+            wasm_aot: false,
             metrics: false,
         };
         land_worker_server::init_globals(&opts)?;

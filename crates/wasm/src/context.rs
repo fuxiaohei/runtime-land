@@ -64,7 +64,7 @@ impl Context {
     pub fn new(envs: Option<HashMap<String, String>>) -> Self {
         let table = ResourceTable::new();
         let mut wasi_ctx_builder = WasiCtxBuilder::new();
-        wasi_ctx_builder.inherit_stderr().inherit_stdout();
+        wasi_ctx_builder.inherit_stdio();
         if let Some(envs) = envs {
             for (k, v) in envs {
                 // set env key as upper case

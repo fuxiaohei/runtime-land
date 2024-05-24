@@ -1,3 +1,4 @@
+mod asyncio;
 mod body;
 mod context;
 mod fetch;
@@ -10,3 +11,4 @@ pub use guest::HttpHandler;
 pub use host::HttpService;
 
 impl host::land::http::types::Host for HttpContext {}
+impl host::land::asyncio::types::Host for HttpContext {}

@@ -1,0 +1,17 @@
+package land:asyncio;
+
+interface asyncio{
+    use types.{task-handle};
+
+    // sleep for ms milliseconds, create a sleep task and return the handle
+    sleep: func(ms: u32) -> result<task-handle>;
+    // take-ready gets ready status of a task, return true if the task is ready
+    // and it is removed from the list
+    take-ready: func(handle: task-handle) -> result<bool>;
+    // select on a list of tasks, return the handle of the first ready task
+    // or none if none of the tasks are ready
+    // the selected task is removed from the list
+    select: func() -> result<option<task-handle>>;
+    /// cancel a task, no-op if the task is already done or not found
+    cancel: func(handle: task-handle);
+}

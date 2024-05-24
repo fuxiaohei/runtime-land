@@ -10,6 +10,7 @@ use std::sync::{atomic::AtomicU32, Once};
 use std::task::{Context, Poll};
 use std::{collections::HashMap, future::Future, pin::Pin};
 use tokio::sync::{mpsc, oneshot};
+use tracing::debug;
 
 static CLIENT_INIT_ONCE: Once = Once::new();
 static REDIRECT_FOLLOW_POOL: OnceCell<Client> = OnceCell::new();
@@ -50,13 +51,21 @@ pub fn init_clients() {
 }
 
 pub struct HttpContext {
+    // elapsed time need
+    created_at: tokio::time::Instant,
+
+    // body related
     body_seq_id: AtomicU32,
     body_map: HashMap<u32, Body>,
     body_stream_map: HashMap<u32, BodyDataStream>,
     body_buffer_map: HashMap<u32, Vec<u8>>,
     body_sender_map: HashMap<u32, Sender>,
     body_sender_closed: HashMap<u32, bool>,
-    created_at: tokio::time::Instant,
+
+    // async io related
+    asyncio_seq_id: AtomicU32,
+    asyncio_tasks_seq: Vec<(u32, i64)>,
+    asyncio_tasks: HashMap<u32, i64>,
 }
 
 impl HttpContext {
@@ -69,6 +78,9 @@ impl HttpContext {
             body_sender_map: HashMap::new(),
             body_sender_closed: HashMap::new(),
             created_at: tokio::time::Instant::now(),
+            asyncio_seq_id: AtomicU32::new(1),
+            asyncio_tasks_seq: vec![],
+            asyncio_tasks: HashMap::new(),
         }
     }
 
@@ -236,6 +248,79 @@ impl HttpContext {
         let body = Body::from(data);
         self.set_body(handle, body);
         Ok(data_len)
+    }
+
+    /// new_asyncio_task create async io timeup task
+    pub fn new_asyncio_task(&mut self, timeout: u64) -> u32 {
+        let seq_id = self
+            .asyncio_seq_id
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        let now_nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap();
+        let expired_nanos = now_nanos + timeout as i64;
+        debug!(
+            "new asyncio task: {}, timeout: {}, expired at: {}",
+            seq_id, timeout, expired_nanos
+        );
+        // the asyncio_tasks need sort by expired time, so push and resort ?
+        self.asyncio_tasks_seq.push((seq_id, expired_nanos));
+        self.asyncio_tasks_seq.sort_by(|a, b| a.1.cmp(&b.1));
+        self.asyncio_tasks.insert(seq_id, expired_nanos);
+        debug!("asyncio task left: {:?}", self.asyncio_tasks_seq);
+        seq_id
+    }
+
+    /// is_asyncio_task_ready is used to check if asyncio task is read
+    pub fn is_asyncio_task_ready(&mut self, handle: u32) -> bool {
+        let now_nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap();
+        if let Some(expired_nanos) = self.asyncio_tasks.get(&handle) {
+            if now_nanos >= *expired_nanos {
+                debug!(
+                    "asyncio task: {} is ready, expired at: {}, now: {}",
+                    handle, expired_nanos, now_nanos
+                );
+                // drop the handle in map and seq
+                self.asyncio_tasks.remove(&handle);
+                self.asyncio_tasks_seq
+                    .retain(|(seq_id, _)| *seq_id != handle);
+                debug!("asyncio task left: {:?}", self.asyncio_tasks_seq);
+                return true;
+            } else {
+                debug!("asyncio task: {} not ready", handle);
+            }
+        }
+        debug!("asyncio task: {} not found", handle);
+        false
+    }
+
+    pub fn select_asyncio_task(&mut self) -> Option<u32> {
+        let now_nanos = chrono::Utc::now().timestamp_nanos_opt().unwrap();
+        // find the first value that task timeout time is less than now
+        let mut handle = None;
+        for (seq_id, expired_nanos) in self.asyncio_tasks_seq.iter() {
+            if now_nanos >= *expired_nanos {
+                handle = Some(*seq_id);
+                debug!(
+                    "asyncio task: {} is selected ready, expired at: {}, now: {}",
+                    seq_id, expired_nanos, now_nanos
+                );
+                break;
+            }
+        }
+        // drop the handle in map and seq
+        if let Some(handle) = handle {
+            self.asyncio_tasks.remove(&handle);
+            self.asyncio_tasks_seq
+                .retain(|(seq_id, _)| *seq_id != handle);
+        } else {
+            debug!("no asyncio task is ready");
+        }
+        handle
+    }
+
+    pub fn cancel_asyncio_task(&mut self, handle: u32) {
+        self.asyncio_tasks.remove(&handle);
+        self.asyncio_tasks_seq
+            .retain(|(seq_id, _)| *seq_id != handle);
     }
 }
 

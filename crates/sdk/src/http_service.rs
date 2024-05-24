@@ -4,6 +4,176 @@
 #[allow(dead_code)]
 pub mod land {
     #[allow(dead_code)]
+    pub mod asyncio {
+        #[allow(dead_code, clippy::all)]
+        pub mod types {
+            #[used]
+            #[doc(hidden)]
+            #[cfg(target_arch = "wasm32")]
+            static __FORCE_SECTION_REF: fn() =
+                super::super::super::__link_custom_section_describing_imports;
+            /// async io task handle
+            pub type TaskHandle = u32;
+        }
+
+        #[allow(dead_code, clippy::all)]
+        pub mod asyncio {
+            #[used]
+            #[doc(hidden)]
+            #[cfg(target_arch = "wasm32")]
+            static __FORCE_SECTION_REF: fn() =
+                super::super::super::__link_custom_section_describing_imports;
+            use super::super::super::_rt;
+            pub type TaskHandle = super::super::super::land::asyncio::types::TaskHandle;
+            #[allow(unused_unsafe, clippy::all)]
+            /// sleep for ms milliseconds, create a sleep task and return the handle
+            pub fn sleep(ms: u32) -> Result<TaskHandle, ()> {
+                unsafe {
+                    #[repr(align(4))]
+                    struct RetArea([::core::mem::MaybeUninit<u8>; 8]);
+                    let mut ret_area = RetArea([::core::mem::MaybeUninit::uninit(); 8]);
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "land:asyncio/asyncio")]
+                    extern "C" {
+                        #[link_name = "sleep"]
+                        fn wit_import(_: i32, _: *mut u8);
+                    }
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: i32, _: *mut u8) {
+                        unreachable!()
+                    }
+                    wit_import(_rt::as_i32(&ms), ptr0);
+                    let l1 = i32::from(*ptr0.add(0).cast::<u8>());
+                    match l1 {
+                        0 => {
+                            let e = {
+                                let l2 = *ptr0.add(4).cast::<i32>();
+
+                                l2 as u32
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = ();
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    }
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            /// take-ready gets ready status of a task, return true if the task is ready
+            /// and it is removed from the list
+            pub fn take_ready(handle: TaskHandle) -> Result<bool, ()> {
+                unsafe {
+                    #[repr(align(1))]
+                    struct RetArea([::core::mem::MaybeUninit<u8>; 2]);
+                    let mut ret_area = RetArea([::core::mem::MaybeUninit::uninit(); 2]);
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "land:asyncio/asyncio")]
+                    extern "C" {
+                        #[link_name = "take-ready"]
+                        fn wit_import(_: i32, _: *mut u8);
+                    }
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: i32, _: *mut u8) {
+                        unreachable!()
+                    }
+                    wit_import(_rt::as_i32(handle), ptr0);
+                    let l1 = i32::from(*ptr0.add(0).cast::<u8>());
+                    match l1 {
+                        0 => {
+                            let e = {
+                                let l2 = i32::from(*ptr0.add(1).cast::<u8>());
+
+                                _rt::bool_lift(l2 as u8)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = ();
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    }
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            /// select on a list of tasks, return the handle of the first ready task
+            /// or none if none of the tasks are ready
+            /// the selected task is removed from the list
+            pub fn select() -> Result<Option<TaskHandle>, ()> {
+                unsafe {
+                    #[repr(align(4))]
+                    struct RetArea([::core::mem::MaybeUninit<u8>; 12]);
+                    let mut ret_area = RetArea([::core::mem::MaybeUninit::uninit(); 12]);
+                    let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "land:asyncio/asyncio")]
+                    extern "C" {
+                        #[link_name = "select"]
+                        fn wit_import(_: *mut u8);
+                    }
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: *mut u8) {
+                        unreachable!()
+                    }
+                    wit_import(ptr0);
+                    let l1 = i32::from(*ptr0.add(0).cast::<u8>());
+                    match l1 {
+                        0 => {
+                            let e = {
+                                let l2 = i32::from(*ptr0.add(4).cast::<u8>());
+
+                                match l2 {
+                                    0 => None,
+                                    1 => {
+                                        let e = {
+                                            let l3 = *ptr0.add(8).cast::<i32>();
+
+                                            l3 as u32
+                                        };
+                                        Some(e)
+                                    }
+                                    _ => _rt::invalid_enum_discriminant(),
+                                }
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = ();
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    }
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            /// cancel a task, no-op if the task is already done or not found
+            pub fn cancel(handle: TaskHandle) {
+                unsafe {
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "land:asyncio/asyncio")]
+                    extern "C" {
+                        #[link_name = "cancel"]
+                        fn wit_import(_: i32);
+                    }
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: i32) {
+                        unreachable!()
+                    }
+                    wit_import(_rt::as_i32(handle));
+                }
+            }
+        }
+    }
+    #[allow(dead_code)]
     pub mod http {
         #[allow(dead_code, clippy::all)]
         pub mod types {
@@ -932,9 +1102,9 @@ mod _rt {
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.25.0:http-service-with-all-of-its-exports-removed:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1169] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xee\x07\x01A\x02\x01\
-A\x0b\x01B\x16\x01{\x04\0\x0bstatus-code\x03\0\0\x01s\x04\0\x06method\x03\0\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1385] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xc6\x09\x01A\x02\x01\
+A\x10\x01B\x16\x01{\x04\0\x0bstatus-code\x03\0\0\x01s\x04\0\x06method\x03\0\x02\x01\
 o\x02ss\x01p\x04\x04\0\x07headers\x03\0\x05\x01s\x04\0\x03uri\x03\0\x07\x01y\x04\
 \0\x0bbody-handle\x03\0\x09\x01k\x0a\x01r\x04\x06method\x03\x03uri\x08\x07header\
 s\x06\x04body\x0b\x04\0\x07request\x03\0\x0c\x01r\x03\x06status\x01\x07headers\x06\
@@ -956,10 +1126,15 @@ B\x0b\x02\x03\x02\x01\x03\x04\0\x07request\x03\0\0\x02\x03\x02\x01\x04\x04\0\x08
 response\x03\0\x02\x02\x03\x02\x01\x05\x04\0\x0drequest-error\x03\0\x04\x02\x03\x02\
 \x01\x06\x04\0\x0frequest-options\x03\0\x06\x01j\x01\x03\x01\x05\x01@\x02\x03req\
 \x01\x07options\x07\0\x08\x04\0\x0dfetch-request\x01\x09\x03\x01\x12land:http/ou\
-tgoing\x05\x07\x04\x018land:worker/http-service-with-all-of-its-exports-removed\x04\
-\0\x0b2\x01\0,http-service-with-all-of-its-exports-removed\x03\0\0\0G\x09produce\
-rs\x01\x0cprocessed-by\x02\x0dwit-component\x070.208.1\x10wit-bindgen-rust\x060.\
-25.0";
+tgoing\x05\x07\x01B\x02\x01y\x04\0\x0btask-handle\x03\0\0\x03\x01\x12land:asynci\
+o/types\x05\x08\x02\x03\0\x03\x0btask-handle\x01B\x0e\x02\x03\x02\x01\x09\x04\0\x0b\
+task-handle\x03\0\0\x01j\x01\x01\0\x01@\x01\x02msy\0\x02\x04\0\x05sleep\x01\x03\x01\
+j\x01\x7f\0\x01@\x01\x06handle\x01\0\x04\x04\0\x0atake-ready\x01\x05\x01k\x01\x01\
+j\x01\x06\0\x01@\0\0\x07\x04\0\x06select\x01\x08\x01@\x01\x06handle\x01\x01\0\x04\
+\0\x06cancel\x01\x09\x03\x01\x14land:asyncio/asyncio\x05\x0a\x04\x018land:worker\
+/http-service-with-all-of-its-exports-removed\x04\0\x0b2\x01\0,http-service-with\
+-all-of-its-exports-removed\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dw\
+it-component\x070.208.1\x10wit-bindgen-rust\x060.25.0";
 
 #[inline(never)]
 #[doc(hidden)]

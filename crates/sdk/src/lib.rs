@@ -35,6 +35,7 @@ mod http_service;
 
 pub mod http;
 pub mod router;
+pub mod asyncio;
 
 /// Re-export macro from sdk-macro
 pub use land_sdk_macro::http_main;
