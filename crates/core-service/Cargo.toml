@@ -9,6 +9,7 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { version = "0.9.3", features = ["cookie", "form"] }
 axum-template = { version = "2.3.0", features = ["handlebars"] }
+chrono = { workspace = true }
 handlebars = "5.1.2"
 jsonwebtoken = "9.3.0"
 land-common = { workspace = true }
@@ -23,4 +24,3 @@ tokio = { workspace = true }
 toml = "0.8.13"
 tracing = { workspace = true }
 walkdir = { workspace = true }
-chrono = { workspace = true }

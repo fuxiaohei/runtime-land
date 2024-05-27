@@ -1,0 +1,15 @@
+<script type="text/javascript">
+    const load_requests = (async () => {
+        let params = new URLSearchParams();
+        params.append("period", "1d");
+        let resp = await fetch("/traffic/requests", {
+            method: "POST",
+            body: params
+        });
+        if (!resp.ok) {
+            console.error("Failed to fetch requests data");
+            return;
+        }
+    })
+    load_requests();
+</script>

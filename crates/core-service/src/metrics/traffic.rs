@@ -198,3 +198,38 @@ pub async fn query_flows_traffic(
     let values = LineSeries::from(&res, period.sequence.clone());
     Ok(values)
 }
+
+pub async fn query_total_requests(period: &TrafficPeriodParams) -> Result<MultiLineSeries> {
+    let query = "sum(increase(req_fn_total{status='all'}[".to_string() + &period.step_word + "]))";
+    debug!(
+        "query: {}, start:{}, end:{}, step:{}",
+        query, period.start, period.end, period.step
+    );
+    let params = QueryRangeParams {
+        query: query.to_string(),
+        step: period.step,
+        start: period.start,
+        end: period.end,
+    };
+    let res = query_range(params).await?;
+    let values = LineSeries::from(&res, period.sequence.clone());
+    Ok(values)
+}
+
+pub async fn query_total_flow(period: &TrafficPeriodParams) -> Result<MultiLineSeries> {
+    let query =
+        "sum by (flowtype) (increase(req_fn_bytes_total{}[".to_string() + &period.step_word + "]))";
+    debug!(
+        "query: {}, start:{}, end:{}, step:{}",
+        query, period.start, period.end, period.step
+    );
+    let params = QueryRangeParams {
+        query: query.to_string(),
+        step: period.step,
+        start: period.start,
+        end: period.end,
+    };
+    let res = query_range(params).await?;
+    let values = LineSeries::from(&res, period.sequence.clone());
+    Ok(values)
+}

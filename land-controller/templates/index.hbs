@@ -24,7 +24,7 @@
                                         <div class="card-body d-flex justify-content-between">
                                             <div>
                                                 <h5 class="card-title">Users</h5>
-                                                <p class="fs-3 fw-bold gauge">12</p>
+                                                <p class="fs-3 fw-bold gauge">{{dashboard.user_count}}</p>
                                             </div>
                                             <i class="text-body-tertiary fs-4 bi bi-people-fill"></i>
                                         </div>
@@ -35,7 +35,7 @@
                                         <div class="card-body d-flex justify-content-between">
                                             <div>
                                                 <h5 class="card-title">Projects</h5>
-                                                <p class="fs-3 fw-bold gauge">24</p>
+                                                <p class="fs-3 fw-bold gauge">{{dashboard.project_count}}</p>
                                             </div>
                                             <i class="text-body-tertiary fs-4 bi bi-kanban"></i>
                                         </div>
@@ -46,7 +46,12 @@
                                         <div class="card-body d-flex justify-content-between">
                                             <div>
                                                 <h5 class="card-title">Requests</h5>
-                                                <p class="fs-3 fw-bold gauge">32.23K</p>
+                                                <p class="fs-3 fw-bold gauge">
+                                                    <span class="traffic-requests"
+                                                        data-x-value="{{dashboard.total_requests}}">
+                                                        {{dashboard.total_requests}}
+                                                    </span>
+                                                </p>
                                             </div>
                                             <i class="text-body-tertiary fs-4 bi bi-cloud-fog2"></i>
                                         </div>
@@ -57,7 +62,12 @@
                                         <div class="card-body d-flex justify-content-between">
                                             <div>
                                                 <h5 class="card-title">Bytes</h5>
-                                                <p class="fs-3 fw-bold gauge">126.55 MB</p>
+                                                <p class="fs-3 fw-bold gauge">
+                                                    <span class="traffic-bytes"
+                                                        data-x-value="{{dashboard.total_bytes}}">
+                                                        {{dashboard.total_bytes}}
+                                                    </span>
+                                                </p>
                                             </div>
                                             <i class="text-body-tertiary fs-4 bi bi-clouds-fill"></i>
                                         </div>
@@ -66,7 +76,7 @@
                             </div>
                         </div>
                         <div class="col-7">
-                            traffic pages
+                            {{> partials/traffic.hbs}}
                         </div>
                     </div>
                 </div>
@@ -74,6 +84,16 @@
             </div>
     </main>
     {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll(".traffic-requests").forEach(function (el) {
+            let value = parseInt(el.getAttribute("data-x-value")) || 0;
+            el.textContent = friendly_bytesize(value, false);
+        });
+        document.querySelectorAll(".traffic-bytes").forEach(function (el) {
+            let value = parseInt(el.getAttribute("data-x-value")) || 0;
+            el.textContent = friendly_bytesize(value, true);
+        });
+    </script>
 </body>
 
 </html>

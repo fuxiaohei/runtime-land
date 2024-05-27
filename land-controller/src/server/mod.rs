@@ -11,6 +11,7 @@ mod index;
 mod projects;
 mod settings;
 mod templates;
+mod traffic;
 mod workers;
 
 /// start the server
@@ -24,6 +25,8 @@ pub async fn start(addr: SocketAddr, assets_dir: &str) -> anyhow::Result<()> {
     let app = Router::new()
         .route("/", get(index::index))
         .route("/settings", get(settings::index).post(settings::update))
+        .route("/traffic/requests", post(traffic::requests))
+        .route("/traffic/flows", post(traffic::flows))
         .route("/projects", get(projects::index))
         .route("/projects/redeploy", post(projects::redeploy))
         .route("/projects/disable", post(projects::disable))
