@@ -7,6 +7,7 @@ pub fn init() {
         // every 20min
         let interval = tokio::time::Duration::from_secs(20 * 60);
         let mut ticker = tokio::time::interval(interval);
+        ticker.tick().await;
         loop {
             match refresh().await {
                 Ok(_) => {}

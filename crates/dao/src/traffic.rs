@@ -50,7 +50,7 @@ pub async fn get_traffic(project_id: i32, diff: i64) -> Result<Option<TrafficSum
         .filter(project_traffic::Column::TimeAt.eq(time_at))
         .all(db)
         .await?;
-    if results.len() != 2 {
+    if results.len() < 2 {
         return Ok(None);
     }
     let mut summary = TrafficSummary {

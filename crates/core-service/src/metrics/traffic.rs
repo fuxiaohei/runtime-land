@@ -1,6 +1,7 @@
 use crate::metrics::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
 use anyhow::Result;
-use tracing::{debug, info, instrument};
+use land_dao::traffic::get_traffic;
+use tracing::{debug, instrument};
 
 pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     let (current_hour_ts, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
@@ -52,6 +53,11 @@ pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
 }
 
 async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
+    let pid = i32::MAX - 1;
+    let summary = get_traffic(pid, 0).await?;
+    if summary.is_some() {
+        return Ok(());
+    }
     let summary_info = land_dao::traffic::summary_projects_traffic(pids2).await?;
     let mut total_requests = 0;
     let mut total_bytes = 0;
@@ -60,13 +66,8 @@ async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
         total_bytes += summary.transferred_bytes;
     }
     let (_, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
-    land_dao::traffic::save_traffic(
-        i32::MAX - 1,
-        current_hour_str.clone(),
-        total_requests,
-        total_bytes,
-    )
-    .await?;
+    land_dao::traffic::save_traffic(pid, current_hour_str.clone(), total_requests, total_bytes)
+        .await?;
     debug!(
         hour = current_hour_str,
         "Traffic refresh total done, requests: {}, bytes: {}", total_requests, total_bytes
@@ -77,7 +78,6 @@ async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
 /// refresh refreshes the metrics
 #[instrument("[TRAFFIC]")]
 pub async fn refresh() -> Result<()> {
-    info!("refresh");
     let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
     let mut pids = vec![];
     let mut pids2 = vec![];
@@ -89,7 +89,6 @@ pub async fn refresh() -> Result<()> {
     refresh_total(pids2).await?;
     Ok(())
 }
-
 
 #[derive(Debug)]
 pub struct TrafficPeriodParams {
