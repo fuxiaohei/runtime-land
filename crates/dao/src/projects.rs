@@ -153,6 +153,16 @@ pub async fn list_paginate(
     Ok((projects, pages))
 }
 
+/// count counts all active projects
+pub async fn count() -> Result<u64> {
+    let db = DB.get().unwrap();
+    project::Entity::find()
+        .filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()))
+        .count(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))
+}
+
 /// get_by_name gets a project by name
 pub async fn get_by_name(name: String, user_id: Option<i32>) -> Result<Option<project::Model>> {
     let db = DB.get().unwrap();

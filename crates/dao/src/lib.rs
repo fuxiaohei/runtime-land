@@ -2,7 +2,6 @@ pub mod confs;
 pub mod db;
 pub mod deployment;
 pub mod envs;
-pub mod metrics;
 pub mod models;
 pub mod projects;
 pub mod settings;

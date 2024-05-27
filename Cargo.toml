@@ -18,7 +18,7 @@ default-members = ["land-cli"]
 resolver = "2"
 
 [workspace.package]
-version = "0.3.9"
+version = "0.3.11"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 

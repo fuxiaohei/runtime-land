@@ -5,6 +5,7 @@ use crate::{
 };
 use anyhow::Result;
 use lazy_static::lazy_static;
+use sea_orm::PaginatorTrait;
 use sea_orm::{
     sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder,
 };
@@ -287,4 +288,14 @@ pub async fn list_infos(user_ids: Vec<i32>) -> Result<HashMap<i32, user_info::Mo
         user_map.insert(user.id, user);
     }
     Ok(user_map)
+}
+
+/// count counts all active users
+pub async fn count() -> Result<u64> {
+    let db = DB.get().unwrap();
+    user_info::Entity::find()
+        .filter(user_info::Column::Status.eq(UserStatus::Active.to_string()))
+        .count(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))
 }

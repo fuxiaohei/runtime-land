@@ -7,7 +7,7 @@ use sea_orm::{
 use serde::Serialize;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct TrafficSummary {
     pub requests: i32,
     pub transferred_bytes: i32,
@@ -65,6 +65,15 @@ pub async fn get_traffic(project_id: i32, diff: i64) -> Result<Option<TrafficSum
         }
     }
     Ok(Some(summary))
+}
+
+/// get_current_total gets the current total traffic summary
+pub async fn get_current_total() -> Result<Option<TrafficSummary>> {
+    let summary = get_traffic(i32::MAX - 1, 0).await?;
+    if summary.is_none() {
+        return get_traffic(i32::MAX - 1, -1).await;
+    }
+    Ok(summary)
 }
 
 /// save_traffic saves the traffic summary of a project

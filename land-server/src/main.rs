@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
     // Init clerk env
     land_core_service::clerkauth::init_clerk_env().await?;
     // Init prometheus env
-    land_dao::metrics::init_prometheus().await?;
+    land_core_service::metrics::init_prometheus().await?;
 
     // Start deployer background task
     deployer::run_background();

@@ -1,8 +1,10 @@
-use crate::deployer::TrafficPeriodParams;
 use axum::{response::IntoResponse, Extension, Form, Json};
 use http::StatusCode;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::ServerError;
+use land_core_service::metrics::traffic::{
+    query_flows_traffic, query_requests_traffic, TrafficPeriodParams,
+};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
@@ -37,7 +39,7 @@ pub async fn requests(
             "User uuid does not match",
         ));
     }
-    let values = crate::deployer::query_requests_traffic(acc, q.project, &period).await?;
+    let values = query_requests_traffic(acc, q.project, &period).await?;
     info!(
         "requests, start:{}, end:{}, step:{}, cost:{}",
         period.start,
@@ -62,7 +64,7 @@ pub async fn flows(
             "User uuid does not match",
         ));
     }
-    let values = crate::deployer::query_flows_traffic(acc, q.project, &period).await?;
+    let values = query_flows_traffic(acc, q.project, &period).await?;
     info!(
         "flows, start:{}, end:{}, step:{}, cost:{}",
         period.start,

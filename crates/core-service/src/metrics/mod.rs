@@ -4,6 +4,7 @@ use tracing::info;
 
 mod query;
 pub use query::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
+pub mod traffic;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct PromEnv {
@@ -33,13 +34,14 @@ impl Default for PromEnv {
 
 /// init_prometheus initializes PromEnv from environment variables
 pub async fn init_prometheus() -> Result<()> {
-    let item = crate::settings::get("prometheus").await?;
+    let item: Option<land_dao::models::settings::Model> =
+        land_dao::settings::get("prometheus").await?;
     if item.is_none() {
         let env = PromEnv::default();
         let content = serde_json::to_string(&env)?;
-        crate::settings::set("prometheus", &content).await?;
+        land_dao::settings::set("prometheus", &content).await?;
     }
-    let item = crate::settings::get("prometheus").await?.unwrap();
+    let item = land_dao::settings::get("prometheus").await?.unwrap();
     let env: PromEnv = serde_json::from_str(item.value.as_str())?;
     info!("PromEnv initial: {:?}", env);
     Ok(())
@@ -48,13 +50,13 @@ pub async fn init_prometheus() -> Result<()> {
 /// set_env sets prometheus environment
 pub async fn set_env(env: PromEnv) -> Result<()> {
     let content = serde_json::to_string(&env)?;
-    crate::settings::set("prometheus", &content).await?;
+    land_dao::settings::set("prometheus", &content).await?;
     Ok(())
 }
 
 /// get_env gets prometheus environment
 pub async fn get_env() -> Result<PromEnv> {
-    let item = crate::settings::get("prometheus").await?.unwrap();
+    let item = land_dao::settings::get("prometheus").await?.unwrap();
     let env: PromEnv = serde_json::from_str(item.value.as_str())?;
     Ok(env)
 }

@@ -2,12 +2,7 @@ use tracing::warn;
 
 mod deploying;
 mod envs;
-mod traffic;
 mod waiting;
-
-pub use traffic::{
-    query_flows_traffic, query_requests_traffic, refresh_projects, TrafficPeriodParams,
-};
 
 /// run_background starts the background worker to handle the deployer's tasks.
 pub fn run_background() {
@@ -27,18 +22,6 @@ pub fn run_background() {
                     warn!("Deploying::run_tasks failed: {}", e);
                 }
             };
-        }
-    });
-    tokio::spawn(async {
-        loop {
-            // every 20 minute to refresh project traffic data
-            tokio::time::sleep(tokio::time::Duration::from_secs(1200)).await;
-            match traffic::refresh().await {
-                Ok(_) => {}
-                Err(e) => {
-                    warn!("Metrics::refresh failed: {}", e);
-                }
-            }
         }
     });
     tokio::spawn(async {

@@ -4,6 +4,7 @@ use axum_csrf::CsrfToken;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::ServerError;
 use land_core_service::template::{self, RenderHtmlMinified};
+use land_core_service::vars::admin::DashboardVars;
 use land_core_service::vars::PageVars;
 use serde::Serialize;
 
@@ -18,9 +19,11 @@ pub async fn index(
         page: PageVars,
         user: SessionUser,
         csrf: String,
+        dashboard: DashboardVars,
     }
 
     let csrf = csrf_layer.authenticity_token()?;
+    let dashboard = DashboardVars::new().await?;
 
     Ok((
         csrf_layer,
@@ -31,6 +34,7 @@ pub async fn index(
                 page: PageVars::new_admin("Dashboard", "admin-dashboard"),
                 user,
                 csrf,
+                dashboard,
             },
         ),
     )

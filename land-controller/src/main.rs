@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use land_common::{tracing::TraceArgs, version};
 
-
+mod crontab;
 mod server;
 
 #[derive(Parser, Debug)]
@@ -43,6 +43,9 @@ async fn main() -> Result<()> {
     land_dao::settings::init_defaults().await?;
     // Init clerk env
     land_core_service::clerkauth::init_clerk_env().await?;
+
+    // Init cron jobs
+    crontab::init();
 
     // Start the server
     server::start(args.address.parse()?, "./admin_assets").await?;

@@ -4,6 +4,7 @@ use axum::{Form, Json};
 use axum_csrf::CsrfToken;
 use land_core_service::clerkauth::SessionUser;
 use land_core_service::httputil::{response_redirect, ServerError};
+use land_core_service::metrics::traffic::refresh_projects;
 use land_core_service::template::{self, RenderHtmlMinified};
 use land_core_service::vars::{EnvVar, PageVars, ProjectVar};
 use land_dao::projects::ProjectStatus;
@@ -40,7 +41,7 @@ pub async fn index(
     if !missing_pids.is_empty() {
         debug!("Missing traffic data, refresh: {:?}", missing_pids);
         tokio::spawn(async move {
-            match crate::deployer::refresh_projects(missing_pids).await {
+            match refresh_projects(missing_pids).await {
                 Ok(_) => debug!("Traffic refresh done"),
                 Err(e) => warn!("Traffic refresh error: {:?}", e),
             }

@@ -1,6 +1,6 @@
+use crate::metrics::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
 use anyhow::Result;
-use land_dao::metrics::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
-use tracing::{debug, info};
+use tracing::{debug, info, instrument};
 
 pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     let (current_hour_ts, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
@@ -51,17 +51,45 @@ pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     Ok(())
 }
 
-/// refresh refreshes the metrics
-pub async fn refresh() -> Result<()> {
-    info!("Traffic::refresh");
-    let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
-    let mut pids = vec![];
-    for p in projects {
-        pids.push((p.id, p.uuid));
+async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
+    let summary_info = land_dao::traffic::summary_projects_traffic(pids2).await?;
+    let mut total_requests = 0;
+    let mut total_bytes = 0;
+    for (_, summary) in summary_info.iter() {
+        total_requests += summary.requests;
+        total_bytes += summary.transferred_bytes;
     }
-    refresh_projects(pids).await?;
+    let (_, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
+    land_dao::traffic::save_traffic(
+        i32::MAX - 1,
+        current_hour_str.clone(),
+        total_requests,
+        total_bytes,
+    )
+    .await?;
+    debug!(
+        hour = current_hour_str,
+        "Traffic refresh total done, requests: {}, bytes: {}", total_requests, total_bytes
+    );
     Ok(())
 }
+
+/// refresh refreshes the metrics
+#[instrument("[TRAFFIC]")]
+pub async fn refresh() -> Result<()> {
+    info!("refresh");
+    let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
+    let mut pids = vec![];
+    let mut pids2 = vec![];
+    for p in projects {
+        pids.push((p.id, p.uuid));
+        pids2.push(p.id);
+    }
+    refresh_projects(pids).await?;
+    refresh_total(pids2).await?;
+    Ok(())
+}
+
 
 #[derive(Debug)]
 pub struct TrafficPeriodParams {

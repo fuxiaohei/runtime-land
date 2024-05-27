@@ -9,6 +9,8 @@ pub use token::TokenVar;
 mod envs;
 pub use envs::EnvVar;
 
+pub mod admin;
+
 /// PageVars is the common variables for all pages
 #[derive(Debug, Default, Serialize)]
 pub struct PageVars {
