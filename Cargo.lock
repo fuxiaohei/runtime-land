@@ -2183,7 +2183,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "clap",
@@ -2201,7 +2201,7 @@ dependencies = [
 
 [[package]]
 name = "land-common"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -2220,7 +2220,7 @@ dependencies = [
 
 [[package]]
 name = "land-controller"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "axum",
@@ -2231,8 +2231,12 @@ dependencies = [
  "land-common",
  "land-core-service",
  "land-dao",
+ "land-wasm-gen",
+ "md5",
  "rust-embed",
  "serde",
+ "serde_json",
+ "tempdir",
  "tokio",
  "tower-http",
  "tracing",
@@ -2240,7 +2244,7 @@ dependencies = [
 
 [[package]]
 name = "land-core-service"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "axum",
@@ -2265,7 +2269,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2294,7 +2298,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "http",
@@ -2306,7 +2310,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "http",
@@ -2316,7 +2320,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "axum",
@@ -2348,7 +2352,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2371,7 +2375,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2383,7 +2387,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "clap",
@@ -2407,7 +2411,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker-server"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "axum",
@@ -3861,7 +3865,7 @@ dependencies = [
 
 [[package]]
 name = "rust-helloworld"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "anyhow",
  "http",

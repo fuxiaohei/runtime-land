@@ -219,8 +219,8 @@ pub async fn set_success(id: i32, project_id: i32) -> Result<()> {
     Ok(())
 }
 
-/// set_uploaded sets a deployment as uploaded, waiting for deploying
-pub async fn set_uploaded(
+/// set_uploaded_and_deploying sets a deployment as uploaded, waiting for deploying
+pub async fn set_uploaded_and_deploying(
     id: i32,
     project_id: i32,
     path: String,

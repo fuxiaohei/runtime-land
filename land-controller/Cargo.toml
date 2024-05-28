@@ -9,13 +9,17 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 axum-template = { version = "2.3.0", features = ["handlebars"] }
 axum_csrf = { version = "0.9.0", features = ["layer"] }
-chrono =  { workspace = true }
+chrono = { workspace = true }
 clap = { workspace = true }
 land-common = { workspace = true }
 land-core-service = { workspace = true }
 land-dao = { workspace = true }
+land-wasm-gen = { workspace = true }
+md5 = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
+tempdir = "0.3.7"
 tokio = { workspace = true }
 tower-http = { workspace = true }
 tracing = { workspace = true }

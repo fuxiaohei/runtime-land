@@ -1,5 +1,7 @@
-use land_core_service::metrics::traffic::refresh;
 use tracing::error;
+
+mod deploy;
+mod traffic;
 
 pub fn init() {
     // init traffic refresh to database
@@ -9,12 +11,25 @@ pub fn init() {
         let mut ticker = tokio::time::interval(interval);
         ticker.tick().await;
         loop {
-            match refresh().await {
+            match traffic::refresh().await {
                 Ok(_) => {}
                 Err(e) => {
                     error!("Traffic refresh failed: {}", e);
                 }
             };
+            ticker.tick().await;
+        }
+    });
+
+    // handle deploy tasks in every second
+    tokio::spawn(async {
+        let interval = tokio::time::Duration::from_secs(1);
+        let mut ticker = tokio::time::interval(interval);
+        ticker.tick().await;
+        loop {
+            deploy::run_tasks().await.unwrap_or_else(|e| {
+                error!("Deploy tasks failed: {}", e);
+            });
             ticker.tick().await;
         }
     });

@@ -1,7 +1,7 @@
 use crate::metrics::{query_range, LineSeries, MultiLineSeries, QueryRangeParams};
 use anyhow::Result;
 use land_dao::traffic::get_traffic;
-use tracing::{debug, instrument};
+use tracing::debug;
 
 pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     let (current_hour_ts, current_hour_str) = land_dao::traffic::get_traffic_hour(0);
@@ -52,7 +52,7 @@ pub async fn refresh_projects(projects: Vec<(i32, String)>) -> Result<()> {
     Ok(())
 }
 
-async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
+pub async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
     let pid = i32::MAX - 1;
     let summary = get_traffic(pid, 0).await?;
     if summary.is_some() {
@@ -72,21 +72,6 @@ async fn refresh_total(pids2: Vec<i32>) -> Result<()> {
         hour = current_hour_str,
         "Traffic refresh total done, requests: {}, bytes: {}", total_requests, total_bytes
     );
-    Ok(())
-}
-
-/// refresh refreshes the metrics
-#[instrument("[TRAFFIC]")]
-pub async fn refresh() -> Result<()> {
-    let (projects, _) = land_dao::projects::list_paginate(1, 10000).await?;
-    let mut pids = vec![];
-    let mut pids2 = vec![];
-    for p in projects {
-        pids.push((p.id, p.uuid));
-        pids2.push(p.id);
-    }
-    refresh_projects(pids).await?;
-    refresh_total(pids2).await?;
     Ok(())
 }
 
@@ -202,7 +187,7 @@ pub async fn query_flows_traffic(
 pub async fn query_total_requests(period: &TrafficPeriodParams) -> Result<MultiLineSeries> {
     let query = "sum(increase(req_fn_total{status='all'}[".to_string() + &period.step_word + "]))";
     debug!(
-        "query: {}, start:{}, end:{}, step:{}",
+        "query_total_requests: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
     let params = QueryRangeParams {
@@ -220,7 +205,7 @@ pub async fn query_total_flow(period: &TrafficPeriodParams) -> Result<MultiLineS
     let query =
         "sum by (flowtype) (increase(req_fn_bytes_total{}[".to_string() + &period.step_word + "]))";
     debug!(
-        "query: {}, start:{}, end:{}, step:{}",
+        "query_total_flow: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
     let params = QueryRangeParams {
