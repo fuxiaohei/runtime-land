@@ -2396,7 +2396,7 @@ dependencies = [
  "land-wasm",
  "land-worker-server",
  "md5",
- "metrics",
+ "metrics 0.23.0",
  "once_cell",
  "reqwest",
  "serde",
@@ -2418,7 +2418,7 @@ dependencies = [
  "land-common",
  "land-dao",
  "land-wasm",
- "metrics",
+ "metrics 0.23.0",
  "metrics-exporter-prometheus",
  "once_cell",
  "serde",
@@ -2642,6 +2642,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "metrics"
+version = "0.23.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "884adb57038347dfbaf2d5065887b6cf4312330dc8e94bc30a1a839bd79d3261"
+dependencies = [
+ "ahash 0.8.11",
+ "portable-atomic",
+]
+
+[[package]]
 name = "metrics-exporter-prometheus"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2653,7 +2663,7 @@ dependencies = [
  "hyper-util",
  "indexmap",
  "ipnet",
- "metrics",
+ "metrics 0.22.3",
  "metrics-util",
  "quanta",
  "thiserror",
@@ -2670,7 +2680,7 @@ dependencies = [
  "crossbeam-epoch",
  "crossbeam-utils",
  "hashbrown 0.14.5",
- "metrics",
+ "metrics 0.22.3",
  "num_cpus",
  "quanta",
  "sketches-ddsketch",
