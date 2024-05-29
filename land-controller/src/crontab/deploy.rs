@@ -22,9 +22,9 @@ pub async fn run_tasks() -> Result<()> {
 }
 
 async fn handle_deploying() -> Result<()> {
-    let dps = deployment::list_by_status(deployment::DeployStatus::Waiting).await?;
+    let dps = deployment::list_by_deploy_status(deployment::DeployStatus::Waiting).await?;
     if dps.is_empty() {
-        debug!("No waiting deploys");
+        // debug!("No waiting deploys");
         return Ok(());
     }
     debug!("Found {} waiting deploys", dps.len());
@@ -151,9 +151,9 @@ async fn handle_deploy_one(dp: &mut DeploymentModel) -> Result<()> {
 
 async fn handle_review() -> Result<()> {
     // 1. read deploying deployment
-    let dps = deployment::list_by_status(deployment::DeployStatus::Deploying).await?;
+    let dps = deployment::list_by_deploy_status(deployment::DeployStatus::Deploying).await?;
     if dps.is_empty() {
-        debug!("No deploying tasks");
+        // debug!("No deploying tasks");
         return Ok(());
     }
 
@@ -217,12 +217,8 @@ async fn handle_review_one(dp: &DeploymentModel) -> Result<()> {
             domain = dp.domain,
             "Deployment failed, some tasks failed"
         );
-    }else{
-        debug!(
-            id = dp.id,
-            domain = dp.domain,
-            "Deployment still deploying"
-        );
+    } else {
+        debug!(id = dp.id, domain = dp.domain, "Deployment still deploying");
     }
     Ok(())
 }

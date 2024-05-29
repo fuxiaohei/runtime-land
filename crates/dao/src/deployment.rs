@@ -5,7 +5,8 @@ use crate::user::UserStatus;
 use anyhow::Result;
 use sea_orm::sea_query::Expr;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder,
+    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, ItemsAndPagesNumber,
+    PaginatorTrait, QueryFilter, QueryOrder,
 };
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
@@ -131,8 +132,8 @@ pub async fn is_deploying(project_id: i32) -> Result<bool> {
         || dp.deploy_status == DeployStatus::Deploying.to_string())
 }
 
-/// list_by_status gets all deployments by status
-pub async fn list_by_status(status: DeployStatus) -> Result<Vec<deployment::Model>> {
+/// list_by_deploy_status gets all deployments by status
+pub async fn list_by_deploy_status(status: DeployStatus) -> Result<Vec<deployment::Model>> {
     let db = DB.get().unwrap();
     let dps = deployment::Entity::find()
         .filter(deployment::Column::DeployStatus.eq(status.to_string()))
@@ -141,6 +142,26 @@ pub async fn list_by_status(status: DeployStatus) -> Result<Vec<deployment::Mode
         .all(db)
         .await?;
     Ok(dps)
+}
+
+/// list_by_status_paginate gets deployments by status with pagination
+pub async fn list_by_status_paginate(
+    status: Vec<DeploymentStatus>,
+    current: u64,
+    page_size: u64,
+) -> Result<(Vec<deployment::Model>, ItemsAndPagesNumber)> {
+    let mut args = vec![];
+    for s in status {
+        args.push(s.to_string());
+    }
+    let db = DB.get().unwrap();
+    let pager = deployment::Entity::find()
+        .filter(deployment::Column::Status.is_in(args))
+        .order_by_desc(deployment::Column::Id)
+        .paginate(db, page_size);
+    let dps = pager.fetch_page(current - 1).await?;
+    let pages = pager.num_items_and_pages().await?;
+    Ok((dps, pages))
 }
 
 /// set_failed sets a deployment as failed

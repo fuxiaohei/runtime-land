@@ -1,15 +1,82 @@
+<div id="admin-dashboard-traffic-chart-container">
+    <h5 class="text-body-secondary">Requests in the last 24 hours</h5>
+    <div class="loading spinner-border p-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <div class="alert alert-danger d-none" role="alert"></div>
+    <div id="admin-dashboard-traffic-chart" style="height: 250px;"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"
+    integrity="sha256-QvgynZibb2U53SsVu98NggJXYqwRL7tg3FeyfXvPOUY=" crossorigin="anonymous"></script>
 <script type="text/javascript">
     const load_requests = (async () => {
         let params = new URLSearchParams();
+        let chartContainer = document.getElementById("admin-dashboard-traffic-chart-container");
+        let loadingElement = chartContainer.querySelector(".loading");
         params.append("period", "1d");
         let resp = await fetch("/traffic/requests", {
             method: "POST",
             body: params
         });
+        loadingElement.remove();
         if (!resp.ok) {
-            console.error("Failed to fetch requests data");
+            let content = await resp.text();
+            let alertContainer = chartContainer.querySelector(".alert");
+            alertContainer.textContent = content;
+            alertContainer.classList.remove("d-none");
             return;
         }
+        let chartDiv = document.getElementById("admin-dashboard-traffic-chart");
+        let series = await resp.json();
+        series = series["metric"] || { total: 0, values: [] };
+        let chart = echarts.init(chartDiv, null, { renderer: 'svg' });
+        let option = {
+            title: {
+                show: false,
+            },
+            tooltip: {
+                trigger: "axis",
+                formatter: function (params) {
+                    let t = params[0].axisValueLabel;
+                    let v = params[0].value[1];
+                    return `<span>${t}<br/><span style="color:#AC3B2A">REQUESTS</span> <strong>${v}</strong></span>`
+                }
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    formatter: function (value, index) {
+                        return unix2hour(value) // js use milliseconds
+                    },
+                },
+                splitNumber: 6,
+            },
+            yAxis: {
+                type: 'value',
+                show: true,
+            },
+            grid: {
+                top: 10,
+                left: 30,
+                right: 0,
+                bottom: 20,
+            },
+            series: [
+                {
+                    type: 'line',
+                    data: series.values || [],
+                    smooth: true,
+                    symbol: "none",
+                    lineStyle: {
+                        normal: {
+                            width: 2,
+                        }
+                    },
+                    areaStyle: {},
+                }
+            ]
+        };
+        chart.setOption(option);
     })
     load_requests();
 </script>

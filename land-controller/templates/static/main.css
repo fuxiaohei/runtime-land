@@ -177,3 +177,17 @@ html[data-bs-theme="dark"] #project-codeview .card-body {
 .env-del-btn:hover i {
     color: var(--bs-danger) !important;
 }
+
+.admin-dashboard-traffic {
+    height: 280px;
+}
+
+#admin-deploys-table .ops a {
+    text-decoration: none;
+    margin-right: .7rem;
+}
+
+#admin-deploys-table .deploy-status.status-failed,
+#admin-deploys-table .common-status.status-disabled {
+    color: var(--bs-danger);
+}

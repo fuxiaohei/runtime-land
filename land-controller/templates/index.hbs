@@ -11,7 +11,7 @@
         <div id="main-body" class="w-100">
             {{> partials/nav-top.hbs}}
             <div id="main-panel" class="overflow-y-auto">
-                <div id="main-stats" class="container mt-3">
+                <div id="main-stats" class="container-fluid mt-3">
                     <div>
                         <h5>Dashboard</h5>
                         <p class="text-body-tertiary mb-1">Manage all projects here.</p>
@@ -76,7 +76,9 @@
                             </div>
                         </div>
                         <div class="col-7">
-                            {{> partials/traffic.hbs}}
+                            <div class="admin-dashboard-traffic">
+                                {{> partials/traffic.hbs}}
+                            </div>
                         </div>
                     </div>
                 </div>

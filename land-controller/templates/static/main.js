@@ -92,6 +92,12 @@
 })();
 
 (() => {
+    // enable tooltip
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+})();
+
+(() => {
     // convert data-x-time to local time string
     const xTimeElements = document.querySelectorAll('[data-x-time]');
     xTimeElements.forEach((element) => {
@@ -122,5 +128,23 @@ function friendly_bytesize(v, with_byte_unit) {
     }
     v = v.toFixed(2);
     let u = with_byte_unit ? bytes_units[i] : units[i];
+    if (u) {
+        u = ' ' + u;
+    }
     return `${v}${u}`
+}
+
+
+/// convert unixtimestamp to hour and minute, HH:MM
+function unix2hour(v) {
+    const dateObj = new Date(v)
+    const hours = dateObj.getHours() >= 10 ? dateObj.getHours() : '0' + dateObj.getHours()
+    const minutes = dateObj.getMinutes() < 10 ? dateObj.getMinutes() + '0' : dateObj.getMinutes()
+    const UnixTimeToDate = hours + ':' + minutes
+    if (window.traffic_period == "7d") {
+        const month = dateObj.getMonth() + 1
+        const days = dateObj.getDate() >= 10 ? dateObj.getDate() : '0' + dateObj.getDate()
+        return month + '/' + days + ' ' + UnixTimeToDate
+    }
+    return UnixTimeToDate
 }

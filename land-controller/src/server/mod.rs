@@ -7,6 +7,7 @@ use std::net::SocketAddr;
 use tower_http::services::ServeDir;
 use tracing::info;
 
+mod deploys;
 mod index;
 mod projects;
 mod settings;
@@ -31,6 +32,7 @@ pub async fn start(addr: SocketAddr, assets_dir: &str) -> anyhow::Result<()> {
         .route("/projects/redeploy", post(projects::redeploy))
         .route("/projects/disable", post(projects::disable))
         .route("/projects/enable", post(projects::enable))
+        .route("/deploys", get(deploys::index))
         .route("/workers", get(workers::index))
         .route("/create-worker-token", post(workers::create_token))
         .route("/delete-token", post(settings::delete_token))

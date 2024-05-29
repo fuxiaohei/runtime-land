@@ -14,6 +14,7 @@ use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, ItemsAndPagesNumber,
     PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
 };
+use std::collections::HashMap;
 use std::str::FromStr;
 use tracing::info;
 
@@ -135,6 +136,20 @@ pub async fn list_by_user_id(
     }
     let projects = select.all(db).await.map_err(|e| anyhow::anyhow!(e))?;
     Ok(projects)
+}
+
+/// list_by_ids lists all projects by ids
+pub async fn list_by_ids(ids: Vec<i32>) -> Result<HashMap<i32, project::Model>> {
+    let db = DB.get().unwrap();
+    let projects = project::Entity::find()
+        .filter(project::Column::Id.is_in(ids))
+        .all(db)
+        .await?;
+    let mut map = HashMap::new();
+    for p in projects {
+        map.insert(p.id, p);
+    }
+    Ok(map)
 }
 
 /// list_paginate lists all projects with pagination

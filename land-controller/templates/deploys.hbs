@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> partials/head.hbs}}
+</head>
+
+<body>
+    <main id="main-container" class="d-flex flex-nowrap">
+        {{> partials/admin-sidebar.hbs}}
+        <div id="main-body" class="w-100">
+            {{> partials/nav-top.hbs}}
+            <div id="main-panel" class="overflow-y-auto">
+                <div id="admin-deploys" class="pt-3 px-3 container-fluid">
+                    <div>
+                        <h5>Projects Deployments</h5>
+                        <p class="text-body-tertiary mb-1">Manage all projects deployments here.</p>
+                    </div>
+                    <div class="mt-3">
+                        <table id="admin-deploys-table" class="table table-striped shadow-none">
+                            <thead class="border-top">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Domain</th>
+                                    <th scope="col">Lang</th>
+                                    <th scope="col">Created_By</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Deploy_Status</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Updated</th>
+                                    <th scope="col">Ops</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each deploys}}
+                                <tr>
+                                    <th scope="row">{{id}}</th>
+                                    <td>{{domain}}</td>
+                                    <td>{{language}}</td>
+                                    <td>{{created_by}}</td>
+                                    <td class="wasm-size" data-x-value="{{size}}">{{size}}</td>
+                                    <td class="deploy-status status-{{deploy_status}}">
+                                        <span class="text-uppercase">{{deploy_status}}</span>
+                                        {{#if (eq_str deploy_status 'failed')}}
+                                        <span class="text-sm text-danger ms-1">({{deploy_message}})</span>
+                                        {{/if}}
+                                    </td>
+                                    <td class="common-status status-{{status}} text-uppercase">{{status}}</td>
+                                    <td>
+                                        <span data-x-timeago="{{updated_at}}"></span>
+                                    </td>
+                                    <td class="ops">
+                                        <a class="text-body" href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </a>
+                                        <a class="text-body" href="#" data-bs-toggle="tooltip" data-bs-title="Disable">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </a>
+                                        <a class="text-danger" href="#" data-bs-toggle="tooltip" data-bs-title="Remove">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <ul class="pagination pagination-sm mt-3">
+                        {{#each pagination.items}}
+                        <li class="page-item"><a class="page-link" href="{{link}}">{{page}}</a></li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{> partials/nav-footer.hbs}}
+            </div>
+    </main>
+    {{> partials/footer.hbs}}
+    <script type="text/javascript">
+        document.querySelectorAll(".wasm-size").forEach(function (el) {
+            let value = parseInt(el.getAttribute("data-x-value")) || 0;
+            el.textContent = friendly_bytesize(value, true);
+        });
+    </script>
+</body>
+
+</html>
