@@ -60,7 +60,7 @@ serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 serde_yaml = "0.9.33"
 time = { version = "0.3.36", features = ["local-offset"] }
-tokio = { version = "1.37.0", features = ["full"] }
+tokio = { version = "1.38.0", features = ["full"] }
 tower-http = { version = "0.5.2", features = [
     "timeout",
     "cors",
@@ -75,7 +75,7 @@ tracing-subscriber = { version = "0.3.18", features = [
 ] }
 uuid = { version = "1.8.0", features = ["v4"] }
 walkdir = "2.5.0"
-wit-bindgen = "0.25.0"
-wit-bindgen-core = "0.25.0"
-wit-bindgen-rust = "0.25.0"
-wit-component = "0.208.1"
+wit-bindgen = "0.26.0"
+wit-bindgen-core = "0.26.0"
+wit-bindgen-rust = "0.26.0"
+wit-component = "0.209.1"
