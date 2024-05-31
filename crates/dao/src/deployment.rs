@@ -30,7 +30,7 @@ impl Default for Spec {
     }
 }
 
-#[derive(strum::Display)]
+#[derive(strum::Display, PartialEq, strum::EnumString, strum::EnumIter)]
 #[strum(serialize_all = "lowercase")]
 pub enum DeployStatus {
     Waiting,
@@ -41,7 +41,7 @@ pub enum DeployStatus {
     Failed,
 }
 
-#[derive(strum::Display)]
+#[derive(strum::Display, PartialEq, strum::EnumString, strum::EnumIter)]
 #[strum(serialize_all = "lowercase")]
 pub enum DeploymentStatus {
     Active,
@@ -59,6 +59,13 @@ pub async fn get_last_by_project(project_id: i32) -> Result<Option<deployment::M
         .order_by_desc(deployment::Column::Id) // find latest one, need be success or failed
         .one(db)
         .await?;
+    Ok(dp)
+}
+
+/// get_by_id gets a deployment by id
+pub async fn get_by_id(id: i32) -> Result<Option<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let dp = deployment::Entity::find_by_id(id).one(db).await?;
     Ok(dp)
 }
 
@@ -147,17 +154,36 @@ pub async fn list_by_deploy_status(status: DeployStatus) -> Result<Vec<deploymen
 /// list_by_status_paginate gets deployments by status with pagination
 pub async fn list_by_status_paginate(
     status: Vec<DeploymentStatus>,
+    deploy_status: Vec<DeployStatus>,
     current: u64,
     page_size: u64,
+    domain: Option<String>,
 ) -> Result<(Vec<deployment::Model>, ItemsAndPagesNumber)> {
-    let mut args = vec![];
-    for s in status {
-        args.push(s.to_string());
-    }
     let db = DB.get().unwrap();
-    let pager = deployment::Entity::find()
-        .filter(deployment::Column::Status.is_in(args))
-        .order_by_desc(deployment::Column::Id)
+    let mut select = deployment::Entity::find();
+
+    let mut args1 = vec![];
+    if !status.is_empty() {
+        for s in status {
+            args1.push(s.to_string());
+        }
+        select = select.filter(deployment::Column::Status.is_in(args1));
+    }
+
+    let mut args2 = vec![];
+    if !deploy_status.is_empty() {
+        for s in deploy_status {
+            args2.push(s.to_string());
+        }
+        select = select.filter(deployment::Column::DeployStatus.is_in(args2));
+    }
+
+    if let Some(d) = domain {
+        select = select.filter(deployment::Column::Domain.contains(d));
+    }
+
+    let pager = select
+        .order_by_desc(deployment::Column::UpdatedAt)
         .paginate(db, page_size);
     let dps = pager.fetch_page(current - 1).await?;
     let pages = pager.num_items_and_pages().await?;
@@ -282,6 +308,16 @@ pub async fn list_tasks_by_taskid(task_id: String) -> Result<Vec<deployment_task
     let db = DB.get().unwrap();
     let tasks = deployment_task::Entity::find()
         .filter(deployment_task::Column::TaskId.eq(task_id))
+        .all(db)
+        .await?;
+    Ok(tasks)
+}
+
+/// list_tasks_by_deploy_id gets all tasks by deploy_id
+pub async fn list_tasks_by_deploy_id(deploy_id: i32) -> Result<Vec<deployment_task::Model>> {
+    let db = DB.get().unwrap();
+    let tasks = deployment_task::Entity::find()
+        .filter(deployment_task::Column::DeploymentId.eq(deploy_id))
         .all(db)
         .await?;
     Ok(tasks)

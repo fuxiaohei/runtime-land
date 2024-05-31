@@ -2275,6 +2275,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "strum 0.26.2",
  "time",
  "tokio",
  "toml",

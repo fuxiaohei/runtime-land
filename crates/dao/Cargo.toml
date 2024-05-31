@@ -29,7 +29,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
 sha2 = "0.10.8"
-strum = { version = "0.26.2", features = ["derive"] }
+strum = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }

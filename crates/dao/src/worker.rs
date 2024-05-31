@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{db::DB, models::worker, now_time};
 use anyhow::Result;
 use sea_orm::{
@@ -30,6 +32,20 @@ pub async fn list_all() -> Result<Vec<worker::Model>> {
         .all(db)
         .await?;
     Ok(workers)
+}
+
+/// list_by_ids returns workers by ids
+pub async fn list_by_ids(ids: Vec<i32>) -> Result<HashMap<i32, worker::Model>> {
+    let db = DB.get().unwrap();
+    let workers = worker::Entity::find()
+        .filter(worker::Column::Id.is_in(ids))
+        .all(db)
+        .await?;
+    let mut map = HashMap::new();
+    for w in workers {
+        map.insert(w.id, w);
+    }
+    Ok(map)
 }
 
 /// update_online updates worker status

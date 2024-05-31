@@ -16,12 +16,55 @@
                         <h5>Projects Deployments</h5>
                         <p class="text-body-tertiary mb-1">Manage all projects deployments here.</p>
                     </div>
+                    <form class="row gy-2 gx-3 align-items-center mt-2" action="/deploys">
+                        <div class="col-auto">
+                            <label class="visually-hidden" for="domain-input">Domain</label>
+                            <div class="input-group">
+                                <div class="input-group-text">Domain</div>
+                                <input name="domain" type="text" class="form-control" id="domain-input"
+                                    placeholder="Type in domain">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <label class="input-group-text" for="deploy-status">DeployStatus</label>
+                                <select name="deploy-status" class="form-select text-uppercase" id="deploy-status">
+                                    {{#each deploy_status_list}}
+                                    {{#if is_selected}}
+                                    <option selected value="{{value}}">{{value}}</option>
+                                    {{else}}
+                                    <option value="{{value}}">{{value}}</option>
+                                    {{/if}}
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="input-group">
+                                <label class="input-group-text" for="common-status">Status</label>
+                                <select name="common-status" class="form-select text-uppercase" id="common-status">
+                                    {{#each common_status_list}}
+                                    {{#if is_selected}}
+                                    <option selected value="{{value}}">{{label}}</option>
+                                    {{else}}
+                                    <option value="{{value}}">{{label}}</option>
+                                    {{/if}}
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary"><i
+                                    class="bi bi-search me-2"></i>Search</button>
+                        </div>
+                    </form>
                     <div class="mt-3">
                         <table id="admin-deploys-table" class="table table-striped shadow-none">
                             <thead class="border-top">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Domain</th>
+                                    <th scope="col">User</th>
                                     <th scope="col">Lang</th>
                                     <th scope="col">Created_By</th>
                                     <th scope="col">Size</th>
@@ -36,6 +79,10 @@
                                 <tr>
                                     <th scope="row">{{id}}</th>
                                     <td>{{domain}}</td>
+                                    <td>
+                                        <span data-bs-toggle="tooltip"
+                                            data-bs-title="{{user_email}}">{{user_name}}</span>
+                                    </td>
                                     <td>{{language}}</td>
                                     <td>{{created_by}}</td>
                                     <td class="wasm-size" data-x-value="{{size}}">{{size}}</td>
@@ -50,7 +97,8 @@
                                         <span data-x-timeago="{{updated_at}}"></span>
                                     </td>
                                     <td class="ops">
-                                        <a class="text-body" href="/deploys/details/{{id}}" data-bs-toggle="tooltip" data-bs-title="Details">
+                                        <a class="text-body" href="/deploys/details/{{id}}" data-bs-toggle="tooltip"
+                                            data-bs-title="Details">
                                             <i class="bi bi-ui-checks-grid"></i>
                                         </a>
                                         <a class="text-body" href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy">
@@ -74,8 +122,10 @@
                         {{/each}}
                     </ul>
                 </div>
+                {{> partials/notification.hbs}}
                 {{> partials/nav-footer.hbs}}
             </div>
+
     </main>
     {{> partials/footer.hbs}}
     <script type="text/javascript">
