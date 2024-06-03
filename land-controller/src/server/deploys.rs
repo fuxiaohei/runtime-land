@@ -37,14 +37,13 @@ impl DeploysQuery {
     pub fn to_common_status_filter(&self) -> Vec<DeploymentStatus> {
         let mut filters = vec![];
         if let Some(status) = &self.common_status {
-            if status == "available" || status.is_empty() {
-                filters.push(DeploymentStatus::Active);
-                filters.push(DeploymentStatus::Disabled);
-                return filters;
-            }
             if let Ok(s) = status.parse::<DeploymentStatus>() {
                 filters.push(s);
             }
+        }
+        if filters.is_empty() {
+            filters.push(DeploymentStatus::Active);
+            filters.push(DeploymentStatus::Disabled);
         }
         filters
     }

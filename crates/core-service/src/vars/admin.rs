@@ -127,6 +127,7 @@ impl DeployVars {
 #[derive(Serialize)]
 pub struct DeployDetailVars {
     pub id: i32,
+    pub task_id: String,
     pub deploy_id: i32,
     pub worker_id: i32,
     pub worker_ip: String,
@@ -150,6 +151,7 @@ impl DeployDetailVars {
         for task in tasks {
             vars.push(DeployDetailVars {
                 id: task.id,
+                task_id: task.task_id,
                 deploy_id: task.deployment_id,
                 worker_id: task.worker_id,
                 worker_ip: "".to_string(),

@@ -85,7 +85,7 @@ pub async fn update(
     }
 
     Ok(response_redirect(
-        format!("/admin/settings?show={}", f.name).as_str(),
+        format!("/settings?show={}", f.name).as_str(),
     ))
 }
 
@@ -96,7 +96,7 @@ pub struct DeleteTokenForm {
     pub id: i32,
 }
 
-/// delete_token is a handler for POST /admin/delete-token
+/// delete_token is a handler for POST /delete-token
 pub async fn delete_token(
     csrf_layer: CsrfToken,
     Form(form): Form<DeleteTokenForm>,
@@ -118,5 +118,5 @@ pub async fn delete_token(
     }
     info!("Delete token: {:?}", token);
     land_dao::user::remove_token(form.id).await?;
-    Ok(response_redirect("/admin"))
+    Ok(response_redirect("/settings"))
 }

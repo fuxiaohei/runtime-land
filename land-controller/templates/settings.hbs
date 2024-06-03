@@ -18,7 +18,7 @@
                     </div>
                     <div class="card shadow-none mt-3">
                         <div class="card-body">
-                            <form action="/admin/settings" method="post">
+                            <form action="/settings" method="post">
                                 <div class="row g-3 align-items-center">
                                     <div class="col-auto">
                                         <label for="settings-select" class="col-form-label">Item Name</label>
@@ -69,7 +69,7 @@
                 return;
             }
             settings_value.value = 'Loading...';
-            const response = await fetch(`/admin/settings?name=${value}`);
+            const response = await fetch(`/settings?name=${value}`);
             if (response.status !== 200) {
                 settings_value.value = "Failed to fetch settings";
                 settings_value.disabled = true;
