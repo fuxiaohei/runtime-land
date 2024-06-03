@@ -2197,6 +2197,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "land-apiserver"
+version = "0.3.12"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "land-common",
+ "land-core-service",
+ "land-dao",
+ "serde",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "land-cli"
 version = "0.3.12"
 dependencies = [
@@ -4477,9 +4492,9 @@ dependencies = [
 
 [[package]]
 name = "spdx"
-version = "0.10.4"
+version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29ef1a0fa1e39ac22972c8db23ff89aea700ab96aa87114e1fb55937a631a0c9"
+checksum = "47317bbaf63785b53861e1ae2d11b80d6b624211d42cb20efcd210ee6f8a14bc"
 dependencies = [
  "smallvec",
 ]
@@ -5880,9 +5895,9 @@ dependencies = [
 
 [[package]]
 name = "wast"
-version = "209.0.0"
+version = "209.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "796916a29f4a8454655b7af3aa2d0e40532d07b4d3b8abdb78e4cb6b84c00586"
+checksum = "8fffef2ff6147e4d12e972765fd75332c6a11c722571d4ab7a780d81ffc8f0a4"
 dependencies = [
  "bumpalo",
  "leb128",
@@ -5893,11 +5908,11 @@ dependencies = [
 
 [[package]]
 name = "wat"
-version = "1.209.0"
+version = "1.209.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ecc135c1bdf98ef1c818b80996897ab23dff91391149e8c22d8278796b743e9"
+checksum = "42203ec0271d113f8eb1f77ebc624886530cecb35915a7f63a497131f16e4d24"
 dependencies = [
- "wast 209.0.0",
+ "wast 209.0.1",
 ]
 
 [[package]]

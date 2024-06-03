@@ -7,7 +7,7 @@ members = [
     "crates/sdk-macro",
     "crates/wasm",
     "crates/wasm-gen",
-    "crates/worker-server",
+    "crates/worker-server", "land-apiserver",
     "land-cli",
     "land-controller",
     "land-server",
