@@ -2208,6 +2208,7 @@ dependencies = [
  "land-dao",
  "serde",
  "tokio",
+ "tower-http",
  "tracing",
 ]
 
