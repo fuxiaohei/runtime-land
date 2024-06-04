@@ -10,7 +10,6 @@ pub struct CreateTokenParam {
     pub id: String,
     pub session: String,
     pub user_id: String,
-    pub xxx:String,
 }
 
 pub async fn create(Json(j): Json<CreateTokenParam>) -> Result<impl IntoResponse, ServerJsonError> {
