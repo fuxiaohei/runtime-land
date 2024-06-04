@@ -68,6 +68,13 @@ pub struct SignCallbackValue {
     pub origin_provider: String,
 }
 
+/// create_session_token_by_userid creates a new session token by user id
+pub async fn create_session_token_by_userid(id: i32) -> Result<user_token::Model> {
+    let token_name = format!("session-{}-{}", id, chrono::Utc::now().timestamp());
+    let token = create_new_token(id, &token_name, 3600 * 23, TokenUsage::Session).await?;
+    Ok(token)
+}
+
 /// create_session creates a new session token
 pub async fn create_session_token(value: &SignCallbackValue) -> Result<user_token::Model> {
     let mut user = get_info_by_origin_id(&value.origin_user_id).await?;
@@ -84,9 +91,7 @@ pub async fn create_session_token(value: &SignCallbackValue) -> Result<user_toke
         user = Some(new_user);
     }
     let user = user.unwrap();
-    let token_name = format!("session-{}-{}", user.id, chrono::Utc::now().timestamp(),);
-    let token = create_new_token(user.id, &token_name, 3600 * 23, TokenUsage::Session).await?;
-    Ok(token)
+    create_session_token_by_userid(user.id).await
 }
 
 lazy_static! {

@@ -5,9 +5,11 @@ members = [
     "crates/dao",
     "crates/sdk",
     "crates/sdk-macro",
+    "crates/service",
     "crates/wasm",
     "crates/wasm-gen",
-    "crates/worker-server", "land-apiserver",
+    "crates/worker-server",
+    "land-apiserver", "land-backend",
     "land-cli",
     "land-controller",
     "land-server",
@@ -32,6 +34,7 @@ http = "1.1.0"
 land-common = { path = "./crates/common" }
 land-dao = { path = "./crates/dao" }
 land-core-service = { path = "./crates/core-service" }
+land-service = { path = "crates/service" }
 land-sdk = { path = "crates/sdk" }
 land-sdk-macro = { path = "crates/sdk-macro" }
 land-wasm = { path = "./crates/wasm" }

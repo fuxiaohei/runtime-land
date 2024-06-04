@@ -1,37 +1,22 @@
-use crate::v1::Data;
 use axum::response::IntoResponse;
 use axum::Json;
 use land_core_service::httputil::ServerJsonError;
+use land_service::clerk;
 use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CreateTokenUserParam {
-    #[serde(rename = "firstName")]
-    pub first_name: String,
-    #[serde(rename = "lastName")]
-    pub last_name: Option<String>,
-    #[serde(rename = "imageUrl")]
-    pub image_url: String,
-    #[serde(rename = "hasImage")]
-    pub has_image: bool,
-    pub identifier: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CreateTokenSessionParam {
-    pub id: String,
-    pub value: String,
-}
+use tracing::debug;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateTokenParam {
-    pub user: CreateTokenUserParam,
-    pub session: CreateTokenSessionParam,
+    pub id: String,
+    pub session: String,
+    pub user_id: String,
+    pub xxx:String,
 }
 
 pub async fn create(Json(j): Json<CreateTokenParam>) -> Result<impl IntoResponse, ServerJsonError> {
-    println!("{:?}", j);
-    Ok(Json(Data {
-        data: "ok".to_string(),
-    }))
+    clerk::verify(&j.session).await?;
+
+    let token = clerk::create_session_token(&j.user_id).await?;
+    debug!("Token created: {:?}", token);
+    Ok(Json(token))
 }

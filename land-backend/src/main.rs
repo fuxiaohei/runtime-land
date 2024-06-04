@@ -2,10 +2,6 @@ use anyhow::Result;
 use clap::Parser;
 use land_common::tracing::TraceArgs;
 use land_common::version;
-use land_service::clerk;
-
-mod server;
-mod v1;
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
@@ -20,9 +16,6 @@ struct Args {
     version: bool,
     #[clap(flatten)]
     output: TraceArgs,
-    /// Address to listen on.
-    #[clap(long, default_value("0.0.0.0:9814"))]
-    address: String,
     #[clap(flatten)]
     dbargs: land_dao::db::DBArgs,
 }
@@ -41,11 +34,11 @@ async fn main() -> Result<()> {
     // Connect to database
     args.dbargs.connect().await?;
 
-    // Init clerk envs
-    clerk::init_envs(false).await?;
+    // Init clerk jwks from api
+    land_service::clerk::init_envs(true).await?;
 
-    // Start the server
-    server::start(args.address.parse()?).await?;
+    // Block until the server stops
+    tokio::signal::ctrl_c().await?;
 
     Ok(())
 }
