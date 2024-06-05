@@ -11,6 +11,9 @@ mod user;
 use tracing::info;
 pub use user::get_user;
 
+mod middleware;
+pub use middleware::{middleware, AuthUser};
+
 /// ClerkEnv is the environment variables for Clerk.js
 #[derive(Serialize, Clone)]
 pub struct ClerkEnv {

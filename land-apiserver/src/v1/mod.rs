@@ -1,10 +1,11 @@
 use anyhow::Result;
-use axum::routing::post;
-use axum::Router;
-use serde::Serialize;
+use axum::routing::{get, post};
+use axum::{middleware, Router};
+use land_service::clerk;
 use tower_http::cors::{Any, CorsLayer};
 
-pub mod tokens;
+mod projects;
+mod tokens;
 
 pub fn router() -> Result<Router> {
     let cors = CorsLayer::new()
@@ -14,10 +15,7 @@ pub fn router() -> Result<Router> {
 
     Ok(Router::new()
         .route("/token", post(tokens::create))
+        .route("/projects", get(projects::list))
+        .route_layer(middleware::from_fn(clerk::middleware))
         .layer(cors))
-}
-
-#[derive(Serialize)]
-pub struct Data<T: Serialize> {
-    data: T,
 }

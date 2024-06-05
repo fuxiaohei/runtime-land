@@ -1,6 +1,7 @@
 use anyhow::Result;
 use axum::routing::get;
-use axum::Router;
+use axum::{middleware, Router};
+use land_core_service::httputil::log_middleware;
 use std::net::SocketAddr;
 use tracing::info;
 
@@ -10,7 +11,8 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
     // routes
     let app = Router::new()
         .route("/", get(index))
-        .nest("/v1", v1::router()?);
+        .nest("/v1", v1::router()?)
+        .route_layer(middleware::from_fn(log_middleware));
 
     info!("Starting server on {}", addr);
 

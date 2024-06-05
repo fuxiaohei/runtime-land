@@ -42,14 +42,14 @@ impl PageVars {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct PaginationVarItem {
     pub link: String,
     pub current: bool,
     pub page: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct PaginationVar {
     pub current: u64,
     pub count: u64,

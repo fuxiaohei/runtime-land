@@ -14,6 +14,7 @@ use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, IntoActiveModel, ItemsAndPagesNumber,
     PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
 };
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use tracing::info;
@@ -24,7 +25,7 @@ pub enum Language {
     JavaScript,
 }
 
-#[derive(strum::Display)]
+#[derive(strum::Display, Serialize, Deserialize, Debug)]
 #[strum(serialize_all = "lowercase")]
 pub enum ProjectStatus {
     Active,
@@ -164,6 +165,34 @@ pub async fn list_paginate(
         .paginate(db, page_size);
     // current page data
     let projects = pager.fetch_page(current - 1).await?;
+    let pages = pager.num_items_and_pages().await?;
+    Ok((projects, pages))
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListQuery {
+    pub user_id: Option<i32>,
+    pub status: Option<ProjectStatus>,
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+}
+
+/// list_paginate2 lists all projects with pagination
+pub async fn list_paginate2(q: &ListQuery) -> Result<(Vec<project::Model>, ItemsAndPagesNumber)> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find();
+    if let Some(user_id) = q.user_id {
+        select = select.filter(project::Column::UserId.eq(user_id));
+    }
+    if let Some(status) = &q.status {
+        select = select.filter(project::Column::Status.eq(status.to_string()));
+    } else {
+        select = select.filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()));
+    }
+    let pager = select
+        .order_by_desc(project::Column::Id)
+        .paginate(db, q.page_size.unwrap_or(10));
+    let projects = pager.fetch_page(q.page.unwrap_or(1) - 1).await?;
     let pages = pager.num_items_and_pages().await?;
     Ok((projects, pages))
 }

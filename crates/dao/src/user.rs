@@ -56,6 +56,17 @@ pub async fn get_token_by_id(id: i32) -> Result<Option<user_token::Model>> {
     Ok(token)
 }
 
+/// is_token_expired checks if a token is expired
+pub async fn is_token_expired(token: &user_token::Model) -> bool {
+    let now = chrono::Utc::now().naive_utc();
+    if let Some(expired_at) = token.expired_at {
+        if now > expired_at {
+            return true;
+        }
+    }
+    false
+}
+
 #[derive(Deserialize, Debug)]
 pub struct SignCallbackValue {
     pub session_id: String,
