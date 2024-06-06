@@ -14,8 +14,9 @@ pub fn router() -> Result<Router> {
         .allow_origin(Any);
 
     Ok(Router::new()
-        .route("/token", post(tokens::create))
-        .route("/projects", get(projects::list))
+        .route("/v1/token", post(tokens::create))
+        .route("/v1/projects", get(projects::list))
+        .route("/v1/projects/:project_name", get(projects::single))
         .route_layer(middleware::from_fn(clerk::middleware))
         .layer(cors))
 }

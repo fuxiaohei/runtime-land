@@ -1,9 +1,9 @@
-use axum::extract::Query;
+use axum::extract::{Path, Query};
+use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use land_core_service::httputil::ServerJsonError;
 use land_core_service::vars::{PaginationVar, ProjectVar};
-use land_dao::projects;
 use land_service::clerk::AuthUser;
 use tracing::debug;
 
@@ -20,7 +20,7 @@ pub async fn list(
     q.user_id = Some(user.id);
     debug!("list projects: {:?}", q);
 
-    let (projects, pagination) = projects::list_paginate2(&q).await?;
+    let (projects, pagination) = land_dao::projects::list_paginate2(&q).await?;
 
     let projects_vars = ProjectVar::from_models_vec(projects).await?;
     let page_vars = PaginationVar::new(
@@ -35,4 +35,33 @@ pub async fn list(
         page: page_vars,
         projects: projects_vars,
     }))
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct SingleQuery {
+    pub with_playground: Option<bool>,
+}
+
+pub async fn single(
+    Extension(user): Extension<AuthUser>,
+    Path(project_name): Path<String>,
+    Query(q): Query<SingleQuery>,
+) -> Result<impl IntoResponse, ServerJsonError> {
+    debug!("get project single: {}, q:{:?}", project_name, q);
+    let with_playground = q.with_playground.unwrap_or(false);
+    if !with_playground {
+        let p = land_dao::projects::get_by_name(project_name.clone(), Some(user.id)).await?;
+        if p.is_none() {
+            return Err(ServerJsonError(
+                StatusCode::NOT_FOUND,
+                anyhow::anyhow!("Project not found"),
+            ));
+        }
+        let project_var = ProjectVar::new(&p.unwrap(), None).await?;
+        return Ok(Json(project_var));
+    }
+    let (p, py) =
+        land_dao::projects::get_project_by_name_with_playground(project_name, user.id).await?;
+    let project_var = ProjectVar::new(&p, py.as_ref()).await?;
+    Ok(Json(project_var))
 }

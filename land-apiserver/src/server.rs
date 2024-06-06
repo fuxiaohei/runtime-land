@@ -11,7 +11,7 @@ pub async fn start(addr: SocketAddr) -> Result<()> {
     // routes
     let app = Router::new()
         .route("/", get(index))
-        .nest("/v1", v1::router()?)
+        .merge(v1::router()?)
         .route_layer(middleware::from_fn(log_middleware));
 
     info!("Starting server on {}", addr);

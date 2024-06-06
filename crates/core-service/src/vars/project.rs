@@ -20,6 +20,7 @@ pub struct ProjectVar {
     pub description: String,
     pub language: String,
     pub created_by: String,
+    pub created_at: DateTimeUTC,
     pub updated_at: DateTimeUTC,
     pub source: String,
     pub is_editable: bool,
@@ -51,6 +52,7 @@ impl ProjectVar {
                 language: p.language,
                 is_editable: p.created_by == ProjectCreatedBy::Playground.to_string(),
                 created_by: p.created_by,
+                created_at: p.created_at.and_utc(),
                 updated_at: p.updated_at.and_utc(),
                 description: p.description,
                 source: String::new(), // for list show, source is not needed
@@ -79,6 +81,7 @@ impl ProjectVar {
             dev_domain_full: format!("{}.{}", project.dev_domain, domain),
             dev_domain_url: format!("{}://{}.{}", protocol, project.dev_domain, domain),
             language: project.language.clone(),
+            created_at: project.created_at.and_utc(),
             updated_at: project.updated_at.and_utc(),
             description: project.description.clone(),
             source: String::new(),

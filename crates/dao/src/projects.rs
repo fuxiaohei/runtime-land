@@ -190,7 +190,7 @@ pub async fn list_paginate2(q: &ListQuery) -> Result<(Vec<project::Model>, Items
         select = select.filter(project::Column::Status.ne(ProjectStatus::Deleted.to_string()));
     }
     let pager = select
-        .order_by_desc(project::Column::Id)
+        .order_by_desc(project::Column::UpdatedAt)
         .paginate(db, q.page_size.unwrap_or(10));
     let projects = pager.fetch_page(q.page.unwrap_or(1) - 1).await?;
     let pages = pager.num_items_and_pages().await?;

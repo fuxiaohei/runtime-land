@@ -74,5 +74,5 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
         email: user.email,
     };
     request.extensions_mut().insert(auth_user);
-    return Ok(next.run(request).await);
+    Ok(next.run(request).await)
 }
