@@ -257,6 +257,7 @@ pub async fn update_name(id: i32, name: String, desc: String) -> Result<()> {
         .col_expr(project::Column::Name, Expr::value(name.clone()))
         .col_expr(project::Column::ProdDomain, Expr::value(name))
         .col_expr(project::Column::Description, Expr::value(desc))
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;

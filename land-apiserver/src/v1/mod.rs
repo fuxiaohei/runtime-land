@@ -16,7 +16,10 @@ pub fn router() -> Result<Router> {
     Ok(Router::new()
         .route("/v1/token", post(tokens::create))
         .route("/v1/projects", get(projects::list))
-        .route("/v1/projects/:project_name", get(projects::single))
+        .route(
+            "/v1/projects/:project_name",
+            get(projects::single).post(projects::update_names),
+        )
         .route_layer(middleware::from_fn(clerk::middleware))
         .layer(cors))
 }

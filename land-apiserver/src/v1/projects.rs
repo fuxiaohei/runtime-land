@@ -3,7 +3,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use land_core_service::httputil::ServerJsonError;
-use land_core_service::vars::{PaginationVar, ProjectVar};
+use land_core_service::vars::{OkRespVar, PaginationVar, ProjectVar};
 use land_service::clerk::AuthUser;
 use tracing::debug;
 
@@ -64,4 +64,32 @@ pub async fn single(
         land_dao::projects::get_project_by_name_with_playground(project_name, user.id).await?;
     let project_var = ProjectVar::new(&p, py.as_ref()).await?;
     Ok(Json(project_var))
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct UpdateNamesForm {
+    pub name: String,
+    pub description: String,
+}
+
+/// update_names updates project names
+pub async fn update_names(
+    Extension(user): Extension<AuthUser>,
+    Path(project_name): Path<String>,
+    Json(f): Json<UpdateNamesForm>,
+) -> Result<impl IntoResponse, ServerJsonError> {
+    debug!(
+        "update project names: {:?}, old_name: {:?}",
+        f, project_name
+    );
+    let p = land_dao::projects::get_by_name(project_name, Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerJsonError(
+            StatusCode::NOT_FOUND,
+            anyhow::anyhow!("Project not found"),
+        ));
+    }
+    let p = p.unwrap();
+    land_dao::projects::update_name(p.id, f.name, f.description).await?;
+    Ok(Json(OkRespVar::new()))
 }

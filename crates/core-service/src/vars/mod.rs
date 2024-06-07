@@ -11,6 +11,17 @@ pub use envs::EnvVar;
 
 pub mod admin;
 
+#[derive(Debug, Default, Serialize)]
+pub struct OkRespVar {
+    pub ok: bool,
+}
+
+impl OkRespVar {
+    pub fn new() -> Self {
+        Self { ok: true }
+    }
+}
+
 /// PageVars is the common variables for all pages
 #[derive(Debug, Default, Serialize)]
 pub struct PageVars {
