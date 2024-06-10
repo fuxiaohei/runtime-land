@@ -93,3 +93,21 @@ pub async fn update_names(
     land_dao::projects::update_name(p.id, f.name, f.description).await?;
     Ok(Json(OkRespVar::new()))
 }
+
+/// delete deletes a project
+pub async fn delete(
+    Extension(user): Extension<AuthUser>,
+    Path(project_name): Path<String>,
+) -> Result<impl IntoResponse, ServerJsonError> {
+    debug!("delete project: {}", project_name);
+    let p = land_dao::projects::get_by_name(project_name, Some(user.id)).await?;
+    if p.is_none() {
+        return Err(ServerJsonError(
+            StatusCode::NOT_FOUND,
+            anyhow::anyhow!("Project not found"),
+        ));
+    }
+    let p = p.unwrap();
+    land_dao::projects::delete(p.id, p.name).await?;
+    Ok(Json(OkRespVar::new()))
+}

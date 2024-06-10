@@ -27,6 +27,7 @@ pub struct ProjectVar {
     pub deploy_status: String,
     pub status: String,
     pub traffic: Option<TrafficSummary>,
+    pub domain_suffix: String,
 }
 
 impl ProjectVar {
@@ -43,6 +44,7 @@ impl ProjectVar {
                 user_email: String::new(),
                 user_nickname: String::new(),
                 user_id: p.user_id,
+                domain_suffix: domain.clone(),
                 prod_domain: p.prod_domain.clone(),
                 prod_domain_full: format!("{}.{}", p.prod_domain, domain),
                 prod_domain_url: format!("{}://{}.{}", protocol, p.prod_domain, domain),
@@ -74,6 +76,7 @@ impl ProjectVar {
             user_email: String::new(),
             user_nickname: String::new(),
             user_id: project.user_id,
+            domain_suffix: domain.clone(),
             prod_domain: project.prod_domain.clone(),
             prod_domain_full: format!("{}.{}", project.prod_domain, domain),
             prod_domain_url: format!("{}://{}.{}", protocol, project.prod_domain, domain),

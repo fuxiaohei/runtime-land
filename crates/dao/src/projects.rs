@@ -247,6 +247,18 @@ pub async fn delete(id: i32, name: String) -> Result<()> {
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;
+
+    // make deployment deleted
+    deployment::Entity::update_many()
+        .col_expr(
+            deployment::Column::Status,
+            Expr::value(DeploymentStatus::Deleted.to_string()),
+        )
+        .filter(deployment::Column::ProjectId.eq(id))
+        .filter(deployment::Column::Status.ne(DeploymentStatus::Outdated.to_string()))
+        .exec(db)
+        .await?;
+    
     Ok(())
 }
 
