@@ -21,5 +21,5 @@ serde_yaml = { workspace = true }
 sysinfo = "0.30.12"
 tokio = { workspace = true }
 tracing = { workspace = true }
-url = "2.5.0"
+url = "2.5.1"
 walkdir = { workspace = true }

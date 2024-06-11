@@ -22,6 +22,6 @@ serde_json = { workspace = true }
 strum = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }
-toml = "0.8.13"
+toml = "0.8.14"
 tracing = { workspace = true }
 walkdir = { workspace = true }
