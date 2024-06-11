@@ -244,6 +244,7 @@ pub async fn delete(id: i32, name: String) -> Result<()> {
             Expr::value(ProjectStatus::Deleted.to_string()),
         )
         .col_expr(project::Column::Name, Expr::value(rename))
+        .col_expr(project::Column::DeletedAt, Expr::value(now_time()))
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;
@@ -254,8 +255,8 @@ pub async fn delete(id: i32, name: String) -> Result<()> {
             deployment::Column::Status,
             Expr::value(DeploymentStatus::Deleted.to_string()),
         )
+        .col_expr(deployment::Column::DeletedAt, Expr::value(now_time()))
         .filter(deployment::Column::ProjectId.eq(id))
-        .filter(deployment::Column::Status.ne(DeploymentStatus::Outdated.to_string()))
         .exec(db)
         .await?;
     
