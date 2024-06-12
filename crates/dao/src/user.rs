@@ -56,6 +56,19 @@ pub async fn get_token_by_id(id: i32) -> Result<Option<user_token::Model>> {
     Ok(token)
 }
 
+/// get_token_by_name gets an active token by name
+pub async fn get_token_by_name(name: &str, user_id: i32) -> Result<Option<user_token::Model>> {
+    let db = DB.get().unwrap();
+    let token = user_token::Entity::find()
+        .filter(user_token::Column::Name.eq(name))
+        .filter(user_token::Column::UserId.eq(user_id))
+        .filter(user_token::Column::Status.eq(TokenStatus::Active.to_string()))
+        .one(db)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))?;
+    Ok(token)
+}
+
 /// is_token_expired checks if a token is expired
 pub async fn is_token_expired(token: &user_token::Model) -> bool {
     let now = chrono::Utc::now().naive_utc();

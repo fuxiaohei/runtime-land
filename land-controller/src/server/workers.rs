@@ -42,6 +42,7 @@ pub async fn index(
             value: token.value,
             is_new: true,
             updated_at: token.updated_at.and_utc(),
+            created_at: token.created_at.and_utc(),
         });
     }
 

@@ -14,7 +14,13 @@ pub fn router() -> Result<Router> {
         .allow_origin(Any);
 
     Ok(Router::new()
-        .route("/v1/token", post(tokens::create))
+        .route("/v1/session", post(tokens::create_session))
+        .route(
+            "/v1/tokens",
+            get(tokens::list)
+                .post(tokens::create)
+                .delete(tokens::delete),
+        )
         .route("/v1/projects", get(projects::list))
         .route(
             "/v1/projects/:project_name",

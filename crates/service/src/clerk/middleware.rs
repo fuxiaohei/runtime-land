@@ -20,7 +20,8 @@ pub async fn middleware(mut request: Request, next: Next) -> Result<Response, St
     let path = uri.path();
 
     // skip static assets auth
-    if path.starts_with("/v1/token") {
+    // skip session auth api, because it will create session without auth
+    if path.starts_with("/v1/session") {
         // debug!("auth skip path: {}", path);
         return Ok(next.run(request).await);
     }
