@@ -4,17 +4,20 @@ edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
 [workspace]
-members = ["land-cli", "land-server", "land-worker", "lib/common"]
+members = ["land-cli", "land-server", "land-worker", "lib/common", "lib/dao"]
 default-members = ["land-cli"]
 resolver = "2"
 
 [workspace.dependencies]
 # internal dependencies
 land-common = { path = "lib/common" }
+land-dao = { path = "lib/dao" }
 # third-party dependencies
 anyhow = "1.0.86"
 axum = "0.7.5"
+chrono = "0.4.38"
 clap = { version = "4.5.9", features = ["derive", "env"] }
+once_cell = "1.19.0"
 rust-embed = { version = "8.5.0", features = [
     "include-exclude",
     "compression",

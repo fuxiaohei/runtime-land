@@ -1,1 +1,29 @@
-<h1>this is template file</h1>
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        <aside id="sidebar" class="d-flex flex-column flex-shrink-0 border-end">
+            <div class="brand d-flex align-items-center p-3 border-bottom" id="logo-brand">logo</div>
+            <div id="account-nav" class="flex-column mb-auto">account-nav</div>
+            <div id="resource-nav">resource-nav</div>
+        </aside>
+        <main id="main" class="w-100">
+            <div id="top-nav" class="border-bottom d-flex justify-content-between align-items-center p-3">
+                <div class="left">left</div>
+                <div class="right">right</div>
+            </div>
+            <div id="main-container" class="overflow-y-auto p-3">
+                main-container
+            </div>
+            {{> parts/footer.hbs}}
+        </main>
+    </div>
+    {{> parts/js.hbs}}
+</body>
+
+</html>

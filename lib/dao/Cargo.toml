@@ -1,0 +1,19 @@
+[package]
+name = "land-dao"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+once_cell = { workspace = true }
+sea-orm = { version = "0.12.15", default-features = false, features = [
+    "with-chrono",
+    "with-json",
+    "runtime-tokio-rustls",
+    "sqlx-postgres",
+] }
+sea-orm-migration = "0.12.15"
+tracing = { workspace = true }

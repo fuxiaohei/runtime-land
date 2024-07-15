@@ -27,9 +27,9 @@ struct Args {
     /// Template directory
     #[clap(long)]
     tpldir: Option<String>,
-    // Database connection args.
-    // #[clap(flatten)]
-    // dbargs: land_dao::DBArgs,
+    /// Database connection args.
+    #[clap(flatten)]
+    dbargs: land_dao::DBArgs,
 }
 
 #[tokio::main]
@@ -42,6 +42,9 @@ async fn main() -> anyhow::Result<()> {
 
     // Initialize tracing
     logging::init(args.output.verbose);
+
+    // Connect to database
+    land_dao::connect(&args.dbargs).await?;
 
     // Start server
     server::start(args.address.parse()?, "./assets", args.tpldir).await?;
