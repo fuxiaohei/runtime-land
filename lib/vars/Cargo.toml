@@ -1,0 +1,10 @@
+[package]
+name = "land-vars"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+land-common = { workspace = true }
+serde = { workspace = true }
+strum = { workspace = true }

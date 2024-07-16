@@ -7,16 +7,9 @@
 
 <body>
     <div id="root">
-        <aside id="sidebar" class="d-flex flex-column flex-shrink-0 border-end">
-            <div class="brand d-flex align-items-center p-3 border-bottom" id="logo-brand">logo</div>
-            <div id="account-nav" class="flex-column mb-auto">account-nav</div>
-            <div id="resource-nav">resource-nav</div>
-        </aside>
+        {{> parts/sidebar.hbs}}
         <main id="main" class="w-100">
-            <div id="top-nav" class="border-bottom d-flex justify-content-between align-items-center p-3">
-                <div class="left">left</div>
-                <div class="right">right</div>
-            </div>
+            {{> parts/top-nav.hbs}}
             <div id="main-container" class="overflow-y-auto p-3">
                 main-container
             </div>

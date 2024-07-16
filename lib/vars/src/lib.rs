@@ -1,0 +1,31 @@
+use breadcrumb::{handle_nav_active, BreadCrumb};
+use land_common::version;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use user::AuthUser;
+
+mod breadcrumb;
+pub use breadcrumb::BreadCrumbKey;
+
+mod user;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Page {
+    pub title: String,
+    pub nav_active: HashMap<String, String>,
+    pub breadcrumb: Vec<BreadCrumb>,
+    pub user: Option<AuthUser>,
+    pub version: String,
+}
+
+impl Page {
+    pub fn new(title: &str, breadcrumb: BreadCrumbKey, user: Option<AuthUser>) -> Self {
+        Page {
+            title: title.to_string(),
+            nav_active: handle_nav_active(&breadcrumb),
+            breadcrumb: BreadCrumb::new(&breadcrumb),
+            user,
+            version: version::short(),
+        }
+    }
+}

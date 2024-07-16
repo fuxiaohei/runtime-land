@@ -5,6 +5,15 @@ body {
     font-family: Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+.vertical-center {
+    display: flex;
+    align-items: center;
+}
+
+.cl-card {
+    box-shadow: none !important;
+    border: 1px solid #dbdcde
+}
 
 #root {
     height: 100vh;
@@ -16,6 +25,26 @@ body {
 }
 
 #sidebar {
-    width: 230px;
+    width: 220px;
     background-color: #f9fdfe;
+}
+
+#logo-brand,
+#top-nav {
+    height: 60px;
+}
+
+a.link-reset {
+    text-decoration: none;
+    color: inherit !important;
+}
+
+#account-nav .nav-link:hover,
+#resource-nav .nav-link:hover {
+    background-color: #e2e4e5;
+}
+
+#account-nav .nav-link.active {
+    background-color: #d4e9f4 !important;
+    color: #3459e6;
 }

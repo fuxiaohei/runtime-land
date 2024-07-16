@@ -14,6 +14,11 @@ fn build_long() -> String {
     )
 }
 
+/// short version of the binary
+pub fn short() -> String {
+    build_short()
+}
+
 /// print the version of the binary
 pub fn print(binary: &str, verbose: bool) {
     if verbose {

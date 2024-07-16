@@ -1,0 +1,11 @@
+[package]
+name = "land-core"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+once_cell = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }

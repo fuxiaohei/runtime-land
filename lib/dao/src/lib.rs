@@ -2,8 +2,12 @@ use anyhow::Result;
 use clap::Args;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm_migration::MigratorTrait;
 use std::time::Duration;
 use tracing::{debug, info};
+
+mod migration;
+pub mod models;
 
 #[derive(Args)]
 pub struct DBArgs {
@@ -82,7 +86,7 @@ pub async fn connect(args: &DBArgs) -> Result<()> {
     let db = Database::connect(opt).await?;
 
     // run migrations
-    // migration::Migrator::up(&db, None).await?;
+    migration::Migrator::up(&db, None).await?;
 
     DB.set(db).unwrap();
     info!("DB Init success: {}", args.url_safe());

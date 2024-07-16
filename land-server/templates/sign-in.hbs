@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="signin-container" class="container p-4" style="width: 600px;">
+        <h3 class="text-center">
+            <img src="/static/img/logo-v2.png" alt="logo" width="48" height="48"
+                class="rounded border p-1 bg-white me-2">
+            Sign In - Runtime.land
+        </h3>
+        <p class="desc text-center text-body-secondary">Distributed, scalable, and secure runtime for your project</p>
+        <div class="mx-auto my-4" style="width: 440px;">
+            <div id="sign-loading" class="text-center my-5">
+                <div class="spinner-grow" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div id="sign-in"></div>
+        </div>
+        {{> parts/footer.hbs}}
+        <script async crossorigin="anonymous" data-clerk-publishable-key="{{clerk.publishable_key}}"
+            src="{{clerk.js_src}}" type="text/javascript"></script>
+        <script>
+            window.addEventListener("load", async function () {
+                await Clerk.load();
+                if (Clerk.user) {
+                    window.location.href = "/sign-callback"; // Redirect to the callback page to generate runtime-land-session cookie
+                } else {
+                    const signLoadingDiv = document.getElementById("sign-loading");
+                    signLoadingDiv.style.display = "none";
+                    const signInDiv = document.getElementById("sign-in");
+                    Clerk.mountSignIn(signInDiv);
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

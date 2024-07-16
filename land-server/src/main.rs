@@ -1,5 +1,6 @@
 use clap::Parser;
 use land_common::{logging, version};
+use land_core::clerk;
 
 mod admin;
 mod dash;
@@ -22,7 +23,7 @@ struct Args {
     #[clap(flatten)]
     output: logging::TraceArgs,
     /// Address to listen on.
-    #[clap(long, default_value("0.0.0.0:8840"))]
+    #[clap(long, default_value("0.0.0.0:9840"))]
     address: String,
     /// Template directory
     #[clap(long)]
@@ -45,6 +46,9 @@ async fn main() -> anyhow::Result<()> {
 
     // Connect to database
     land_dao::connect(&args.dbargs).await?;
+
+    // Clerk env initialize
+    clerk::init()?;
 
     // Start server
     server::start(args.address.parse()?, "./assets", args.tpldir).await?;
