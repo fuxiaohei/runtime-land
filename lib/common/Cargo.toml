@@ -7,6 +7,7 @@ authors = { workspace = true }
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
+hostname = "0.4.0"
 md5 = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }

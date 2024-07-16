@@ -16,6 +16,7 @@ members = [
     "lib/vars",
     "lib/wasm-gen",
     "lib/wasm-host",
+    "lib/wasm-server",
 ]
 default-members = ["land-cli"]
 resolver = "2"
@@ -29,6 +30,7 @@ land-vars = { path = "lib/vars" }
 land-sdk-macro = { path = "lib/sdk-macro" }
 land-wasm-gen = { path = "lib/wasm-gen" }
 land-wasm-host = { path = "lib/wasm-host" }
+land-wasm-server = { path = "lib/wasm-server" }
 # third-party dependencies
 anyhow = "1.0.86"
 async-trait = "0.1.81"
