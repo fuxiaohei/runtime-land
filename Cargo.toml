@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.5.0-alpha.5"
+version = "0.5.0-alpha.7"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
@@ -11,7 +11,11 @@ members = [
     "lib/common",
     "lib/core",
     "lib/dao",
+    "lib/sdk",
+    "lib/sdk-macro",
     "lib/vars",
+    "lib/wasm-gen",
+    "lib/wasm-host",
 ]
 default-members = ["land-cli"]
 resolver = "2"
@@ -22,12 +26,17 @@ land-common = { path = "lib/common" }
 land-core = { path = "lib/core" }
 land-dao = { path = "lib/dao" }
 land-vars = { path = "lib/vars" }
+land-sdk-macro = { path = "lib/sdk-macro" }
+land-wasm-gen = { path = "lib/wasm-gen" }
+land-wasm-host = { path = "lib/wasm-host" }
 # third-party dependencies
 anyhow = "1.0.86"
 async-trait = "0.1.81"
 axum = "0.7.5"
 chrono = "0.4.38"
 clap = { version = "4.5.9", features = ["derive", "env"] }
+http = "1.1.0"
+lazy_static = "1.5.0"
 md5 = "0.7.0"
 once_cell = "1.19.0"
 rand = "0.8.5"
