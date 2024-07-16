@@ -15,6 +15,7 @@ use tower_http::services::ServeDir;
 
 mod auth;
 mod middle;
+mod projects;
 
 /// redirect returns a redirect response
 fn redirect(url: &str) -> impl IntoResponse {
@@ -50,6 +51,10 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/sign-in", get(auth::sign_in))
         .route("/sign-callback", get(auth::callback))
         .route("/sign-out", get(auth::sign_out))
+        .route("/projects", get(projects::index))
+        .route("/projects/:name", get(projects::single))
+        .route("/new", get(projects::new))
+        .route("/new/:name", get(projects::handle_new))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::auth))
         .route_layer(middleware::from_fn(middle::logger))
@@ -68,7 +73,7 @@ impl Clone for ServerError {
 
 impl ServerError {
     /// status_code creates a new `ServerError` with the given status code and message.
-    pub fn _status_code(code: StatusCode, msg: &str) -> Self {
+    pub fn status_code(code: StatusCode, msg: &str) -> Self {
         Self(code, anyhow!(msg.to_string()))
     }
 }

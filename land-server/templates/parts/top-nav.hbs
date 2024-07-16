@@ -7,6 +7,9 @@
         <li class="breadcrumb-item active">{{title}}</li>
         {{/if}}
         {{/each}}
+        {{#if project_name}}
+        <li class="breadcrumb-item active">{{project_name}}</li>
+        {{/if}}
     </ol>
     <div class="d-flex align-items-center justify-content-between">
         <div id="user-dropdown" class="dropdown mx-3">

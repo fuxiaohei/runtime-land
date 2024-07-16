@@ -7,10 +7,14 @@ use std::time::Duration;
 use tracing::{debug, info, instrument};
 
 mod migration;
+
+pub mod deploys;
 pub mod models;
+pub mod projects;
 pub mod settings;
 pub mod tokens;
 pub mod users;
+pub mod playground;
 
 #[derive(Args)]
 pub struct DBArgs {

@@ -10,8 +10,41 @@
         {{> parts/sidebar.hbs}}
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
-            <div id="main-container" class="overflow-y-auto p-3">
-                main-container
+            <div id="main-container" class="overflow-y-auto">
+                <div id="projects-overview" class="p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1 fw-medium fs-5">Recently updated projects</p>
+                            <p class="mb-0 text-body-tertiary">Projects that have been recently updated.</p>
+                        </div>
+                        <a href="/new" class="link-reset">
+                            <button class="btn btn-dark vertical-center">
+                                <i class='bx bx-plus me-2'></i>New Projects
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <hr class="my-0">
+                <div id="projects-traffic" class="p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-1 fw-medium fs-5">Global Traffic</p>
+                            <p class="mb-0 text-body-tertiary">Aggregate traffic data for your account.</p>
+                        </div>
+                        <div class="dropdown">
+                            <button
+                                class="btn btn-sm btn-secondary dropdown-toggle text-body-secondary custom-theme-btn"
+                                data-bs-toggle="dropdown" id="traffic-period-btn" type="button">Last 24 Hours
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item traffic-period-select" href="#">Last 24
+                                        Hours</a></li>
+                                <li><a class="dropdown-item traffic-period-select" href="#">Last 7
+                                        Days</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             {{> parts/footer.hbs}}
         </main>

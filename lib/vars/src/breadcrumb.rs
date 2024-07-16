@@ -14,6 +14,24 @@ impl BreadCrumb {
                 title: "Dashboard".to_string(),
                 link: None,
             }],
+            BreadCrumbKey::Projects => vec![BreadCrumb {
+                title: "Projects".to_string(),
+                link: None,
+            }],
+            BreadCrumbKey::ProjectNew => vec![
+                BreadCrumb {
+                    title: "Projects".to_string(),
+                    link: Some("/projects".to_string()),
+                },
+                BreadCrumb {
+                    title: "New".to_string(),
+                    link: None,
+                },
+            ],
+            BreadCrumbKey::ProjectSingle => vec![BreadCrumb {
+                title: "Projects".to_string(),
+                link: Some("/projects".to_string()),
+            }],
             BreadCrumbKey::SignIn => vec![],
         }
     }
@@ -30,5 +48,8 @@ pub fn handle_nav_active(breadcrumb: &BreadCrumbKey) -> HashMap<String, String> 
 #[strum(serialize_all = "lowercase")]
 pub enum BreadCrumbKey {
     Home,
+    Projects,
+    ProjectNew,
+    ProjectSingle,
     SignIn,
 }

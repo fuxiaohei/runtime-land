@@ -47,11 +47,18 @@ a.link-reset {
 }
 
 #account-nav .nav-link:hover,
-#resource-nav .nav-link:hover {
+#resource-nav .nav-link:hover,
+#project-nav .nav-link:hover {
     background-color: #e2e4e5;
 }
 
-#account-nav .nav-link.active {
+#account-nav .nav-link.active,
+#project-nav .nav-link.active {
     background-color: #d4e9f4 !important;
     color: #3459e6;
+}
+
+.project-item:hover {
+    border-color: #ccc !important;
+    box-shadow: .5rem #ccc;
 }
