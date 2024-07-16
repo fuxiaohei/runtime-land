@@ -2,12 +2,12 @@ use breadcrumb::{handle_nav_active, BreadCrumb};
 use land_common::version;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use user::AuthUser;
 
 mod breadcrumb;
 pub use breadcrumb::BreadCrumbKey;
 
 mod user;
+pub use user::AuthUser;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Page {

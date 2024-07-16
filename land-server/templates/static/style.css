@@ -15,6 +15,13 @@ body {
     border: 1px solid #dbdcde
 }
 
+.btn.btn-reset {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
 #root {
     height: 100vh;
     max-height: 100vh;

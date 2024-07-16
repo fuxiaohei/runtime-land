@@ -4,10 +4,13 @@ use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
 use std::time::Duration;
-use tracing::{debug, info};
+use tracing::{debug, info, instrument};
 
 mod migration;
 pub mod models;
+pub mod settings;
+pub mod tokens;
+pub mod users;
 
 #[derive(Args)]
 pub struct DBArgs {
@@ -71,8 +74,9 @@ impl std::fmt::Debug for DBArgs {
 pub static DB: OnceCell<DatabaseConnection> = OnceCell::new();
 
 /// connect connects to the database.
+#[instrument("[DB]", skip_all)]
 pub async fn connect(args: &DBArgs) -> Result<()> {
-    debug!("DB Connecting: {}", args.url_safe());
+    debug!("Connecting: {}", args.url_safe());
 
     let mut opt = ConnectOptions::new(args.url());
     opt.max_connections(args.pool_size)
@@ -89,7 +93,7 @@ pub async fn connect(args: &DBArgs) -> Result<()> {
     migration::Migrator::up(&db, None).await?;
 
     DB.set(db).unwrap();
-    info!("DB Init success: {}", args.url_safe());
+    info!("Init success: {}", args.url_safe());
 
     // check installed
     /*
@@ -103,7 +107,7 @@ pub async fn connect(args: &DBArgs) -> Result<()> {
     Ok(())
 }
 
-fn _now_time() -> chrono::NaiveDateTime {
+fn now_time() -> chrono::NaiveDateTime {
     chrono::Utc::now().naive_utc()
 }
 

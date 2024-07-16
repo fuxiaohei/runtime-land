@@ -6,6 +6,10 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+land-dao = { workspace = true }
 once_cell = { workspace = true }
 serde = { workspace = true }
 tracing = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+jsonwebtoken = "9.3.0"

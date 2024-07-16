@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.5.0-alpha.4"
+version = "0.5.0-alpha.5"
 edition = "2021"
 authors = ["fuxiaohei <fudong0797@gmail.com>"]
 
@@ -28,7 +28,14 @@ async-trait = "0.1.81"
 axum = "0.7.5"
 chrono = "0.4.38"
 clap = { version = "4.5.9", features = ["derive", "env"] }
+md5 = "0.7.0"
 once_cell = "1.19.0"
+rand = "0.8.5"
+reqwest = { version = "0.12.5", default-features = false, features = [
+    "stream",
+    "rustls-tls",
+    "json",
+] }
 rust-embed = { version = "8.5.0", features = [
     "include-exclude",
     "compression",
@@ -50,4 +57,5 @@ tracing-subscriber = { version = "0.3.18", features = [
     "local-time",
     "env-filter",
 ] }
+uuid = { version = "1.10.0", features = ["v4"] }
 walkdir = "2.5.0"

@@ -1,8 +1,9 @@
+use anyhow::Result;
 use axum_template::engine::Engine as AxumTemplateEngine;
 use handlebars::Handlebars;
 use rust_embed::RustEmbed;
 use std::{fs, path::PathBuf};
-use tracing::debug;
+use tracing::{debug, instrument};
 
 #[derive(RustEmbed)]
 #[folder = "./templates"]
@@ -18,7 +19,7 @@ pub struct Assets;
 
 /// new_handlebar creates a new handlebars instance with templates extracted to the static directory,
 /// or load from the tpldir directory.
-pub fn new_handlebar(dir: &str, tpl_dir: Option<String>) -> anyhow::Result<Handlebars<'static>> {
+pub fn new_handlebar(dir: &str, tpl_dir: Option<String>) -> Result<Handlebars<'static>> {
     if let Some(tpl_dir) = tpl_dir {
         return init_handlebars(&tpl_dir);
     }
@@ -26,7 +27,8 @@ pub fn new_handlebar(dir: &str, tpl_dir: Option<String>) -> anyhow::Result<Handl
     init_handlebars(dir)
 }
 
-fn init_handlebars(dir: &str) -> anyhow::Result<Handlebars<'static>> {
+#[instrument("[TPL]")]
+fn init_handlebars(dir: &str) -> Result<Handlebars<'static>> {
     let mut hbs = Handlebars::new();
     hbs.set_dev_mode(true);
 
@@ -45,14 +47,14 @@ fn init_handlebars(dir: &str) -> anyhow::Result<Handlebars<'static>> {
         let tpl_name = path.strip_prefix(dir).unwrap().to_str().unwrap();
         // convert windows path slash to unix
         let tpl_name = tpl_name.replace('\\', "/");
-        debug!(name = tpl_name, "Register template");
+        debug!(name = tpl_name, "Register");
         hbs.register_template_file(&tpl_name, path)?;
     }
     Ok(hbs)
 }
 
 /// extract extracts all assets to the statis directory.
-fn extract(dir: &str) -> anyhow::Result<()> {
+fn extract(dir: &str) -> Result<()> {
     Assets::iter().for_each(|file| {
         let filepath = file.to_string();
 

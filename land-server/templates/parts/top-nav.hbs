@@ -8,5 +8,37 @@
         {{/if}}
         {{/each}}
     </ol>
-    <div class="right">right</div>
+    <div class="d-flex align-items-center justify-content-between">
+        <div id="user-dropdown" class="dropdown mx-3">
+            <button class="btn btn-reset dropdown-toggle vertical-center text-body-secondary px-0"
+                data-bs-toggle="dropdown">
+                <i class='bx bxs-user-circle me-2'></i>{{page.user.name}}
+            </button>
+            <ul class="dropdown-menu">
+                <div class="text-center my-2">
+                    <img src="{{page.user.avatar_url}}" alt="user-avatar" width="96" height="96" class="rounded">
+                    <h6 class="my-3">{{page.user.name}}</h6>
+                    {{#if page.user.social_name}}
+                    <p class="mb-3 small">
+                        <a href="{{page.user.social_link}}" class="link-reset" target="_blank">
+                            <i class='bx bxl-{{page.user.social_provider}} me-1'></i>{{page.user.social_name}}
+                        </a>
+                    </p>
+                    {{/if}}
+                </div>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item vertical-center" href="/settings"><i
+                            class='bx bxs-cog me-2'></i>Settings</a></li>
+                <li><a class="dropdown-item vertical-center" href="/sign-out"><i
+                            class='bx bx-log-out-circle me-2'></i>Sign Out</a></li>
+            </ul>
+        </div>
+        <div id="theme-switcher" class="border-start">
+            <button class="text-body-secondary border-0 bg-transparent mx-3 p-0">
+                <i class='bx bxs-moon fs-6'></i>
+            </button>
+        </div>
+    </div>
 </div>

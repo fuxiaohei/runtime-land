@@ -6,5 +6,6 @@ authors = { workspace = true }
 
 [dependencies]
 land-common = { workspace = true }
+land-dao = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }

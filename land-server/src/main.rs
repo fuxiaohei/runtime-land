@@ -48,7 +48,7 @@ async fn main() -> anyhow::Result<()> {
     land_dao::connect(&args.dbargs).await?;
 
     // Clerk env initialize
-    clerk::init()?;
+    clerk::init().await?;
 
     // Start server
     server::start(args.address.parse()?, "./assets", args.tpldir).await?;
