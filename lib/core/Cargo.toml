@@ -10,6 +10,8 @@ jsonwebtoken = "9.3.0"
 land-dao = { workspace = true }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
+rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+toml = "0.8.14"
 tracing = { workspace = true }

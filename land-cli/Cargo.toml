@@ -5,3 +5,12 @@ edition = { workspace = true }
 authors = { workspace = true }
 
 [dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+color-print = "0.3.6"
+inquire = "0.7.5"
+land-common = { workspace = true }
+land-core = { workspace = true }
+regex = "1.10.5"
+tokio = { workspace = true }
+tracing = { workspace = true }
