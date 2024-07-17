@@ -4,7 +4,7 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension};
 use axum_template::RenderHtml;
 use land_core::examples::{self, Item};
 use land_dao::projects;
-use land_vars::{AuthUser, BreadCrumbKey, Page};
+use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
 use tracing::info;
 
@@ -16,12 +16,15 @@ pub async fn index(
     #[derive(Serialize)]
     struct Vars {
         pub page: Page,
+        pub projects: Vec<Project>,
     }
+    let projects_data = land_dao::projects::list(Some(user.id), None, 1, 50).await?;
     Ok(RenderHtml(
         "projects.hbs",
         engine,
         Vars {
             page: Page::new("Projects", BreadCrumbKey::Projects, Some(user)),
+            projects: Project::new_from_models(projects_data).await?,
         },
     ))
 }

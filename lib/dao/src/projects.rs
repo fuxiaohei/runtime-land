@@ -6,7 +6,10 @@ use crate::{
 use anyhow::Result;
 use rand::Rng;
 use random_word::Lang;
-use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter,
+    QueryOrder,
+};
 use tracing::info;
 
 #[derive(strum::Display, strum::EnumString, Clone)]
@@ -120,4 +123,27 @@ async fn create_internal(
     let db = DB.get().unwrap();
     let project = project_active_model.insert(db).await?;
     Ok(project)
+}
+
+/// list lists all projects with optional user_id, optional name and pagination
+pub async fn list(
+    user_id: Option<i32>,
+    search: Option<String>,
+    page: u64,
+    page_size: u64,
+) -> Result<Vec<project::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find()
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .order_by_desc(project::Column::UpdatedAt);
+    if let Some(user_id) = user_id {
+        select = select.filter(project::Column::OwnerId.eq(user_id));
+    }
+    if let Some(search) = search {
+        let search = format!("%{}%", search);
+        select = select.filter(project::Column::Name.like(search));
+    }
+    let pager = select.paginate(db, page_size);
+    let projects = pager.fetch_page(page - 1).await?;
+    Ok(projects)
 }

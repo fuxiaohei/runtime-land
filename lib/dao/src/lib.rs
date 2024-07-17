@@ -3,6 +3,7 @@ use clap::Args;
 use once_cell::sync::OnceCell;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use sea_orm_migration::MigratorTrait;
+use settings::init_defaults;
 use std::time::Duration;
 use tracing::{debug, info, instrument};
 
@@ -10,11 +11,11 @@ mod migration;
 
 pub mod deploys;
 pub mod models;
+pub mod playground;
 pub mod projects;
 pub mod settings;
 pub mod tokens;
 pub mod users;
-pub mod playground;
 
 #[derive(Args)]
 pub struct DBArgs {
@@ -99,14 +100,8 @@ pub async fn connect(args: &DBArgs) -> Result<()> {
     DB.set(db).unwrap();
     info!("Init success: {}", args.url_safe());
 
-    // check installed
-    /*
-    if settings::check_installed().await? {
-        info!("Already installed");
-        settings::load_defaults().await?;
-    } else {
-        warn!("Not installed");
-    }*/
+    // initialize settings
+    init_defaults().await?;
 
     Ok(())
 }

@@ -9,7 +9,7 @@ use axum::{
     Extension, Router,
 };
 use axum_template::RenderHtml;
-use land_vars::{AuthUser, BreadCrumbKey, Page};
+use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
 use tower_http::services::ServeDir;
 
@@ -26,18 +26,24 @@ fn redirect(url: &str) -> impl IntoResponse {
         .unwrap()
 }
 
-async fn handler(Extension(user): Extension<AuthUser>, engine: Engine) -> impl IntoResponse {
+async fn handler(
+    Extension(user): Extension<AuthUser>,
+    engine: Engine,
+) -> Result<impl IntoResponse, ServerError> {
     #[derive(Serialize)]
     struct Vars {
         pub page: Page,
+        pub projects: Vec<Project>,
     }
-    RenderHtml(
+    let projects_data = land_dao::projects::list(Some(user.id), None, 1, 5).await?;
+    Ok(RenderHtml(
         "index.hbs",
         engine,
         Vars {
             page: Page::new("Dashboard", BreadCrumbKey::Home, Some(user)),
+            projects: Project::new_from_models(projects_data).await?,
         },
-    )
+    ))
 }
 
 pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> {

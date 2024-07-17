@@ -9,6 +9,9 @@ pub use breadcrumb::BreadCrumbKey;
 mod user;
 pub use user::AuthUser;
 
+mod project;
+pub use project::Project;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Page {
     pub title: String,

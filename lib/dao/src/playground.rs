@@ -5,7 +5,7 @@ use crate::{
     DB,
 };
 use anyhow::Result;
-use sea_orm::{ActiveModelTrait, IntoActiveModel};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder};
 pub type Status = projects::Status;
 
 #[derive(strum::Display)]
@@ -44,5 +44,17 @@ pub async fn create(
     let mut active_model = p.into_active_model();
     active_model.id = Default::default();
     let p = active_model.insert(DB.get().unwrap()).await?;
+    Ok(p)
+}
+
+/// get_by_project gets a playground by project
+pub async fn get_by_project(project_id: i32) -> Result<Option<playground::Model>> {
+    let db = DB.get().unwrap();
+    let p = playground::Entity::find()
+        .filter(playground::Column::ProjectId.eq(project_id))
+        .filter(playground::Column::Status.eq(Status::Active.to_string()))
+        .order_by_desc(playground::Column::Id)
+        .one(db)
+        .await?;
     Ok(p)
 }

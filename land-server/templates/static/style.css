@@ -5,7 +5,8 @@ body {
     font-family: Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.vertical-center {
+.vertical-center,
+.y-center {
     display: flex;
     align-items: center;
 }
@@ -46,6 +47,10 @@ a.link-reset {
     color: inherit !important;
 }
 
+a.link-hover:hover {
+    text-decoration: underline;
+}
+
 #account-nav .nav-link:hover,
 #resource-nav .nav-link:hover,
 #project-nav .nav-link:hover {
@@ -61,4 +66,22 @@ a.link-reset {
 .project-item:hover {
     border-color: #ccc !important;
     box-shadow: .5rem #ccc;
+}
+
+.project-item.project-item-new {
+    border-style: dashed !important;
+}
+
+.project-item .lang-logo img {
+    width: 48px;
+    height: 48px;
+}
+
+#projects-table .lang-logo img {
+    width: 40px;
+    height: 40px;
+}
+
+#projects-table tr:last-child td {
+    border-bottom: none;
 }

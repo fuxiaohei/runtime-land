@@ -10,8 +10,59 @@
         {{> parts/sidebar.hbs}}
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
-            <div id="projects-container" class="overflow-y-auto">
-                projects
+            <div id="projects-container" class="overflow-y-auto p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1 fw-medium fs-5">All Projects</p>
+                        <p class="mb-0 text-body-tertiary">All projects that you have created.</p>
+                    </div>
+                    <a href="/new" class="link-reset">
+                        <button class="btn btn-dark vertical-center">
+                            <i class='bx bx-plus me-2'></i>New Projects
+                        </button>
+                    </a>
+                </div>
+                <table id="projects-table" class="table shadow-none bg-transparent my-3">
+                    <thead>
+                        <tr>
+                            <th scope="col"><span class="y-center">Name<i class='bx bx-sort ms-2'
+                                        role="button"></i></span></th>
+                            <th scope="col">Lang</th>
+                            <th scope="col">Deployment URL</th>
+                            <th scope="col" class="y-center">Requests / Bandwidth<i class='bx bx-info-circle ms-2'
+                                    data-bs-toggle="tooltip" data-bs-title="Latest 24 Hours"></i></th>
+                            <th scope="col"><span class="y-center">Updated<i class='bx bx-sort ms-2'
+                                        role="button"></i></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each projects}}
+                        <tr>
+                            <td>
+                                <p class="mb-1 fw-semibold fs-6">
+                                    <a href="/projects/{{name}}" class="link-reset link-hover">{{name}}</a>
+                                </p>
+                                <p class="mb-0 text-body-tertiary small text-uppercase fw-normal">Edit with
+                                    {{created_by}}</p>
+                            </td>
+                            <td class="lang-logo">
+                                <img src="/static/img/js-logo.svg" class="me-2 {{language}}-svg" alt="{{language}}">
+                            </td>
+                            <td>
+                                {{#if prod_domain_url}}
+                                <a href="{{prod_domain_url}}" target="_blank"
+                                    class="link-reset y-center link-hover"><span
+                                        class="link">{{prod_domain_full}}</span><i
+                                        class='bx bx-link-external ms-2'></i></a></i>
+                                {{/if}}
+                            </td>
+                            <td></td>
+                            <td><span class="time-ago" data-x-timeago="{{updated_at}}"></span></td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
             </div>
             {{> parts/footer.hbs}}
         </main>
