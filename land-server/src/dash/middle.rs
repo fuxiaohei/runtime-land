@@ -1,7 +1,7 @@
 use super::ServerError;
 use crate::dash::redirect;
 use axum::{
-    extract::{ConnectInfo, Request},
+    extract::{ConnectInfo, OriginalUri, Request},
     http::{HeaderValue, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
@@ -77,8 +77,12 @@ pub async fn auth(mut request: Request, next: Next) -> Result<Response, StatusCo
 
 #[instrument("[HTTP]", skip_all)]
 pub async fn logger(request: Request, next: Next) -> Result<Response, StatusCode> {
-    let uri = request.uri().clone();
-    let path = uri.path();
+    let path = if let Some(path) = request.extensions().get::<OriginalUri>() {
+        // This will include nested routes
+        path.0.path().to_owned()
+    } else {
+        request.uri().path().to_owned()
+    };
     if path.starts_with("/static") {
         // ignore static assets log
         return Ok(next.run(request).await);

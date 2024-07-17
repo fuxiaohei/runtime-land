@@ -99,7 +99,8 @@ a.link-hover:hover {
 
 #account-nav .nav-link:hover,
 #resource-nav .nav-link:hover,
-#project-nav .nav-link:hover {
+#project-nav .nav-link:hover,
+#admin-nav .nav-link:hover {
     background-color: #e2e4e5;
 }
 
@@ -107,6 +108,11 @@ a.link-hover:hover {
 #project-nav .nav-link.active {
     background-color: #d4e9f4 !important;
     color: #3459e6;
+}
+
+#admin-nav .nav-link.active{
+    background-color: #f8d7da !important;
+    color: #b22b38;
 }
 
 #user-dropdown .admin:hover {

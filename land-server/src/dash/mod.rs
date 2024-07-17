@@ -14,12 +14,12 @@ use serde::Serialize;
 use tower_http::services::ServeDir;
 
 mod auth;
-mod middle;
+pub mod middle;
 mod projects;
 mod settings;
 
 /// redirect returns a redirect response
-fn redirect(url: &str) -> impl IntoResponse {
+pub fn redirect(url: &str) -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::FOUND)
         .header("Location", url)
