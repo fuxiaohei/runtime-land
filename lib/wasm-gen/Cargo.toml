@@ -8,6 +8,6 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
 which = "6.0.1"
-wit-bindgen-core = "0.27.0"
-wit-bindgen-rust = "0.27.0"
-wit-component = "0.213.0"
+wit-bindgen-core = "0.28.0"
+wit-bindgen-rust = "0.28.0"
+wit-component = "0.214.0"

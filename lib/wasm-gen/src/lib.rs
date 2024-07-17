@@ -1,11 +1,14 @@
 use anyhow::{anyhow, Result};
-use tracing::debug;
-use wit_component::ComponentEncoder;
 use std::{
-    collections::HashMap, io::Write, path::{Path, PathBuf}, process::{Command, Stdio}
+    collections::HashMap,
+    io::Write,
+    path::{Path, PathBuf},
+    process::{Command, Stdio},
 };
+use tracing::debug;
 use wit_bindgen_core::{wit_parser::Resolve, Files, WorldGenerator};
-use wit_bindgen_rust::{Opts, WithGeneration};
+use wit_bindgen_rust::Opts;
+use wit_component::ComponentEncoder;
 
 // GuestGeneratorType is the type of the guest generator.
 pub enum GuestGeneratorType {
@@ -15,15 +18,13 @@ pub enum GuestGeneratorType {
 impl GuestGeneratorType {
     /// create a new guest generator
     fn create(&self) -> Result<Box<dyn WorldGenerator>> {
-        let mut with = WithGeneration::default();
-        with.generate_by_default = true;
         match self {
             GuestGeneratorType::Rust => {
                 let opts = Opts {
                     // exports,
                     format: true,
+                    generate_all: true,
                     pub_export_macro: true,
-                    with,
                     ..Default::default()
                 };
                 let builder = opts.build();
