@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        {{> parts/aside.hbs}}
+        <main id="main" class="d-flex flex-column flex-fill">
+            {{> parts/topnav.hbs}}
+            <div id="not-found-container" class="m-3 w-50">
+                <div class="message p-3">
+                    {{msg}}
+                </div>
+            </div>
+        </main>
+    </div>
+    {{> parts/footer.hbs}}
+</body>
+
+</html>

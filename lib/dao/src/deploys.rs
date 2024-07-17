@@ -1,5 +1,3 @@
-
-
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum Status {

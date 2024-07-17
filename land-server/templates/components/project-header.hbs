@@ -1,0 +1,23 @@
+<div id="project-header" class="p-3 y-center justify-content-between">
+    <div class="y-center">
+        <div class="lang-logo">
+            <img src="/static/img/js-logo.svg" class="me-2" alt="">
+        </div>
+        <div>
+            <p class="mb-1 fw-medium fs-5">{{project.name}}</p>
+            <p class="mb-0 text-body-tertiary">{{project.description}}</p>
+        </div>
+    </div>
+    <div class="btns">
+        <button class="btn btn-success">
+            <a href="{{project.prod_domain_url}}" class="y-center link-reset" target="_blank"><i
+                    class='bx bx-globe me-2'></i>View</a>
+        </button>
+        {{#if project.is_editable}}
+        <button class="ms-3 btn btn-dark">
+            <a href="/projects/{{project.name}}/edit" class="y-center link-reset"><i
+                    class='bx bxs-edit me-2'></i>Edit</a>
+        </button>
+        {{/if}}
+    </div>
+</div>

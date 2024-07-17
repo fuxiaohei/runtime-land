@@ -7,8 +7,7 @@ use anyhow::Result;
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter,
-    QueryOrder,
+    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder
 };
 use tracing::info;
 
@@ -146,4 +145,31 @@ pub async fn list(
     let pager = select.paginate(db, page_size);
     let projects = pager.fetch_page(page - 1).await?;
     Ok(projects)
+}
+
+/// get_by_name gets a project by name
+pub async fn get_by_name(name: &str, user_id: Option<i32>) -> Result<Option<project::Model>> {
+    let db = DB.get().unwrap();
+    let mut select = project::Entity::find()
+        .filter(project::Column::Name.eq(name))
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()));
+    if let Some(user_id) = user_id {
+        select = select.filter(project::Column::OwnerId.eq(user_id));
+    }
+    let project = select.one(db).await?;
+    Ok(project)
+}
+
+/// update_names updates a project name
+pub async fn update_names(id: i32, name: &str, desc: &str) -> Result<()> {
+    let db = DB.get().unwrap();
+    project::Entity::update_many()
+        .col_expr(project::Column::Name, Expr::value(name))
+        .col_expr(project::Column::ProdDomain, Expr::value(name))
+        .col_expr(project::Column::Description, Expr::value(desc))
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(project::Column::Id.eq(id))
+        .exec(db)
+        .await?;
+    Ok(())
 }

@@ -5,7 +5,9 @@ use crate::{
     DB,
 };
 use anyhow::Result;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder,
+};
 pub type Status = projects::Status;
 
 #[derive(strum::Display)]

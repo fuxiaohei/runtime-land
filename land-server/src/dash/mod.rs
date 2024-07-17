@@ -32,6 +32,27 @@ fn error_html(msg: &str) -> impl IntoResponse {
     Html(format!("<div class=\"err-message\">{}</div>", msg))
 }
 
+/// notfound_html returns a html response with not found page
+fn notfound_html(engine: Engine, msg: &str, user: AuthUser) -> impl IntoResponse {
+    #[derive(Debug, serde::Serialize)]
+    struct Vars {
+        pub page: Page,
+        pub msg: String,
+    }
+    (
+        StatusCode::NOT_FOUND,
+        RenderHtml(
+            "not-found.hbs",
+            engine,
+            Vars {
+                page: Page::new("Page Not Found", BreadCrumbKey::NotFound, Some(user)),
+                msg: msg.to_string(),
+            },
+        ),
+    )
+        .into_response()
+}
+
 async fn handler(
     Extension(user): Extension<AuthUser>,
     engine: Engine,
@@ -65,6 +86,11 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/sign-out", get(auth::sign_out))
         .route("/projects", get(projects::index))
         .route("/projects/:name", get(projects::single))
+        .route("/projects/:name/traffic", get(projects::traffic))
+        .route(
+            "/projects/:name/settings",
+            get(projects::settings).post(projects::handle_settings),
+        )
         .route("/new", get(projects::new))
         .route("/new/:name", get(projects::handle_new))
         .route("/settings", get(settings::index))

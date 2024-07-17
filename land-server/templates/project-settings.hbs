@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        {{> parts/sidebar.hbs}}
+        <main id="main" class="w-100">
+            {{> parts/top-nav.hbs}}
+            <div id="project-single-container" class="overflow-y-auto">
+                {{> components/project-header.hbs}}
+                <div id="project-settings" class="border-top d-flex p-3">
+                    <form class="container p-0" hx-swap="innerHTML settle:3s" hx-target="#projects-names-message"
+                        hx-post="/projects/{{project.name}}/settings">
+                        <div class="mb-3 w-50">
+                            <div class="input-group">
+                                <input name="name" type="text" class="form-control" value="{{project.prod_domain}}"
+                                    required>
+                                <span class="input-group-text">.{{domain}}</span>
+                            </div>
+                            <p class="form-text mb-0">The name of the project is used to create the access domain.</p>
+                        </div>
+                        <div class="mb-3">
+                            <input name="description" type="text" class="form-control" value="{{project.description}}"
+                                required />
+                            <p class="form-text mb-0">The description is used to describe the project.</p>
+                        </div>
+                        <div id="projects-names-message" class="hx-message mb-3 w-50"></div>
+                        <button class="btn btn-dark" type="submit">Save</button>
+                    </form>
+                </div>
+            </div>
+            {{> parts/footer.hbs}}
+        </main>
+    </div>
+    {{> parts/js.hbs}}
+</body>
+
+</html>
