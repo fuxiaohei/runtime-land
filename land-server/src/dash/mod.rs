@@ -4,8 +4,8 @@ use axum::{
     body::Body,
     http::StatusCode,
     middleware,
-    response::{IntoResponse, Response},
-    routing::get,
+    response::{Html, IntoResponse, Response},
+    routing::{get, post},
     Extension, Router,
 };
 use axum_template::RenderHtml;
@@ -16,6 +16,7 @@ use tower_http::services::ServeDir;
 mod auth;
 mod middle;
 mod projects;
+mod settings;
 
 /// redirect returns a redirect response
 fn redirect(url: &str) -> impl IntoResponse {
@@ -24,6 +25,11 @@ fn redirect(url: &str) -> impl IntoResponse {
         .header("Location", url)
         .body(Body::empty())
         .unwrap()
+}
+
+/// error_html returns a html response with error message
+fn error_html(msg: &str) -> impl IntoResponse {
+    Html(format!("<div class=\"err-message\">{}</div>", msg))
 }
 
 async fn handler(
@@ -61,6 +67,9 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/projects/:name", get(projects::single))
         .route("/new", get(projects::new))
         .route("/new/:name", get(projects::handle_new))
+        .route("/settings", get(settings::index))
+        .route("/settings/tokens/create", post(settings::create_token))
+        .route("/settings/tokens/remove", post(settings::remove_token))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::auth))
         .route_layer(middleware::from_fn(middle::logger))

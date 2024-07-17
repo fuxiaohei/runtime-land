@@ -8,6 +8,7 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 axum = { workspace = true }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
+axum-htmx = "0.6.0"
 axum-template = { version = "2.3.0", features = ["handlebars"] }
 chrono = { workspace = true }
 clap = { workspace = true }

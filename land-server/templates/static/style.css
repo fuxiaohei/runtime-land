@@ -23,6 +23,30 @@ body {
     box-shadow: none;
 }
 
+.hx-message {
+    display: none;
+}
+
+.hx-message.htmx-settling {
+    display: block;
+}
+
+.hx-message .err-message {
+    color: #b22b38;
+    background-color: #f8d7da;
+    border-color: #f68490;
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+}
+
+.hx-message .ok-message {
+    color: #008000;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+}
+
 #root {
     height: 100vh;
     max-height: 100vh;
@@ -61,6 +85,11 @@ a.link-hover:hover {
 #project-nav .nav-link.active {
     background-color: #d4e9f4 !important;
     color: #3459e6;
+}
+
+#user-dropdown .admin:hover {
+    background-color: rgb(var(--bs-danger-rgb));
+    color: white !important;
 }
 
 .project-item:hover {

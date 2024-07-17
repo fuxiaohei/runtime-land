@@ -34,6 +34,12 @@
                 </li>
                 <li><a class="dropdown-item vertical-center" href="/settings"><i
                             class='bx bxs-cog me-2'></i>Settings</a></li>
+                {{#if page.user.is_admin}}
+                <li>
+                    <a class="dropdown-item vertical-center admin text-danger" href="/admin"><i
+                            class='bx bx-shield-quarter me-2'></i>Admin</a>
+                </li>
+                {{/if}}
                 <li><a class="dropdown-item vertical-center" href="/sign-out"><i
                             class='bx bx-log-out-circle me-2'></i>Sign Out</a></li>
             </ul>

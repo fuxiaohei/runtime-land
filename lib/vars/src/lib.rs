@@ -12,6 +12,9 @@ pub use user::AuthUser;
 mod project;
 pub use project::Project;
 
+mod token;
+pub use token::Token;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Page {
     pub title: String,

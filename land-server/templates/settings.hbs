@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        {{> parts/sidebar.hbs}}
+        <main id="main" class="w-100">
+            {{> parts/top-nav.hbs}}
+            <div id="settings-container" class="overflow-y-auto">
+                <div id="settings-profile" class="y-center justify-content-between p-3">
+                    <div class="profile-title y-center justify-content-start">
+                        <img src="{{page.user.avatar_url}}" alt="user-avatar" width="80" height="80" class="rounded">
+                        <div class="title ms-3">
+                            <h5>{{page.user.name}}</h5>
+                            {{#if page.user.social_name}}
+                            <p class="mb-0">
+                                <a href="{{page.user.social_link}}"
+                                    class="v-center text-body-tertiary link-reset link-hover" target="_blank">
+                                    <i class='bx bxl-{{page.user.social_provider}} me-1'></i>{{page.user.social_name}}
+                                </a>
+                            </p>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="plan">
+                        <button class="btn btn-outline-dark" disabled>Free</button>
+                    </div>
+                </div>
+                <div id="settings-token" class="p-3 border-top">
+                    <div class="mb-3">
+                        <p class="mb-1 fw-medium fs-5">Access Tokens</p>
+                        <p class="mb-0 text-body-tertiary">Access tokens are used to authenticate with the API.</p>
+                    </div>
+                    {{> components/tokens-list.hbs}}
+                </div>
+            </div>
+            {{> parts/footer.hbs}}
+        </main>
+    </div>
+    {{> parts/js.hbs}}
+</body>
+
+</html>

@@ -10,3 +10,4 @@ land-common = { workspace = true }
 land-dao = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }
+chrono = { workspace = true }

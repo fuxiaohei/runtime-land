@@ -69,7 +69,7 @@ pub fn get() -> Vars {
 
 /// verify_session checks if the session is valid
 pub async fn verify_session(value: &str) -> Result<user_info::Model> {
-    let token = tokens::get_by_value(value, Some(tokens::TokenUsage::Session)).await?;
+    let token = tokens::get_by_value(value, Some(tokens::Usage::Session)).await?;
     if token.is_none() {
         return Err(anyhow!("Session not found"));
     }

@@ -68,8 +68,7 @@ pub(crate) async fn callback(jar: CookieJar) -> Result<impl IntoResponse, Server
     let user = user.unwrap();
     // create session token
     let token_name = format!("sess-{}-{}", user.id, chrono::Utc::now().timestamp());
-    let token =
-        tokens::create(user.id, &token_name, 3600 * 24, tokens::TokenUsage::Session).await?;
+    let token = tokens::create(user.id, &token_name, 3600 * 24, tokens::Usage::Session).await?;
 
     let mut session_cookie = Cookie::new("__runtime_land_session", token.value);
     session_cookie.set_max_age(Some(time::Duration::days(1)));
