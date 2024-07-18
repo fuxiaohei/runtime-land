@@ -110,7 +110,7 @@ a.link-hover:hover {
     color: #3459e6;
 }
 
-#admin-nav .nav-link.active{
+#admin-nav .nav-link.active {
     background-color: #f8d7da !important;
     color: #b22b38;
 }
@@ -139,7 +139,8 @@ a.link-hover:hover {
     height: 40px;
 }
 
-#projects-table tr:last-child td {
+#projects-table tr:last-child td,
+#workers-table tr:last-child td {
     border-bottom: none;
 }
 

@@ -1,7 +1,10 @@
 use std::str::FromStr;
 
 use super::{redirect, ServerError};
-use crate::{dash::{error_html, notfound_html}, templates::Engine};
+use crate::{
+    dash::{error_html, notfound_html},
+    templates::Engine,
+};
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Form};
 use axum_htmx::HxRedirect;
 use axum_template::RenderHtml;
@@ -182,7 +185,6 @@ pub async fn settings(
     )
     .into_response())
 }
-
 
 #[derive(serde::Deserialize, Debug)]
 pub struct SettingsForm {

@@ -28,7 +28,7 @@ pub fn redirect(url: &str) -> impl IntoResponse {
 }
 
 /// error_html returns a html response with error message
-fn error_html(msg: &str) -> impl IntoResponse {
+pub fn error_html(msg: &str) -> impl IntoResponse {
     Html(format!("<div class=\"err-message\">{}</div>", msg))
 }
 

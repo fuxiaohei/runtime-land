@@ -23,6 +23,17 @@ pub enum Status {
     Deleted,
 }
 
+/// is_expired checks if the token is expired
+pub fn is_expired(model: &user_token::Model) -> bool {
+    let now = now_time();
+    if let Some(expired_at) = model.expired_at {
+        if now > expired_at {
+            return true;
+        }
+    }
+    false
+}
+
 /// get_by_value gets an active token by value
 pub async fn get_by_value(value: &str, usage: Option<Usage>) -> Result<Option<user_token::Model>> {
     let db = DB.get().unwrap();
@@ -118,6 +129,18 @@ pub async fn set_expired(token_id: i32, name: &str) -> Result<()> {
         )
         .col_expr(user_token::Column::Name, Expr::value(name))
         .col_expr(user_token::Column::DeletedAt, Expr::value(now_time()))
+        .exec(db)
+        .await
+        .map_err(|e| anyhow!(e))?;
+    Ok(())
+}
+
+/// set_usage_at sets a token to expired
+pub async fn set_usage_at(id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    user_token::Entity::update_many()
+        .col_expr(user_token::Column::LatestUsedAt, Expr::value(now_time()))
+        .filter(user_token::Column::Id.eq(id))
         .exec(db)
         .await
         .map_err(|e| anyhow!(e))?;

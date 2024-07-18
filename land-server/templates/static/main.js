@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+    // bootstrap tooltip init
+    (() => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const _tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    })();
+
     // timeago change to human readable time
     (() => {
         let fn = function () {
@@ -23,6 +29,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 evt.detail.target.classList.remove("htmx-settling");
             }, 2000);
         });
-    })()
+    })();
 
+    // set copy clipboard
+    (() => {
+        var clipboard = new ClipboardJS('.btn-copy');
+        clipboard.on('success', function (e) {
+            const tooltip = bootstrap.Tooltip.getInstance(e.trigger);
+            tooltip.show();
+            setTimeout(() => {
+                tooltip.hide();
+            }, 1000);
+        });
+    })();
 })

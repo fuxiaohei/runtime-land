@@ -16,6 +16,7 @@ pub mod projects;
 pub mod settings;
 pub mod tokens;
 pub mod users;
+pub mod workers;
 
 #[derive(Args)]
 pub struct DBArgs {

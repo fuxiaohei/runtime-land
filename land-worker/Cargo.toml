@@ -8,6 +8,7 @@ authors = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 land-common = { workspace = true }
+land-core = { workspace = true }
 land-wasm-server = { workspace = true }
 tokio = { workspace = true }
 url = "2.5.2"

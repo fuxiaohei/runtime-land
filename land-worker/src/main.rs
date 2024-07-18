@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use land_common::{logging, version};
+use land_core::agent;
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
@@ -50,6 +51,10 @@ async fn main() -> Result<()> {
 
     // Initialize tracing
     logging::init(args.output.verbose);
+
+    // Initialize agent role
+    agent::init_ip(args.ip).await?;
+    agent::init_sync(args.server_url, args.token).await;
 
     // Start server
     let opts = land_wasm_server::Opts {

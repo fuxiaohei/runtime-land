@@ -19,6 +19,7 @@ land-dao = { workspace = true }
 land-vars = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
 time = { workspace = true }
 tokio = { workspace = true }
 tower-http = { workspace = true }

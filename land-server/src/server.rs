@@ -18,7 +18,8 @@ pub async fn start(addr: SocketAddr, assets_dir: &str, tpl_dir: Option<String>) 
     let app = Router::new()
         .merge(dash_routes)
         .nest("/worker-api", worker_api_routes)
-        .nest("/admin", admin_routes).fallback(handle_404);
+        .nest("/admin", admin_routes)
+        .fallback(handle_404);
     // with connect info
     let app = app.into_make_service_with_connect_info::<SocketAddr>();
 

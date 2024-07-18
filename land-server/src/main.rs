@@ -1,6 +1,6 @@
 use clap::Parser;
 use land_common::{logging, version};
-use land_core::clerk;
+use land_core::{agent, clerk};
 
 mod admin;
 mod dash;
@@ -49,6 +49,11 @@ async fn main() -> anyhow::Result<()> {
 
     // Clerk env initialize
     clerk::init().await?;
+
+    // Initialize background tasks
+    {
+        agent::init_livings().await;
+    }
 
     // Start server
     server::start(args.address.parse()?, "./assets", args.tpldir).await?;
