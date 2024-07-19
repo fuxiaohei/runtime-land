@@ -27,8 +27,8 @@ pub async fn index(
         pub workers: Vec<Worker>,
     }
     let token_values = tokens::list(None, Some(tokens::Usage::Worker)).await?;
-    let workers_value = workers::find_all().await?;
-    let workers = workers_value.values().map(Worker::new).collect();
+    let workers_value = workers::find_all(None).await?;
+    let workers = workers_value.iter().map(Worker::new).collect();
     Ok(RenderHtml(
         "admin/workers.hbs",
         engine,

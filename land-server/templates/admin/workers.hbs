@@ -32,7 +32,9 @@
                                     <td class="status-{{status}}">{{status}}</td>
                                     <td class="text-body-tertiary">
                                         Last Seen at
-                                        <span class="time-ago ms-1" data-x-timeago="{{last_seen_at}}"></span></span>
+                                        <span class="time-ago ms-1" data-bs-toggle="tooltip"
+                                            data-bs-title="{{last_seen_at}}"
+                                            data-x-timeago="{{last_seen_at}}"></span></span>
                                     </td>
                                 </tr>
                                 {{/each}}

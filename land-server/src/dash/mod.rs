@@ -32,6 +32,11 @@ pub fn error_html(msg: &str) -> impl IntoResponse {
     Html(format!("<div class=\"err-message\">{}</div>", msg))
 }
 
+/// ok_html returns a html response with ok message
+pub fn ok_html(msg: &str) -> impl IntoResponse {
+    Html(format!("<div class=\"ok-message\">{}</div>", msg))
+}
+
 /// notfound_html returns a html response with not found page
 fn notfound_html(engine: Engine, msg: &str, user: AuthUser) -> impl IntoResponse {
     #[derive(Debug, serde::Serialize)]

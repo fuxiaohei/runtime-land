@@ -46,11 +46,15 @@ pub async fn init_livings() {
 
 #[instrument("[AGT-LIVINGS]")]
 async fn refresh() -> Result<()> {
-    let workers = workers::find_all().await?;
+    let workers = workers::find_all(None).await?;
     let livings = LIVINGS.lock().await;
     let now = chrono::Utc::now().timestamp();
+
     let mut onlines = vec![];
-    for (_, worker) in workers.iter() {
+    let mut all_ips = vec![];
+    for worker in workers.iter() {
+        all_ips.push(worker.ip.clone());
+
         let living = livings.get(&worker.ip);
         // if not found in livings, check if worker last seen is older than 60 seconds
         if living.is_none() {
@@ -63,11 +67,11 @@ async fn refresh() -> Result<()> {
             continue;
         }
         // if found in livings, check if worker last seen is older than 60 seconds
-        if now - living.unwrap().last_seen > 60
-            && worker.status != workers::Status::Offline.to_string()
-        {
-            workers::set_offline(&worker.ip).await?;
-            info!(ip = &worker.ip, "Set offline by living expired");
+        if now - living.unwrap().last_seen > 60 {
+            if worker.status != workers::Status::Offline.to_string() {
+                workers::set_offline(&worker.ip).await?;
+                info!(ip = &worker.ip, "Set offline by living expired");
+            }
             continue;
         }
         onlines.push(worker.ip.clone());
@@ -77,16 +81,15 @@ async fn refresh() -> Result<()> {
     workers::set_onlines(onlines).await?;
 
     for (ip, v) in livings.iter() {
-        let worker = workers.get(ip);
-        if worker.is_none() {
-            // worker not found in livings, create new worker record
-            let ip_info = serde_json::to_string(&v.ip)?;
-            let hostname = v.ip.hostname.clone().unwrap_or("".to_string());
-            let region = format!("{}, {}, {}", v.ip.city, v.ip.region, v.ip.country);
-            let wk = workers::create(&v.ip.ip, "", &hostname, &region, &ip_info).await?;
-            info!(ip = ip, "Create new worker: {:?}", wk);
+        if all_ips.contains(&ip) {
             continue;
         }
+        // worker not found in livings, create new worker record
+        let ip_info = serde_json::to_string(&v.ip)?;
+        let hostname = v.ip.hostname.clone().unwrap_or("".to_string());
+        let region = format!("{}, {}, {}", v.ip.city, v.ip.region, v.ip.country);
+        let wk = workers::create(&v.ip.ip, "", &hostname, &region, &ip_info).await?;
+        info!(ip = ip, "Create new worker: {:?}", wk);
     }
 
     Ok(())

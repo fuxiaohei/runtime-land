@@ -41,7 +41,7 @@ impl BreadCrumb {
             }],
             BreadCrumbKey::Admin => vec![BreadCrumb {
                 title: "Admin".to_string(),
-                link: None,
+                link: Some("/admin".to_string()),
             }],
             BreadCrumbKey::AdminProjects => vec![
                 BreadCrumb {

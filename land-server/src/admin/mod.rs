@@ -49,7 +49,7 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/", get(handler))
         .route("/projects", get(projects::index))
         .route("/settings", get(settings::index))
-        .route("/storage", get(storage::index))
+        .route("/storage", get(storage::index).post(storage::update))
         .route("/workers", get(workers::index))
         .route("/workers/tokens/create", post(workers::create_token))
         .route("/workers/tokens/remove", post(workers::remove_token))

@@ -1,10 +1,9 @@
 use crate::{models::worker_node, now_time, DB};
 use anyhow::{anyhow, Result};
 use sea_orm::{
-    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, QueryFilter,
+    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, Order, QueryFilter,
     QueryOrder,
 };
-use std::collections::HashMap;
 
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
@@ -14,22 +13,24 @@ pub enum Status {
 }
 
 /// find_all returns all worker nodes
-pub async fn find_all() -> Result<HashMap<String, worker_node::Model>> {
+pub async fn find_all(status: Option<Status>) -> Result<Vec<worker_node::Model>> {
     let db = DB.get().unwrap();
-    let nodes = worker_node::Entity::find()
-        .order_by_asc(worker_node::Column::Ip)
+    let mut select = worker_node::Entity::find();
+    if let Some(status) = status {
+        select = select.filter(worker_node::Column::Status.eq(status.to_string()));
+    }
+    let nodes = select
+        .order_by(worker_node::Column::UpdatedAt, Order::Desc)
+        .order_by(worker_node::Column::Ip, Order::Asc)
         .all(db)
         .await
         .map_err(|e| anyhow!(e))?;
-    let mut map = HashMap::new();
-    for node in nodes {
-        map.insert(node.ip.clone(), node);
-    }
-    Ok(map)
+    Ok(nodes)
 }
 
 /// set_offline sets worker node offline
 pub async fn set_offline(ip: &str) -> Result<()> {
+    println!("set_offline: {}", ip);
     let db = DB.get().unwrap();
     worker_node::Entity::update_many()
         .col_expr(

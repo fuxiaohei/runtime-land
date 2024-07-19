@@ -12,6 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".time-ago").forEach((el) => {
                 let timestamp = parseInt(el.getAttribute("data-x-timeago")) * 1000;
                 let dt = new Date(timestamp);
+                if (el.getAttribute("data-bs-toggle") == "tooltip") {
+                    el.setAttribute("data-bs-title", dt.toLocaleString());
+                    new bootstrap.Tooltip(el);
+                }
                 el.innerText = timeago.format(dt, "en_US");
             });
         };

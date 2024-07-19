@@ -6,15 +6,23 @@ authors = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+chrono = { workspace = true }
 jsonwebtoken = "9.3.0"
-land-dao = { workspace = true }
 land-common = { workspace = true }
+land-dao = { workspace = true }
+land-wasm-gen = { workspace = true }
+md5 = { workspace = true }
 once_cell = { workspace = true }
+opendal = { version = "0.47.3", default-features = false, features = [
+    "services-fs",
+    "services-s3",
+    "services-memory",
+] }
 reqwest = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tempfile = "3.10.1"
+tokio = { workspace = true }
 toml = "0.8.15"
 tracing = { workspace = true }
-tokio = { workspace = true }
-chrono= { workspace = true }

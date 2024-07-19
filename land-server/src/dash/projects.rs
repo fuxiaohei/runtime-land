@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use super::{redirect, ServerError};
 use crate::{
     dash::{error_html, notfound_html},
@@ -9,9 +7,10 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, F
 use axum_htmx::HxRedirect;
 use axum_template::RenderHtml;
 use land_core::examples::{self, Item};
-use land_dao::{projects, settings};
+use land_dao::{deploys, projects, settings};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
+use std::str::FromStr;
 use tracing::{info, warn};
 
 /// index is handler for projects index page, /projects
@@ -83,10 +82,20 @@ pub async fn handle_new(
         source.unwrap(),
     )
     .await?;
+    let dp = deploys::create(
+        user.id,
+        user.uuid,
+        project.id,
+        project.uuid,
+        project.prod_domain,
+        deploys::DeployType::Production,
+    )
+    .await?;
     info!(
         owner_id = user.id,
         project_name = project.name,
         playground_id = playground.id,
+        dp_id = dp.id,
         tpl_name = name,
         "Create new project",
     );

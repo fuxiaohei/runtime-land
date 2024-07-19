@@ -1,6 +1,6 @@
 use clap::Parser;
 use land_common::{logging, version};
-use land_core::{agent, clerk};
+use land_core::{agent, clerk, deployer, storage};
 
 mod admin;
 mod dash;
@@ -52,7 +52,15 @@ async fn main() -> anyhow::Result<()> {
 
     // Initialize background tasks
     {
+        // Initialize storage
+        storage::init_defaults().await?;
+        storage::load_storage().await?;
+
+        // Initialize living agent refreshing
         agent::init_livings().await;
+
+        // Initialize handling waiting and reviewing deployments
+        deployer::init_waiting().await;
     }
 
     // Start server

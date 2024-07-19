@@ -7,7 +7,8 @@ use anyhow::Result;
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
-    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder
+    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait,
+    QueryFilter, QueryOrder,
 };
 use tracing::info;
 
@@ -160,6 +161,17 @@ pub async fn get_by_name(name: &str, user_id: Option<i32>) -> Result<Option<proj
     Ok(project)
 }
 
+/// get_by_id gets a project by id
+pub async fn get_by_id(id: i32) -> Result<Option<project::Model>> {
+    let db = DB.get().unwrap();
+    let project = project::Entity::find()
+        .filter(project::Column::Id.eq(id))
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .one(db)
+        .await?;
+    Ok(project)
+}
+
 /// update_names updates a project name
 pub async fn update_names(id: i32, name: &str, desc: &str) -> Result<()> {
     let db = DB.get().unwrap();
@@ -168,6 +180,20 @@ pub async fn update_names(id: i32, name: &str, desc: &str) -> Result<()> {
         .col_expr(project::Column::ProdDomain, Expr::value(name))
         .col_expr(project::Column::Description, Expr::value(desc))
         .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(project::Column::Id.eq(id))
+        .exec(db)
+        .await?;
+    Ok(())
+}
+
+/// set_deploy_status sets a deploy status to a project
+pub async fn set_deploy_status(id: i32, status: deploys::Status) -> Result<()> {
+    let db = DB.get().unwrap();
+    project::Entity::update_many()
+        .col_expr(
+            project::Column::DeployStatus,
+            Expr::value(status.to_string()),
+        )
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;
