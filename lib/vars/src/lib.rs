@@ -18,6 +18,9 @@ pub use token::Token;
 mod worker;
 pub use worker::Worker;
 
+mod task;
+pub use task::Task;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Page {
     pub title: String,

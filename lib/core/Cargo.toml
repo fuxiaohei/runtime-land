@@ -10,7 +10,9 @@ chrono = { workspace = true }
 jsonwebtoken = "9.3.0"
 land-common = { workspace = true }
 land-dao = { workspace = true }
+land-vars = { workspace = true }
 land-wasm-gen = { workspace = true }
+lazy_static = { workspace = true }
 md5 = { workspace = true }
 once_cell = { workspace = true }
 opendal = { version = "0.47.3", default-features = false, features = [
@@ -22,6 +24,7 @@ reqwest = { workspace = true }
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = "0.9.33"
 tempfile = "3.10.1"
 tokio = { workspace = true }
 toml = "0.8.15"

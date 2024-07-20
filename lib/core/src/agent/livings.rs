@@ -81,7 +81,7 @@ async fn refresh() -> Result<()> {
     workers::set_onlines(onlines).await?;
 
     for (ip, v) in livings.iter() {
-        if all_ips.contains(&ip) {
+        if all_ips.contains(ip) {
             continue;
         }
         // worker not found in livings, create new worker record

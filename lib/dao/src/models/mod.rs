@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod deploy_task;
 pub mod deployment;
 pub mod playground;
 pub mod project;

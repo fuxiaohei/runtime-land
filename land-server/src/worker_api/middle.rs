@@ -60,5 +60,5 @@ pub async fn auth(request: Request, next: Next) -> Result<Response, StatusCode> 
             }
         }
     }
-    return Ok(next.run(request).await);
+    Ok(next.run(request).await)
 }

@@ -1,7 +1,10 @@
+use std::collections::HashMap;
+
 use crate::{models::storage, now_time, DB};
 use anyhow::Result;
 use sea_orm::{
     sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+    QueryOrder,
 };
 
 #[derive(strum::Display)]
@@ -62,4 +65,20 @@ pub async fn set_success(id: i32, target: Option<String>) -> Result<()> {
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// list_success_by_deploys list success storage by deploy ids
+pub async fn list_success_by_deploys(deploy_ids: Vec<i32>) -> Result<HashMap<i32, storage::Model>> {
+    let db = DB.get().unwrap();
+    let models = storage::Entity::find()
+        .filter(storage::Column::DeployId.is_in(deploy_ids))
+        .filter(storage::Column::Status.eq(Status::Success.to_string()))
+        .order_by_asc(storage::Column::Id)
+        .all(db)
+        .await?;
+    let mut map = HashMap::new();
+    for model in models {
+        map.insert(model.deploy_id, model);
+    }
+    Ok(map)
 }

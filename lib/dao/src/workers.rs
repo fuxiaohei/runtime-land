@@ -30,7 +30,6 @@ pub async fn find_all(status: Option<Status>) -> Result<Vec<worker_node::Model>>
 
 /// set_offline sets worker node offline
 pub async fn set_offline(ip: &str) -> Result<()> {
-    println!("set_offline: {}", ip);
     let db = DB.get().unwrap();
     worker_node::Entity::update_many()
         .col_expr(

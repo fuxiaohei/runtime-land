@@ -9,15 +9,16 @@ use tracing::{debug, info, instrument};
 
 mod migration;
 
+pub mod deploy_task;
 pub mod deploys;
 pub mod models;
 pub mod playground;
 pub mod projects;
 pub mod settings;
+pub mod store;
 pub mod tokens;
 pub mod users;
 pub mod workers;
-pub mod store;
 
 #[derive(Args)]
 pub struct DBArgs {

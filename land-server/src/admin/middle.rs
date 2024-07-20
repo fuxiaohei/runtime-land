@@ -18,5 +18,5 @@ pub async fn check_admin(request: Request, next: Next) -> Result<Response, Statu
         warn!("User {} is not admin", user.name);
         return Ok(crate::dash::redirect("/").into_response());
     }
-    return Ok(next.run(request).await);
+    Ok(next.run(request).await)
 }

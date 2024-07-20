@@ -54,7 +54,18 @@ async fn main() -> Result<()> {
 
     // Initialize agent role
     agent::init_ip(args.ip).await?;
-    agent::init_sync(args.server_url, args.token).await;
+    agent::init_sync(
+        args.server_url.clone(),
+        args.token.clone(),
+        args.dir.clone(),
+    )
+    .await;
+    agent::init_task(
+        args.server_url.clone(),
+        args.token.clone(),
+        args.dir.clone(),
+    )
+    .await;
 
     // Start server
     let opts = land_wasm_server::Opts {

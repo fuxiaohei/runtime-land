@@ -1,9 +1,8 @@
 use anyhow::Result;
 use axum::{
-    body::Body,
     http::StatusCode,
     middleware,
-    response::{Html, IntoResponse, Response},
+    response::{Html, IntoResponse},
     routing::{get, post},
     Json, Router,
 };
@@ -11,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 mod middle;
 mod sync;
+mod task;
 
 async fn handler() -> impl IntoResponse {
     Html("Hello World - Worker API !")
@@ -20,6 +20,7 @@ pub async fn route() -> Result<Router> {
     let app = Router::new()
         .route("/", get(handler))
         .route("/sync", post(sync::handle))
+        .route("/task", post(task::handle))
         .route_layer(middleware::from_fn(middle::auth));
     Ok(app)
 }
@@ -48,14 +49,6 @@ fn response_error(msg: String) -> impl IntoResponse {
         message: msg,
         data: (),
     })
-}
-
-/// response_failed returns a response with error message
-fn response_failed(status: StatusCode, msg: &str) -> impl IntoResponse {
-    Response::builder()
-        .status(status)
-        .body(Body::from(msg.to_string()))
-        .unwrap()
 }
 
 // Make our own error that wraps `anyhow::Error`.

@@ -1,8 +1,10 @@
+use crate::agent::Item;
 use anyhow::Result;
 use land_dao::{
+    deploy_task,
     deploys::{self, Status},
     models::deployment,
-    playground, projects, store, workers,
+    playground, projects, settings, store, workers,
 };
 use tracing::{debug, info, instrument, warn};
 
@@ -128,13 +130,40 @@ async fn handle_one(dp: &deployment::Model) -> Result<()> {
     debug!("Save file to storage end: {:?}", file_name);
     let target_url = crate::storage::build_url(&file_name).await?;
     debug!("Save file to storage url: {:?}", target_url);
-    store::set_success(storage_record.id, Some(target_url)).await?;
+    store::set_success(storage_record.id, Some(target_url.clone())).await?;
 
     // 10. create details task for each worker
     let workers_value = workers::find_all(Some(workers::Status::Online)).await?;
     if workers_value.is_empty() {
         warn!(dp_id = dp.id, "No worker online");
         return set_failed(dp.id, dp.project_id, "No worker online").await;
+    }
+
+    // 11. create conf values
+    let domain_settings = settings::get_domain_settings().await?;
+    let item = Item {
+        user_id: dp.owner_id,
+        project_id: dp.project_id,
+        deploy_id: dp.id,
+        task_id: dp.task_id.clone(),
+        file_name,
+        file_hash,
+        download_url: target_url,
+        domain: format!("{}.{}", dp.domain, domain_settings.domain_suffix),
+    };
+    let item_content = serde_json::to_string(&item)?;
+
+    // 12. create details task for each worker
+    for worker in workers_value.iter() {
+        let task = deploy_task::create(
+            dp,
+            deploy_task::TaskType::DeployWasmToWorker,
+            &item_content,
+            worker.id,
+            &worker.ip,
+        )
+        .await?;
+        debug!("Create task: {:?}", task);
     }
 
     Ok(())

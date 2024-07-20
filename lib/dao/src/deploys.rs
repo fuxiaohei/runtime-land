@@ -2,6 +2,7 @@ use crate::{models::deployment, now_time, DB};
 use anyhow::Result;
 use sea_orm::{
     sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+    QueryOrder, QuerySelect,
 };
 use serde::{Deserialize, Serialize};
 
@@ -110,4 +111,26 @@ pub async fn set_deploy_status(deploy_id: i32, status: Status, message: &str) ->
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// success_ids returns a list of success deployment ids
+pub async fn success_ids() -> Result<Vec<i32>> {
+    let db = DB.get().unwrap();
+    let models = deployment::Entity::find()
+        .column(deployment::Column::Id)
+        .filter(deployment::Column::DeployStatus.eq(Status::Success.to_string()))
+        .order_by_asc(deployment::Column::Id)
+        .all(db)
+        .await?;
+    Ok(models.iter().map(|model| model.id).collect())
+}
+
+/// list_by_ids returns a list of deployments by ids
+pub async fn list_by_ids(ids: Vec<i32>) -> Result<Vec<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let models = deployment::Entity::find()
+        .filter(deployment::Column::Id.is_in(ids))
+        .all(db)
+        .await?;
+    Ok(models)
 }

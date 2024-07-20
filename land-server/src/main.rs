@@ -58,6 +58,7 @@ async fn main() -> anyhow::Result<()> {
 
         // Initialize living agent refreshing
         agent::init_livings().await;
+        agent::init_confs().await;
 
         // Initialize handling waiting and reviewing deployments
         deployer::init_waiting().await;
