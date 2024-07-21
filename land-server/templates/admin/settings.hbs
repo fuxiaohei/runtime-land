@@ -11,8 +11,34 @@
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
             <div id="main-container" class="overflow-y-auto">
-                <div id="admin-dashboard" class="p-3">
-                    admin-settings
+                <div id="setting-domains-container" class="p-3">
+                    <div class="mb-3">
+                        <p class="mb-1 fw-medium fs-5">Domains</p>
+                        <p class="mb-0 text-body-tertiary">Set the domain suffix and http protocol that project
+                            generated URLs will use.</p>
+                    </div>
+                    <form hx-post="/admin/settings/domains" hx-swap="innerHTML settle:3s"
+                        hx-target="#settings-domain-message">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">example-domain.</span>
+                                    <input type="text" class="form-control" name="domain" value="example.com">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input name="protocol" class="form-check-input" type="checkbox" role="switch"
+                                        id="protocol-switch" value="https" checked>
+                                    <label class="form-check-label" for="protocol-switch">use HTTPS</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-start">
+                            <p id="settings-domain-message" class="hx-message"></p>
+                            <button class="btn btn-dark">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             {{> parts/footer.hbs}}

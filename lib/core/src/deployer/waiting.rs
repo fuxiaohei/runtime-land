@@ -37,7 +37,7 @@ async fn set_failed(dp_id: i32, project_id: i32, message: &str) -> Result<()> {
 async fn handle() -> Result<()> {
     let deploy_data = deploys::list_by_deploy_status(Status::Waiting).await?;
     if deploy_data.is_empty() {
-        debug!("No waiting");
+        // debug!("No waiting");
         return Ok(());
     }
     info!("Waitings: {}", deploy_data.len());
