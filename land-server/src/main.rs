@@ -45,16 +45,22 @@ async fn main() -> anyhow::Result<()> {
     logging::init(args.output.verbose);
 
     // Connect to database
-    land_dao::connect(&args.dbargs).await?;
+    land_dao::connect(&args.dbargs)
+        .await
+        .expect("Failed to connect to database");
 
     // Clerk env initialize
-    clerk::init().await?;
+    clerk::init().await.expect("Failed to initialize clerk env");
 
     // Initialize background tasks
     {
         // Initialize storage
-        storage::init_defaults().await?;
-        storage::load_storage().await?;
+        storage::init_defaults()
+            .await
+            .expect("Failed to initialize storage");
+        storage::load_storage()
+            .await
+            .expect("Failed to load storage");
 
         // Initialize living agent refreshing
         agent::init_livings().await;
@@ -65,7 +71,9 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Start server
-    server::start(args.address.parse()?, "./assets", args.tpldir).await?;
+    server::start(args.address.parse()?, "./assets", args.tpldir)
+        .await
+        .expect("Failed to start server");
 
     Ok(())
 }
