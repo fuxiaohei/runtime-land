@@ -64,9 +64,9 @@ pub async fn hash() -> Result<String> {
 /// new_operator load storage
 pub async fn new_operator() -> Result<Operator> {
     let settings = get().await?;
+    std::fs::create_dir_all(&settings.local_path)?;
     let abs_path = std::path::Path::new(&settings.local_path).canonicalize()?;
     debug!("fs storage path: {:?}", abs_path);
-    std::fs::create_dir_all(&abs_path)?;
     let mut builder = Fs::default();
     builder.root(abs_path.to_str().unwrap());
     let op: Operator = Operator::new(builder)?.finish();
