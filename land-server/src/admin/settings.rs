@@ -4,7 +4,7 @@ use crate::{
 };
 use axum::{response::IntoResponse, Extension, Form};
 use axum_template::RenderHtml;
-use land_dao::settings;
+use land_dao::settings::{self, DomainSettings};
 use land_vars::{AuthUser, BreadCrumbKey, Page};
 use serde::{Deserialize, Serialize};
 
@@ -16,13 +16,16 @@ pub async fn index(
     struct Vars {
         pub page: Page,
         pub nav_admin: bool,
+        pub domain_settings: DomainSettings,
     }
+    let domain_settings = settings::get_domain_settings().await?;
     Ok(RenderHtml(
         "admin/settings.hbs",
         engine,
         Vars {
             nav_admin: true,
             page: Page::new("Admin Settings", BreadCrumbKey::AdminSettings, Some(user)),
+            domain_settings,
         },
     ))
 }

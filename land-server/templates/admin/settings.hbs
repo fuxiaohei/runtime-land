@@ -23,13 +23,15 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text">example-domain.</span>
-                                    <input type="text" class="form-control" name="domain" value="example.com">
+                                    <input type="text" class="form-control" name="domain"
+                                        value="{{domain_settings.domain_suffix}}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
                                     <input name="protocol" class="form-check-input" type="checkbox" role="switch"
-                                        id="protocol-switch" value="https" checked>
+                                        id="protocol-switch" value="https" {{is_active
+                                        domain_settings.http_protocol "https" "checked" }}>
                                     <label class="form-check-label" for="protocol-switch">use HTTPS</label>
                                 </div>
                             </div>
