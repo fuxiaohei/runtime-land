@@ -1,11 +1,10 @@
+use super::UrlBuilder;
 use anyhow::Result;
-use land_dao::settings;
 use land_common::obj_hash;
+use land_dao::settings;
 use opendal::{services::Fs, Operator};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
-
-use super::UrlBuilder;
 
 static FS_SETTINGS: &str = "storage-fs";
 
@@ -18,7 +17,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            local_path: "./storage/wasm".to_string(),
+            local_path: "./data".to_string(),
             local_url: "/download/{name}".to_string(),
         }
     }
@@ -67,6 +66,7 @@ pub async fn new_operator() -> Result<Operator> {
     let settings = get().await?;
     let abs_path = std::path::Path::new(&settings.local_path).canonicalize()?;
     debug!("fs storage path: {:?}", abs_path);
+    std::fs::create_dir_all(&abs_path)?;
     let mut builder = Fs::default();
     builder.root(abs_path.to_str().unwrap());
     let op: Operator = Operator::new(builder)?.finish();
