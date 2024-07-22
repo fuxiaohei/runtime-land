@@ -3,7 +3,7 @@ use axum_template::engine::Engine as AxumTemplateEngine;
 use handlebars::Handlebars;
 use rust_embed::RustEmbed;
 use std::{fs, path::PathBuf};
-use tracing::{debug, instrument};
+use tracing::instrument;
 
 #[derive(RustEmbed)]
 #[folder = "./templates"]
@@ -47,7 +47,7 @@ fn init_handlebars(dir: &str) -> Result<Handlebars<'static>> {
         let tpl_name = path.strip_prefix(dir).unwrap().to_str().unwrap();
         // convert windows path slash to unix
         let tpl_name = tpl_name.replace('\\', "/");
-        debug!(name = tpl_name, "Register");
+        // debug!(name = tpl_name, "Register");
         hbs.register_template_file(&tpl_name, path)?;
     }
     Ok(hbs)

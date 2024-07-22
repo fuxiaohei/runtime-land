@@ -30,7 +30,14 @@ impl Vars {
         // read from env
         let publishable_key =
             std::env::var("CLERK_PUBLISHABLE_KEY").expect("CLERK_PUBLISHABLE_KEY must be set");
-        let js_src = std::env::var("CLERK_JS_SRC").expect("CLERK_JS_SRC must be set");
+        let mut js_src = std::env::var_os("CLERK_JS_SRC");
+        if js_src.is_none() {
+            js_src = std::env::var_os("CLERK_JAVASCRIPT_SRC");
+        }
+        if js_src.is_none() {
+            return Err(anyhow!("CLERK_JS_SRC or CLERK_JAVASCRIPT_SRC must be set"));
+        }
+        let js_src = js_src.unwrap().into_string().unwrap();
         let secret_key = std::env::var("CLERK_SECRET_KEY").expect("CLERK_SECRET_KEY must be set");
         Ok(Vars {
             publishable_key,
