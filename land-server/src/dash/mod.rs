@@ -67,7 +67,7 @@ async fn handler(
         pub page: Page,
         pub projects: Vec<Project>,
     }
-    let projects_data = land_dao::projects::list(Some(user.id), None, 1, 5).await?;
+    let (projects_data, _) = land_dao::projects::list(Some(user.id), None, 1, 5).await?;
     Ok(RenderHtml(
         "index.hbs",
         engine,
@@ -91,6 +91,7 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/sign-out", get(auth::sign_out))
         .route("/projects", get(projects::index))
         .route("/projects/:name", get(projects::single))
+        .route("/projects/:name/edit", get(projects::edit))
         .route("/projects/:name/traffic", get(projects::traffic))
         .route(
             "/projects/:name/settings",

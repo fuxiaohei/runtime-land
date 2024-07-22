@@ -13,6 +13,7 @@ enum Project {
     ProdDomain,
     Description,
     DeployStatus,
+    DeployMessage,
     Status,
     CreatedBy,
     CreatedAt,
@@ -60,6 +61,11 @@ async fn create_project_table(manager: &SchemaManager<'_>) -> Result<(), DbErr> 
                 .col(
                     ColumnDef::new(Project::DeployStatus)
                         .string_len(24)
+                        .not_null(),
+                )
+                .col(
+                    ColumnDef::new(Project::DeployMessage)
+                        .string_len(256)
                         .not_null(),
                 )
                 .col(ColumnDef::new(Project::Uuid).string_len(64).not_null())

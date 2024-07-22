@@ -23,6 +23,7 @@ pub struct Model {
     pub deleted_at: Option<DateTime>,
     #[sea_orm(column_type = "Text", nullable)]
     pub metadata: Option<String>,
+    pub deploy_message: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

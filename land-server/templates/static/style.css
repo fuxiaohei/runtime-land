@@ -134,7 +134,8 @@ a.link-hover:hover {
     height: 48px;
 }
 
-#projects-table .lang-logo img {
+#projects-table .lang-logo img,
+#projects-dashboard .lang-logo img {
     width: 40px;
     height: 40px;
 }
@@ -154,4 +155,13 @@ a.link-hover:hover {
     background-color: #f8d7da;
     border-color: #f68490;
     border-radius: .25rem;
+}
+
+#project-deploy-status-btn {
+    background-color: #c3c6c4;
+}
+
+#project-deploy-status-btn.status-failed {
+    background-color: #b22b38;
+    color: #e2e4e5;
 }

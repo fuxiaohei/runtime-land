@@ -29,13 +29,13 @@ pub async fn init_waiting() {
 /// set_failed sets the deploy status to failed
 async fn set_failed(dp_id: i32, project_id: i32, message: &str) -> Result<()> {
     deploys::set_deploy_status(dp_id, deploys::Status::Failed, message).await?;
-    projects::set_deploy_status(project_id, deploys::Status::Failed).await?;
+    projects::set_deploy_status(project_id, deploys::Status::Failed, message).await?;
     Ok(())
 }
 
 #[instrument("[DEPLOY-WAITING]")]
 async fn handle() -> Result<()> {
-    let deploy_data = deploys::list_by_deploy_status(Status::Waiting).await?;
+    let deploy_data = deploys::list_by_deploy_status(Status::WaitingDeploy).await?;
     if deploy_data.is_empty() {
         // debug!("No waiting");
         return Ok(());

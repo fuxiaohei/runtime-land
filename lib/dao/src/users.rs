@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::{models::user_info, now_time, DB};
 use anyhow::{anyhow, Result};
 use land_common::rand_string;
@@ -40,6 +41,21 @@ pub async fn get_by_oauth_id(oauth_id: &str) -> Result<Option<user_info::Model>>
         .await
         .map_err(|e| anyhow!(e))?;
     Ok(user)
+}
+
+/// find_by_ids returns a list of users by ids
+pub async fn find_by_ids(ids: Vec<i32>) -> Result<HashMap<i32, user_info::Model>> {
+    let db = DB.get().unwrap();
+    let users = user_info::Entity::find()
+        .filter(user_info::Column::Id.is_in(ids))
+        .all(db)
+        .await
+        .map_err(|e| anyhow!(e))?;
+    let mut map = HashMap::new();
+    for user in users {
+        map.insert(user.id, user);
+    }
+    Ok(map)
 }
 
 /// is_first checks if the system has the first user

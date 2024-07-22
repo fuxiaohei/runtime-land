@@ -23,7 +23,7 @@ pub async fn index(
         pub page: Page,
         pub projects: Vec<Project>,
     }
-    let projects_data = land_dao::projects::list(Some(user.id), None, 1, 50).await?;
+    let (projects_data, _) = land_dao::projects::list(Some(user.id), None, 1, 50).await?;
     Ok(RenderHtml(
         "projects.hbs",
         engine,
@@ -229,4 +229,34 @@ pub async fn handle_settings(
     let uri = axum::http::Uri::from_str(format!("/projects/{}/settings", f.name).as_str())?;
     let parts = HxRedirect(uri);
     Ok((parts, ()).into_response())
+}
+
+/// edit is handler for projects eidt page, /projects/:name/edit
+pub async fn edit(
+    engine: Engine,
+    Extension(user): Extension<AuthUser>,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(Serialize)]
+    struct Vars {
+        pub page: Page,
+        pub project_name: String,
+        pub project: Project,
+    }
+    let project = projects::get_by_name(&name, Some(user.id)).await?;
+    if project.is_none() {
+        let msg = format!("Project {} not found", name);
+        return Ok(notfound_html(engine, &msg, user).into_response());
+    }
+    let project = Project::new_with_source(&project.unwrap()).await?;
+    Ok(RenderHtml(
+        "project-edit.hbs",
+        engine,
+        Vars {
+            page: Page::new(&name, BreadCrumbKey::ProjectSingle, Some(user)),
+            project_name: name,
+            project,
+        },
+    )
+    .into_response())
 }

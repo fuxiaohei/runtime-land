@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum Status {
-    Waiting,
+    WaitingDeploy,
     Compiling, // if compilation is long time, we need mark it as compiling
     Uploading,
     Deploying,
@@ -73,7 +73,7 @@ pub async fn create(
         domain,
         spec: serde_json::to_value(&spec)?,
         deploy_type: deploy_type.to_string(),
-        deploy_status: Status::Waiting.to_string(),
+        deploy_status: Status::WaitingDeploy.to_string(),
         deploy_message: "Waiting to deploy".to_string(),
         status: DeploymentStatus::Active.to_string(),
         created_at: now,

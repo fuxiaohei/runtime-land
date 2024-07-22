@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        <div id="editor-container" class="border-end d-flex flex-column w-50" data-x-name="{{project.name}}">
+            <div id="editor-nav" style="height: 60px;" class="y-center justify-content-between border-bottom">
+                <div class="y-center">
+                    <div class="lang-logo">
+                        <img width="40" height="40" src="/static/img/js-logo.svg" class="ms-2 me-1 {{lang}}-svg"
+                            alt="{{lang}}">
+                    </div>
+                    <div class="name">
+                        <p class="fw-bold mb-0"><a href="/projects/{{project.name}}"
+                                class="text-reset">{{project.name}}</a></p>
+                        <p class="mb-0 text-body-tertiary small"> Updated<span class="time-ago ms-1"
+                                data-x-timeago="{{project.updated_at}}"></span></p>
+                    </div>
+                </div>
+                <div class="y-center justify-content-end">
+                    <div id="deploy-message"></div>
+                    <button id="save-btn" class="mx-3 btn btn-primary btn-sm text-uppercase">Save & Deploy</button>
+                </div>
+            </div>
+            <div id="editor-wrapper" class="p-2 mb-auto" style="height: calc(100vh - 14.5rem)">loading...</div>
+            <div id="log-wrapper" class="border-top p-2">
+                <h6 class="y-center"><i class='bx bx-file me-1'></i>Logs</h6>
+                <p class="text-body-tertiary">Comming soon...</p>
+            </div>
+            <pre class="d-none"><code id="code">{{project.source}}</code></pre>
+        </div>
+        <div id="preview-container" class="d-flex flex-column flex-fill">
+            <div id="preview-nav" style="height: 60px;" class="y-center border-bottom">
+                <div class="input-group mx-3">
+                    <input type="text" class="form-control py-1 shadow-none" value="{{project.prod_domain_url}}">
+                    <button class="btn btn-outline-secondary y-center" type="button"><i
+                            class='bx bx-refresh me-2'></i>Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> parts/js.hbs}}
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs/loader.js"></script>
+    <script type="text/javascript">
+        const projectName = document.getElementById("editor-container").getAttribute("data-x-name");
+        const projectEditSubmitUrl = "/projects/" + projectName + "/edit";
+
+        // init editor after document is loaded
+        function initEditor() {
+            require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs' } });
+            require(['vs/editor/editor.main'], function () {
+                let container = document.getElementById('editor-wrapper');
+                container.innerText = "";
+                let code = document.getElementById('code').textContent;
+                var editor = monaco.editor.create(container, {
+                    automaticLayout: true,
+                    value: code,
+                    language: 'javascript',
+                    scrollBeyondLastLine: false,
+                    scrollBeyondLastColumn: 0,
+                    scrollbar: {
+                        useShadows: false,
+                        vertical: 'hidden',
+                        horizontal: 'hidden',
+                    },
+                    minimap: { enabled: false },
+                    overviewRulerLanes: 0,
+                    fontSize: "14px",
+                    theme: "vs", //getPreferredTheme() === "dark" ? "vs-dark" : "vs",
+                });
+                const btn = document.getElementById("save-btn");
+                btn.addEventListener("click", async function (e) {
+                    let data = new URLSearchParams();
+                    data.append("source", editor.getValue());
+                    let resp = await fetch(projectEditSubmitUrl, {
+                        method: "POST",
+                        body: data,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        }
+                    });
+                    let messageElement = document.getElementById("deploy-message");
+                    let status = resp.status;
+                    if (status === 200) {
+                        let json = await resp.json();
+                        console.log(json);
+                        return;
+                    }
+                    messageElement.innerText = "Faild to save: " + status;
+                    messageElement.classList.add("text-danger");
+                })
+            });
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            initEditor();
+        });
+    </script>
+</body>
+
+</html>

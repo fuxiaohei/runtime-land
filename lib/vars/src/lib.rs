@@ -21,6 +21,9 @@ pub use worker::Worker;
 mod task;
 pub use task::Task;
 
+mod pagination;
+pub use pagination::{Pagination, PaginationItem};
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Page {
     pub title: String,

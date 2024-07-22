@@ -11,8 +11,61 @@
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
             <div id="main-container" class="overflow-y-auto">
-                <div id="admin-dashboard" class="p-3">
-                    admin-projects
+                <div id="projects-dashboard" class="p-3">
+                    <p class="mb-3">Manage all projects on your site.</p>
+                    <table class="table shadow-none bg-transparent mb-3">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Lang</th>
+                                <th scope="col">Owner</th>
+                                <th scope="col">Updated/Created</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">...</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each projects}}
+                            <tr>
+                                <th scope="row">{{id}}</th>
+                                <td>
+                                    <p class="mb-1 fw-bold">{{name}}</p>
+                                    <p class="mb-0 small text-body-tertiary text-uppercase">{{created_by}}</p>
+                                </td>
+                                <td class="lang-logo">
+                                    <img src="/static/img/js-logo.svg" class="me-2 {{language}}-svg" alt="{{language}}">
+                                </td>
+                                <td>
+                                    {{#if owner}}
+                                    {{owner.name}}
+                                    <span class="small text-body-tertiary ms-1">({{owner.email}})</span>
+                                    {{/if}}
+                                </td>
+                                <td class="small text-body-secondary">
+                                    <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{updated_at}}"
+                                        data-x-timeago="{{updated_at}}"></span> /
+                                    <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{created_at}}"
+                                        data-x-timeago="{{created_at}}"></span>
+                                </td>
+                                <td class="small text-uppercase status-{{deploy_status}}">{{deploy_status}}</td>
+                                <td>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="View Source"
+                                        class="link-reset me-1 d-inline-block"><i class='bx bx-file-find'></i></a>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy"
+                                        class="link-reset me-1 d-inline-block"><i class='bx bx-refresh'></i></a>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="Disable"
+                                        class="link-reset me-1 d-inline-block"><i class='bx bx-stop-circle'></i></a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                    <ul class="pagination pagination-sm mb-3">
+                        {{#each pagination.items}}
+                        <li class="page-item"><a class="page-link" href="{{link}}">{{page}}</a></li>
+                        {{/each}}
+                    </ul>
                 </div>
             </div>
             {{> parts/footer.hbs}}

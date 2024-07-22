@@ -9,10 +9,17 @@
         </div>
     </div>
     <div class="btns">
+        {{#if project.is_deploy_success}}
         <button class="btn btn-success">
             <a href="{{project.prod_domain_url}}" class="y-center link-reset" target="_blank"><i
                     class='bx bx-globe me-2'></i>View</a>
         </button>
+        {{else}}
+        <button id="project-deploy-status-btn" class="btn status-{{project.deploy_status}} text-uppercase"
+            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{project.deploy_message}}">
+            {{project.deploy_status}}
+        </button>
+        {{/if}}
         {{#if project.is_editable}}
         <button class="ms-3 btn btn-dark">
             <a href="/projects/{{project.name}}/edit" class="y-center link-reset"><i

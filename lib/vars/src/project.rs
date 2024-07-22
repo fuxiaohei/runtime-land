@@ -1,5 +1,6 @@
+use crate::AuthUser;
 use anyhow::{anyhow, Result};
-use land_dao::{models::project, playground, projects::CreatedBy, settings};
+use land_dao::{deploys, models::project, playground, projects::CreatedBy, settings};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -16,11 +17,16 @@ pub struct Project {
     pub description: String,
     pub language: String,
     pub created_by: String,
+    pub created_at: i64,
     pub updated_at: i64,
     pub status: String,
     pub deploy_status: String,
+    pub deploy_message: String,
+    pub is_deploy_success: bool,
     pub is_editable: bool,
     pub source: Option<String>,
+    pub owner_id: i32,
+    pub owner: Option<AuthUser>,
 }
 
 impl Project {
@@ -52,11 +58,16 @@ impl Project {
             description: project.description.clone(),
             language: project.language.clone(),
             created_by: project.created_by.clone(),
+            created_at: project.created_at.and_utc().timestamp(),
             updated_at: project.updated_at.and_utc().timestamp(),
             status: project.status.clone(),
             deploy_status: project.deploy_status.clone(),
+            deploy_message: project.deploy_message.clone(),
+            is_deploy_success: project.deploy_status == deploys::Status::Success.to_string(),
             is_editable: project.created_by == CreatedBy::Playground.to_string(),
             source: None,
+            owner_id: project.owner_id,
+            owner: None,
         })
     }
 

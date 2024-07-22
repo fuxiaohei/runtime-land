@@ -7,8 +7,8 @@ use anyhow::Result;
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
-    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, PaginatorTrait,
-    QueryFilter, QueryOrder,
+    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, ItemsAndPagesNumber,
+    PaginatorTrait, QueryFilter, QueryOrder,
 };
 use tracing::info;
 
@@ -104,7 +104,8 @@ async fn create_internal(
         name: name.clone(),
         language: language.to_string(),
         status: Status::Active.to_string(),
-        deploy_status: deploys::Status::Waiting.to_string(),
+        deploy_status: deploys::Status::WaitingDeploy.to_string(),
+        deploy_message: "Waiting to deploy".to_string(),
         uuid: uuid::Uuid::new_v4().to_string(),
         description: description.to_string(),
         dev_domain: String::new(),
@@ -131,7 +132,7 @@ pub async fn list(
     search: Option<String>,
     page: u64,
     page_size: u64,
-) -> Result<Vec<project::Model>> {
+) -> Result<(Vec<project::Model>, ItemsAndPagesNumber)> {
     let db = DB.get().unwrap();
     let mut select = project::Entity::find()
         .filter(project::Column::Status.ne(Status::Deleted.to_string()))
@@ -145,7 +146,8 @@ pub async fn list(
     }
     let pager = select.paginate(db, page_size);
     let projects = pager.fetch_page(page - 1).await?;
-    Ok(projects)
+    let pages = pager.num_items_and_pages().await?;
+    Ok((projects, pages))
 }
 
 /// get_by_name gets a project by name
@@ -187,13 +189,14 @@ pub async fn update_names(id: i32, name: &str, desc: &str) -> Result<()> {
 }
 
 /// set_deploy_status sets a deploy status to a project
-pub async fn set_deploy_status(id: i32, status: deploys::Status) -> Result<()> {
+pub async fn set_deploy_status(id: i32, status: deploys::Status, msg: &str) -> Result<()> {
     let db = DB.get().unwrap();
     project::Entity::update_many()
         .col_expr(
             project::Column::DeployStatus,
             Expr::value(status.to_string()),
         )
+        .col_expr(project::Column::DeployMessage, Expr::value(msg))
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;

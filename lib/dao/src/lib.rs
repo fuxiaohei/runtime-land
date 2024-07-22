@@ -115,3 +115,6 @@ fn now_time() -> chrono::NaiveDateTime {
 
 /// DateTimeUTC is a UTC time type, for easy to use in dao models
 pub type DateTimeUTC = chrono::DateTime<chrono::Utc>;
+
+/// ItemsAndPagesNumber re-expresent items and pages number from sea-orm
+pub use sea_orm::ItemsAndPagesNumber as ItemsAndPagesNumber;
