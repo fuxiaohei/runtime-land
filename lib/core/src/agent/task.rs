@@ -63,6 +63,7 @@ async fn request(addr: String, token: String, dir: String) -> Result<()> {
 
     let status_code = res.status().as_u16();
     if status_code == 204 {
+        tasks.clear();
         // debug!("no change");
         return Ok(());
     }
@@ -72,11 +73,17 @@ async fn request(addr: String, token: String, dir: String) -> Result<()> {
         return Err(anyhow!("Bad status:{}, Error:{}", status_code, content));
     }
     let resp: SyncResponse = res.json().await?;
-    debug!("sync response: {}, {}", resp.status, resp.message);
+    if resp.status != "ok" {
+        warn!("Bad response: {}", resp.message);
+        return Err(anyhow!("Bad response: {}", resp.message));
+    }
+    // debug!("sync response: {}, {}", resp.status, resp.message);
     if resp.data.is_empty() {
-        debug!("no task");
+        tasks.clear();
+        // debug!("no task");
         return Ok(());
     }
+    debug!("sync task: {:?}", resp.data);
 
     // remove not exist task in task-res from current task response
     let current_task_keys = resp

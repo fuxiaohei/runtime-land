@@ -1,9 +1,9 @@
 use crate::{
     deploys,
-    models::{playground, project},
-    now_time, DB,
+    models::{deployment, playground, project},
+    now_time, users, DB,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
@@ -104,7 +104,7 @@ async fn create_internal(
         name: name.clone(),
         language: language.to_string(),
         status: Status::Active.to_string(),
-        deploy_status: deploys::Status::WaitingDeploy.to_string(),
+        deploy_status: deploys::Status::WaitDeploy.to_string(),
         deploy_message: "Waiting to deploy".to_string(),
         uuid: uuid::Uuid::new_v4().to_string(),
         description: description.to_string(),
@@ -201,4 +201,66 @@ pub async fn set_deploy_status(id: i32, status: deploys::Status, msg: &str) -> R
         .exec(db)
         .await?;
     Ok(())
+}
+
+/// update_source updates a project source
+pub async fn update_source(id: i32, source: String) -> Result<deployment::Model> {
+    let project = get_by_id(id).await?;
+    if project.is_none() {
+        return Err(anyhow!("Project not found"));
+    }
+    let project = project.unwrap();
+    if project.created_by != CreatedBy::Playground.to_string() {
+        return Err(anyhow!("Only playground project can update source"));
+    }
+    let py = crate::playground::create(
+        project.owner_id,
+        project.id,
+        project.language.parse().unwrap(),
+        source,
+        false,
+    )
+    .await?;
+    info!(
+        owner_id = project.owner_id,
+        project_id = id,
+        project_name = project.name,
+        playground_id = py.id,
+        "Create new playground",
+    );
+
+    let user = users::get_by_id(project.owner_id, Some(users::UserStatus::Active)).await?;
+    if user.is_none() {
+        return Err(anyhow!("User not found or not active"));
+    }
+    let user = user.unwrap();
+
+    // create new deploy
+    let dp = deploys::create(
+        project.owner_id,
+        user.uuid,
+        id,
+        project.uuid,
+        project.prod_domain,
+        deploys::DeployType::Production,
+    )
+    .await?;
+
+    // update project status to deploying
+    set_deploy_status(
+        id,
+        deploys::Status::WaitDeploy,
+        "Waiting to deploy after playground update",
+    )
+    .await?;
+
+    info!(
+        owner_id = project.owner_id,
+        project_id = id,
+        project_name = project.name,
+        dp_id = dp.id,
+        "Create new deploy",
+    );
+
+    Ok(dp)
 }

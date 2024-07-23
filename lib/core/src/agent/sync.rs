@@ -38,7 +38,10 @@ async fn request(addr: String, token: String, dir: String) -> Result<()> {
     }
     let resp: SyncResponse = res.json().await?;
     let conf_file = format!("{}/confs.json", dir);
-    debug!("sync data: {}, {}", resp.status, resp.message);
+    if resp.status != "ok"{
+        return Err(anyhow!("sync error: {}", resp.message));
+    }
+    // debug!("sync data: {}, {}", resp.status, resp.message);
     // write resp to file
     std::fs::write(conf_file, serde_json::to_string(&resp.data).unwrap()).unwrap();
     Ok(())

@@ -48,6 +48,55 @@
     <script type="text/javascript">
         const projectName = document.getElementById("editor-container").getAttribute("data-x-name");
         const projectEditSubmitUrl = "/projects/" + projectName + "/edit";
+        const projectStatusUrl = "/projects/" + projectName + "/status";
+        const messageElement = document.getElementById("deploy-message");
+        const saveBtn = document.getElementById("save-btn");
+
+        function setFailedMessage(msg) {
+            messageElement.innerText = "Failed: " + msg;
+            messageElement.classList.remove("text-success");
+            messageElement.classList.add("text-danger");
+        }
+
+        function setSuccessMessage(msg) {
+            messageElement.innerText = msg;
+            messageElement.classList.remove("text-danger");
+            messageElement.classList.add("text-success");
+        }
+
+        function startCheckStatus(obj) {
+            saveBtn.setAttribute("disabled", "disabled");
+            window.checkProjectStatusInterval = setInterval(async function () {
+                let resp = await fetch(projectStatusUrl, {
+                    method: "POST",
+                    body: JSON.stringify(obj),
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                let status = resp.status;
+                if (status !== 200) {
+                    let text = await resp.text();
+                    setFailedMessage(text);
+                    clearInterval(window.checkProjectStatusInterval);
+                    saveBtn.removeAttribute("disabled");
+                    return;
+                }
+                let result = await resp.json();
+                if (result.status == "success") {
+                    setSuccessMessage("OK");
+                    clearInterval(window.checkProjectStatusInterval);
+                    saveBtn.removeAttribute("disabled");
+                    return;
+                }
+                if (result.status == "failed") {
+                    setFailedMessage(result.message);
+                    clearInterval(window.checkProjectStatusInterval);
+                    saveBtn.removeAttribute("disabled");
+                    return;
+                }
+            }, 1000)
+        }
 
         // init editor after document is loaded
         function initEditor() {
@@ -74,6 +123,7 @@
                 });
                 const btn = document.getElementById("save-btn");
                 btn.addEventListener("click", async function (e) {
+                    btn.setAttribute("disabled", "disabled");
                     let data = new URLSearchParams();
                     data.append("source", editor.getValue());
                     let resp = await fetch(projectEditSubmitUrl, {
@@ -83,15 +133,15 @@
                             "Content-Type": "application/x-www-form-urlencoded",
                         }
                     });
-                    let messageElement = document.getElementById("deploy-message");
                     let status = resp.status;
                     if (status === 200) {
                         let json = await resp.json();
                         console.log(json);
+                        startCheckStatus(json);
                         return;
                     }
-                    messageElement.innerText = "Faild to save: " + status;
-                    messageElement.classList.add("text-danger");
+                    let text = await resp.text();
+                    setFailedMessage(text);
                 })
             });
         };

@@ -68,6 +68,7 @@ async fn main() -> anyhow::Result<()> {
 
         // Initialize handling waiting and reviewing deployments
         deployer::init_waiting().await;
+        deployer::init_review().await;
     }
 
     // Start server

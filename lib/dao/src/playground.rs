@@ -6,8 +6,11 @@ use crate::{
 };
 use anyhow::Result;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder,
+    sea_query::Expr, ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter,
+    QueryOrder,
 };
+
+/// Status is the status of a playground
 pub type Status = projects::Status;
 
 #[derive(strum::Display)]
@@ -46,6 +49,10 @@ pub async fn create(
     let mut active_model = p.into_active_model();
     active_model.id = Default::default();
     let p = active_model.insert(DB.get().unwrap()).await?;
+
+    // set old playground to disabled, only one playground can be active at a time
+    set_old_disabled(project_id, p.id).await?;
+
     Ok(p)
 }
 
@@ -59,4 +66,19 @@ pub async fn get_by_project(project_id: i32) -> Result<Option<playground::Model>
         .one(db)
         .await?;
     Ok(p)
+}
+
+async fn set_old_disabled(project_id: i32, current_playground_id: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    playground::Entity::update_many()
+        .filter(playground::Column::ProjectId.eq(project_id))
+        .filter(playground::Column::Id.ne(current_playground_id))
+        .filter(playground::Column::Status.eq(Status::Active.to_string()))
+        .col_expr(
+            playground::Column::Status,
+            Expr::value(Status::Disabled.to_string()),
+        )
+        .exec(db)
+        .await?;
+    Ok(())
 }

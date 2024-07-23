@@ -22,6 +22,11 @@ pub struct Model {
     pub created_at: DateTime,
     pub updated_at: DateTime,
     pub deleted_at: Option<DateTime>,
+    #[sea_orm(column_type = "Text")]
+    pub rips: String,
+    pub success_count: i32,
+    pub failed_count: i32,
+    pub total_count: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

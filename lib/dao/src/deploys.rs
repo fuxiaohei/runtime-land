@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum Status {
-    WaitingDeploy,
+    WaitDeploy,
     Compiling, // if compilation is long time, we need mark it as compiling
     Uploading,
     Deploying,
@@ -73,12 +73,16 @@ pub async fn create(
         domain,
         spec: serde_json::to_value(&spec)?,
         deploy_type: deploy_type.to_string(),
-        deploy_status: Status::WaitingDeploy.to_string(),
+        deploy_status: Status::WaitDeploy.to_string(),
         deploy_message: "Waiting to deploy".to_string(),
         status: DeploymentStatus::Active.to_string(),
         created_at: now,
         updated_at: now,
         deleted_at: None,
+        rips: String::new(),
+        success_count: 0,
+        failed_count: 0,
+        total_count: 0,
     };
     let mut active_model = model.into_active_model();
     active_model.id = Default::default();
@@ -113,6 +117,19 @@ pub async fn set_deploy_status(deploy_id: i32, status: Status, message: &str) ->
     Ok(())
 }
 
+/// set_rips sets the rips of a deployment
+pub async fn set_rips(id: i32, rips: String, total_count: i32) -> Result<()> {
+    let db = DB.get().unwrap();
+    deployment::Entity::update_many()
+        .col_expr(deployment::Column::Rips, Expr::value(rips))
+        .col_expr(deployment::Column::TotalCount, Expr::value(total_count))
+        .col_expr(deployment::Column::UpdatedAt, Expr::value(now_time()))
+        .filter(deployment::Column::Id.eq(id))
+        .exec(db)
+        .await?;
+    Ok(())
+}
+
 /// success_ids returns a list of success deployment ids
 pub async fn success_ids() -> Result<Vec<i32>> {
     let db = DB.get().unwrap();
@@ -133,4 +150,15 @@ pub async fn list_by_ids(ids: Vec<i32>) -> Result<Vec<deployment::Model>> {
         .all(db)
         .await?;
     Ok(models)
+}
+
+/// get_for_status returns a deployment by status
+pub async fn get_for_status(id: i32, task_id: String) -> Result<Option<deployment::Model>> {
+    let db = DB.get().unwrap();
+    let model = deployment::Entity::find()
+        .filter(deployment::Column::Id.eq(id))
+        .filter(deployment::Column::TaskId.eq(task_id))
+        .one(db)
+        .await?;
+    Ok(model)
 }

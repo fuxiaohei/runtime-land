@@ -54,7 +54,11 @@ pub async fn create(
 }
 
 /// list deploy task
-pub async fn list(ip: Option<String>, status: Option<Status>) -> Result<Vec<deploy_task::Model>> {
+pub async fn list(
+    ip: Option<String>,
+    status: Option<Status>,
+    task_id: Option<String>,
+) -> Result<Vec<deploy_task::Model>> {
     let db = DB.get().unwrap();
     let mut select = deploy_task::Entity::find();
     if let Some(ip) = ip {
@@ -62,6 +66,9 @@ pub async fn list(ip: Option<String>, status: Option<Status>) -> Result<Vec<depl
     }
     if let Some(status) = status {
         select = select.filter(deploy_task::Column::Status.eq(status.to_string()));
+    }
+    if let Some(task_id) = task_id {
+        select = select.filter(deploy_task::Column::TaskId.eq(task_id));
     }
     let models = select.order_by_asc(deploy_task::Column::Id).all(db).await?;
     Ok(models)
@@ -75,6 +82,7 @@ pub async fn set_success(ip: String, task_id: String) -> Result<()> {
             deploy_task::Column::Status,
             Expr::value(Status::Success.to_string()),
         )
+        .col_expr(deploy_task::Column::UpdatedAt, Expr::value(now_time()))
         .filter(deploy_task::Column::WorkerIp.eq(ip))
         .filter(deploy_task::Column::TaskId.eq(task_id))
         .exec(db)
@@ -90,6 +98,7 @@ pub async fn set_failed(ip: String, task_id: String, message: String) -> Result<
             deploy_task::Column::Status,
             Expr::value(Status::Failed.to_string()),
         )
+        .col_expr(deploy_task::Column::UpdatedAt, Expr::value(now_time()))
         .col_expr(deploy_task::Column::Message, Expr::value(message))
         .filter(deploy_task::Column::WorkerIp.eq(ip))
         .filter(deploy_task::Column::TaskId.eq(task_id))

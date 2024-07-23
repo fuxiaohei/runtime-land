@@ -16,6 +16,10 @@ enum Deployment {
     DeployStatus,
     DeployMessage,
     Status,
+    Rips,
+    SuccessCount,
+    FailedCount,
+    TotalCount,
     CreatedAt,
     UpdatedAt,
     DeletedAt,
@@ -72,6 +76,14 @@ async fn create_deployment_table(manager: &SchemaManager<'_>) -> Result<(), DbEr
                         .not_null(),
                 )
                 .col(ColumnDef::new(Deployment::Status).string_len(12).not_null())
+                .col(ColumnDef::new(Deployment::Rips).text().not_null())
+                .col(
+                    ColumnDef::new(Deployment::SuccessCount)
+                        .integer()
+                        .not_null(),
+                )
+                .col(ColumnDef::new(Deployment::FailedCount).integer().not_null())
+                .col(ColumnDef::new(Deployment::TotalCount).integer().not_null())
                 .col(
                     ColumnDef::new(Deployment::CreatedAt)
                         .timestamp()

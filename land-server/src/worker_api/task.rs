@@ -29,7 +29,7 @@ pub async fn handle(
             }
         }
     }
-    let models = deploy_task::list(Some(q.ip), Some(deploy_task::Status::Doing)).await?;
+    let models = deploy_task::list(Some(q.ip), Some(deploy_task::Status::Doing), None).await?;
     if models.is_empty() {
         return Ok(response_ok(vec![], None));
     }

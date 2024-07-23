@@ -3,13 +3,13 @@ use crate::{
     dash::{error_html, notfound_html},
     templates::Engine,
 };
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Form};
+use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Form, Json};
 use axum_htmx::HxRedirect;
 use axum_template::RenderHtml;
 use land_core::examples::{self, Item};
 use land_dao::{deploys, projects, settings};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use tracing::{info, warn};
 
@@ -195,7 +195,7 @@ pub async fn settings(
     .into_response())
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SettingsForm {
     pub name: String,
     pub description: String,
@@ -258,5 +258,69 @@ pub async fn edit(
             project,
         },
     )
+    .into_response())
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ProjectEditForm {
+    pub source: String,
+}
+
+#[derive(Serialize)]
+struct ProjectEditResp {
+    pub task_id: String,
+    pub deploy_id: i32,
+}
+
+/// handle_edit is handler for projects edit page, /projects/:name/edit
+pub async fn handle_edit(
+    Extension(user): Extension<AuthUser>,
+    Path(name): Path<String>,
+    Form(f): Form<ProjectEditForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    let project = projects::get_by_name(&name, Some(user.id)).await?;
+    if project.is_none() {
+        return Ok(error_html("Project not found").into_response());
+    }
+    let project = project.unwrap();
+    let dp = projects::update_source(project.id, f.source).await?;
+    info!(owner_id = user.id, project_name = name, "Edit project");
+    Ok(Json(ProjectEditResp {
+        task_id: dp.task_id,
+        deploy_id: dp.id,
+    })
+    .into_response())
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ProjectStatusForm {
+    pub deploy_id: i32,
+    pub task_id: String,
+}
+
+#[derive(Serialize)]
+struct ProjectStatusResp {
+    pub status: String,
+    pub message: String,
+}
+
+pub async fn handle_status(
+    Extension(user): Extension<AuthUser>,
+    Path(name): Path<String>,
+    Json(f): Json<ProjectStatusForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    let project = projects::get_by_name(&name, Some(user.id)).await?;
+    if project.is_none() {
+        return Ok(error_html("Project not found").into_response());
+    }
+    let dp = deploys::get_for_status(f.deploy_id, f.task_id).await?;
+    if dp.is_none() {
+        return Ok(error_html("Deployment not found").into_response());
+    }
+    let dp = dp.unwrap();
+    Ok(Json(ProjectStatusResp {
+        status: dp.deploy_status,
+        message: dp.deploy_message,
+    })
     .into_response())
 }

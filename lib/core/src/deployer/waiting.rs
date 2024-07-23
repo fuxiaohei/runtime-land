@@ -26,16 +26,27 @@ pub async fn init_waiting() {
     });
 }
 
-/// set_failed sets the deploy status to failed
-async fn set_failed(dp_id: i32, project_id: i32, message: &str) -> Result<()> {
+/// set_failed sets the deploy and project status to failed
+pub(crate) async fn set_failed(dp_id: i32, project_id: i32, mut message: &str) -> Result<()> {
+    if message.len() > 255 {
+        message = &message[..255];
+    }
     deploys::set_deploy_status(dp_id, deploys::Status::Failed, message).await?;
     projects::set_deploy_status(project_id, deploys::Status::Failed, message).await?;
+    warn!(dp_id = dp_id, "set failed: {}", message);
+    Ok(())
+}
+
+/// set_success sets the deploy and projectstatus to success
+pub(crate) async fn set_success(dp_id: i32, project_id: i32) -> Result<()> {
+    deploys::set_deploy_status(dp_id, deploys::Status::Success, "Success").await?;
+    projects::set_deploy_status(project_id, deploys::Status::Success, "Success").await?;
     Ok(())
 }
 
 #[instrument("[DEPLOY-WAITING]")]
 async fn handle() -> Result<()> {
-    let deploy_data = deploys::list_by_deploy_status(Status::WaitingDeploy).await?;
+    let deploy_data = deploys::list_by_deploy_status(Status::WaitDeploy).await?;
     if deploy_data.is_empty() {
         // debug!("No waiting");
         return Ok(());
@@ -154,6 +165,7 @@ async fn handle_one(dp: &deployment::Model) -> Result<()> {
     let item_content = serde_json::to_string(&item)?;
 
     // 12. create details task for each worker
+    let mut rips = vec![];
     for worker in workers_value.iter() {
         let task = deploy_task::create(
             dp,
@@ -164,7 +176,12 @@ async fn handle_one(dp: &deployment::Model) -> Result<()> {
         )
         .await?;
         debug!("Create task: {:?}", task);
+        rips.push(worker.ip.clone());
     }
+
+    // 13. update deployment status, to trigger review logic
+    deploys::set_rips(dp.id, rips.join(","), rips.len() as i32).await?;
+    deploys::set_deploy_status(dp.id, deploys::Status::Deploying, "Deploying").await?;
 
     Ok(())
 }
