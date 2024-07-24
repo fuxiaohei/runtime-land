@@ -120,7 +120,6 @@ async fn handle_each_task(t: Task, dir: String) -> Result<()> {
 }
 
 async fn handle_each_agent_item(item: Item, dir: String) -> Result<()> {
-    println!("handle each item: {:?}", item);
     let wasm_target_file = format!("{}/{}", dir, item.file_name);
 
     // 1. download wasm file
@@ -157,6 +156,10 @@ async fn handle_each_agent_item(item: Item, dir: String) -> Result<()> {
     let content = serde_yaml::to_string(&confs)?;
     std::fs::write(&traefik_file, content)?;
     debug!("generate traefik success: {}", traefik_file);
+
+    // 3. prepare worker
+    land_wasm_host::pool::prepare_worker(&item.file_name, true).await?;
+    debug!("prepare worker success: {}", item.file_name);
 
     Ok(())
 }

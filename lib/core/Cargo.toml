@@ -12,6 +12,7 @@ land-common = { workspace = true }
 land-dao = { workspace = true }
 land-vars = { workspace = true }
 land-wasm-gen = { workspace = true }
+land-wasm-host = { workspace = true }
 lazy_static = { workspace = true }
 md5 = { workspace = true }
 once_cell = { workspace = true }

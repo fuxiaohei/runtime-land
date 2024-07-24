@@ -23,7 +23,10 @@
                 </div>
                 <div class="y-center justify-content-end">
                     <div id="deploy-message"></div>
-                    <button id="save-btn" class="mx-3 btn btn-primary btn-sm text-uppercase">Save & Deploy</button>
+                    <button id="save-btn" class="mx-3 btn btn-primary btn-sm text-uppercase">
+                        <span id="save-btn-spinner" class="spinner-border d-none spinner-border-sm me-1"></span>
+                        <span>Save & Deploy</span>
+                    </button>
                 </div>
             </div>
             <div id="editor-wrapper" class="p-2 mb-auto" style="height: calc(100vh - 14.5rem)">loading...</div>
@@ -36,10 +39,16 @@
         <div id="preview-container" class="d-flex flex-column flex-fill">
             <div id="preview-nav" style="height: 60px;" class="y-center border-bottom">
                 <div class="input-group mx-3">
-                    <input type="text" class="form-control py-1 shadow-none" value="{{project.prod_domain_url}}">
-                    <button class="btn btn-outline-secondary y-center" type="button"><i
+                    <input id="preview-url" type="text" class="form-control py-1 shadow-none"
+                        value="{{project.prod_domain_url}}">
+                    <button data-x-url="{{project.prod_domain_url}}" id="refresh-btn"
+                        class="btn btn-outline-secondary y-center" type="button"><i
                             class='bx bx-refresh me-2'></i>Refresh</button>
                 </div>
+            </div>
+            <div class="bg-transparent" style="height: calc(100vh - 60px)">
+                <iframe src="{{project.prod_domain_url}}" frameborder="0" id="project-preview"
+                    sandbox="allow-forms allow-modals allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
             </div>
         </div>
     </div>
@@ -51,6 +60,8 @@
         const projectStatusUrl = "/projects/" + projectName + "/status";
         const messageElement = document.getElementById("deploy-message");
         const saveBtn = document.getElementById("save-btn");
+        const saveBtnSpinner = document.getElementById("save-btn-spinner");
+        const refreshBtn = document.getElementById("refresh-btn");
 
         function setFailedMessage(msg) {
             messageElement.innerText = "Failed: " + msg;
@@ -66,6 +77,7 @@
 
         function startCheckStatus(obj) {
             saveBtn.setAttribute("disabled", "disabled");
+            saveBtnSpinner.classList.remove("d-none");
             window.checkProjectStatusInterval = setInterval(async function () {
                 let resp = await fetch(projectStatusUrl, {
                     method: "POST",
@@ -80,6 +92,7 @@
                     setFailedMessage(text);
                     clearInterval(window.checkProjectStatusInterval);
                     saveBtn.removeAttribute("disabled");
+                    saveBtnSpinner.classList.add("d-none");
                     return;
                 }
                 let result = await resp.json();
@@ -87,12 +100,15 @@
                     setSuccessMessage("OK");
                     clearInterval(window.checkProjectStatusInterval);
                     saveBtn.removeAttribute("disabled");
+                    saveBtnSpinner.classList.add("d-none");
+                    refreshBtn.click(); // refresh preview
                     return;
                 }
                 if (result.status == "failed") {
                     setFailedMessage(result.message);
                     clearInterval(window.checkProjectStatusInterval);
                     saveBtn.removeAttribute("disabled");
+                    saveBtnSpinner.classList.add("d-none");
                     return;
                 }
             }, 1000)
@@ -148,6 +164,21 @@
         document.addEventListener("DOMContentLoaded", function () {
             initEditor();
         });
+
+        // refresh refresh button
+        refreshBtn.addEventListener("click", function () {
+            let iframe = document.getElementById("project-preview");
+            let url = refreshBtn.getAttribute("data-x-url");
+            let new_url = document.getElementById("preview-url").value;
+            if (!new_url.startsWith(url)) {
+                alert("Only support refresh same origin: " + url);
+                return;
+            }
+            console.log("iframe", new_url);
+            iframe.src = new_url;
+        })
+
+
     </script>
 </body>
 

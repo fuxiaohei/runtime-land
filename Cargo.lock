@@ -1999,6 +1999,7 @@ dependencies = [
  "land-dao",
  "land-vars",
  "land-wasm-gen",
+ "land-wasm-host",
  "lazy_static",
  "md5",
  "once_cell",
