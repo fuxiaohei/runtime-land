@@ -17,8 +17,8 @@ struct SyncResponse {
 }
 
 /// init_task starts background tasks
-pub async fn init_task(addr: String, token: String, dir: String) {
-    debug!("agent init_task");
+pub async fn init_task(addr: String, token: String, dir: String, service_name: String) {
+    debug!("agent init_task, {}, {}, {}", token, dir, service_name);
 
     // init client
     super::CLIENT_ONCE.call_once(|| {
@@ -30,7 +30,14 @@ pub async fn init_task(addr: String, token: String, dir: String) {
         let mut ticker = tokio::time::interval(std::time::Duration::from_secs(1));
         ticker.tick().await;
         loop {
-            match request(addr.clone(), token.clone(), dir.clone()).await {
+            match request(
+                addr.clone(),
+                token.clone(),
+                dir.clone(),
+                service_name.clone(),
+            )
+            .await
+            {
                 Ok(_) => {}
                 Err(e) => {
                     warn!("agent task error: {:?}", e);
@@ -46,7 +53,7 @@ lazy_static! {
 }
 
 #[instrument("[AGT-TASK]", skip_all)]
-async fn request(addr: String, token: String, dir: String) -> Result<()> {
+async fn request(addr: String, token: String, dir: String, service_name: String) -> Result<()> {
     let ipinfo = super::get_ip().await;
     let client = super::CLIENT.get().unwrap();
     let mut tasks = TASK_RES.lock().await;
@@ -96,7 +103,7 @@ async fn request(addr: String, token: String, dir: String) -> Result<()> {
     // handle each task
     for task in resp.data {
         let task_id = task.task_id.clone();
-        match handle_each_task(task, dir.clone()).await {
+        match handle_each_task(task, dir.clone(), service_name.clone()).await {
             Ok(_) => {
                 tasks.insert(task_id, "success".to_string());
             }
@@ -110,16 +117,16 @@ async fn request(addr: String, token: String, dir: String) -> Result<()> {
     Ok(())
 }
 
-async fn handle_each_task(t: Task, dir: String) -> Result<()> {
+async fn handle_each_task(t: Task, dir: String, service_name: String) -> Result<()> {
     if t.task_type == TaskType::DeployWasmToWorker.to_string() {
         let item: Item = serde_json::from_str(&t.content)?;
-        handle_each_agent_item(item, dir.clone()).await?;
+        handle_each_agent_item(item, dir.clone(), service_name.clone()).await?;
         return Ok(());
     }
     Err(anyhow!("unknown task type: {}", t.task_type))
 }
 
-async fn handle_each_agent_item(item: Item, dir: String) -> Result<()> {
+async fn handle_each_agent_item(item: Item, dir: String, service_name: String) -> Result<()> {
     let wasm_target_file = format!("{}/{}", dir, item.file_name);
 
     // 1. download wasm file
@@ -152,7 +159,7 @@ async fn handle_each_agent_item(item: Item, dir: String) -> Result<()> {
     let traefik_file = format!("{}/traefik/{}.yaml", dir, item.domain.replace('.', "_"));
     let traefik_dir = format!("{}/traefik", dir);
     std::fs::create_dir_all(traefik_dir)?;
-    let confs = super::traefik::build(&item, "land-worker")?;
+    let confs = super::traefik::build(&item, &service_name)?;
     let content = serde_yaml::to_string(&confs)?;
     std::fs::write(&traefik_file, content)?;
     debug!("generate traefik success: {}", traefik_file);

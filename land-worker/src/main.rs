@@ -28,12 +28,26 @@ struct Args {
     /// The url of cloud server
     #[clap(long = "url",env = "LAND_SERVER_URL", value_parser = validate_url,default_value("http://127.0.0.1:9840"))]
     pub server_url: String,
+    /// The service name to generate traefik conf
+    #[clap(
+        long = "service-name",
+        env = "LAND_SERVICE_NAME",
+        default_value("land-worker@docker")
+    )]
+    pub service_name: String,
     /// Hostname
     #[clap(long = "hostname")]
     pub hostname: Option<String>,
     /// IP
     #[clap(long = "ip")]
     pub ip: Option<String>,
+    /// Metrics listen address, default 0.0.0.0:9000
+    #[clap(
+        long = "metrics-addr",
+        env = "LAND_METRICS_ADDR",
+        default_value("0.0.0.0:9000")
+    )]
+    pub metrics_addr: String,
 }
 
 fn validate_url(url: &str) -> Result<String, String> {
@@ -64,6 +78,7 @@ async fn main() -> Result<()> {
         args.server_url.clone(),
         args.token.clone(),
         args.dir.clone(),
+        args.service_name.clone(),
     )
     .await;
 
@@ -75,7 +90,7 @@ async fn main() -> Result<()> {
         enable_wasmtime_aot: true,
         endpoint_name: args.hostname,
         enable_metrics: true,
-        metrics_addr: None,
+        metrics_addr: Some(args.metrics_addr),
     };
     land_wasm_server::start(opts).await?;
 
