@@ -9,6 +9,10 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 land-common = { workspace = true }
 land-wasm-host = { workspace = true }
+metrics = { workspace = true }
+metrics-exporter-prometheus = { version = "0.15.3", default-features = false, features = [
+    "http-listener",
+] }
 once_cell = { workspace = true }
 serde = { workspace = true }
 tokio = { workspace = true }

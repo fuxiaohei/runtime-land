@@ -5,6 +5,7 @@ use land_wasm_host::{
     init_engines,
     pool::{prepare_worker, FILE_DIR},
 };
+use metrics_exporter_prometheus::PrometheusBuilder;
 use once_cell::sync::OnceCell;
 use std::{net::SocketAddr, time::Duration};
 use tower_http::timeout::TimeoutLayer;
@@ -17,10 +18,11 @@ mod middle;
 pub struct Opts {
     pub addr: SocketAddr,
     pub dir: String,
-    pub default_wasm: String,
+    pub default_wasm: Option<String>,
     pub endpoint_name: Option<String>,
     pub enable_wasmtime_aot: bool,
     pub enable_metrics: bool,
+    pub metrics_addr: Option<String>,
 }
 
 impl Default for Opts {
@@ -28,10 +30,11 @@ impl Default for Opts {
         Self {
             addr: "127.0.0.1:9044".parse().unwrap(),
             dir: "./data/land".to_string(),
-            default_wasm: "".to_string(),
+            default_wasm: None,
             endpoint_name: Some("localhost".to_string()),
             enable_wasmtime_aot: false,
             enable_metrics: false,
+            metrics_addr: None,
         }
     }
 }
@@ -50,14 +53,14 @@ async fn init_opts(opts: &Opts) -> Result<()> {
 
     debug!("Endpoint: {}", hostname);
     debug!("Wasm dir: {}", opts.dir);
-    debug!("Default wasm: {}", opts.default_wasm);
+    debug!("Default wasm: {:?}", opts.default_wasm);
     debug!("Enable Wasmtime AOT: {}", opts.enable_wasmtime_aot);
     debug!("Enable Metrics: {}", opts.enable_metrics);
 
     // create directory
     std::fs::create_dir_all(&opts.dir).unwrap();
 
-    DEFAULT_WASM.set(opts.default_wasm.clone()).unwrap();
+    DEFAULT_WASM.set(opts.default_wasm.clone().unwrap_or_default()).unwrap();
     ENDPOINT_NAME.set(hostname).unwrap();
     ENABLE_WASMTIME_AOT.set(opts.enable_wasmtime_aot).unwrap();
     ENABLE_METRICS.set(opts.enable_metrics).unwrap();
@@ -65,6 +68,19 @@ async fn init_opts(opts: &Opts) -> Result<()> {
 
     init_clients();
     init_engines()?;
+
+    if opts.enable_metrics {
+        let addr: SocketAddr = opts
+            .metrics_addr
+            .clone()
+            .unwrap_or_else(|| "127.0.0.1:9000".to_string())
+            .parse()
+            .unwrap();
+        PrometheusBuilder::new()
+            .with_http_listener(addr)
+            .install()?;
+        info!("Metrics server started at {}", addr);
+    }
 
     Ok(())
 }

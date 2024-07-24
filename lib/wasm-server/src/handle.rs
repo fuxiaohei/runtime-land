@@ -1,7 +1,10 @@
-use crate::{middle::WorkerInfo, ServerError, ENABLE_WASMTIME_AOT, ENDPOINT_NAME};
+use crate::{
+    middle::{WorkerInfo, WorkerMetrics},
+    ServerError, ENABLE_WASMTIME_AOT, ENDPOINT_NAME,
+};
 use anyhow::Result;
 use axum::{
-    body::Body,
+    body::{Body, HttpBody},
     extract::ConnectInfo,
     http::Request,
     response::{IntoResponse, Response},
@@ -15,10 +18,11 @@ use tracing::{debug, info, info_span, warn, Instrument};
 pub async fn run(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     Extension(info): Extension<WorkerInfo>,
-    // Extension(metrics): Extension<middleware::WorkerMetrics>,
+    Extension(metrics): Extension<WorkerMetrics>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, ServerError> {
     let st = Instant::now();
+    metrics.req_fn_total.increment(1);
 
     // prepare span info
     let method = req.method().clone();
@@ -35,12 +39,13 @@ pub async fn run(
             elapsed = %st.elapsed().as_micros(),
             "Function not found",
         );
-        // metrics.req_fn_notfound_total.increment(1);
+        metrics.req_fn_notfound_total.increment(1);
         return Err(ServerError::not_found(info, "Function not found"));
     }
 
     // collect post body size
-    // let body_size = req.body().size_hint().exact().unwrap_or(0);
+    let body_size = req.body().size_hint().exact().unwrap_or(0);
+    metrics.req_fn_in_bytes_total.increment(body_size);
 
     // call wasm async
     async move {
@@ -53,7 +58,7 @@ pub async fn run(
                 "Internal error: {}",
                 err,
             );
-            // metrics.req_fn_error_total.increment(1);
+            metrics.req_fn_error_total.increment(1);
             let msg = format!("Internal error: {}", err);
             return Err(ServerError::internal_error(info, &msg));
         }
@@ -65,8 +70,9 @@ pub async fn run(
         } else {
             info!( status=%status_code,elapsed=%elapsed, "Done");
         }
-        // let body_size = resp.body().size_hint().exact().unwrap_or(0);
-        // metrics.req_fn_out_bytes_total.increment(body_size);
+        let body_size = resp.body().size_hint().exact().unwrap_or(0);
+        metrics.req_fn_out_bytes_total.increment(body_size);
+        metrics.req_fn_success_total.increment(1);
         Ok(resp)
     }
     .instrument(span_clone)

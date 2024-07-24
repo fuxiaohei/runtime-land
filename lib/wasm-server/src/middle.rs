@@ -1,5 +1,6 @@
-use crate::{DEFAULT_WASM, ENDPOINT_NAME};
+use crate::{DEFAULT_WASM, ENABLE_METRICS, ENDPOINT_NAME};
 use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response};
+use metrics::{counter, Counter};
 use serde::Serialize;
 
 #[derive(Default, Clone, Serialize, Debug)]
@@ -11,6 +12,53 @@ pub struct WorkerInfo {
     pub deploy_id: String,
     pub host: String,
     pub endpoint: String,
+}
+
+#[derive(Clone)]
+pub struct WorkerMetrics {
+    pub req_fn_total: Counter,
+    pub req_fn_notfound_total: Counter,
+    pub req_fn_success_total: Counter,
+    pub req_fn_error_total: Counter,
+    pub req_fn_in_bytes_total: Counter,
+    pub req_fn_out_bytes_total: Counter,
+}
+
+impl WorkerMetrics {
+    pub fn new(pid: String, uid: String, did: String, ep: String) -> Self {
+        if !ENABLE_METRICS.get().unwrap() {
+            let noop = Counter::noop();
+            return WorkerMetrics {
+                req_fn_total: noop.clone(),
+                req_fn_notfound_total: noop.clone(),
+                req_fn_success_total: noop.clone(),
+                req_fn_error_total: noop.clone(),
+                req_fn_in_bytes_total: noop.clone(),
+                req_fn_out_bytes_total: noop,
+            };
+        }
+        let labels = vec![("pid", pid), ("uid", uid), ("did", did), ("ep", ep)];
+        let mut req_fn_total_labels = labels.clone();
+        req_fn_total_labels.push(("typ", "all".to_string()));
+        let mut req_fn_notfound_total_labels = labels.clone();
+        req_fn_notfound_total_labels.push(("typ", "notfound".to_string()));
+        let mut req_fn_success_total_labels = labels.clone();
+        req_fn_success_total_labels.push(("typ", "success".to_string()));
+        let mut req_fn_error_total_labels = labels.clone();
+        req_fn_error_total_labels.push(("typ", "error".to_string()));
+        let mut req_fn_in_bytes_total_labels = labels.clone();
+        req_fn_in_bytes_total_labels.push(("typ", "main_in_bytes".to_string()));
+        let mut req_fn_out_bytes_total_labels = labels.clone();
+        req_fn_out_bytes_total_labels.push(("typ", "main_out_bytes".to_string()));
+        WorkerMetrics {
+            req_fn_total: counter!("req_fn_total", &req_fn_total_labels),
+            req_fn_notfound_total: counter!("req_fn_total", &req_fn_notfound_total_labels),
+            req_fn_success_total: counter!("req_fn_total", &req_fn_success_total_labels),
+            req_fn_error_total: counter!("req_fn_total", &req_fn_error_total_labels),
+            req_fn_in_bytes_total: counter!("req_fn_bytes", &req_fn_in_bytes_total_labels),
+            req_fn_out_bytes_total: counter!("req_fn_bytes", &req_fn_out_bytes_total_labels),
+        }
+    }
 }
 
 /// worker_info to get worker info
@@ -49,6 +97,12 @@ pub async fn worker_info(mut request: Request, next: Next) -> Result<Response, S
         .to_string();
 
     let endpoint = ENDPOINT_NAME.get().unwrap().to_string();
+    let metrics = WorkerMetrics::new(
+        project_id.clone(),
+        user_id.clone(),
+        deploy_id.clone(),
+        endpoint.clone(),
+    );
     let info = WorkerInfo {
         req_id,
         wasm_module,
@@ -60,5 +114,6 @@ pub async fn worker_info(mut request: Request, next: Next) -> Result<Response, S
     };
 
     request.extensions_mut().insert(info);
+    request.extensions_mut().insert(metrics);
     Ok(next.run(request).await)
 }

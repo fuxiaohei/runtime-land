@@ -71,9 +71,11 @@ async fn main() -> Result<()> {
     let opts = land_wasm_server::Opts {
         addr: args.address.parse().unwrap(),
         dir: args.dir,
+        default_wasm: None,
         enable_wasmtime_aot: true,
         endpoint_name: args.hostname,
-        ..Default::default()
+        enable_metrics: true,
+        metrics_addr: None,
     };
     land_wasm_server::start(opts).await?;
 
