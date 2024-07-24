@@ -48,7 +48,7 @@ pub async fn gen() -> anyhow::Result<()> {
     let ids_hash = obj_hash(ids.clone())?;
     let mut confs = CONFS.lock().await;
     if confs.0 == ids_hash {
-        debug!("No changed");
+        // debug!("No changed");
         return Ok(());
     }
     confs.0.clone_from(&ids_hash);

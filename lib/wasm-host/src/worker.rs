@@ -1,8 +1,9 @@
+use crate::hostcall::HttpHandlerPre;
 use anyhow::Result;
 use axum::body::Body;
 use tracing::debug;
 use wasmtime::{
-    component::{Component, InstancePre, Linker},
+    component::{Component, Linker},
     Engine, Store, UpdateDeadline,
 };
 
@@ -11,7 +12,7 @@ use wasmtime::{
 pub struct Worker {
     path: String,
     engine: Engine,
-    instance_pre: InstancePre<crate::context::Context>,
+    instance_pre: HttpHandlerPre<crate::context::Context>,
 }
 
 impl std::fmt::Debug for Worker {
@@ -34,10 +35,11 @@ impl Worker {
         crate::hostcall::HttpService::add_to_linker(&mut linker, crate::context::Context::host_ctx)
             .expect("add http_service failed");
 
+        let instance_pre = linker.instantiate_pre(&component)?;
         Ok(Self {
             path: path.unwrap_or("binary".to_string()),
             engine,
-            instance_pre: linker.instantiate_pre(&component)?,
+            instance_pre: HttpHandlerPre::new(instance_pre)?,
         })
     }
 
@@ -59,10 +61,11 @@ impl Worker {
         crate::hostcall::HttpService::add_to_linker(&mut linker, crate::context::Context::host_ctx)
             .expect("add http_service failed");
 
+        let instance_pre = linker.instantiate_pre(&component)?;
         Ok(Self {
             path,
             engine,
-            instance_pre: linker.instantiate_pre(&component)?,
+            instance_pre: HttpHandlerPre::new(instance_pre)?,
         })
     }
 
@@ -116,8 +119,7 @@ impl Worker {
         store.limiter(|ctx| &mut ctx.limiter);
 
         // get exports and call handle_request
-        let (exports, _instance) =
-            crate::hostcall::HttpHandler::instantiate_pre(&mut store, &self.instance_pre).await?;
+        let exports = self.instance_pre.instantiate_async(&mut store).await?;
         let resp = exports
             .land_http_incoming()
             .call_handle_request(&mut store, &req)
