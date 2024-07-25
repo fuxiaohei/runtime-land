@@ -17,6 +17,7 @@ mod auth;
 pub mod middle;
 mod projects;
 mod settings;
+mod traffic;
 
 /// redirect returns a redirect response
 pub fn redirect(url: &str) -> impl IntoResponse {
@@ -106,6 +107,8 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/settings", get(settings::index))
         .route("/settings/tokens/create", post(settings::create_token))
         .route("/settings/tokens/remove", post(settings::remove_token))
+        .route("/traffic/requests", post(traffic::requests))
+        .route("/traffic/flows", post(traffic::flows))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::auth))
         .route_layer(middleware::from_fn(middle::logger))

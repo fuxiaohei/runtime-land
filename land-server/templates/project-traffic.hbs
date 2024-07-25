@@ -8,18 +8,18 @@
 <body>
     <div id="root">
         {{> parts/sidebar.hbs}}
-        <main id="main" class="w-100">
+        <main id="main" class="w-100 overflow-y-auto">
             {{> parts/top-nav.hbs}}
             <div id="project-single-container" class="overflow-y-auto">
                 {{> components/project-header.hbs}}
-                <div id="project-traffic" class="d-flex px-3 pb-4">
-                    traffic
-                </div>
+                {{> components/traffic.hbs}}
             </div>
             {{> parts/footer.hbs}}
         </main>
     </div>
     {{> parts/js.hbs}}
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"
+        integrity="sha256-6EJwvQzVvfYP78JtAMKjkcsugfTSanqe4WGFpUdzo88=" crossorigin="anonymous"></script>
 </body>
 
 </html>

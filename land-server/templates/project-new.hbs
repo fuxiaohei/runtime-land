@@ -8,7 +8,7 @@
 <body>
     <div id="root">
         {{> parts/sidebar.hbs}}
-        <main id="main" class="w-100">
+        <main id="main" class="w-100 overflow-y-auto">
             {{> parts/top-nav.hbs}}
             <div id="project-new-container" class="overflow-y-auto p-3">
                 <div>
@@ -18,8 +18,7 @@
                 <div class="row g-4 py-3">
                     {{#each examples}}
                     <div class="col-md-4">
-                        <a href="/new/{{link}}"
-                            class="d-flex flex-column project-item border rounded p-3 link-reset">
+                        <a href="/new/{{link}}" class="d-flex flex-column project-item border rounded p-3 link-reset">
                             <div class="meta d-flex justify-content-between align-items-top mb-2">
                                 <div class="title">
                                     <h6>{{title}}</h6>

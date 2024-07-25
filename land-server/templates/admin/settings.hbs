@@ -11,7 +11,7 @@
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
             <div id="main-container" class="overflow-y-auto">
-                <div id="setting-domains-container" class="p-3">
+                <div id="setting-domains-container" class="p-3 border-bottom">
                     <div class="mb-3">
                         <p class="mb-1 fw-medium fs-5">Domains</p>
                         <p class="mb-0 text-body-tertiary">Set the domain suffix and http protocol that project
@@ -38,6 +38,36 @@
                         </div>
                         <div class="text-start">
                             <p id="settings-domain-message" class="hx-message"></p>
+                            <button class="btn btn-dark">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="setting-prometheus-container" class="p-3">
+                    <div class="mb-3">
+                        <p class="mb-1 fw-medium fs-5">Prometheus</p>
+                        <p class="mb-0 text-body-tertiary">Set prometheus endpoint, and authentication</p>
+                    </div>
+                    <form hx-post="/admin/settings/prometheus" hx-swap="innerHTML settle:3s"
+                        hx-target="#settings-prometheus-message">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="endpoint" value="{{prometheus.endpoint}}"
+                                    required placeholder="Set prometheus endpoint" />
+                                <p class="form-text mb-0">The API endpoint for prometheus</p>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="username" value="{{prometheus.username}}"
+                                    placeholder="Set prometheus username" />
+                                <p class="form-text mb-0">User name for prometheus endpoint</p>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="password" class="form-control" name="password"
+                                    value="{{prometheus.password}}" placeholder="Set prometheus password" />
+                                <p class="form-text mb-0">Password for prometheus endpoint</p>
+                            </div>
+                        </div>
+                        <div class="text-start">
+                            <p id="settings-prometheus-message" class="hx-message"></p>
                             <button class="btn btn-dark">Save Changes</button>
                         </div>
                     </form>
