@@ -2,8 +2,9 @@ use anyhow::Result;
 use land_dao::settings;
 use serde::{Deserialize, Serialize};
 
+mod promql;
 mod query;
-pub use query::{flow_traffic, requests_traffic};
+pub use query::{flow_traffic, projects_traffic, requests_traffic};
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Settings {
@@ -30,6 +31,12 @@ pub async fn set_settings(settings: Settings) -> Result<()> {
 pub struct Form {
     pub period: String,
     pub pid: Option<i32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectsQueryForm {
+    pub period: String,
+    pub pids: Vec<i32>,
 }
 
 #[derive(Debug)]

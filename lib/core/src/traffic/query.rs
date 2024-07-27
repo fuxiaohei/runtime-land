@@ -5,41 +5,24 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 use std::{collections::HashMap, sync::Once};
-use super::{PeriodParams, Settings, SETTINGS_KEY};
+use crate::traffic::promql::{flow_ql, projects_flows_ql, request_ql};
+use super::{promql::projects_traffic_ql, PeriodParams, Settings, SETTINGS_KEY};
 
 static CLIENT: OnceCell<Client> = OnceCell::new();
 static CLIENT_ONCE: Once = Once::new();
 
-fn request_ql(pid: Option<String>, uid: Option<String>, step: &str) -> Result<String> {
-    if let Some(pid) = pid {
-        Ok(format!(
-            "sum by (typ) (increase(req_fn_total{{pid=\"{}\",typ=~\"success|error\"}}[{}]))",
-            pid, step
-        ))
-    } else if let Some(uid) = uid {
-        Ok(format!(
-            "sum by (typ) (increase(req_fn_total{{uid=\"{}\",typ=~\"success|error\"}}[{}]))",
-            uid, step
-        ))
-    } else {
-        Ok(format!("sum by (typ) (increase(req_fn_total[{}]))", step))
-    }
-}
-
-fn flow_ql(pid: Option<String>, uid: Option<String>, step: &str) -> Result<String> {
-    if let Some(pid) = pid {
-        Ok(format!(
-            "sum by (typ) (increase(req_fn_bytes{{pid=\"{}\"}}[{}]))",
-            pid, step
-        ))
-    } else if let Some(uid) = uid {
-        Ok(format!(
-            "sum by (typ) (increase(req_fn_bytes{{uid=\"{}\"}}[{}]))",
-            uid, step
-        ))
-    } else {
-        Ok(format!("sum by (typ) (increase(req_fn_bytes[{}]))", step))
-    }
+async fn traffic_internal(
+    period: &PeriodParams,
+    query:String) -> Result<MultiLineSeries>{
+    let params = Params {
+        query: query.clone(),
+        step: period.step,
+        start: period.start,
+        end: period.end,
+    };
+    let res = range(params).await?;
+    let values = LineSeries::from(&res, period.sequence.clone());
+    Ok(values)
 }
 
 /// requests_traffic queries requests traffic
@@ -53,15 +36,29 @@ pub async fn requests_traffic(
         "query-requests: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
-    let params = Params {
-        query: query.clone(),
-        step: period.step,
-        start: period.start,
-        end: period.end,
-    };
-    let res = range(params).await?;
-    let values = LineSeries::from(&res, period.sequence.clone());
-    Ok(values)
+    traffic_internal(period, query).await
+}
+
+/// projects_traffic queries projects traffic with requests and flows
+pub async fn projects_traffic(
+    uid:String,
+    pids:Vec<String>,
+    period: &PeriodParams,
+)-> Result<MultiLineSeries> {
+    let query = projects_traffic_ql(uid.clone(), pids.clone(), &period.step_word);
+    debug!(
+        "query-projects-requests: {}, start:{}, end:{}, step:{}",
+        query, period.start, period.end, period.step
+    );
+    let mut requests = traffic_internal(period, query).await?;
+    let query2 = projects_flows_ql(uid, pids,&period.step_word);
+    debug!(
+        "query-projects-flows: {}, start:{}, end:{}, step:{}",
+        query2, period.start, period.end, period.step
+    );
+    let flows = traffic_internal(period, query2).await?;
+    requests.extend(flows);
+    Ok(requests)
 }
 
 /// flow_traffic queries flows traffic
@@ -75,15 +72,7 @@ pub async fn flow_traffic(
         "query-flows: {}, start:{}, end:{}, step:{}",
         query, period.start, period.end, period.step
     );
-    let params = Params {
-        query: query.clone(),
-        step: period.step,
-        start: period.start,
-        end: period.end,
-    };
-    let res = range(params).await?;
-    let values = LineSeries::from(&res, period.sequence.clone());
-    Ok(values)
+    traffic_internal(period, query).await
 }
 
 /// QueryParams is the parameters for querying range

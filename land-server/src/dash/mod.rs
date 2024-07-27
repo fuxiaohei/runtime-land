@@ -109,6 +109,7 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/settings/tokens/remove", post(settings::remove_token))
         .route("/traffic/requests", post(traffic::requests))
         .route("/traffic/flows", post(traffic::flows))
+        .route("/traffic/projects", post(traffic::projects))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::auth))
         .route_layer(middleware::from_fn(middle::logger))

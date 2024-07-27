@@ -18,7 +18,6 @@ function friendly_bytesize(v, with_byte_unit) {
 /// convert unixtimestamp to hour and minute, HH:MM
 function unix2hour(v) {
     const dateObj = new Date(v)
-    console.log(dateObj, v)
     const hours = dateObj.getHours() >= 10 ? dateObj.getHours() : '0' + dateObj.getHours()
     const minutes = dateObj.getMinutes() < 10 ? dateObj.getMinutes() + '0' : dateObj.getMinutes()
     const UnixTimeToDate = hours + ':' + minutes
@@ -86,10 +85,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!traffic) {
             return;
         }
+        window.traffic_period = "1d";
+
         const pid = traffic.getAttribute("x-data-pid");
         async function request_traffic(pid) {
             let params = new URLSearchParams();
-            params.append("period", "1d");
+            params.append("period", window.traffic_period);
             if (pid) {
                 params.append("pid", pid);
             }
@@ -161,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         async function flow_traffic(pid) {
             let params = new URLSearchParams();
-            params.append("period", "1d");
+            params.append("period", window.traffic_period);
             if (pid) {
                 params.append("pid", pid);
             }
@@ -230,5 +231,21 @@ document.addEventListener("DOMContentLoaded", function () {
             chart.setOption(option);
         }
         flow_traffic(pid);
+
+        document.querySelectorAll(".traffic-period-select").forEach((el) => {
+            el.addEventListener("click", function () {
+                let period = el.getAttribute("x-data-v");
+                if (period == window.traffic_period) {
+                    return;
+                }
+
+                let text = el.innerText;
+                document.getElementById("traffic-period-btn").innerText = text;
+                window.traffic_period = period;
+
+                request_traffic(pid);
+                flow_traffic(pid);
+            })
+        });
     })();
 })

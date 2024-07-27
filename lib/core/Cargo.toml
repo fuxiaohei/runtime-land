@@ -28,5 +28,5 @@ serde_json = { workspace = true }
 serde_yaml = "0.9.33"
 tempfile = "3.10.1"
 tokio = { workspace = true }
-toml = "0.8.15"
+toml = "0.8.16"
 tracing = { workspace = true }

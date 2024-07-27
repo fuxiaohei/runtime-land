@@ -41,3 +41,26 @@ pub async fn flows(
     );
     Ok(Json(lines))
 }
+
+/// flows is route of traffic requests query page, /traffic/flows
+pub async fn projects(
+    Extension(user): Extension<AuthUser>,
+    Json(f): Json<traffic::ProjectsQueryForm>,
+) -> Result<impl IntoResponse, ServerError> {
+    let now = tokio::time::Instant::now();
+    let pids = f
+        .pids
+        .iter()
+        .map(|pid| pid.to_string())
+        .collect::<Vec<String>>();
+    let period = traffic::PeriodParams::new(&f.period, None);
+    let lines = traffic::projects_traffic(user.id.to_string(), pids, &period).await?;
+    info!(
+        "projects, start:{}, end:{}, step:{}, cost:{}",
+        period.start,
+        period.end,
+        period.step,
+        now.elapsed().as_millis(),
+    );
+    Ok(Json(lines))
+}

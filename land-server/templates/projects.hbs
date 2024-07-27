@@ -38,13 +38,13 @@
                     </thead>
                     <tbody>
                         {{#each projects}}
-                        <tr>
+                        <tr x-data-pid="{{id}}">
                             <td>
                                 <p class="mb-1 fw-semibold fs-6">
                                     <a href="/projects/{{name}}" class="link-reset link-hover">{{name}}</a>
                                 </p>
-                                <p class="mb-0 text-body-tertiary small text-uppercase fw-normal">Edit with
-                                    {{created_by}}</p>
+                                <p class="mb-0 text-body-tertiary small fw-normal">edit with
+                                    <span class="text-uppercase">{{created_by}}</span></p>
                             </td>
                             <td class="lang-logo">
                                 <img src="/static/img/js-logo.svg" class="me-2 {{language}}-svg" alt="{{language}}">
@@ -57,7 +57,9 @@
                                         class='bx bx-link-external ms-2'></i></a></i>
                                 {{/if}}
                             </td>
-                            <td></td>
+                            <td>
+                                <span id="p-{{id}}-reqs-value">-</span><span id="p-{{id}}-flows-value" class="border-start ms-2 ps-2">-</span>
+                            </td>
                             <td><span class="time-ago" data-x-timeago="{{updated_at}}"></span></td>
                         </tr>
                         {{/each}}
@@ -68,6 +70,35 @@
         </main>
     </div>
     {{> parts/js.hbs}}
+    <script type="text/javascript">
+        (async () => {
+            let pids = [];
+            document.querySelectorAll('tr[x-data-pid]').forEach((tr) => {
+                let pid = tr.getAttribute('x-data-pid');
+                pids.push(parseInt(pid));
+            });
+
+            let resp = await fetch("/traffic/projects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "period": "1d",
+                    "pids": pids,
+                })
+            })
+            let data = await resp.json();
+            for (let i in pids) {
+                let pid = pids[i];
+                let total = data["pid-" + pid]?.total || 0;
+                document.getElementById("p-" + pid + "-reqs-value").innerHTML = total;
+                let ins = data["pid-" + pid + "-typ-main_in_bytes"]?.total || 0;
+                let outs = data["pid-" + pid + "-typ-main_out_bytes"]?.total || 0;
+                document.getElementById("p-" + pid + "-flows-value").innerHTML = friendly_bytesize(ins + outs, true);
+            }
+        })()
+    </script>
 </body>
 
 </html>
