@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+</head>
+
+<body>
+    <div id="root">
+        {{> parts/sidebar.hbs}}
+        <main id="main" class="w-100">
+            {{> parts/top-nav.hbs}}
+            <div id="main-container" class="overflow-y-auto">
+                <div id="admin-users-dashboard" class="p-3">
+                    <p class="mb-3">Manage all users on your site.</p>
+                    <table class="table shadow-none bg-transparent mb-3">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Avatar</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Projects</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">...</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each users}}
+                            <tr x-data-uid="{{id}}">
+                                <th scope="row">{{id}}</th>
+                                <td>
+                                    <p class="mb-1 fw-bold">{{name}}</p>
+                                    <p class="mb-0 small text-body-tertiary">{{username}}</p>
+                                </td>
+                                <td>
+                                    <img src="{{avatar_url}}" class="rounded" width="40" height="40">
+                                </td>
+                                <td>
+                                    <p class="mb-1">{{email}}</p>
+                                    <p class="small text-body-tertiary mb-0">
+                                        <a href="{{social_link}}" target="_blank">
+                                            {{social_name}}({{social_provider}})
+                                        </a>
+                                    </p>
+                                </td>
+                                <td>
+                                    {{projects_count}}
+                                </td>
+                                <td class="small text-body-secondary">
+                                    <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{created_at}}"
+                                        data-x-timeago="{{created_at}}"></span>
+                                </td>
+                                <td>
+                                    <span class="small text-uppercase status-{{status}} badge">
+                                        {{status}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="View Source"
+                                        class="link-reset me-1 d-inline-block">
+                                        <span x-data-modal-pid="{{id}}" data-bs-toggle="modal"
+                                            data-bs-target="#project-source-modal">
+                                            <i class='bx bx-file-find'></i>
+                                        </span>
+                                    </a>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy"
+                                        class="link-reset me-1 d-inline-block"><i class='bx bx-refresh'></i></a>
+                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="Disable"
+                                        class="link-reset me-1 d-inline-block"><i class='bx bx-stop-circle'></i></a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                    <ul class="pagination pagination-sm mb-3">
+                        {{#each pagination.items}}
+                        <li class="page-item"><a class="page-link" href="{{link}}">{{page}}</a></li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            {{> parts/footer.hbs}}
+        </main>
+    </div>
+    {{> parts/js.hbs}}
+</body>
+
+</html>

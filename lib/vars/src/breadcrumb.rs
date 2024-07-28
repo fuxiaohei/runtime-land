@@ -53,6 +53,16 @@ impl BreadCrumb {
                     link: None,
                 },
             ],
+            BreadCrumbKey::AdminUsers => vec![
+                BreadCrumb {
+                    title: "Admin".to_string(),
+                    link: Some("/admin".to_string()),
+                },
+                BreadCrumb {
+                    title: "Users".to_string(),
+                    link: None,
+                },
+            ],
             BreadCrumbKey::AdminStorage => vec![
                 BreadCrumb {
                     title: "Admin".to_string(),
@@ -108,6 +118,7 @@ pub enum BreadCrumbKey {
     NotFound,
     Admin,
     AdminProjects,
+    AdminUsers,
     AdminStorage,
     AdminWorkers,
     AdminSettings,

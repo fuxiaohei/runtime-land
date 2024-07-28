@@ -20,6 +20,7 @@
                                 <th scope="col">Name</th>
                                 <th scope="col">Lang</th>
                                 <th scope="col">Owner</th>
+                                <th scope="col" style="width:150px;">Traffic</th>
                                 <th scope="col">Updated/Created</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">...</th>
@@ -27,7 +28,7 @@
                         </thead>
                         <tbody>
                             {{#each projects}}
-                            <tr>
+                            <tr x-data-pid="{{id}}">
                                 <th scope="row">{{id}}</th>
                                 <td>
                                     <p class="mb-1 fw-bold">{{name}}</p>
@@ -38,9 +39,13 @@
                                 </td>
                                 <td>
                                     {{#if owner}}
-                                    {{owner.name}}
-                                    <span class="small text-body-tertiary ms-1">({{owner.email}})</span>
+                                    <p class="mb-1">{{owner.name}}</p>
+                                    <p class="small text-body-tertiary mb-0">{{owner.email}}</p>
                                     {{/if}}
+                                </td>
+                                <td>
+                                    <span id="p-{{id}}-reqs-value">-</span><span id="p-{{id}}-flows-value"
+                                        class="border-start ms-2 ps-2">-</span>
                                 </td>
                                 <td class="small text-body-secondary">
                                     <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{updated_at}}"
@@ -48,10 +53,19 @@
                                     <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{created_at}}"
                                         data-x-timeago="{{created_at}}"></span>
                                 </td>
-                                <td class="small text-uppercase status-{{deploy_status}}">{{deploy_status}}</td>
+                                <td>
+                                    <span class="small text-uppercase status-{{deploy_status}} badge">
+                                        {{deploy_status}}
+                                    </span>
+                                </td>
                                 <td>
                                     <a href="#" data-bs-toggle="tooltip" data-bs-title="View Source"
-                                        class="link-reset me-1 d-inline-block"><i class='bx bx-file-find'></i></a>
+                                        class="link-reset me-1 d-inline-block">
+                                        <span x-data-modal-pid="{{id}}" data-bs-toggle="modal"
+                                            data-bs-target="#project-source-modal">
+                                            <i class='bx bx-file-find'></i>
+                                        </span>
+                                    </a>
                                     <a href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy"
                                         class="link-reset me-1 d-inline-block"><i class='bx bx-refresh'></i></a>
                                     <a href="#" data-bs-toggle="tooltip" data-bs-title="Disable"
@@ -68,10 +82,61 @@
                     </ul>
                 </div>
             </div>
+            <div class="modal fade" id="project-source-modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <pre class="mb-0"><code class="language-javascript">loading...</code></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {{> parts/footer.hbs}}
         </main>
     </div>
     {{> parts/js.hbs}}
+    <script type="text/javascript">
+        (async () => {
+            let pids = [];
+            document.querySelectorAll('tr[x-data-pid]').forEach((tr) => {
+                let pid = tr.getAttribute('x-data-pid');
+                pids.push(parseInt(pid));
+            });
+
+            let resp = await fetch("/admin/projects/traffic", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "period": "1d",
+                    "pids": pids,
+                })
+            })
+            let data = await resp.json();
+            for (let i in pids) {
+                let pid = pids[i];
+                let total = data["pid-" + pid]?.total || 0;
+                document.getElementById("p-" + pid + "-reqs-value").innerHTML = total;
+                let ins = data["pid-" + pid + "-typ-main_in_bytes"]?.total || 0;
+                let outs = data["pid-" + pid + "-typ-main_out_bytes"]?.total || 0;
+                document.getElementById("p-" + pid + "-flows-value").innerHTML = friendly_bytesize(ins + outs, true);
+            }
+        })();
+        (async () => {
+            document.querySelectorAll('span[x-data-modal-pid]').forEach((span) => {
+                let pid = span.getAttribute('x-data-modal-pid');
+                span.addEventListener('click', async (e) => {
+                   let resp = await fetch("/admin/projects/source?pid="+pid);
+                   let data = await resp.text();
+                   document.querySelector("#project-source-modal div.modal-body code").innerHTML = data;
+                });
+            })
+        })()
+    </script>
 </body>
 
 </html>

@@ -18,6 +18,7 @@ mod middle;
 mod projects;
 mod settings;
 mod storage;
+mod users;
 mod workers;
 
 async fn handler(
@@ -48,6 +49,8 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
     let app = Router::new()
         .route("/", get(handler))
         .route("/projects", get(projects::index))
+        .route("/projects/traffic", post(projects::traffic))
+        .route("/projects/source", get(projects::source))
         .route("/settings", get(settings::index))
         .route("/settings/domains", post(settings::update_domains))
         .route("/settings/prometheus", post(settings::update_prometheus))
@@ -55,6 +58,7 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/workers", get(workers::index))
         .route("/workers/tokens/create", post(workers::create_token))
         .route("/workers/tokens/remove", post(workers::remove_token))
+        .route("/users", get(users::index))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::check_admin))
         .route_layer(middleware::from_fn(crate::dash::middle::logger))

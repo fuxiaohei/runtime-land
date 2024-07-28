@@ -15,6 +15,8 @@ pub struct AuthUser {
     pub is_admin: bool,
     pub last_login_at: i64,
     pub created_at: i64,
+    pub status: String,
+    pub projects_count: Option<i64>,
 }
 
 impl AuthUser {
@@ -32,6 +34,8 @@ impl AuthUser {
             is_admin: user.role == UserRole::Admin.to_string(),
             last_login_at: user.last_login_at.and_utc().timestamp(),
             created_at: user.created_at.and_utc().timestamp(),
+            status: user.status.clone(),
+            projects_count:None,
         };
         if user.oauth_provider.contains("github") {
             u.social_name = Some(user.name.clone());

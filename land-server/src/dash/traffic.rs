@@ -54,7 +54,7 @@ pub async fn projects(
         .map(|pid| pid.to_string())
         .collect::<Vec<String>>();
     let period = traffic::PeriodParams::new(&f.period, None);
-    let lines = traffic::projects_traffic(user.id.to_string(), pids, &period).await?;
+    let lines = traffic::projects_traffic(Some(user.id.to_string()), pids, &period).await?;
     info!(
         "projects, start:{}, end:{}, step:{}, cost:{}",
         period.start,

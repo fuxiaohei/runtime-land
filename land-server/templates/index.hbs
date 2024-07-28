@@ -15,7 +15,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0 fw-medium fs-5">Recent Projects</p>
-                            <p class="mb-0 small text-body-tertiary">Show the most recent projects you have deployed.</p>
+                            <p class="mb-0 small text-body-tertiary">Show the most recent projects you have deployed.
+                            </p>
                         </div>
                         <a href="/new" class="link-reset">
                             <button class="btn btn-dark vertical-center">
@@ -40,10 +41,11 @@
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-start">
-                                    <button
-                                        class="btn btn-reset btn-sm ps-0 y-center"><span
-                                            class="link text-decoration-underline">{{prod_domain_full}}</span><i
-                                            class='bx bx-link-external ms-1 fs-6'></i></button>
+                                    <button class="btn project-link btn-reset btn-sm ps-0 y-center"
+                                        x-data-url="{{prod_domain_url}}">
+                                        <span class="link text-decoration-underline">{{prod_domain_full}}</span>
+                                        <i class='bx bx-link-external ms-1 fs-6'></i>
+                                    </button>
                                 </div>
                                 <p class="mb-1 text-body-secondary small">Last updated: <span class="time-ago ms-1"
                                         data-x-timeago="{{updated_at}}"></span></p>

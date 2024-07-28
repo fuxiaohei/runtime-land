@@ -32,20 +32,36 @@ pub(crate) fn flow_ql(pid: Option<String>, uid: Option<String>, step: &str) -> R
     }
 }
 
-pub(crate) fn projects_traffic_ql(uid: String, pids: Vec<String>, step: &str) -> String {
-    format!(
-        "sum by (pid) (increase(req_fn_total{{uid=\"{}\",typ=\"all\",pid=~\"{}\"}}[{}]))",
-        uid,
-        pids.join("|"),
-        step
-    )
+pub(crate) fn projects_traffic_ql(uid: Option<String>, pids: Vec<String>, step: &str) -> String {
+    if let Some(uid) = uid {
+        format!(
+            "sum by (pid) (increase(req_fn_total{{uid=\"{}\",typ=\"all\",pid=~\"{}\"}}[{}]))",
+            uid,
+            pids.join("|"),
+            step
+        )
+    } else {
+        format!(
+            "sum by (pid) (increase(req_fn_total{{typ=\"all\",pid=~\"{}\"}}[{}]))",
+            pids.join("|"),
+            step
+        )
+    }
 }
 
-pub(crate) fn projects_flows_ql(uid: String, pids: Vec<String>, step: &str) -> String {
-    format!(
-        "sum by (pid,typ) (increase(req_fn_bytes{{uid=\"{}\",pid=~\"{}\"}}[{}]))",
-        uid,
-        pids.join("|"),
-        step
-    )
+pub(crate) fn projects_flows_ql(uid: Option<String>, pids: Vec<String>, step: &str) -> String {
+    if let Some(uid) = uid {
+        format!(
+            "sum by (pid,typ) (increase(req_fn_bytes{{uid=\"{}\",pid=~\"{}\"}}[{}]))",
+            uid,
+            pids.join("|"),
+            step
+        )
+    } else {
+        format!(
+            "sum by (pid,typ) (increase(req_fn_bytes{{pid=~\"{}\"}}[{}]))",
+            pids.join("|"),
+            step
+        )
+    }
 }

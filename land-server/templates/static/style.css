@@ -170,3 +170,20 @@ a.link-hover:hover {
     width: 100%;
     height: 100%;
 }
+
+#projects-dashboard .badge.status-waiting{
+    background-color: #DDD;
+    color: #333;
+}
+
+#projects-dashboard .badge.status-success,
+#admin-users-dashboard .badge.status-active{
+    background-color: #008000;
+    color: #e2e4e5;
+}
+
+#projects-dashboard .badge.status-failed,
+#admin-users-dashboard .badge.status-disabled{
+    background-color: #b22b38;
+    color: #e2e4e5;
+}

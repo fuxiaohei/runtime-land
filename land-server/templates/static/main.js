@@ -78,6 +78,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     })();
 
+    // external link button click in index page
+    (() => {
+        const links = document.querySelectorAll(".project-item .btn.project-link");
+        links.forEach((link) => {
+            console.log(link);
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                let url = link.getAttribute("x-data-url")
+                window.open(url, "_blank");
+            });
+        });
+    })();
+
     // traffic logic
     (() => {
 

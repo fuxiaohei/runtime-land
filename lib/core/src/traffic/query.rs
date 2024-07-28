@@ -41,7 +41,7 @@ pub async fn requests_traffic(
 
 /// projects_traffic queries projects traffic with requests and flows
 pub async fn projects_traffic(
-    uid:String,
+    uid:Option<String>,
     pids:Vec<String>,
     period: &PeriodParams,
 )-> Result<MultiLineSeries> {

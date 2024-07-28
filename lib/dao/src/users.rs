@@ -1,7 +1,10 @@
 use crate::{models::user_info, now_time, DB};
 use anyhow::{anyhow, Result};
 use land_common::rand_string;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, ItemsAndPagesNumber, PaginatorTrait, QueryFilter,
+    QueryOrder,
+};
 use std::collections::HashMap;
 
 /// ----- user
@@ -11,6 +14,7 @@ use std::collections::HashMap;
 pub enum UserStatus {
     Active,
     Disabled,
+    Deleted,
 }
 
 #[derive(strum::Display)]
@@ -115,4 +119,24 @@ pub async fn create(
     user_active_model.id = Default::default();
     let user_model = user_active_model.insert(DB.get().unwrap()).await?;
     Ok(user_model)
+}
+
+/// list lists all users with optional name and pagination
+pub async fn list(
+    search: Option<String>,
+    page: u64,
+    page_size: u64,
+) -> Result<(Vec<user_info::Model>, ItemsAndPagesNumber)> {
+    let db = DB.get().unwrap();
+    let mut select = user_info::Entity::find()
+        .filter(user_info::Column::Status.ne(UserStatus::Deleted.to_string()))
+        .order_by_desc(user_info::Column::CreatedAt);
+    if let Some(search) = search {
+        let search = format!("%{}%", search);
+        select = select.filter(user_info::Column::Name.like(search));
+    }
+    let pager = select.paginate(db, page_size);
+    let projects = pager.fetch_page(page - 1).await?;
+    let pages = pager.num_items_and_pages().await?;
+    Ok((projects, pages))
 }

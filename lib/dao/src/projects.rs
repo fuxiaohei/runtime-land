@@ -7,9 +7,10 @@ use anyhow::{anyhow, Result};
 use rand::Rng;
 use random_word::Lang;
 use sea_orm::{
-    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, ItemsAndPagesNumber,
-    PaginatorTrait, QueryFilter, QueryOrder,
+    sea_query::Expr, ActiveModelTrait, ActiveValue, ColumnTrait, EntityTrait, FromQueryResult,
+    ItemsAndPagesNumber, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
 };
+use std::collections::HashMap;
 use tracing::info;
 
 #[derive(strum::Display, strum::EnumString, Clone)]
@@ -263,4 +264,30 @@ pub async fn update_source(id: i32, source: String) -> Result<deployment::Model>
     );
 
     Ok(dp)
+}
+
+#[derive(FromQueryResult, Debug)]
+struct CountByUsers {
+    num: i64,
+    owner_id: i32,
+}
+
+/// count_by_users counts projects by users
+pub async fn count_by_users(users: Vec<i32>) -> Result<HashMap<i32, i64>> {
+    let db = DB.get().unwrap();
+    let projects = project::Entity::find()
+        .select_only()
+        .column_as(project::Column::Id.count(), "num")
+        .column(project::Column::OwnerId)
+        .filter(project::Column::OwnerId.is_in(users))
+        .filter(project::Column::Status.ne(Status::Deleted.to_string()))
+        .group_by(project::Column::OwnerId)
+        .into_model::<CountByUsers>()
+        .all(db)
+        .await?;
+    let mut map = HashMap::new();
+    for project in projects {
+        map.insert(project.owner_id, project.num);
+    }
+    Ok(map)
 }
