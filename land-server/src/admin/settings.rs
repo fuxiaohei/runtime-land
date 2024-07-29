@@ -4,7 +4,7 @@ use crate::{
 };
 use axum::{response::IntoResponse, Extension, Form};
 use axum_template::RenderHtml;
-use land_core::traffic;
+use land_core::{storage, traffic};
 use land_dao::settings::{self, DomainSettings};
 use land_vars::{AuthUser, BreadCrumbKey, Page};
 use serde::{Deserialize, Serialize};
@@ -19,6 +19,7 @@ pub async fn index(
         pub nav_admin: bool,
         pub domain_settings: DomainSettings,
         pub prometheus: traffic::Settings,
+        pub storage: storage::Vars,
     }
     let domain_settings = settings::get_domain_settings().await?;
     let prometheus = traffic::get_settings().await?;
@@ -30,6 +31,7 @@ pub async fn index(
             page: Page::new("Admin Settings", BreadCrumbKey::AdminSettings, Some(user)),
             prometheus,
             domain_settings,
+            storage: storage::Vars::get().await?,
         },
     ))
 }
@@ -54,4 +56,12 @@ pub async fn update_prometheus(
 ) -> Result<impl IntoResponse, ServerError> {
     traffic::set_settings(f).await?;
     Ok(ok_html("Updated successfully"))
+}
+
+/// update_storage for admin storage, POST /admin/storage
+pub async fn update_storage(
+    Form(form): Form<storage::Form>,
+) -> Result<impl IntoResponse, ServerError> {
+    storage::update_by_form(form).await?;
+    Ok(ok_html("Storage updated"))
 }

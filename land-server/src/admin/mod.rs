@@ -14,10 +14,10 @@ use land_vars::{AuthUser, BreadCrumbKey, Page};
 use serde::Serialize;
 use tower_http::services::ServeDir;
 
+mod deploylogs;
 mod middle;
 mod projects;
 mod settings;
-mod storage;
 mod users;
 mod workers;
 
@@ -54,11 +54,12 @@ pub async fn route(assets_dir: &str, tpl_dir: Option<String>) -> Result<Router> 
         .route("/settings", get(settings::index))
         .route("/settings/domains", post(settings::update_domains))
         .route("/settings/prometheus", post(settings::update_prometheus))
-        .route("/storage", get(storage::index).post(storage::update))
+        .route("/settings/storage", post(settings::update_storage))
         .route("/workers", get(workers::index))
         .route("/workers/tokens/create", post(workers::create_token))
         .route("/workers/tokens/remove", post(workers::remove_token))
         .route("/users", get(users::index))
+        .route("/deploy-logs", get(deploylogs::index))
         .nest_service("/static", ServeDir::new(static_assets_dir))
         .route_layer(middleware::from_fn(middle::check_admin))
         .route_layer(middleware::from_fn(crate::dash::middle::logger))
