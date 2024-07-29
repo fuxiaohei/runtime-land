@@ -53,10 +53,10 @@ rust-embed = { version = "8.5.0", features = [
     "compression",
 ] }
 serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
+serde_json = "1.0.121"
 strum = { version = "0.26.3", features = ["derive"] }
 time = { version = "0.3.36", features = ["local-offset"] }
-tokio = { version = "1.39.1", features = ["full"] }
+tokio = { version = "1.39.2", features = ["full"] }
 tower-http = { version = "0.5.2", features = [
     "timeout",
     "cors",
