@@ -47,7 +47,7 @@ pub async fn index(
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Admin", BreadCrumbKey::AdminProjects, Some(user)),
+            page: Page::new("Admin Projects", BreadCrumbKey::AdminProjects, Some(user)),
             projects,
             pagination,
         },

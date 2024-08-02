@@ -69,6 +69,15 @@ i.bx {
     padding: .5rem 1rem;
 }
 
+html[data-bs-theme="dark"] {
+    --bs-border-color: #34393e !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-menu,
+html[data-bs-theme="dark"] .dropdown-divider {
+    border-color: var(--bs-border-color) !important;
+}
+
 #root {
     height: 100vh;
     max-height: 100vh;
@@ -81,6 +90,10 @@ i.bx {
 #sidebar {
     width: 220px;
     background-color: #f9fdfe;
+}
+
+html[data-bs-theme="dark"] #sidebar {
+    background-color: var(--bs-body-bg);
 }
 
 #logo-brand,
@@ -104,15 +117,41 @@ a.link-hover:hover {
     background-color: #e2e4e5;
 }
 
+html[data-bs-theme="dark"] #account-nav .nav-link,
+html[data-bs-theme="dark"] #resource-nav .nav-link,
+html[data-bs-theme="dark"] #project-nav .nav-link,
+html[data-bs-theme="dark"] #admin-nav .nav-link {
+    color: #878987;
+}
+
+html[data-bs-theme="dark"] #account-nav .nav-link:hover,
+html[data-bs-theme="dark"] #resource-nav .nav-link:hover,
+html[data-bs-theme="dark"] #project-nav .nav-link:hover,
+html[data-bs-theme="dark"] #admin-nav .nav-link:hover {
+    background-color: #1a1a1a;
+    color: #c3c6c4;
+}
+
 #account-nav .nav-link.active,
 #project-nav .nav-link.active {
     background-color: #d4e9f4 !important;
     color: #3459e6;
 }
 
+html[data-bs-theme="dark"] #account-nav .nav-link.active,
+html[data-bs-theme="dark"] #project-nav .nav-link.active {
+    background-color: #1a1a1a !important;
+    color: #e0e3e1 !important;
+}
+
 #admin-nav .nav-link.active {
     background-color: #f8d7da !important;
     color: #b22b38;
+}
+
+html[data-bs-theme="dark"] #admin-nav .nav-link.active {
+    background-color: #b22b38 !important;
+    color: #f8d7da !important;
 }
 
 #user-dropdown .admin:hover {
@@ -123,6 +162,10 @@ a.link-hover:hover {
 .project-item:hover {
     border-color: #ccc !important;
     box-shadow: .5rem #ccc;
+}
+
+html[data-bs-theme="dark"] .project-item:hover {
+    border-color: #636262 !important;
 }
 
 .project-item.project-item-new {
@@ -171,19 +214,19 @@ a.link-hover:hover {
     height: 100%;
 }
 
-#projects-dashboard .badge.status-waiting{
+#projects-dashboard .badge.status-waiting {
     background-color: #DDD;
     color: #333;
 }
 
 #projects-dashboard .badge.status-success,
-#admin-users-dashboard .badge.status-active{
+#admin-users-dashboard .badge.status-active {
     background-color: #008000;
     color: #e2e4e5;
 }
 
 #projects-dashboard .badge.status-failed,
-#admin-users-dashboard .badge.status-disabled{
+#admin-users-dashboard .badge.status-disabled {
     background-color: #b22b38;
     color: #e2e4e5;
 }

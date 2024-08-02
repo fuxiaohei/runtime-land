@@ -34,7 +34,7 @@ pub async fn index(
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Workers", BreadCrumbKey::AdminWorkers, Some(user)),
+            page: Page::new("Admin Workers", BreadCrumbKey::AdminWorkers, Some(user)),
             tokens: Token::new_from_models(token_values),
             token_create_url: "/admin/workers/tokens/create".to_string(),
             token_remove_url: "/admin/workers/remove".to_string(),

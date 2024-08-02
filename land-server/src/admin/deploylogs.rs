@@ -19,7 +19,7 @@ pub async fn index(
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Admin", BreadCrumbKey::AdminDeployLogs, Some(user)),
+            page: Page::new("Admin Deploy Logs", BreadCrumbKey::AdminDeployLogs, Some(user)),
         },
     ))
 }

@@ -42,7 +42,7 @@ pub async fn index(
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Admin", BreadCrumbKey::AdminUsers, Some(user)),
+            page: Page::new("Admin Users", BreadCrumbKey::AdminUsers, Some(user)),
             users,
             pagination,
         },

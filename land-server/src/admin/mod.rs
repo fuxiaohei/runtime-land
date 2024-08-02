@@ -35,7 +35,7 @@ async fn handler(
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Admin", BreadCrumbKey::Admin, Some(user)),
+            page: Page::new("Admin Dashboard", BreadCrumbKey::Admin, Some(user)),
         },
     ))
 }
