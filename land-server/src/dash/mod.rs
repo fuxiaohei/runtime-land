@@ -74,7 +74,7 @@ async fn handler(
         engine,
         Vars {
             page: Page::new("Dashboard", BreadCrumbKey::Home, Some(user)),
-            projects: Project::new_from_models(projects_data).await?,
+            projects: Project::new_from_models(projects_data, false).await?,
         },
     ))
 }

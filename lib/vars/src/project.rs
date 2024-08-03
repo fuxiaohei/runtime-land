@@ -1,6 +1,6 @@
 use crate::AuthUser;
 use anyhow::{anyhow, Result};
-use land_dao::{deploys, models::project, playground, projects::CreatedBy, settings};
+use land_dao::{deploys, models::project, playground, projects::CreatedBy, settings, users};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -31,10 +31,27 @@ pub struct Project {
 
 impl Project {
     /// new_from_models creates a list of projects from a list of models
-    pub async fn new_from_models(models: Vec<project::Model>) -> Result<Vec<Self>> {
+    pub async fn new_from_models(
+        models: Vec<project::Model>,
+        with_owner: bool,
+    ) -> Result<Vec<Self>> {
         let mut projects = Vec::new();
         for model in models {
             projects.push(Project::new(&model).await?);
+        }
+        if with_owner {
+            // read owners to fill
+            let mut owner_ids = vec![];
+            for project in &projects {
+                owner_ids.push(project.owner_id);
+            }
+            let owners = users::find_by_ids(owner_ids).await?;
+            for project in &mut projects {
+                let owner = owners.get(&project.owner_id);
+                if let Some(owner) = owner {
+                    project.owner = Some(AuthUser::new(owner));
+                }
+            }
         }
         Ok(projects)
     }

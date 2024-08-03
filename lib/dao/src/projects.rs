@@ -198,6 +198,7 @@ pub async fn set_deploy_status(id: i32, status: deploys::Status, msg: &str) -> R
             Expr::value(status.to_string()),
         )
         .col_expr(project::Column::DeployMessage, Expr::value(msg))
+        .col_expr(project::Column::UpdatedAt, Expr::value(now_time()))
         .filter(project::Column::Id.eq(id))
         .exec(db)
         .await?;

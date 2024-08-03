@@ -10,7 +10,7 @@ use axum::{
     Extension, Router,
 };
 use axum_template::RenderHtml;
-use land_vars::{AuthUser, BreadCrumbKey, Page};
+use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
 use tower_http::services::ServeDir;
 
@@ -29,13 +29,21 @@ async fn handler(
     struct Vars {
         pub page: Page,
         pub nav_admin: bool,
+        pub projects: Vec<Project>,
+        pub users: Vec<AuthUser>,
     }
+    let (projects_data, _) = land_dao::projects::list(None, None, 1, 5).await?;
+    let projects = Project::new_from_models(projects_data, true).await?;
+    let (user_models, _) = land_dao::users::list(None, 1, 5).await?;
+    let users: Vec<_> = user_models.iter().map(AuthUser::new).collect();
     Ok(RenderHtml(
         "admin/index.hbs",
         engine,
         Vars {
             nav_admin: true,
             page: Page::new("Admin Dashboard", BreadCrumbKey::Admin, Some(user)),
+            projects,
+            users,
         },
     ))
 }

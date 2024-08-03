@@ -2,7 +2,7 @@ use crate::{dash::ServerError, templates::Engine};
 use axum::{extract::Query, http::StatusCode, response::IntoResponse, Extension, Json};
 use axum_template::RenderHtml;
 use land_core::traffic;
-use land_dao::{playground, projects, users};
+use land_dao::{playground, projects};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Pagination, Project};
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -20,7 +20,7 @@ pub async fn index(
     }
 
     let (project_models, pager) = projects::list(None, None, 1, 20).await?;
-    let mut projects = Project::new_from_models(project_models).await?;
+    let projects = Project::new_from_models(project_models, true).await?;
     let pagination = Pagination::new(
         1,
         20,
@@ -28,19 +28,6 @@ pub async fn index(
         pager.number_of_items,
         "/admin/projects",
     );
-
-    // read owners to fill
-    let mut owner_ids = vec![];
-    for project in &projects {
-        owner_ids.push(project.owner_id);
-    }
-    let owners = users::find_by_ids(owner_ids).await?;
-    for project in &mut projects {
-        let owner = owners.get(&project.owner_id);
-        if let Some(owner) = owner {
-            project.owner = Some(AuthUser::new(owner));
-        }
-    }
 
     Ok(RenderHtml(
         "admin/projects.hbs",

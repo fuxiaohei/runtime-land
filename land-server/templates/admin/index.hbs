@@ -11,8 +11,41 @@
         <main id="main" class="w-100">
             {{> parts/top-nav.hbs}}
             <div id="main-container" class="overflow-y-auto">
-                <div id="admin-dashboard" class="p-3">
-                    admin-admin
+                <div id="admin-dashboard" class="p-3 container">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p class="mb-1">Recent Projects</p>
+                            <ul class="list-group list-group-flush shadow-none">
+                                {{#each projects}}
+                                <li class="p-2 list-group-item y-center justify-content-between">
+                                    <div>
+                                        <h6 class="mb-1">{{name}}</h6>
+                                        <p class="mb-0 text-body-tertiary small"><span class="fw-medium">{{owner.name}}
+                                                ({{owner.email}})</span></p>
+                                    </div>
+                                    <div class="text-body-tertiary small">
+                                        Updated at <span class="time-ago" data-x-timeago="{{updated_at}}"></span>
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-3">Recent Created Users</p>
+                            <ul class="list-group list-group-flush shadow-none">
+                                {{#each users}}
+                                <li class="p-2 list-group-item y-center justify-content-start">
+                                    <img src="{{avatar_url}}" class="rounded" width="40" height="40">
+                                    <div class="ms-2">
+                                        <h6 class="mb-1">{{name}}</h6>
+                                        <p class="mb-0 text-body-tertiary small"><span
+                                                class="fw-medium">{{email}}</span></p>
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             {{> parts/footer.hbs}}
