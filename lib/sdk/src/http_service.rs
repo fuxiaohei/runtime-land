@@ -956,7 +956,7 @@ mod _rt {
     extern crate alloc as alloc_crate;
 }
 #[cfg(target_arch = "wasm32")]
-#[link_section = "component-type:wit-bindgen:0.28.0:http-service-with-all-of-its-exports-removed:encoded world"]
+#[link_section = "component-type:wit-bindgen:0.29.0:http-service-with-all-of-its-exports-removed:encoded world"]
 #[doc(hidden)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1168] = *b"\
 \0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xed\x07\x01A\x02\x01\
@@ -984,8 +984,8 @@ response\x03\0\x02\x02\x03\x02\x01\x05\x04\0\x0drequest-error\x03\0\x04\x02\x03\
 \x01\x07options\x07\0\x08\x04\0\x0csend-request\x01\x09\x03\x01\x12land:http/fet\
 ching\x05\x07\x04\x018land:worker/http-service-with-all-of-its-exports-removed\x04\
 \0\x0b2\x01\0,http-service-with-all-of-its-exports-removed\x03\0\0\0G\x09produce\
-rs\x01\x0cprocessed-by\x02\x0dwit-component\x070.214.0\x10wit-bindgen-rust\x060.\
-28.0";
+rs\x01\x0cprocessed-by\x02\x0dwit-component\x070.215.0\x10wit-bindgen-rust\x060.\
+29.0";
 #[inline(never)]
 #[doc(hidden)]
 #[cfg(target_arch = "wasm32")]

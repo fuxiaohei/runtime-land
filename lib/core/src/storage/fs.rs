@@ -67,8 +67,7 @@ pub async fn new_operator() -> Result<Operator> {
     std::fs::create_dir_all(&settings.local_path)?;
     let abs_path = std::path::Path::new(&settings.local_path).canonicalize()?;
     debug!("fs storage path: {:?}", abs_path);
-    let mut builder = Fs::default();
-    builder.root(abs_path.to_str().unwrap());
+    let builder = Fs::default().root(abs_path.to_str().unwrap());
     let op: Operator = Operator::new(builder)?.finish();
     Ok(op)
 }

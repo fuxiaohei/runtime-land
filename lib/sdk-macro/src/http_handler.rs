@@ -466,7 +466,7 @@ macro_rules! __export_http_handler_impl {
         exports::land::http::incoming::__export_land_http_incoming_cabi!($ty
         with_types_in $($path_to_types_root)*:: exports::land::http::incoming); const _ :
         () = { #[cfg(target_arch = "wasm32")] #[link_section =
-        "component-type:wit-bindgen:0.28.0:http-handler:imports and exports"]
+        "component-type:wit-bindgen:0.29.0:http-handler:imports and exports"]
         #[doc(hidden)] pub static __WIT_BINDGEN_COMPONENT_TYPE : [u8; 692] = *
         b"\
 \0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xb1\x04\x01A\x02\x01\
@@ -483,15 +483,15 @@ edirect\x13\x04\0\x0frequest-options\x03\0\x14\x03\x01\x0fland:http/types\x05\0\
 request\x03\0\0\x02\x03\x02\x01\x02\x04\0\x08response\x03\0\x02\x01@\x01\x03req\x01\
 \0\x03\x04\0\x0ehandle-request\x01\x04\x04\x01\x12land:http/incoming\x05\x03\x04\
 \x01\x18land:worker/http-handler\x04\0\x0b\x12\x01\0\x0chttp-handler\x03\0\0\0G\x09\
-producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.214.0\x10wit-bindgen-rus\
-t\x060.28.0";
+producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.215.0\x10wit-bindgen-rus\
+t\x060.29.0";
         };
     };
 }
 #[doc(inline)]
 pub use __export_http_handler_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[link_section = "component-type:wit-bindgen:0.28.0:http-handler-with-all-of-its-exports-removed:encoded world"]
+#[link_section = "component-type:wit-bindgen:0.29.0:http-handler-with-all-of-its-exports-removed:encoded world"]
 #[doc(hidden)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 639] = *b"\
 \0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xdc\x03\x01A\x02\x01\
@@ -506,7 +506,7 @@ eout\0\0\x0binvalid-url\0\0\x17destination-not-allowed\0\0\x11too-many-requests\
 edirect\x13\x04\0\x0frequest-options\x03\0\x14\x03\x01\x0fland:http/types\x05\0\x04\
 \x018land:worker/http-handler-with-all-of-its-exports-removed\x04\0\x0b2\x01\0,h\
 ttp-handler-with-all-of-its-exports-removed\x03\0\0\0G\x09producers\x01\x0cproce\
-ssed-by\x02\x0dwit-component\x070.214.0\x10wit-bindgen-rust\x060.28.0";
+ssed-by\x02\x0dwit-component\x070.215.0\x10wit-bindgen-rust\x060.29.0";
 #[inline(never)]
 #[doc(hidden)]
 #[cfg(target_arch = "wasm32")]

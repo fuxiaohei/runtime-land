@@ -1,11 +1,10 @@
+use super::UrlBuilder;
 use anyhow::Result;
 use land_common::obj_hash;
 use land_dao::settings;
 use opendal::{services::S3, Operator};
 use serde::{Deserialize, Serialize};
 use tracing::debug;
-
-use super::UrlBuilder;
 
 static S3_SETTINGS: &str = "storage-s3";
 
@@ -87,14 +86,14 @@ pub async fn hash() -> Result<String> {
 pub async fn new_operator() -> Result<Operator> {
     let settings = get().await?;
     debug!("s3 storage settings: {:?}", settings.endpoint);
-    let mut builder = S3::default();
-    builder.root(&settings.directory.unwrap_or("/".to_string()));
-    builder.bucket(&settings.bucket);
-    builder.region(&settings.region);
-    builder.endpoint(&settings.endpoint);
-    builder.access_key_id(&settings.access_key);
-    builder.secret_access_key(&settings.secret_key);
-    builder.batch_max_operations(100);
+    let builder = S3::default()
+        .root(&settings.directory.unwrap_or("/".to_string()))
+        .bucket(&settings.bucket)
+        .region(&settings.region)
+        .endpoint(&settings.endpoint)
+        .access_key_id(&settings.access_key)
+        .secret_access_key(&settings.secret_key)
+        .batch_max_operations(100);
     let op = Operator::new(builder)?.finish();
     Ok(op)
 }

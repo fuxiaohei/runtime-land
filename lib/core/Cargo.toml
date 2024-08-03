@@ -16,7 +16,7 @@ land-wasm-host = { workspace = true }
 lazy_static = { workspace = true }
 md5 = { workspace = true }
 once_cell = { workspace = true }
-opendal = { version = "0.47.3", default-features = false, features = [
+opendal = { version = "0.48.0", default-features = false, features = [
     "services-fs",
     "services-s3",
     "services-memory",
@@ -26,7 +26,7 @@ rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = "0.9.33"
-tempfile = "3.10.1"
+tempfile = "3.11.0"
 tokio = { workspace = true }
-toml = "0.8.16"
+toml = "0.8.19"
 tracing = { workspace = true }

@@ -95,8 +95,7 @@ pub async fn build_url(name: &str) -> Result<String> {
 
 /// STORAGE is the global storage operator
 static STORAGE: Lazy<Mutex<Operator>> = Lazy::new(|| {
-    let mut builder = Memory::default();
-    builder.root("/tmp");
+    let builder = Memory::default().root("/tmp");
     let op = Operator::new(builder).unwrap().finish();
     Mutex::new(op)
 });

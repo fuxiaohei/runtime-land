@@ -47,7 +47,7 @@ pub fn generate_guest(
 
     let mut output_maps = HashMap::new();
     let mut files = Files::default();
-    let world = resolve.select_world(&pkg, world.as_deref())?;
+    let world = resolve.select_world(pkg, world.as_deref())?;
     generator.generate(&resolve, world, &mut files)?;
     for (name, contents) in files.iter() {
         output_maps.insert(
