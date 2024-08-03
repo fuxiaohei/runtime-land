@@ -148,8 +148,8 @@ pub fn optimize(path: &str) -> Result<Option<String>> {
     };
     let target = path.replace(".wasm", ".opt.wasm");
     let child = Command::new(cmd)
-        .arg("-O")
-        .arg("--strip-debug")
+        .arg("-O3") // use O3 instead of --strip-debug, https://github.com/fastly/js-compute-runtime/commit/dd91fa506b74487b70dc5bec510e89de95e1c569
+        // .arg("--strip-debug")
         .arg("-o")
         .arg(&target)
         .arg(path)
