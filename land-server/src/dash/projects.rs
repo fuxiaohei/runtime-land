@@ -29,7 +29,7 @@ pub async fn index(
         engine,
         Vars {
             page: Page::new("Projects", BreadCrumbKey::Projects, Some(user)),
-            projects: Project::new_from_models(projects_data,false).await?,
+            projects: Project::new_from_models(projects_data, false).await?,
         },
     ))
 }

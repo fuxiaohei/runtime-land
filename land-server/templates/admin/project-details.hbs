@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    {{> parts/head.hbs}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/a11y-dark.min.css">
+</head>
+
+<body>
+    <div id="root">
+        {{> parts/sidebar.hbs}}
+        <main id="main" class="w-100 overflow-y-auto">
+            {{> parts/top-nav.hbs}}
+            <div id="main-container" class="overflow-y-auto">
+                <div id="project-details-dashboard" class="p-3">
+                    <div class="header mb-2">
+                        <span class="fw-medium fs-5">{{project.name}}</span>
+                        <span class="text-body-tertiary ms-2">( {{project.description}} )</span>
+                        <span class="text-body-tertiary text-uppercase ms-2">( {{project.language}} )</span>
+                    </div>
+                    <div class="times small text-body-tertiary">
+                        <span>Updated at
+                            <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{project.updated_at}}"
+                                data-x-timeago="{{project.updated_at}}">
+                            </span>
+                        </span> |
+                        <span>Created at
+                            <span class="time-ago" data-bs-toggle="tooltip" data-bs-title="{{project.created_at}}"
+                                data-x-timeago="{{project.created_at}}">
+                            </span>
+                        </span>
+                    </div>
+                    <div class="ops-buttons p-3 my-3 border-top border-bottom">
+                        <a class="btn btn-success me-3 text-uppercase" href="{{project.prod_domain_url}}"
+                            target="_blank"><span class="y-center">
+                                <i class='bx bx-globe me-1'></i>View</span>
+                        </a>
+                        <button class="btn btn-dark me-3 text-uppercase"><span class="y-center">
+                                <i class='bx bx-refresh me-1'></i>redeploy</span>
+                        </button>
+                        <button class="btn btn-dark me-3 text-uppercase"><span class="y-center">
+                                <i class='bx bx-window-close me-1'></i>
+                                disable
+                            </span>
+                        </button>
+                        <button class="btn btn-dark me-3 text-uppercase"><span class="y-center">
+                                <i class='bx bx-window-open me-1'></i>
+                                enable
+                            </span>
+                        </button>
+                    </div>
+                    <div class="code-preview p-3 pt-1 overflow-y-auto" style="max-height: 240px;">
+                        <pre class="mb-0"><code class="language-javascript rounded">{{project.source}}</code></pre>
+                    </div>
+                    <div class="traffic-charts p-0 border-top">
+                        {{> components/traffic.hbs}}
+                    </div>
+                </div>
+            </div>
+            {{> parts/footer.hbs}}
+        </main>
+    </div>
+    {{> parts/js.hbs}}
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.initLineNumbersOnLoad();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"
+        integrity="sha256-6EJwvQzVvfYP78JtAMKjkcsugfTSanqe4WGFpUdzo88=" crossorigin="anonymous"></script>
+</body>
+
+</html>

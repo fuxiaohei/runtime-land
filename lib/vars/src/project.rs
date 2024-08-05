@@ -101,4 +101,15 @@ impl Project {
         project.source = Some(playground.unwrap().source);
         Ok(project)
     }
+
+    /// new_with_owner creates a new project from a model with owner
+    pub async fn new_with_owner(project: &project::Model) -> anyhow::Result<Self> {
+        let mut project = Project::new(project).await?;
+        let owner = users::get_by_id(project.owner_id, Some(users::UserStatus::Active)).await?;
+        if owner.is_none() {
+            return Err(anyhow!("Owner not found or disabled"));
+        }
+        project.owner = Some(AuthUser::new(&owner.unwrap()));
+        Ok(project)
+    }
 }

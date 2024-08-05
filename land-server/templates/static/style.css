@@ -78,6 +78,10 @@ html[data-bs-theme="dark"] .dropdown-divider {
     border-color: var(--bs-border-color) !important;
 }
 
+html[data-bs-theme="dark"] .btn-dark {
+    background-color: #34393e !important;
+}
+
 #root {
     height: 100vh;
     max-height: 100vh;
@@ -152,6 +156,10 @@ html[data-bs-theme="dark"] #project-nav .nav-link.active {
 html[data-bs-theme="dark"] #admin-nav .nav-link.active {
     background-color: #b22b38 !important;
     color: #f8d7da !important;
+}
+
+#user-dropdown .dropdown-menu {
+    width: 210px;
 }
 
 #user-dropdown .admin:hover {

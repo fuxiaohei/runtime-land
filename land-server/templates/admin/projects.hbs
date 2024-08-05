@@ -31,7 +31,9 @@
                             <tr x-data-pid="{{id}}">
                                 <th scope="row">{{id}}</th>
                                 <td>
-                                    <p class="mb-1 fw-bold">{{name}}</p>
+                                    <p class="mb-1 fw-bold">
+                                        <a href="/admin/projects/{{name}}" class="link-reset">{{name}}</a>
+                                    </p>
                                     <p class="mb-0 small text-body-tertiary text-uppercase">{{created_by}}</p>
                                 </td>
                                 <td class="lang-logo">
@@ -59,12 +61,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="#" data-bs-toggle="tooltip" data-bs-title="View Source"
-                                        class="link-reset me-1 d-inline-block">
-                                        <span x-data-modal-pid="{{id}}" data-bs-toggle="modal"
-                                            data-bs-target="#project-source-modal">
-                                            <i class='bx bx-file-find'></i>
-                                        </span>
+                                    <a href="/admin/projects/{{name}}" data-bs-toggle="tooltip"
+                                        data-bs-title="View Details" class="link-reset me-1 d-inline-block">
+                                        <i class='bx bx-file-find'></i>
                                     </a>
                                     <a href="#" data-bs-toggle="tooltip" data-bs-title="Redeploy"
                                         class="link-reset me-1 d-inline-block"><i class='bx bx-refresh'></i></a>
@@ -80,18 +79,6 @@
                         <li class="page-item"><a class="page-link" href="{{link}}">{{page}}</a></li>
                         {{/each}}
                     </ul>
-                </div>
-            </div>
-            <div class="modal fade" id="project-source-modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <pre class="mb-0"><code class="language-javascript">loading...</code></pre>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
                 </div>
             </div>
             {{> parts/footer.hbs}}
@@ -126,16 +113,6 @@
                 document.getElementById("p-" + pid + "-flows-value").innerHTML = friendly_bytesize(ins + outs, true);
             }
         })();
-        (async () => {
-            document.querySelectorAll('span[x-data-modal-pid]').forEach((span) => {
-                let pid = span.getAttribute('x-data-modal-pid');
-                span.addEventListener('click', async (e) => {
-                   let resp = await fetch("/admin/projects/source?pid="+pid);
-                   let data = await resp.text();
-                   document.querySelector("#project-source-modal div.modal-body code").innerHTML = data;
-                });
-            })
-        })()
     </script>
 </body>
 

@@ -1,5 +1,10 @@
 use crate::{dash::ServerError, templates::Engine};
-use axum::{extract::Query, http::StatusCode, response::IntoResponse, Extension, Json};
+use axum::{
+    extract::{Path, Query},
+    http::StatusCode,
+    response::IntoResponse,
+    Extension, Json,
+};
 use axum_template::RenderHtml;
 use land_core::traffic;
 use land_dao::{playground, projects};
@@ -78,4 +83,44 @@ pub async fn source(Query(query): Query<SourceQuery>) -> Result<impl IntoRespons
         ));
     }
     Ok(playground.unwrap().source.into_response())
+}
+
+/// details is route of project detail page, /admin/projects/:name
+pub async fn details(
+    Extension(user): Extension<AuthUser>,
+    engine: Engine,
+    Path(name): Path<String>,
+) -> Result<impl IntoResponse, ServerError> {
+    #[derive(Serialize)]
+    struct Vars {
+        pub page: Page,
+        pub nav_admin: bool,
+        pub project_admin_name: String,
+        pub project: Project,
+    }
+    let project = projects::get_by_name(&name, None).await?;
+    if project.is_none() {
+        return Err(ServerError::status_code(
+            StatusCode::NOT_FOUND,
+            "Project not found",
+        ));
+    }
+    let project_model = project.unwrap();
+    let mut project = Project::new_with_owner(&project_model).await?;
+    let p2 = Project::new_with_source(&project_model).await?;
+    project.source = p2.source;
+    Ok(RenderHtml(
+        "admin/project-details.hbs",
+        engine,
+        Vars {
+            nav_admin: true,
+            page: Page::new(
+                format!("Admin Project - {}", project.name).as_str(),
+                BreadCrumbKey::AdminProjects,
+                Some(user),
+            ),
+            project_admin_name: name,
+            project,
+        },
+    ))
 }
