@@ -29,72 +29,72 @@ function unix2hour(v) {
     return UnixTimeToDate
 }
 
+// theme dark mode
+(() => {
+    const changeTrafficPeriodBtn = theme => {
+        // traffic period button changes 
+        const traffic_period_btn = document.getElementById("traffic-period-btn");
+        if (traffic_period_btn) {
+            if (theme == "light") {
+                traffic_period_btn.classList.remove("btn-dark");
+                traffic_period_btn.classList.add("btn-secondary");
+            } else {
+                traffic_period_btn.classList.remove("btn-secondary");
+                traffic_period_btn.classList.add("btn-dark");
+            }
+        }
+    }
+
+    const getStoredTheme = () => localStorage.getItem('runtime-land-theme')
+    const setStoredTheme = theme => localStorage.setItem('runtime-land-theme', theme)
+    const getPreferredTheme = () => {
+        const storedTheme = getStoredTheme();
+        return storedTheme ? storedTheme : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    const setTheme = theme => {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        changeTrafficPeriodBtn(theme);
+    }
+    setTheme(getPreferredTheme());
+
+    // handle media change
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        let newTheme = e.matches ? 'dark' : 'light';
+        setTheme(newTheme);
+        setStoredTheme(newTheme);
+    });
+
+    // handle theme button click
+    const themeSwitcher = document.getElementById("theme-switcher");
+    if (!themeSwitcher) {
+        return;
+    }
+    themeSwitcher.addEventListener('click', function () {
+        let newTheme = getStoredTheme() === 'light' ? 'dark' : 'light';
+        // <i class='bx bx-sun'></i> // bxs-moon
+        setTheme(newTheme);
+        setStoredTheme(newTheme);
+
+        // swither icon changes
+        const btn = document.getElementById("theme-switcher-icon");
+        if (btn) {
+            if (newTheme == "light") {
+                btn.classList.remove("bx-sun");
+                btn.classList.add("bxs-moon");
+            } else {
+                btn.classList.remove("bxs-moon");
+                btn.classList.add("bx-sun");
+            }
+        }
+    });
+})();
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // bootstrap tooltip init
     (() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const _tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    })();
-
-    // theme dark mode
-    (() => {
-        const changeTrafficPeriodBtn = theme => {
-            // traffic period button changes 
-            const traffic_period_btn = document.getElementById("traffic-period-btn");
-            if (traffic_period_btn) {
-                if (theme == "light") {
-                    traffic_period_btn.classList.remove("btn-dark");
-                    traffic_period_btn.classList.add("btn-secondary");
-                } else {
-                    traffic_period_btn.classList.remove("btn-secondary");
-                    traffic_period_btn.classList.add("btn-dark");
-                }
-            }
-        }
-
-        const getStoredTheme = () => localStorage.getItem('runtime-land-theme')
-        const setStoredTheme = theme => localStorage.setItem('runtime-land-theme', theme)
-        const getPreferredTheme = () => {
-            const storedTheme = getStoredTheme();
-            return storedTheme ? storedTheme : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        const setTheme = theme => {
-            document.documentElement.setAttribute('data-bs-theme', theme);
-            changeTrafficPeriodBtn(theme);
-        }
-        setTheme(getPreferredTheme());
-
-        // handle media change
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
-            let newTheme = e.matches ? 'dark' : 'light';
-            setTheme(newTheme);
-            setStoredTheme(newTheme);
-        });
-
-        // handle theme button click
-        const themeSwitcher = document.getElementById("theme-switcher");
-        if (!themeSwitcher) {
-            return;
-        }
-        themeSwitcher.addEventListener('click', function () {
-            let newTheme = getStoredTheme() === 'light' ? 'dark' : 'light';
-            // <i class='bx bx-sun'></i> // bxs-moon
-            setTheme(newTheme);
-            setStoredTheme(newTheme);
-
-            // swither icon changes
-            const btn = document.getElementById("theme-switcher-icon");
-            if (btn) {
-                if (newTheme == "light") {
-                    btn.classList.remove("bx-sun");
-                    btn.classList.add("bxs-moon");
-                } else {
-                    btn.classList.remove("bxs-moon");
-                    btn.classList.add("bx-sun");
-                }
-            }
-        });
     })();
 
     // timeago change to human readable time

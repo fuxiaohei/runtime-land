@@ -74,6 +74,12 @@ async fn refresh() -> Result<()> {
             }
             continue;
         }
+
+        // worker found in livings, check if worker status is offline
+        if worker.status != workers::Status::Online.to_string() {
+            info!(ip = &worker.ip, "Set online by living");
+        }
+
         onlines.push(worker.ip.clone());
     }
 
