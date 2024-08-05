@@ -1,11 +1,10 @@
 use super::{redirect, ServerError};
 use crate::{
     dash::{error_html, notfound_html},
-    templates::Engine,
+    templates::{Engine, RenderHtmlMinified},
 };
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Form, Json};
 use axum_htmx::HxRedirect;
-use axum_template::RenderHtml;
 use land_core::examples::{self, Item};
 use land_dao::{deploys, projects, settings};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
@@ -24,7 +23,7 @@ pub async fn index(
         pub projects: Vec<Project>,
     }
     let (projects_data, _) = land_dao::projects::list(Some(user.id), None, 1, 50).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "projects.hbs",
         engine,
         Vars {
@@ -45,7 +44,7 @@ pub async fn new(
         pub examples: Vec<Item>,
     }
     let examples = examples::defaults();
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "project-new.hbs",
         engine,
         Vars {
@@ -120,7 +119,7 @@ pub async fn single(
         return Ok(notfound_html(engine, &msg, user).into_response());
     }
     let project = Project::new_with_source(&project.unwrap()).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "project-single.hbs",
         engine,
         Vars {
@@ -150,7 +149,7 @@ pub async fn traffic(
         return Ok(notfound_html(engine, &msg, user).into_response());
     }
     let project = Project::new_with_source(&project.unwrap()).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "project-traffic.hbs",
         engine,
         Vars {
@@ -182,7 +181,7 @@ pub async fn settings(
     }
     let domain_settings = settings::get_domain_settings().await?;
     let project = Project::new_with_source(&project.unwrap()).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "project-settings.hbs",
         engine,
         Vars {
@@ -249,7 +248,7 @@ pub async fn edit(
         return Ok(notfound_html(engine, &msg, user).into_response());
     }
     let project = Project::new_with_source(&project.unwrap()).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "project-edit.hbs",
         engine,
         Vars {

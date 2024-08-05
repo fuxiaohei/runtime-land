@@ -1,4 +1,4 @@
-use crate::templates::{new_handlebar, Engine};
+use crate::templates::{new_handlebar, Engine, RenderHtmlMinified};
 use anyhow::{anyhow, Result};
 use axum::{
     body::Body,
@@ -8,7 +8,6 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
-use axum_template::RenderHtml;
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
 use tower_http::services::ServeDir;
@@ -47,7 +46,7 @@ fn notfound_html(engine: Engine, msg: &str, user: AuthUser) -> impl IntoResponse
     }
     (
         StatusCode::NOT_FOUND,
-        RenderHtml(
+        RenderHtmlMinified(
             "not-found.hbs",
             engine,
             Vars {
@@ -69,7 +68,7 @@ async fn handler(
         pub projects: Vec<Project>,
     }
     let (projects_data, _) = land_dao::projects::list(Some(user.id), None, 1, 5).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "index.hbs",
         engine,
         Vars {

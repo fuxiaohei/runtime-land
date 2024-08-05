@@ -1,10 +1,9 @@
 use crate::{
     dash::{error_html, ServerError},
-    templates::Engine,
+    templates::{Engine, RenderHtmlMinified},
 };
 use axum::{response::IntoResponse, Extension, Form};
 use axum_htmx::HxRedirect;
-use axum_template::RenderHtml;
 use land_dao::{
     tokens::{self, Usage},
     workers,
@@ -29,7 +28,7 @@ pub async fn index(
     let token_values = tokens::list(None, Some(tokens::Usage::Worker)).await?;
     let workers_value = workers::find_all(None).await?;
     let workers = workers_value.iter().map(Worker::new).collect();
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/workers.hbs",
         engine,
         Vars {

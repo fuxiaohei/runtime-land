@@ -1,9 +1,8 @@
 use crate::{
     dash::{ok_html, ServerError},
-    templates::Engine,
+    templates::{Engine, RenderHtmlMinified},
 };
 use axum::{response::IntoResponse, Extension, Form};
-use axum_template::RenderHtml;
 use land_core::{storage, traffic};
 use land_dao::settings::{self, DomainSettings};
 use land_vars::{AuthUser, BreadCrumbKey, Page};
@@ -23,7 +22,7 @@ pub async fn index(
     }
     let domain_settings = settings::get_domain_settings().await?;
     let prometheus = traffic::get_settings().await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/settings.hbs",
         engine,
         Vars {

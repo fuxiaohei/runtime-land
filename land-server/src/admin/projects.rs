@@ -1,11 +1,13 @@
-use crate::{dash::ServerError, templates::Engine};
+use crate::{
+    dash::ServerError,
+    templates::{Engine, RenderHtmlMinified},
+};
 use axum::{
     extract::{Path, Query},
     http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
-use axum_template::RenderHtml;
 use land_core::traffic;
 use land_dao::{playground, projects};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Pagination, Project};
@@ -34,7 +36,7 @@ pub async fn index(
         "/admin/projects",
     );
 
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/projects.hbs",
         engine,
         Vars {
@@ -109,7 +111,7 @@ pub async fn details(
     let mut project = Project::new_with_owner(&project_model).await?;
     let p2 = Project::new_with_source(&project_model).await?;
     project.source = p2.source;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/project-details.hbs",
         engine,
         Vars {

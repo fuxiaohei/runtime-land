@@ -17,6 +17,7 @@ land-common = { workspace = true }
 land-core = { workspace = true }
 land-dao = { workspace = true }
 land-vars = { workspace = true }
+minify-html = "0.15.0"
 rust-embed = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

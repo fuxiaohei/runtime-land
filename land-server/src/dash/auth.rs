@@ -1,11 +1,10 @@
 use super::{redirect, ServerError};
-use crate::templates::Engine;
+use crate::templates::{Engine, RenderHtmlMinified};
 use axum::response::IntoResponse;
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     CookieJar,
 };
-use axum_template::RenderHtml;
 use land_core::clerk;
 use land_dao::{tokens, users};
 use land_vars::{BreadCrumbKey, Page};
@@ -18,7 +17,7 @@ pub(crate) async fn sign_in(engine: Engine) -> impl IntoResponse {
         pub page: Page,
         pub clerk: clerk::Vars,
     }
-    RenderHtml(
+    RenderHtmlMinified(
         "sign-in.hbs",
         engine,
         Vars {
@@ -86,7 +85,7 @@ pub(crate) async fn sign_out(engine: Engine, jar: CookieJar) -> impl IntoRespons
         pub page: Page,
         pub clerk: clerk::Vars,
     }
-    let resp = RenderHtml(
+    let resp = RenderHtmlMinified(
         "sign-out.hbs",
         engine,
         Vars {

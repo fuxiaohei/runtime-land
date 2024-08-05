@@ -1,6 +1,6 @@
 use crate::{
     dash::ServerError,
-    templates::{new_handlebar, Engine},
+    templates::{new_handlebar, Engine, RenderHtmlMinified},
 };
 use anyhow::Result;
 use axum::{
@@ -9,7 +9,6 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
-use axum_template::RenderHtml;
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
 use serde::Serialize;
 use tower_http::services::ServeDir;
@@ -36,7 +35,7 @@ async fn handler(
     let projects = Project::new_from_models(projects_data, true).await?;
     let (user_models, _) = land_dao::users::list(None, 1, 5).await?;
     let users: Vec<_> = user_models.iter().map(AuthUser::new).collect();
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/index.hbs",
         engine,
         Vars {

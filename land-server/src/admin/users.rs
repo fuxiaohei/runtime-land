@@ -1,6 +1,8 @@
-use crate::{dash::ServerError, templates::Engine};
+use crate::{
+    dash::ServerError,
+    templates::{Engine, RenderHtmlMinified},
+};
 use axum::{response::IntoResponse, Extension};
-use axum_template::RenderHtml;
 use land_dao::{projects, users};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Pagination};
 use serde::Serialize;
@@ -37,7 +39,7 @@ pub async fn index(
             .projects_count = Some(count);
     }
 
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/users.hbs",
         engine,
         Vars {

@@ -1,8 +1,10 @@
 use super::ServerError;
-use crate::{dash::error_html, templates::Engine};
+use crate::{
+    dash::error_html,
+    templates::{Engine, RenderHtmlMinified},
+};
 use axum::{response::IntoResponse, Extension, Form};
 use axum_htmx::HxRedirect;
-use axum_template::RenderHtml;
 use land_dao::tokens::{self, Usage};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Token};
 use serde::{Deserialize, Serialize};
@@ -21,7 +23,7 @@ pub async fn index(
         pub token_remove_url: String,
     }
     let token_values = tokens::list(Some(user.id), Some(tokens::Usage::Cmdline)).await?;
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "settings.hbs",
         engine,
         Vars {

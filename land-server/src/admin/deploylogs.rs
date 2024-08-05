@@ -1,6 +1,8 @@
-use crate::{dash::ServerError, templates::Engine};
+use crate::{
+    dash::ServerError,
+    templates::{Engine, RenderHtmlMinified},
+};
 use axum::{response::IntoResponse, Extension};
-use axum_template::RenderHtml;
 use land_vars::{AuthUser, BreadCrumbKey, Page};
 use serde::Serialize;
 
@@ -14,12 +16,16 @@ pub async fn index(
         pub page: Page,
         pub nav_admin: bool,
     }
-    Ok(RenderHtml(
+    Ok(RenderHtmlMinified(
         "admin/index.hbs",
         engine,
         Vars {
             nav_admin: true,
-            page: Page::new("Admin Deploy Logs", BreadCrumbKey::AdminDeployLogs, Some(user)),
+            page: Page::new(
+                "Admin Deploy Logs",
+                BreadCrumbKey::AdminDeployLogs,
+                Some(user),
+            ),
         },
     ))
 }

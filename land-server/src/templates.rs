@@ -74,3 +74,28 @@ fn extract(dir: &str) -> Result<()> {
 
 /// Engine is the template engine for axum_template
 pub type Engine = AxumTemplateEngine<Handlebars<'static>>;
+
+pub struct RenderHtmlMinified<K, E, S>(pub K, pub E, pub S);
+
+impl<K, E, S> axum::response::IntoResponse for RenderHtmlMinified<K, E, S>
+where
+    E: axum_template::TemplateEngine,
+    S: serde::Serialize,
+    K: AsRef<str>,
+{
+    fn into_response(self) -> axum::response::Response {
+        let RenderHtmlMinified(key, engine, data) = self;
+
+        let result = engine.render(key.as_ref(), data);
+        match result {
+            Ok(x) => {
+                let mut cfg = minify_html::Cfg::spec_compliant();
+                cfg.minify_js = true;
+                cfg.minify_css = true;
+                let minified = minify_html::minify(x.as_bytes(), &cfg);
+                axum::response::Html(minified).into_response()
+            }
+            Err(x) => x.into_response(),
+        }
+    }
+}
