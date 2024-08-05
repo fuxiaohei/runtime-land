@@ -222,18 +222,21 @@ html[data-bs-theme="dark"] .project-item:hover {
     height: 100%;
 }
 
-#projects-dashboard .badge.status-waiting {
+#projects-dashboard .badge.status-waiting,
+#projects-table .badge.status-waiting {
     background-color: #DDD;
     color: #333;
 }
 
 #projects-dashboard .badge.status-success,
+#projects-table .badge.status-success,
 #admin-users-dashboard .badge.status-active {
     background-color: #008000;
     color: #e2e4e5;
 }
 
 #projects-dashboard .badge.status-failed,
+#projects-table .badge.status-failed,
 #admin-users-dashboard .badge.status-disabled {
     background-color: #b22b38;
     color: #e2e4e5;
