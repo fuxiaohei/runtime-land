@@ -1834,6 +1834,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "htmlentity"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd54ae4f69adcc1a43637dcff230852832c3ad50df31a90e0cb5f001dd441359"
+dependencies = [
+ "anyhow",
+ "lazy_static",
+ "thiserror",
+]
+
+[[package]]
 name = "http"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2167,7 +2178,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "clap",
@@ -2182,7 +2193,7 @@ dependencies = [
 
 [[package]]
 name = "land-common"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "clap",
@@ -2199,7 +2210,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2226,7 +2237,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2248,7 +2259,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "http",
@@ -2260,7 +2271,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "http",
@@ -2270,7 +2281,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "axum",
@@ -2280,6 +2291,7 @@ dependencies = [
  "chrono",
  "clap",
  "handlebars",
+ "htmlentity",
  "land-common",
  "land-core",
  "land-dao",
@@ -2297,7 +2309,7 @@ dependencies = [
 
 [[package]]
 name = "land-vars"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2309,7 +2321,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2321,7 +2333,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-host"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2343,7 +2355,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-server"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "axum",
@@ -2361,7 +2373,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.5.0-beta.1"
+version = "0.5.0-beta.3"
 dependencies = [
  "anyhow",
  "clap",

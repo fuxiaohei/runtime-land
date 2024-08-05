@@ -5,6 +5,7 @@ use crate::{
 };
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Extension, Form, Json};
 use axum_htmx::HxRedirect;
+use htmlentity::entity::{encode, CharacterSet, EncodeType, ICodedDataTrait};
 use land_core::examples::{self, Item};
 use land_dao::{deploys, projects, settings};
 use land_vars::{AuthUser, BreadCrumbKey, Page, Project};
@@ -301,6 +302,7 @@ pub struct ProjectStatusForm {
 struct ProjectStatusResp {
     pub status: String,
     pub message: String,
+    pub html: String,
 }
 
 pub async fn handle_status(
@@ -317,9 +319,16 @@ pub async fn handle_status(
         return Ok(error_html("Deployment not found").into_response());
     }
     let dp = dp.unwrap();
+    let msg = dp.deploy_message.clone();
+    let html = encode(
+        msg.as_bytes(),
+        &EncodeType::NamedOrHex,
+        &CharacterSet::HtmlAndNonASCII,
+    );
     Ok(Json(ProjectStatusResp {
         status: dp.deploy_status,
         message: dp.deploy_message,
+        html: html.to_string()?,
     })
     .into_response())
 }

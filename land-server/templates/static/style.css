@@ -238,3 +238,7 @@ html[data-bs-theme="dark"] .project-item:hover {
     background-color: #b22b38;
     color: #e2e4e5;
 }
+
+#log-wrapper {
+    height: 160px;
+}

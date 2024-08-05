@@ -28,6 +28,7 @@ pub async fn init_waiting() {
 
 /// set_failed sets the deploy and project status to failed
 pub(crate) async fn set_failed(dp_id: i32, project_id: i32, mut message: &str) -> Result<()> {
+    // find last \n flag in 255 chars in message
     if message.len() > 255 {
         message = &message[..255];
     }

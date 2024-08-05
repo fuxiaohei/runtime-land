@@ -3,6 +3,12 @@
 
 <head>
     {{> parts/head.hbs}}
+    <style type="text/css">
+        .tooltip-inner {
+            text-align: left !important;
+            max-width: 300px !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,14 +28,20 @@
                     </div>
                 </div>
                 <div class="y-center justify-content-end">
-                    <div id="deploy-message"></div>
-                    <button id="save-btn" class="mx-3 btn btn-primary btn-sm text-uppercase">
+                    <div>
+                        <span id="deploy-message"></span>
+                        <button class="btn btn-reset px-2 text-danger me-1 d-none" data-bs-toggle="tooltip"
+                            data-bs-html="true" data-bs-placement="bottom" id="deploy-tooltip" data-bs-title="Nothing">
+                            <i class='bx bx-alarm-exclamation'></i>
+                        </button>
+                    </div>
+                    <button id="save-btn" class="me-3 ms-1 btn btn-primary btn-sm text-uppercase">
                         <span id="save-btn-spinner" class="spinner-border d-none spinner-border-sm me-1"></span>
                         <span>Save & Deploy</span>
                     </button>
                 </div>
             </div>
-            <div id="editor-wrapper" class="p-2 mb-auto" style="height: calc(100vh - 14.5rem)">loading...</div>
+            <div id="editor-wrapper" class="p-2 mb-auto" style="height: calc(100vh - 226px)">loading...</div>
             <div id="log-wrapper" class="border-top p-2">
                 <h6 class="y-center"><i class='bx bx-file me-1'></i>Logs</h6>
                 <p class="text-body-tertiary">Comming soon...</p>
@@ -42,8 +54,8 @@
                     <input id="preview-url" type="text" class="form-control py-1 shadow-none"
                         value="{{project.prod_domain_url}}">
                     <button data-x-url="{{project.prod_domain_url}}" id="refresh-btn"
-                        class="btn btn-outline-secondary y-center" type="button"><i
-                            class='bx bx-refresh me-2'></i>Refresh</button>
+                        class="btn btn-outline-secondary y-center px-2" type="button"><i
+                            class='bx bx-refresh me-1'></i>Refresh</button>
                 </div>
             </div>
             <div class="bg-transparent" style="height: calc(100vh - 60px)">
@@ -59,20 +71,29 @@
         const projectEditSubmitUrl = "/projects/" + projectName + "/edit";
         const projectStatusUrl = "/projects/" + projectName + "/status";
         const messageElement = document.getElementById("deploy-message");
+        const tooltipElement = document.getElementById("deploy-tooltip");
         const saveBtn = document.getElementById("save-btn");
         const saveBtnSpinner = document.getElementById("save-btn-spinner");
         const refreshBtn = document.getElementById("refresh-btn");
 
+
+
         function setFailedMessage(msg) {
-            messageElement.innerText = "Failed: " + msg;
+            let msg2 = encodeURIComponent(msg).split("%0A").join("<br>");
+            msg2 = decodeURIComponent(msg2);
+            messageElement.innerText = "Deploy Failed";
             messageElement.classList.remove("text-success");
             messageElement.classList.add("text-danger");
+            tooltipElement.setAttribute("data-bs-title", msg2);
+            tooltipElement.classList.remove("d-none");
+            new bootstrap.Tooltip(tooltipElement);
         }
 
         function setSuccessMessage(msg) {
             messageElement.innerText = msg;
             messageElement.classList.remove("text-danger");
             messageElement.classList.add("text-success");
+            tooltipElement.classList.add("d-none");
         }
 
         function startCheckStatus(obj) {
@@ -105,7 +126,7 @@
                     return;
                 }
                 if (result.status == "failed") {
-                    setFailedMessage(result.message);
+                    setFailedMessage(result.html);
                     clearInterval(window.checkProjectStatusInterval);
                     saveBtn.removeAttribute("disabled");
                     saveBtnSpinner.classList.add("d-none");
