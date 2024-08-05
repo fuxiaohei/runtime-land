@@ -45,6 +45,17 @@ function unix2hour(v) {
         }
     }
 
+    const changeLinkTheme = theme => {
+        // update highlightjs theme css style
+        const links = document.querySelectorAll("link[title]");
+        if (links.length > 0) {
+            links.forEach((link) => {
+                link.setAttribute('disabled', "disabled")
+            });
+            document.querySelector(`link[title="${theme}"]`).removeAttribute('disabled')
+        }
+    }
+
     const getStoredTheme = () => localStorage.getItem('runtime-land-theme')
     const setStoredTheme = theme => localStorage.setItem('runtime-land-theme', theme)
     const getPreferredTheme = () => {
@@ -54,6 +65,7 @@ function unix2hour(v) {
     const setTheme = theme => {
         document.documentElement.setAttribute('data-bs-theme', theme);
         changeTrafficPeriodBtn(theme);
+        changeLinkTheme(theme);
     }
     setTheme(getPreferredTheme());
 

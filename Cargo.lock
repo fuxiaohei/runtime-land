@@ -2178,7 +2178,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "clap",
@@ -2193,7 +2193,7 @@ dependencies = [
 
 [[package]]
 name = "land-common"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "clap",
@@ -2210,7 +2210,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2237,7 +2237,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2259,7 +2259,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "http",
@@ -2271,7 +2271,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "http",
@@ -2281,7 +2281,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "axum",
@@ -2309,7 +2309,7 @@ dependencies = [
 
 [[package]]
 name = "land-vars"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2321,7 +2321,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2333,7 +2333,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-host"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2355,7 +2355,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-server"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "axum",
@@ -2373,7 +2373,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 dependencies = [
  "anyhow",
  "clap",
