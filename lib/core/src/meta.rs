@@ -43,7 +43,7 @@ impl Data {
         Ok(())
     }
     pub fn target_wasm_path(&self) -> String {
-        if self.language == "js" {
+        if self.language == "js" || self.language == "javascript" {
             return format!("dist/{}.wasm", self.name);
         }
         self.build.main.clone()

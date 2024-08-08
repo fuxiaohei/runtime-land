@@ -639,9 +639,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.1.7"
+version = "1.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26a5c3fd7bfa1ce3897a3a3501d362b2d87b7f2583ebcb4a949ec25911025cbc"
+checksum = "504bdec147f2cc13c8b57ed9401fd8a147cc66b67ad5cb241394244f2c947549"
 dependencies = [
  "jobserver",
  "libc",
@@ -795,6 +795,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -1937,9 +1946,9 @@ dependencies = [
 
 [[package]]
 name = "hyper-util"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ab92f4f49ee4fb4f997c784b7a2e0fa70050211e0b6a287f898c3c9785ca956"
+checksum = "cde7055719c54e36e95e8719f95883f22072a48ede39db7fc17a4e1d5281e9b9"
 dependencies = [
  "bytes",
  "futures-channel",
@@ -2178,7 +2187,7 @@ dependencies = [
 
 [[package]]
 name = "land-cli"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "clap",
@@ -2186,6 +2195,8 @@ dependencies = [
  "inquire",
  "land-common",
  "land-core",
+ "land-wasm-gen",
+ "land-wasm-server",
  "regex",
  "tokio",
  "tracing",
@@ -2193,7 +2204,7 @@ dependencies = [
 
 [[package]]
 name = "land-common"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "clap",
@@ -2210,7 +2221,7 @@ dependencies = [
 
 [[package]]
 name = "land-core"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2237,7 +2248,7 @@ dependencies = [
 
 [[package]]
 name = "land-dao"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2259,7 +2270,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "http",
@@ -2271,7 +2282,7 @@ dependencies = [
 
 [[package]]
 name = "land-sdk-macro"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "http",
@@ -2281,7 +2292,7 @@ dependencies = [
 
 [[package]]
 name = "land-server"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "axum",
@@ -2309,7 +2320,7 @@ dependencies = [
 
 [[package]]
 name = "land-vars"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2321,7 +2332,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-gen"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "tracing",
@@ -2333,7 +2344,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-host"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2355,7 +2366,7 @@ dependencies = [
 
 [[package]]
 name = "land-wasm-server"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "axum",
@@ -2373,7 +2384,7 @@ dependencies = [
 
 [[package]]
 name = "land-worker"
-version = "0.5.0-beta.4"
+version = "0.5.0-beta.6"
 dependencies = [
  "anyhow",
  "clap",
@@ -2482,9 +2493,9 @@ dependencies = [
 
 [[package]]
 name = "lightningcss"
-version = "1.0.0-alpha.57"
+version = "1.0.0-alpha.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10bc10261f46b8df263b80e7779d1748b1880488cd951fbb9e096430cead10e6"
+checksum = "ec380ca49dc7f6a1cafbdd2de5e587958eac0f67ab26b1e56727fcc60a0c3d4d"
 dependencies = [
  "ahash 0.8.11",
  "bitflags 2.6.0",
@@ -2496,6 +2507,7 @@ dependencies = [
  "getrandom",
  "itertools 0.10.5",
  "lazy_static",
+ "lightningcss-derive",
  "parcel_selectors",
  "parcel_sourcemap",
  "paste",
@@ -2503,6 +2515,18 @@ dependencies = [
  "rayon",
  "serde",
  "smallvec",
+]
+
+[[package]]
+name = "lightningcss-derive"
+version = "1.0.0-alpha.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84c12744d1279367caed41739ef094c325d53fb0ffcd4f9b84a368796f870252"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -2880,9 +2904,9 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.36.2"
+version = "0.36.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f203fa8daa7bb185f760ae12bd8e097f63d17041dcdcaf675ac54cdf863170e"
+checksum = "27b64972346851a39438c60b341ebc01bba47464ae329e55cf343eb93964efd9"
 dependencies = [
  "crc32fast",
  "hashbrown 0.14.5",
@@ -2983,9 +3007,9 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "parcel_selectors"
-version = "0.26.5"
+version = "0.26.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce9c47a67c66fee4a5a42756f9784d92941bd0ab2b653539a9e90521a44b66f0"
+checksum = "512215cb1d3814e276ace4ec2dbc2cac16726ea3fcac20c22ae1197e16fdd72d"
 dependencies = [
  "bitflags 2.6.0",
  "cssparser",
@@ -3921,9 +3945,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-pki-types"
-version = "1.7.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "976295e77ce332211c0d24d92c0e83e50f5c5f046d11082cea19f3df13a3562d"
+checksum = "fc0a2ce646f8655401bb81e7927b812614bd5d91dbc968696be50603510fcaf0"
 
 [[package]]
 name = "rustls-webpki"
@@ -4149,18 +4173,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.204"
+version = "1.0.205"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc76f558e0cbb2a839d37354c575f1dc3fdc6546b5be373ba43d95f231bf7c12"
+checksum = "e33aedb1a7135da52b7c21791455563facbbcc43d0f0f66165b42c21b3dfb150"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.204"
+version = "1.0.205"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0cd7e117be63d3c3678776753929474f3b04a43a080c744d6b0ae2a8c28e222"
+checksum = "692d6f5ac90220161d6774db30c662202721e64aed9058d2c394f451261420c1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4767,15 +4791,15 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 
 [[package]]
 name = "tempfile"
-version = "3.11.0"
+version = "3.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8fcd239983515c23a32fb82099f97d0b11b8c72f654ed659363a95c3dad7a53"
+checksum = "04cbcdd0c794ebb0d4cf35e88edd2f7d2c4c3e9a5a6dab322839b321c6a87a64"
 dependencies = [
  "cfg-if",
  "fastrand",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]

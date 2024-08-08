@@ -11,6 +11,8 @@ color-print = "0.3.6"
 inquire = "0.7.5"
 land-common = { workspace = true }
 land-core = { workspace = true }
+land-wasm-gen = { workspace = true }
+land-wasm-server = { workspace = true }
 regex = "1.10.6"
 tokio = { workspace = true }
 tracing = { workspace = true }
